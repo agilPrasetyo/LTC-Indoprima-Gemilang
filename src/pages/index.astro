@@ -17,48 +17,51 @@ import Absensi from '../components/Absensi.astro';
        OPENING SPLASH SCREEN (Video Loading Intro)
        Muncul setelah login, sebelum masuk dashboard
        ============================================= -->
-  <div id="opening-splash" class="hidden fixed inset-0 z-[9999] bg-black items-center justify-center">
+  <div id="opening-splash" class="hidden fixed inset-0 z-[9999] bg-[#E6E6E6] items-center justify-center">
 
     <!-- VIDEO - Full screen, autoplay, no controls -->
     <video
       id="splash-video"
       src="/videos/intro.mp4"
-      class="absolute inset-0 w-full h-full object-contain sm:object-cover"
+      class="absolute inset-0 w-full h-full object-contain sm:object-cover transform -translate-y-6 sm:translate-y-0"
       autoplay
       muted
       playsinline
       preload="auto"
     ></video>
 
-    <!-- Overlay gradient bawah (lebih gelap untuk UI) -->
-    <div class="absolute inset-0 bg-gradient-to-t from-black via-transparent to-black/30 pointer-events-none"></div>
+    <!-- Overlay gradient bawah (selaras dengan warna abu-abu) -->
+    <div class="absolute inset-0 bg-gradient-to-t from-[#E6E6E6]/60 via-transparent to-transparent pointer-events-none"></div>
 
-    <!-- Logo Indoprima di pojok kiri bawah -->
-    <div class="absolute bottom-10 left-8 z-10 flex items-center gap-3 opacity-90">
-      <div class="w-10 h-10 rounded-xl bg-white/10 backdrop-blur-sm border border-white/20 flex items-center justify-center p-1.5">
-        <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'" />
+    <!-- Container Terpadu: Logo & Progress Bar di Pojok Kiri Bawah (Mencegah Tabrakan Layout) -->
+    <div class="absolute bottom-10 left-6 sm:left-8 z-10 flex flex-col gap-3.5 opacity-95 max-w-[calc(100%-120px)]">
+      <!-- Top: Logo & Title -->
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-white/50 backdrop-blur-sm border border-slate-200/80 flex items-center justify-center p-1.5 shadow-sm">
+          <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'" />
+        </div>
+        <div>
+          <p class="text-slate-800 font-extrabold text-sm leading-tight">
+            <span class="text-brand-blue">Indoprima</span>
+            <span class="text-brand-red"> Gemilang</span>
+          </p>
+          <p class="text-slate-500 text-[9px] font-bold tracking-widest uppercase">LTC Dashboard</p>
+        </div>
       </div>
-      <div>
-        <p class="text-white font-bold text-sm leading-tight">
-          <span class="text-blue-400">Indoprima</span>
-          <span class="text-red-400"> Gemilang</span>
-        </p>
-        <p class="text-white/50 text-[10px] tracking-widest uppercase">LTC Dashboard</p>
+
+      <!-- Bottom: Progress Bar + Status (Diletakkan di bawah logo) -->
+      <div class="flex flex-col gap-1.5 pl-1">
+        <div class="w-36 h-1 bg-slate-300/60 rounded-full overflow-hidden">
+          <div id="splash-progress-bar" class="h-full bg-brand-blue rounded-full" style="width: 0%; transition: width 0.1s linear;"></div>
+        </div>
+        <p class="text-slate-500 text-[8px] font-bold tracking-wider uppercase">Memuat data...</p>
       </div>
     </div>
 
-    <!-- Progress Bar + Status (tengah bawah) -->
-    <div class="absolute bottom-10 left-1/2 -translate-x-1/2 z-10 flex flex-col items-center gap-2 min-w-[180px]">
-      <div class="w-40 h-0.5 bg-white/15 rounded-full overflow-hidden">
-        <div id="splash-progress-bar" class="h-full bg-white/80 rounded-full" style="width: 0%; transition: width 0.1s linear;"></div>
-      </div>
-      <p class="text-white/40 text-[10px] tracking-widest uppercase">Memuat data...</p>
-    </div>
-
-    <!-- Tombol Lewati (pojok kanan bawah) -->
+    <!-- Tombol Lewati (Pojok Kanan Bawah) -->
     <button
       onclick="skipSplashVideo()"
-      class="absolute bottom-8 right-8 z-10 flex items-center gap-2 px-4 py-2 bg-white/10 hover:bg-white/20 backdrop-blur-sm border border-white/20 text-white/70 hover:text-white text-xs font-semibold rounded-full transition-all duration-300"
+      class="absolute bottom-10 right-6 sm:right-8 z-10 flex items-center gap-2 px-4.5 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all duration-300 cursor-pointer"
     >
       Lewati <i class="fa-solid fa-chevron-right text-[10px]"></i>
     </button>
