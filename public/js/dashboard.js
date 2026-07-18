@@ -431,7 +431,7 @@ function updateTurnoverPieChart() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '30%',
+            cutout: '40%',
             plugins: {
                 legend: {
                     display: false
