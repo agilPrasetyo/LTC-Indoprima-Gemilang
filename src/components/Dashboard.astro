@@ -94,13 +94,13 @@
             <!-- Horizontal Layout: Chart on Left, Table on Right -->
             <div class="flex flex-col sm:flex-row items-center gap-6 mt-4">
                 <!-- Left side: Area Donut Chart -->
-                <div class="relative w-full sm:w-[60%] h-64 flex items-center justify-center">
+                <div class="relative w-full sm:w-[60%] h-48 flex items-center justify-center">
                     <canvas id="dashboardTurnoverPieChart"></canvas>
                     <!-- Central Circle Redesign -->
-                    <div class="absolute w-[88px] h-[88px] rounded-full bg-white shadow-md border border-slate-50 flex flex-col items-center justify-center text-center p-1 pointer-events-none z-10">
-                        <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#F5C400] leading-none">Turnover</p>
+                    <div class="absolute w-[112px] h-[112px] rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-slate-50 flex flex-col items-center justify-center text-center p-2 pointer-events-none z-10">
+                        <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#0D9488] leading-none mb-0.5">Turnover</p>
                         <p class="text-slate-300 text-[8px] tracking-widest leading-none my-1">•••••</p>
-                        <p id="dashboard-turnover-total-center" class="text-xs font-extrabold text-brand-textMain leading-none">0 Siswa</p>
+                        <p id="dashboard-turnover-total-center" class="text-sm font-black text-slate-800 leading-none">0 Siswa</p>
                     </div>
                 </div>
 
@@ -110,19 +110,19 @@
                         <tbody>
                             <tr class="border-b border-slate-100">
                                 <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#F5C400]"></span> Resign
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#FBBF24]"></span> Resign
                                 </td>
                                 <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-resign-val">0 Siswa</td>
                             </tr>
                             <tr class="border-b border-slate-100">
                                 <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#00A651]"></span> Lulus
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span> Lulus
                                 </td>
                                 <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-lulus-val">0 Siswa</td>
                             </tr>
                             <tr>
                                 <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#D3222A]"></span> Indisipliner
+                                    <span class="w-2.5 h-2.5 rounded-full bg-[#F43F5E]"></span> Indisipliner
                                 </td>
                                 <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-indisipliner-val">0 Siswa</td>
                             </tr>

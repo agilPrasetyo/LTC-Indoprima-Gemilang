@@ -420,18 +420,18 @@ function updateTurnoverPieChart() {
             labels: ['Resign', 'Lulus', 'Indisipliner'],
             datasets: [{
                 data: [resignCount, lulusCount, indisiplinerCount],
-                backgroundColor: ['#F5C400', '#00A651', '#D3222A'],
+                backgroundColor: ['#FBBF24', '#10B981', '#F43F5E'],
                 borderWidth: 2,
                 borderColor: '#FFFFFF',
-                spacing: 5, // Gap between slices
-                offset: [15, 0, 0], // Explode first slice (Resign)
-                hoverOffset: 18
+                spacing: 6, // Elegant gap between slices
+                offset: [8, 0, 0], // Subtle explode on Resign
+                hoverOffset: 15
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '40%',
+            cutout: '60%',
             plugins: {
                 legend: {
                     display: false
@@ -447,15 +447,15 @@ function updateTurnoverPieChart() {
                     display: true,
                     color: '#FFFFFF',
                     font: {
-                        family: 'Inter',
-                        size: 12,
+                        family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
+                        size: 13,
                         weight: 'bold'
                     },
                     formatter: function(value, context) {
                         const total = context.dataset.data.reduce((a, b) => a + b, 0);
                         const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                        if (percentage === 0) return ''; // don't show label for 0%
-                        return `DATA\n${percentage}%`;
+                        if (percentage === 0) return '';
+                        return `${percentage}%`;
                     },
                     textAlign: 'center'
                 }
