@@ -678,6 +678,20 @@
         } catch (e) {
             console.error("Failed to save session:", e);
         }
+
+        // Redirect to role-specific URL if on root page (no FORCED_ROLE)
+        if (!window.FORCED_ROLE) {
+            const roleRouteMap = {
+                'Admin': '/admin',
+                'Visitor': '/visitor',
+                'Siswa': '/siswa'
+            };
+            const targetRoute = roleRouteMap[user.role];
+            if (targetRoute) {
+                window.location.href = targetRoute;
+                return;
+            }
+        }
         document.getElementById('login-screen').classList.add('hidden');
 
         const _proceedToDashboard = () => {
