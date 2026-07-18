@@ -409,6 +409,11 @@ function updateTurnoverPieChart() {
     const indisValEl = document.getElementById('stat-turnover-indisipliner-val');
     if (indisValEl) indisValEl.innerText = indisiplinerCount + ' Siswa';
 
+    // Set total in the central circle overlay
+    const totalTurnover = resignCount + lulusCount + indisiplinerCount;
+    const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
+    if (totalCenterEl) totalCenterEl.innerText = totalTurnover + ' Siswa';
+
     turnoverPieChartInstance = new Chart(chartCtx, {
         type: 'doughnut',
         data: {
@@ -417,7 +422,10 @@ function updateTurnoverPieChart() {
                 data: [resignCount, lulusCount, indisiplinerCount],
                 backgroundColor: ['#F5C400', '#00A651', '#D3222A'],
                 borderWidth: 2,
-                borderColor: '#FFFFFF'
+                borderColor: '#FFFFFF',
+                spacing: 5, // Gap between slices
+                offset: [12, 0, 0], // Explode first slice (Resign)
+                hoverOffset: 18
             }]
         },
         options: {
@@ -434,6 +442,22 @@ function updateTurnoverPieChart() {
                     borderRadius: 8,
                     titleFont: { size: 11, family: 'Inter', weight: 'bold' },
                     bodyFont: { size: 11, family: 'Inter' }
+                },
+                datalabels: {
+                    display: true,
+                    color: '#FFFFFF',
+                    font: {
+                        family: 'Inter',
+                        size: 10,
+                        weight: 'bold'
+                    },
+                    formatter: function(value, context) {
+                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
+                        if (percentage === 0) return ''; // don't show label for 0%
+                        return `DATA\n${percentage}%`;
+                    },
+                    textAlign: 'center'
                 }
             }
         }
