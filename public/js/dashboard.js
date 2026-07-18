@@ -424,14 +424,14 @@ function updateTurnoverPieChart() {
                 borderWidth: 2,
                 borderColor: '#FFFFFF',
                 spacing: 5, // Gap between slices
-                offset: [12, 0, 0], // Explode first slice (Resign)
+                offset: [15, 0, 0], // Explode first slice (Resign)
                 hoverOffset: 18
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '70%',
+            cutout: '50%',
             plugins: {
                 legend: {
                     display: false
@@ -448,7 +448,7 @@ function updateTurnoverPieChart() {
                     color: '#FFFFFF',
                     font: {
                         family: 'Inter',
-                        size: 11,
+                        size: 12,
                         weight: 'bold'
                     },
                     formatter: function(value, context) {
