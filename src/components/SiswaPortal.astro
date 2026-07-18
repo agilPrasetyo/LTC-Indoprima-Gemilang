@@ -1,0 +1,499 @@
+<div class="space-y-6 animate-fadeIn">
+    
+    <!-- SUB-VIEW 1: FORMULIR INPUT KINERJA HARIAN (Split Screen Layout) -->
+    <div id="siswa-portal-form-view" class="bg-white rounded-[28px] border border-slate-100 shadow-xl overflow-hidden max-w-6xl mx-auto grid grid-cols-1 md:grid-cols-12 min-h-[600px]">
+        <!-- Panel Kiri: Progress & Brand -->
+        <div class="md:col-span-4 bg-slate-50 border-r border-slate-100 p-8 flex flex-col justify-between">
+            <div class="space-y-8">
+                <!-- Brand Logo & Name -->
+                <div class="flex items-center gap-3">
+                    <div class="w-12 h-12 rounded-xl bg-white flex items-center justify-center shadow-md p-1 border border-brand-border/50">
+                        <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Indoprima Gemilang Logo" onerror="this.src='https://placehold.co/100x100?text=Indoprima'" />
+                    </div>
+                    <div>
+                        <h1 class="font-display font-extrabold text-sm tracking-tight leading-none text-slate-800">
+                            <span class="text-blue-600">Indoprima</span><br />
+                            <span class="text-rose-600">Gemilang</span>
+                        </h1>
+                        <span class="text-[10px] font-bold tracking-widest text-slate-400 uppercase">LTC</span>
+                    </div>
+                </div>
+
+                <!-- Form Header Text -->
+                <div>
+                    <h3 class="font-display font-bold text-xl text-slate-800 leading-tight">Laporan Harian</h3>
+                    <p class="text-xs text-slate-400 mt-1">Isi laporan kinerja harian Anda di bawah ini secara lengkap.</p>
+                </div>
+
+                <!-- Step Indicator List (DNB Reference) -->
+                <div class="space-y-5 relative pl-4 border-l border-slate-200">
+                    <!-- Step 1 -->
+                    <div id="step-indicator-1" class="step-indicator flex items-start gap-3 relative">
+                        <div class="step-dot w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold ring-4 ring-blue-50 transition-all duration-300">1</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800 transition-all duration-300">Identitas Siswa</p>
+                            <span class="text-[10px] text-slate-400">Verifikasi Noreg</span>
+                        </div>
+                    </div>
+                    <!-- Step 2 -->
+                    <div id="step-indicator-2" class="step-indicator flex items-start gap-3 relative">
+                        <div class="step-dot w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">2</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 transition-all duration-300">Detail Operasional</p>
+                            <span class="text-[10px] text-slate-400">Shift, Bagian, Mesin</span>
+                        </div>
+                    </div>
+                    <!-- Step 3 -->
+                    <div id="step-indicator-3" class="step-indicator flex items-start gap-3 relative">
+                        <div class="step-dot w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300">3</div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-400 transition-all duration-300">Hasil & Validasi</p>
+                            <span class="text-[10px] text-slate-400">Target, Hasil, SPV</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <!-- Keluar Sesi button -->
+                <button onclick="logout()" class="w-full flex items-center justify-center gap-2 py-2.5 bg-white border border-slate-200 hover:bg-rose-500/10 hover:text-rose-600 hover:border-rose-200 rounded-xl text-xs font-semibold text-slate-600 transition-all duration-300 shadow-sm">
+                    <i class="fa-solid fa-right-from-bracket text-xs"></i> Keluar Sesi
+                </button>
+                
+                <!-- Footer info -->
+                <div class="text-[10px] text-slate-400 leading-relaxed bg-blue-50/50 border border-blue-100 p-3 rounded-xl">
+                    <i class="fa-solid fa-shield-halved text-blue-600 mr-1"></i> Data disimpan langsung ke database pusat Supabase.
+                </div>
+            </div>
+        </div>
+
+        <!-- Panel Kanan: Form Area -->
+        <div class="md:col-span-8 p-8 flex flex-col justify-between relative">
+            <!-- Realtime Clock in Form -->
+            <div id="siswa-realtime-clock-form" class="text-xs font-bold text-slate-600 bg-slate-50 border border-slate-200/60 rounded-full px-4 py-2 absolute top-6 right-8 flex items-center gap-2 shadow-sm">
+                <i class="fa-regular fa-clock text-blue-600 text-sm animate-pulse"></i> Memuat waktu...
+            </div>
+
+            <form id="form-siswa-daily" onsubmit="event.preventDefault();" class="h-full flex flex-col justify-between gap-6 pt-6">
+                
+                <!-- STEP 1 CONTAINER -->
+                <div id="step-container-1" class="step-container space-y-6">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Identitas Siswa</h4>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nama Lengkap</label>
+                            <input type="text" id="input-siswa-nama" readonly disabled
+                                class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Registrasi</label>
+                            <input type="text" id="input-siswa-noreg" readonly disabled
+                                class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 outline-none">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Kelas</label>
+                            <input type="text" id="input-siswa-kelas" readonly disabled
+                                class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Tanggal Masuk LTC</label>
+                            <input type="text" id="input-siswa-masuk" readonly disabled
+                                class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 outline-none">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Tanggal Berakhir LTC</label>
+                            <input type="text" id="input-siswa-keluar" readonly disabled
+                                class="w-full px-4 py-3 bg-slate-100 border border-slate-200 rounded-xl text-xs font-semibold text-slate-600 outline-none">
+                        </div>
+                    </div>
+
+                    <!-- Konfirmasi Kehadiran Sebelum Laporan -->
+                    <div class="space-y-4 pt-4 border-t border-slate-100">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-800">Status Kehadiran Hari Ini</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all duration-200" id="label-kehadiran-hadir">
+                                <input type="radio" name="siswa-kehadiran" value="Hadir" checked onchange="toggleKehadiranSiswa('Hadir')" class="w-4 h-4 text-blue-600">
+                                <span class="text-xs font-bold text-slate-700">Hadir</span>
+                            </label>
+                            <label class="flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all duration-200" id="label-kehadiran-ijin">
+                                <input type="radio" name="siswa-kehadiran" value="Ijin" onchange="toggleKehadiranSiswa('Ijin')" class="w-4 h-4 text-blue-600">
+                                <span class="text-xs font-bold text-slate-700">Ijin</span>
+                            </label>
+                            <label class="flex items-center justify-center gap-2 px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-slate-100 transition-all duration-200" id="label-kehadiran-sakit">
+                                <input type="radio" name="siswa-kehadiran" value="Sakit" onchange="toggleKehadiranSiswa('Sakit')" class="w-4 h-4 text-blue-600">
+                                <span class="text-xs font-bold text-slate-700">Sakit</span>
+                            </label>
+                        </div>
+                        
+                        <div id="siswa-ket-absen-container" class="hidden space-y-4">
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-800">Apakah Anda sudah menghubungi Supervisor (SPV)?</label>
+                                <div class="flex gap-4">
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="siswa-hubungi-spv" value="Ya" onchange="toggleHubungiSpvSiswa('Ya')" class="w-4 h-4 text-blue-600">
+                                        <span class="text-xs font-semibold text-slate-700">Ya, sudah</span>
+                                    </label>
+                                    <label class="flex items-center gap-2 cursor-pointer">
+                                        <input type="radio" name="siswa-hubungi-spv" value="Tidak" checked onchange="toggleHubungiSpvSiswa('Tidak')" class="w-4 h-4 text-blue-600">
+                                        <span class="text-xs font-semibold text-slate-700">Belum</span>
+                                    </label>
+                                </div>
+                            </div>
+
+                            <div id="siswa-spv-absen-container" class="hidden space-y-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Supervisor (SPV) yang dihubungi</label>
+                                <select id="input-siswa-spv-absen" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                    <option value="" disabled selected>Pilih Supervisor</option>
+                                    <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
+                                    <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
+                                    <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
+                                    <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
+                                    <option value="NANDA TITO PRASETYO">NANDA TITO PRASETYO</option>
+                                    <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
+                                    <option value="MUHTADIN">MUHTADIN</option>
+                                    <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
+                                    <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
+                                    <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
+                                    <option value="AINUN UMAMI">AINUN UMAMI</option>
+                                    <option value="BIMA AGUNG SETIAWAN">BIMA AGUNG SETIAWAN</option>
+                                    <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
+                                    <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
+                                    <option value="YULINDARIKA NUR ANGGAINI">YULINDARIKA NUR ANGGAINI</option>
+                                    <option value="MOHAMMAT YASIR MA'ARIF">MOHAMMAT YASIR MA'ARIF</option>
+                                    <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
+                                    <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
+                                    <option value="AHMAD RIZAL">AHMAD RIZAL</option>
+                                </select>
+                            </div>
+
+                            <div class="space-y-2">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400">Keterangan / Alasan Absen</label>
+                                <textarea id="input-siswa-keterangan-absen" placeholder="Tuliskan alasan ijin / sakit secara jelas..." rows="2"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 2 CONTAINER -->
+                <div id="step-container-2" class="step-container space-y-6 hidden">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Detail Operasional</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Hari / Tanggal</label>
+                                <input type="date" id="input-siswa-tanggal" required
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Shift</label>
+                                <select id="input-siswa-shift" required
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                    <option value="" disabled selected>Pilih Shift</option>
+                                    <option value="Shift 1">Shift 1</option>
+                                    <option value="Shift 2">Shift 2</option>
+                                    <option value="Shift 3">Shift 3</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Bagian</label>
+                            <select id="input-siswa-bagian" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <option value="" disabled selected>Pilih Bagian</option>
+                                <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                                <option value="GRINDING">GRINDING</option>
+                                <option value="PAINTING">PAINTING</option>
+                                <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                                <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                                <option value="LADLE">LADLE</option>
+                                <option value="GALAH IBK">GALAH IBK</option>
+                                <option value="QC LAB PASIR">QC LAB PASIR</option>
+                                <option value="PATTERN">PATTERN</option>
+                                <option value="ADM PPIC">ADM PPIC</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                                <option value="FETTLING">FETTLING</option>
+                                <option value="PPIC">PPIC</option>
+                                <option value="CNC / MACHINING">CNC / MACHINING</option>
+                                <option value="CORE">CORE</option>
+                                <option value="SHOTBLAST">SHOTBLAST</option>
+                                <option value="QC POURING">QC POURING</option>
+                                <option value="MELTING">MELTING</option>
+                                <option value="FURAN">FURAN</option>
+                            </select>
+                        </div>
+
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Mesin</label>
+                                <input type="text" id="input-siswa-mesin" placeholder="Contoh: CNC-01"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Model</label>
+                                <input type="text" id="input-siswa-model" placeholder="Contoh: M-230"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- STEP 3 CONTAINER -->
+                <div id="step-container-3" class="step-container space-y-6 hidden">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Hasil & Validasi</h4>
+                    <div class="space-y-4">
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Target</label>
+                                <input type="number" id="input-siswa-target" placeholder="0" required min="1" step="1"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Hasil</label>
+                                <input type="number" id="input-siswa-hasil" placeholder="0" required min="0" step="1"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Reject</label>
+                                <input type="number" id="input-siswa-reject" placeholder="0" min="0" step="1" value="0"
+                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Supervisor (SPV)</label>
+                            <select id="input-siswa-spv" required
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <option value="" disabled selected>Pilih Supervisor</option>
+                                <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
+                                <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
+                                <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
+                                <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
+                                <option value="NANDA TITO PRASETYO">NANDA TITO PRASETYO</option>
+                                <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
+                                <option value="MUHTADIN">MUHTADIN</option>
+                                <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
+                                <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
+                                <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
+                                <option value="AINUN UMAMI">AINUN UMAMI</option>
+                                <option value="BIMA AGUNG SETIAWAN">BIMA AGUNG SETIAWAN</option>
+                                <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
+                                <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
+                                <option value="YULINDARIKA NUR ANGGAINI">YULINDARIKA NUR ANGGAINI</option>
+                                <option value="MOHAMMAT YASIR MA'ARIF">MOHAMMAT YASIR MA'ARIF</option>
+                                <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
+                                <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
+                                <option value="AHMAD RIZAL">AHMAD RIZAL</option>
+                            </select>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Keterangan / Kendala</label>
+                            <textarea id="input-siswa-keterangan" placeholder="Tuliskan kendala operasional lapangan jika target tidak tercapai..." rows="3"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"></textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- NAV BUTTONS -->
+                <div class="flex items-center justify-between border-t border-slate-100 pt-6 mt-6">
+                    <button type="button" id="btn-siswa-prev" onclick="prevStepSiswa()"
+                        class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs transition-all flex items-center gap-2 invisible">
+                        <i class="fa-solid fa-arrow-left"></i> Kembali
+                    </button>
+                    <button type="button" id="btn-siswa-next" onclick="nextStepSiswa()"
+                        class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-blue-500/10">
+                        Lanjut <i class="fa-solid fa-arrow-right"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- SUB-VIEW 2: DASHBOARD UTAMA SISWA (Kinerja & Absensi) -->
+    <div id="siswa-portal-dashboard-view" class="hidden space-y-6">
+        <!-- Dashboard Top Header Bar -->
+        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div>
+                <h3 class="font-display font-extrabold text-lg text-slate-800">Dashboard Siswa Magang</h3>
+                <p class="text-xs text-slate-400">Ringkasan performa dan log absensi personal Anda.</p>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="backToSiswaForm()" 
+                    class="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 shadow-md transition-all">
+                    <i class="fa-solid fa-pen-to-square"></i> Input Laporan Baru
+                </button>
+                <button onclick="logout()" 
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-xl text-xs flex items-center gap-2 transition-all">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
+                </button>
+            </div>
+        </div>
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Profil Card (Kiri) -->
+            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-6 h-fit">
+                <div class="text-center pb-4 border-b border-slate-100">
+                    <div class="w-20 h-20 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center mx-auto mb-3 shadow-inner text-blue-600">
+                        <i class="fa-solid fa-user-graduate text-3xl"></i>
+                    </div>
+                    <h3 class="font-display font-bold text-lg text-slate-800" id="siswa-portal-dashboard-nama">-</h3>
+                    <p class="text-xs text-slate-400 font-bold tracking-wider uppercase mt-1" id="siswa-portal-dashboard-noreg">-</p>
+                    <span class="inline-flex items-center gap-1 mt-3 px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-full text-[10px] font-bold border border-emerald-100">
+                        <i class="fa-solid fa-circle-check"></i> Peserta Magang Aktif
+                    </span>
+                </div>
+
+                <div class="space-y-4">
+                    <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Skor Rata-rata Kinerja</h4>
+                    <div class="flex items-center gap-4 bg-slate-50 p-4 rounded-2xl border border-slate-100">
+                        <div class="w-14 h-14 rounded-full bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 font-bold text-xl font-display"
+                            id="siswa-portal-nilai">
+                            0%
+                        </div>
+                        <div>
+                            <p class="text-xs font-bold text-slate-800">Indeks Kinerja</p>
+                            <p class="text-[10px] text-slate-400">Pencapaian target harian.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabel Data Riwayat (Kanan - 2 Cols) -->
+            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm lg:col-span-2 space-y-4">
+                <!-- Tabs internal dashboard siswa -->
+                <div class="flex border-b border-slate-100 gap-4">
+                    <button onclick="switchSiswaTab('kinerja')" id="siswa-tab-btn-kinerja" 
+                        class="siswa-tab-btn pb-3 text-xs font-bold border-b-2 border-blue-600 text-blue-600 transition-all duration-200">
+                        Riwayat Kinerja Harian
+                    </button>
+                    <button onclick="switchSiswaTab('absensi')" id="siswa-tab-btn-absensi" 
+                        class="siswa-tab-btn pb-3 text-xs font-semibold border-b-2 border-transparent text-slate-400 hover:text-slate-600 transition-all duration-200">
+                        Riwayat Kehadiran (Absensi)
+                    </button>
+                </div>
+
+                <!-- Tab 1: Kinerja Table -->
+                <div id="siswa-tab-content-kinerja" class="siswa-tab-content space-y-3">
+                    <div class="overflow-x-auto max-h-[350px]" style="overflow-y: auto;">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="text-slate-400 uppercase border-b border-slate-100 sticky top-0 bg-white font-bold text-[10px] tracking-wider">
+                                    <th class="py-3 px-4">Tanggal / Shift</th>
+                                    <th class="py-3 px-4">Bagian</th>
+                                    <th class="py-3 px-4">Mesin / Model</th>
+                                    <th class="py-3 px-4">Target | Hasil</th>
+                                    <th class="py-3 px-4 text-center">Persen</th>
+                                    <th class="py-3 px-4">SPV</th>
+                                    <th class="py-3 px-4">Kendala</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siswa-portal-daily-tbody" class="divide-y divide-slate-50">
+                                <tr>
+                                    <td colspan="7" class="py-8 text-center text-slate-400 italic">Membaca log data pribadi...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Tab 2: Absensi Table -->
+                <div id="siswa-tab-content-absensi" class="siswa-tab-content space-y-3 hidden">
+                    <div class="overflow-x-auto max-h-[350px]" style="overflow-y: auto;">
+                        <table class="w-full text-left text-xs border-collapse">
+                            <thead>
+                                <tr class="text-slate-400 uppercase border-b border-slate-100 sticky top-0 bg-white font-bold text-[10px] tracking-wider">
+                                    <th class="py-3 px-4">Tanggal</th>
+                                    <th class="py-3 px-4">Status Kehadiran</th>
+                                    <th class="py-3 px-4">Keterangan / Alasan</th>
+                                </tr>
+                            </thead>
+                            <tbody id="siswa-portal-absensi-tbody" class="divide-y divide-slate-50">
+                                <tr>
+                                    <td colspan="3" class="py-8 text-center text-slate-400 italic">Membaca log absensi...</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <!-- SUB-VIEW 3: SUCCESS FORM SCREEN -->
+    <div id="siswa-portal-success-view" class="hidden max-w-2xl mx-auto animate-fadeIn">
+        <!-- Kartu Terima Kasih -->
+        <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl overflow-hidden">
+            <!-- Top gradient banner -->
+            <div class="h-3 w-full bg-gradient-to-r from-blue-600 via-blue-500 to-sky-400"></div>
+            
+            <div class="p-8 space-y-8">
+                <!-- Logo + Nama Perusahaan -->
+                <div class="flex flex-col items-center gap-3">
+                    <div class="w-20 h-20 rounded-2xl shadow-md overflow-hidden border border-slate-100 bg-white flex items-center justify-center p-2">
+                        <img src="/images/logo_indoprima.png" 
+                             class="w-full h-full object-contain" 
+                             alt="Indoprima Gemilang Logo" 
+                             onerror="this.src='https://placehold.co/100x100?text=IPG'" />
+                    </div>
+                    <div class="text-center">
+                        <p class="text-[10px] font-bold uppercase tracking-[0.2em] text-slate-400">PT.</p>
+                        <p class="text-lg font-black leading-tight">
+                            <span class="text-blue-600">Indoprima</span>
+                            <span class="text-red-500"> Gemilang</span>
+                        </p>
+                        <p class="text-[10px] text-slate-400 tracking-widest uppercase">Learning Training Center</p>
+                    </div>
+                </div>
+
+                <!-- Divider -->
+                <div class="flex items-center gap-4">
+                    <div class="flex-1 h-px bg-gradient-to-r from-transparent to-slate-200"></div>
+                    <div class="w-8 h-8 bg-emerald-50 border border-emerald-100 rounded-full flex items-center justify-center text-emerald-500">
+                        <i class="fa-solid fa-circle-check text-sm"></i>
+                    </div>
+                    <div class="flex-1 h-px bg-gradient-to-l from-transparent to-slate-200"></div>
+                </div>
+
+                <!-- Ucapan Terima Kasih -->
+                <div class="space-y-5 text-center px-2">
+                    <h3 class="text-2xl font-black text-slate-800 leading-tight">
+                        Terima kasih atas<br />
+                        <span class="text-blue-600">dedikasi Anda.</span>
+                    </h3>
+                    <div class="space-y-4 text-slate-600 text-sm leading-relaxed">
+                        <p>
+                            Setiap langkah yang Anda lakukan hari ini adalah <strong class="text-slate-800">investasi untuk masa depan yang lebih baik.</strong>
+                        </p>
+                        <p class="p-4 bg-blue-50 rounded-2xl border border-blue-100 text-blue-800 text-xs font-medium leading-relaxed italic">
+                            "Bekerjalah dengan disiplin, bertanggung jawab, dan jangan pernah mengabaikan keselamatan. Karena masa depan yang cerah dimulai dengan <strong>pulang ke rumah dengan selamat</strong> setiap hari."
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Info laporan terkirim -->
+                <div class="bg-emerald-50 border border-emerald-100 rounded-2xl px-5 py-4 flex items-center gap-4">
+                    <div class="w-10 h-10 bg-emerald-100 rounded-xl flex items-center justify-center text-emerald-600 shrink-0">
+                        <i class="fa-solid fa-paper-plane text-sm"></i>
+                    </div>
+                    <div>
+                        <p class="text-xs font-bold text-emerald-800">Laporan Berhasil Dikirim</p>
+                        <p class="text-[11px] text-emerald-600">Data Anda telah tercatat dan disinkronkan ke sistem pusat LTC.</p>
+                    </div>
+                </div>
+
+                <!-- Tombol Keluar -->
+                <button onclick="logout()" class="w-full py-3.5 bg-slate-800 hover:bg-slate-700 text-white font-bold rounded-2xl text-sm flex items-center justify-center gap-2 transition-all shadow-lg shadow-slate-200">
+                    <i class="fa-solid fa-right-from-bracket"></i> Keluar Sesi
+                </button>
+            </div>
+
+            <!-- Bottom gradient accent -->
+            <div class="h-1 w-full bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400"></div>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,209 @@
+<!-- ============================================= -->
+<!-- HALAMAN ABSENSI SISWA LTC (KALENDER BULANAN) -->
+<!-- ============================================= -->
+
+<!-- Header Filter & Export -->
+<div class="bg-white rounded-[20px] border border-slate-100 shadow-sm p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+    <div>
+        <h3 class="font-display font-bold text-lg text-brand-textMain">Rekap Absensi Bulanan <span class="text-xs text-slate-400 font-mono ml-2 font-normal" id="absensi-version-label"></span></h3>
+        <p class="text-xs text-slate-400 mt-0.5">Data kehadiran siswa per bulan</p>
+    </div>
+    <div class="flex flex-wrap items-center gap-3">
+        <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-brand-textSub">BULAN</label>
+            <select id="abs-filter-month" onchange="renderAbsensiView()" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50">
+                <option value="0">Januari</option>
+                <option value="1">Februari</option>
+                <option value="2">Maret</option>
+                <option value="3">April</option>
+                <option value="4">Mei</option>
+                <option value="5">Juni</option>
+                <option value="6" selected>Juli</option>
+                <option value="7">Agustus</option>
+                <option value="8">September</option>
+                <option value="9">Oktober</option>
+                <option value="10">November</option>
+                <option value="11">Desember</option>
+            </select>
+        </div>
+        <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-brand-textSub">TAHUN</label>
+            <input type="number" id="abs-filter-year" value="2026" min="2024" max="2030" onchange="renderAbsensiView()" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50 w-20">
+        </div>
+        <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-brand-textSub">CARI NAMA</label>
+            <input type="text" id="abs-filter-name" oninput="renderAbsensiView()" placeholder="Cari nama..." class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50 w-36">
+        </div>
+        <div class="flex items-center gap-2">
+            <label class="text-xs font-bold text-brand-textSub">KELAS</label>
+            <select id="abs-filter-class" onchange="renderAbsensiView()" class="px-3 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50">
+                <option value="all">Semua</option>
+                <option value="Kelas 1">Kelas 1</option>
+                <option value="Kelas 2">Kelas 2</option>
+                <option value="Kelas 3">Kelas 3</option>
+                <option value="Kelas 4">Kelas 4</option>
+                <option value="Kelas 5">Kelas 5</option>
+            </select>
+        </div>
+        <div class="flex items-center gap-2 border-slate-200 md:border-l md:pl-3">
+            <label class="text-xs font-bold text-brand-textSub">HK</label>
+            <input type="number" id="abs-filter-hk" value="22" min="1" max="31" class="px-2 py-1.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50 w-12 text-center" title="Hari Kerja bulan ini">
+            <button id="abs-save-hk-btn" onclick="saveHariKerja()" class="px-3 py-1.5 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer" title="Simpan Hari Kerja">
+                <i class="fa-solid fa-floppy-disk"></i> Simpan
+            </button>
+        </div>
+        <button onclick="exportAbsensiExcel()" class="px-4 py-2 bg-emerald-600 text-white rounded-xl text-xs font-bold hover:bg-emerald-700 transition-all shadow-sm flex items-center gap-1.5 cursor-pointer">
+            <i class="fa-solid fa-file-excel"></i> Export Excel
+        </button>
+    </div>
+</div>
+
+<!-- Kartu Statistik Kehadiran -->
+<div class="grid grid-cols-2 lg:grid-cols-4 gap-4" id="absensi-stat-cards">
+    <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-emerald-50 flex items-center justify-center">
+                <i class="fa-solid fa-user-check text-emerald-600"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 px-2 py-0.5 rounded-full bg-emerald-50">Hadir</span>
+        </div>
+        <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-display font-bold text-brand-textMain" id="abs-stat-hadir">0</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">Total kehadiran</p>
+    </div>
+    <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-amber-50 flex items-center justify-center">
+                <i class="fa-solid fa-file-signature text-amber-600"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 px-2 py-0.5 rounded-full bg-amber-50">Ijin</span>
+        </div>
+        <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-display font-bold text-brand-textMain" id="abs-stat-ijin">0</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">Total ijin</p>
+    </div>
+    <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-rose-50 flex items-center justify-center">
+                <i class="fa-solid fa-user-minus text-rose-600"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 px-2 py-0.5 rounded-full bg-rose-50">Alpha</span>
+        </div>
+        <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-display font-bold text-brand-textMain" id="abs-stat-alpha">0</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">Total alpha</p>
+    </div>
+    <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm">
+        <div class="flex items-center justify-between mb-3">
+            <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center">
+                <i class="fa-solid fa-kit-medical text-blue-600"></i>
+            </div>
+            <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 px-2 py-0.5 rounded-full bg-blue-50">Sakit</span>
+        </div>
+        <div class="flex items-baseline gap-1">
+            <span class="text-3xl font-display font-bold text-brand-textMain" id="abs-stat-sakit">0</span>
+        </div>
+        <p class="text-[10px] text-slate-400 mt-1">Total sakit</p>
+    </div>
+</div>
+
+<!-- Keterangan Status -->
+<div class="bg-white rounded-[20px] border border-slate-100 shadow-sm px-5 py-3 flex flex-wrap items-center gap-4">
+    <span class="text-xs font-bold text-slate-500">Keterangan:</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-emerald-500 text-white text-center leading-5 text-[10px] font-bold">H</span> Hadir</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-amber-400 text-white text-center leading-5 text-[10px] font-bold">I</span> Ijin</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-rose-500 text-white text-center leading-5 text-[10px] font-bold">A</span> Alpha</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-blue-500 text-white text-center leading-5 text-[10px] font-bold">S</span> Sakit</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-slate-100 text-slate-400 text-center leading-5 text-[10px] font-bold">-</span> Tidak ada data</span>
+    <span class="flex items-center gap-1.5 text-xs font-semibold"><span class="inline-block w-5 h-5 rounded-md bg-slate-700 text-white text-center leading-5 text-[10px] font-bold">X</span> Hari Minggu</span>
+</div>
+
+<!-- Tabel Kalender Absensi Bulanan -->
+<div class="bg-white rounded-[20px] border border-slate-100 shadow-sm p-4">
+    <div class="overflow-x-auto overflow-y-auto max-h-[600px] rounded-xl border border-slate-100" id="abs-calendar-wrapper">
+        <table class="text-left border-separate border-spacing-0 w-full" id="abs-calendar-table">
+            <thead id="abs-calendar-thead">
+                <tr class="text-[10px] font-bold uppercase text-slate-400 tracking-wider" id="abs-calendar-thead-tr">
+                    <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-0" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px;">No</th>
+                    <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[40px]" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px;">Noreg</th>
+                    <th class="px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[120px]" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px;">Nama Siswa</th>
+                    <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[320px]" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px;">Kelas</th>
+                    <th class="px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-slate-200 bg-emerald-100 z-30 sticky top-0 left-[410px]" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Hadir">H</th>
+                    <th class="px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-slate-200 bg-amber-100 z-30 sticky top-0 left-[450px]" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Ijin">I</th>
+                    <th class="px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-slate-200 bg-blue-100 z-30 sticky top-0 left-[490px]" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Sakit">S</th>
+                    <th class="px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-slate-200 bg-rose-100 z-30 sticky top-0 left-[530px]" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Alpha">A</th>
+                    <th class="px-1 py-3 text-center text-indigo-800 font-bold border-r border-b border-slate-200 bg-indigo-100 z-30 sticky top-0 left-[570px]" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px;" title="Persentase Kehadiran">%</th>
+                </tr>
+            </thead>
+            <tbody id="abs-calendar-tbody" class="text-sm">
+                <tr><td colspan="35" class="px-3 py-8 text-center text-slate-400 text-xs">Memuat data absensi...</td></tr>
+            </tbody>
+        </table>
+    </div>
+    <div class="flex items-center justify-between mt-4">
+        <p class="text-xs text-slate-400" id="abs-calendar-count">0 siswa</p>
+        <p class="text-xs text-slate-400" id="abs-calendar-pct">Kehadiran: -</p>
+    </div>
+</div>
+
+<!-- MODAL EDIT ABSENSI INDIVIDU -->
+<div id="absensi-edit-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeAbsensiEditModal()">
+    <div class="bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl rounded-[28px] w-full max-w-md overflow-hidden">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-100 flex items-start justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-brand-blue">
+                    <i class="fa-solid fa-clipboard-user text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-base text-brand-textMain">Update Absensi Siswa</h3>
+                    <p class="text-xs text-slate-400 font-semibold" id="abs-modal-date-display">-</p>
+                </div>
+            </div>
+            <button onclick="closeAbsensiEditModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nama Siswa</label>
+                <p class="text-sm font-semibold text-brand-textMain" id="abs-modal-nama-display">-</p>
+                <p class="text-xs text-slate-400 font-mono" id="abs-modal-noreg-display">-</p>
+            </div>
+            
+            <div>
+                <label for="abs-modal-status-select" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Status Kehadiran</label>
+                <select id="abs-modal-status-select" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:border-brand-blue bg-white">
+                    <option value="">- (Tidak ada data / Kosong)</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Ijin">Ijin</option>
+                    <option value="Alpha">Alpha</option>
+                    <option value="Sakit">Sakit</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="abs-modal-ket-input" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Keterangan / Alasan</label>
+                <input type="text" id="abs-modal-ket-input" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue bg-white" placeholder="Alasan ijin/sakit/keterangan lain...">
+            </div>
+
+            <!-- Warning/Info auto-generated -->
+            <div id="abs-modal-auto-info" class="hidden p-3 bg-slate-50 border border-slate-100 rounded-xl text-[11px] text-slate-500 leading-relaxed">
+                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Kehadiran saat ini diisi otomatis berdasarkan daily report performa. Mengubah status di sini akan merekam data absensi manual yang memprioritaskan pilihan Anda.
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button onclick="closeAbsensiEditModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-all">
+                    Batal
+                </button>
+                <button onclick="saveAbsensiModalChanges()" class="px-5 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-md flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> Simpan Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>

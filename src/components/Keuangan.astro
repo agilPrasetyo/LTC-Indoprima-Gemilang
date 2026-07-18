@@ -1,0 +1,132 @@
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6 animate-fadeIn">
+    <!-- Form Input Kas -->
+    <div id="finance-form-container" class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm h-fit">
+        <h3 class="font-display font-bold text-lg text-brand-textMain mb-4">Input Arus Kas</h3>
+        <div class="space-y-4" id="form-transaksi">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Tipe Aliran
+                    Dana</label>
+                <select id="trans-tipe"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
+                    <option value="Pemasukan">Pemasukan (Income)</option>
+                    <option value="Pengeluaran">Pengeluaran (Expense)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kategori</label>
+                <input type="text" id="trans-kat" placeholder="SPP, Honor Instruktur, dll"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Jumlah
+                    (Rp)</label>
+                <input type="number" id="trans-jumlah"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Tanggal Transaksi</label>
+                <input type="date" id="trans-tanggal"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
+            </div>
+            <div>
+                <label
+                    class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Keterangan</label>
+                <textarea id="trans-ket" rows="3"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300"></textarea>
+            </div>
+            <button onclick="saveTransaksi()"
+                class="w-full py-3 bg-brand-blue text-white font-semibold rounded-xl hover:bg-blue-700 transition-all-300 shadow-md">
+                Catat Transaksi
+            </button>
+        </div>
+    </div>
+
+    <!-- Tabel Database Ledger -->
+    <div id="finance-table-container" class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm lg:col-span-2">
+        <h3 class="font-display font-bold text-lg text-brand-textMain mb-4">Histori Aliran Dana (Database Lokal)</h3>
+        <div class="overflow-x-auto max-h-[500px]" id="keuangan-table-wrapper" style="overflow-y: auto;">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                    <tr class="text-brand-textSub text-xs uppercase border-b border-slate-100 sticky top-0 bg-white" id="keuangan-thead-tr">
+                        <th class="py-3 px-4 font-semibold">Trans ID</th>
+                        <th class="py-3 px-4 font-semibold">Tipe</th>
+                        <th class="py-3 px-4 font-semibold">Kategori</th>
+                        <th class="py-3 px-4 font-semibold">Jumlah</th>
+                        <th class="py-3 px-4 font-semibold">Tanggal</th>
+                        <th class="py-3 px-4 font-semibold text-right">Keterangan</th>
+                        <th class="py-3 px-4 font-semibold text-right" id="keuangan-th-aksi">Aksi</th>
+                    </tr>
+                </thead>
+                <tbody id="keuangan-tbody" class="divide-y divide-slate-50"></tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Kalkulator Uang Saku LTC -->
+<div class="mt-8 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm animate-fadeIn">
+    <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-6 border-b border-slate-100 gap-4">
+        <div>
+            <h3 class="font-display font-bold text-lg text-brand-textMain">Kalkulator Pengeluaran Uang Saku LTC</h3>
+            <p class="text-xs text-brand-textSub mt-1">Estimasi biaya saku dan transport peserta program LTC berdasarkan kehadiran dan kelas.</p>
+        </div>
+        
+        <!-- Filter Periode Custom -->
+        <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center gap-2 bg-slate-50 border border-slate-100 rounded-xl px-3 py-1.5">
+                <span class="text-[10px] font-bold uppercase text-brand-textSub">Periode:</span>
+                <input type="date" id="calc-start-date" class="bg-transparent text-xs font-semibold outline-none text-brand-textMain">
+                <span class="text-slate-300">|</span>
+                <input type="date" id="calc-end-date" class="bg-transparent text-xs font-semibold outline-none text-brand-textMain">
+            </div>
+            <button onclick="calculateLTCCosts()" class="px-5 py-2.5 bg-brand-blue text-white text-xs font-bold rounded-xl hover:bg-blue-700 transition-all-300 shadow-sm flex items-center gap-2">
+                <i class="fa-solid fa-calculator"></i> Hitung Biaya
+            </button>
+        </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100/50 flex flex-col justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-brand-textSub">Total Uang Saku</span>
+            <span class="text-xl font-extrabold text-brand-textMain mt-2" id="calc-total-saku">Rp 0</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-slate-50 border border-slate-100/50 flex flex-col justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-brand-textSub">Total Transport</span>
+            <span class="text-xl font-extrabold text-brand-textMain mt-2" id="calc-total-trans">Rp 0</span>
+        </div>
+        <div class="p-4 rounded-2xl bg-brand-blue/[0.03] border border-brand-blue/10 flex flex-col justify-between">
+            <span class="text-[10px] font-bold uppercase tracking-wider text-brand-blue">Total Pengeluaran</span>
+            <span class="text-xl font-extrabold text-brand-blue mt-2" id="calc-total-all">Rp 0</span>
+        </div>
+    </div>
+
+    <!-- Detailed Breakdowns -->
+    <div class="hidden" id="calc-result-container">
+        <div class="overflow-x-auto max-h-[400px]" style="overflow-y: auto;">
+            <table class="w-full text-left text-sm border-collapse">
+                <thead>
+                    <tr class="text-brand-textSub text-xs uppercase border-b border-slate-100 sticky top-0 bg-white">
+                        <th class="py-3 px-4 font-semibold">NoReg</th>
+                        <th class="py-3 px-4 font-semibold">Nama Peserta</th>
+                        <th class="py-3 px-4 font-semibold">Kelas</th>
+                        <th class="py-3 px-4 font-semibold">Hadir (Irisan)</th>
+                        <th class="py-3 px-4 font-semibold">Hari Kerja</th>
+                        <th class="py-3 px-4 font-semibold">Detail Bulan</th>
+                        <th class="py-3 px-4 font-semibold text-right">Uang Saku</th>
+                        <th class="py-3 px-4 font-semibold text-right">Transport</th>
+                        <th class="py-3 px-4 font-semibold text-right">Total Biaya</th>
+                    </tr>
+                </thead>
+                <tbody id="calc-tbody" class="divide-y divide-slate-50"></tbody>
+            </table>
+        </div>
+    </div>
+    
+    <div id="calc-empty-state" class="py-8 text-center text-xs text-brand-textSub font-semibold">
+        Silakan tentukan tanggal periode di atas lalu klik tombol <strong>Hitung Biaya</strong>.
+    </div>
+</div>
+
+<!-- Tabel Histori Biaya Per Bulan -->
+<div id="monthly-history-container"></div>

@@ -1,0 +1,151 @@
+<!-- Panel Indikator Turnover -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-6 rounded-[24px] text-white shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-wider opacity-80">Total Lulus Magang</p>
+            <h3 class="font-display font-black text-4xl mt-1" id="turnover-kpi-lulus">0</h3>
+            <p class="text-[10px] mt-2 bg-white/20 inline-block px-2 py-0.5 rounded font-semibold">Terserap Kerja Unggulan</p>
+        </div>
+        <div class="text-4xl opacity-30"><i class="fa-solid fa-user-graduate"></i></div>
+    </div>
+    <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-6 rounded-[24px] text-white shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-wider opacity-80">Total Resign Mandiri</p>
+            <h3 class="font-display font-black text-4xl mt-1" id="turnover-kpi-resign">0</h3>
+            <p class="text-[10px] mt-2 bg-white/20 inline-block px-2 py-0.5 rounded font-semibold">Kondisi Alasan Pribadi</p>
+        </div>
+        <div class="text-4xl opacity-30"><i class="fa-solid fa-person-walking-arrow-right"></i></div>
+    </div>
+    <div class="bg-gradient-to-br from-rose-500 to-red-600 p-6 rounded-[24px] text-white shadow-md flex items-center justify-between">
+        <div>
+            <p class="text-xs font-bold uppercase tracking-wider opacity-80">Total Indisipliner</p>
+            <h3 class="font-display font-black text-4xl mt-1" id="turnover-kpi-indisipliner">0</h3>
+            <p class="text-[10px] mt-2 bg-white/20 inline-block px-2 py-0.5 rounded font-semibold">Pelanggaran Tata Tertib</p>
+        </div>
+        <div class="text-4xl opacity-30"><i class="fa-solid fa-triangle-exclamation"></i></div>
+    </div>
+</div>
+
+<!-- Peta Tematik Batas Wilayah & Proporsi Donat -->
+<div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+    <!-- Panel Penyaringan Vertikal -->
+    <div class="bg-white p-6 rounded-[28px] border border-brand-border shadow-sm flex flex-col justify-between">
+        <div>
+            <h3 class="font-display font-bold text-lg text-brand-textMain">Panel Penyaringan</h3>
+            <p class="text-brand-textSub text-xs mb-6">Saring data wilayah & status terminasi</p>
+            
+            <div class="space-y-4">
+                <!-- Cari Nama/NoReg -->
+                <div>
+                    <label class="block text-[10px] font-extrabold uppercase tracking-wider text-brand-textSub mb-1.5">Nama / NoReg</label>
+                    <div class="relative">
+                        <input type="text" id="search-turnover" oninput="triggerTurnoverFilter()" placeholder="Cari nama / noreg..." class="w-full pl-10 pr-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300 shadow-sm">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-3.5 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+                
+                <!-- Filter Kota/Kabupaten -->
+                <div>
+                    <label class="block text-[10px] font-extrabold uppercase tracking-wider text-brand-textSub mb-1.5">Kota / Kabupaten</label>
+                    <select id="filter-turnover-wilayah" onchange="triggerTurnoverFilter()" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50 shadow-sm">
+                        <!-- Dipopulasikan otomatis -->
+                    </select>
+                </div>
+                
+                <!-- Tipe Turnover -->
+                <div>
+                    <label class="block text-[10px] font-extrabold uppercase tracking-wider text-brand-textSub mb-1.5">Tipe Turnover</label>
+                    <select id="filter-turnover-tipe" onchange="triggerTurnoverFilter()" class="w-full px-3 py-2.5 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-brand-blue bg-slate-50 shadow-sm">
+                        <option value="">Semua Tipe</option>
+                        <option value="Lulus">Lulus</option>
+                        <option value="Resign">Resign</option>
+                        <option value="Indisipliner">Indisipliner</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+        
+        <div class="pt-4 border-t border-slate-100 mt-6">
+            <button onclick="resetTurnoverFilters()" class="w-full py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all-300 flex items-center justify-center gap-2">
+                <i class="fa-solid fa-filter-circle-xmark"></i> Bersihkan Filter
+            </button>
+        </div>
+    </div>
+
+    <!-- Peta Tematik Batas Wilayah -->
+    <div class="lg:col-span-2 bg-white p-6 rounded-[28px] border border-brand-border shadow-sm flex flex-col justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4">
+            <div>
+                <h3 class="font-display font-bold text-lg text-brand-textMain">Peta Tematik Distribusi Turnover</h3>
+                <p class="text-brand-textSub text-xs">Peta batas wilayah operasional berkode warna pastel interaktif</p>
+            </div>
+            <div class="flex items-center bg-slate-50 p-1.5 rounded-xl border border-slate-100">
+                <button onclick="changeThematicStyle('light')" class="thematic-btn thematic-btn-light px-2.5 py-1.5 rounded-lg transition-all-300 bg-brand-blue text-white border border-brand-blue shadow-sm text-xs font-semibold">Minimalis</button>
+                <button onclick="changeThematicStyle('dark')" class="thematic-btn thematic-btn-dark px-2.5 py-1.5 rounded-lg transition-all-300 bg-white text-slate-600 border border-slate-200 text-xs font-semibold ml-1">Midnight</button>
+                <button onclick="changeThematicStyle('satellite')" class="thematic-btn thematic-btn-satellite px-2.5 py-1.5 rounded-lg transition-all-300 bg-white text-slate-600 border border-slate-200 text-xs font-semibold ml-1">Satelit</button>
+            </div>
+        </div>
+        <div id="map-turnover-container" class="w-full"></div>
+    </div>
+
+    <!-- Proporsi Alasan Keluar (Donut) -->
+    <div class="bg-white p-6 rounded-[28px] border border-brand-border shadow-sm flex flex-col justify-between">
+        <div>
+            <h3 class="font-display font-bold text-lg text-brand-textMain">Proporsi Alasan Keluar</h3>
+            <p class="text-brand-textSub text-xs mb-4">Grafik donat persentase status penyelesaian magang</p>
+        </div>
+        
+        <div class="h-48 relative flex items-center justify-center">
+            <canvas id="turnoverPieChart"></canvas>
+        </div>
+
+        <div class="space-y-2 text-xs font-semibold text-slate-700 border-t pt-4 mt-4">
+            <div class="flex justify-between items-center">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span> Lulus Sukses</span>
+                <span class="font-bold" id="donut-lulus-pct">0% <span class="text-slate-400 font-normal" id="donut-lulus-cnt">(0)</span></span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> Resign Kerja</span>
+                <span class="font-bold" id="donut-resign-pct">0% <span class="text-slate-400 font-normal" id="donut-resign-cnt">(0)</span></span>
+            </div>
+            <div class="flex justify-between items-center">
+                <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-rose-500"></span> Indisipliner</span>
+                <span class="font-bold" id="donut-indis-pct">0% <span class="text-slate-400 font-normal" id="donut-indis-cnt">(0)</span></span>
+            </div>
+            <div class="flex justify-between items-center pt-2 border-t font-extrabold text-slate-800">
+                <span>TOTAL KELUAR</span>
+                <span id="donut-total-count">0 Siswa</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Log History Tabel -->
+<div class="bg-white p-6 rounded-[28px] border border-brand-border shadow-sm">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+        <div>
+            <h3 class="font-display font-bold text-xl text-brand-textMain">Log Riwayat Siswa Keluar</h3>
+            <p class="text-brand-textSub text-xs">Arsip rekam jejak penyelesaian masa magang kerja</p>
+        </div>
+    </div>
+
+    <div class="overflow-x-auto">
+        <table class="w-full min-w-[800px]">
+            <thead>
+                <tr class="text-left text-xs font-bold text-brand-textSub border-b border-brand-border">
+                    <th class="pb-3 px-4">KODE</th>
+                    <th class="pb-3 px-4">NAMA LENGKAP</th>
+                    <th class="pb-3 px-4">BAGIAN / DIVISI</th>
+                    <th class="pb-3 px-4">KELAS</th>
+                    <th class="pb-3 px-4">TANGGAL TERMINASI</th>
+                    <th class="pb-3 px-4">KETERANGAN</th>
+                    <th class="pb-3 px-4">KOTA ASAL</th>
+                    <th class="pb-3 px-4 text-right">ALASAN DETAIL</th>
+                </tr>
+            </thead>
+            <tbody id="turnover-tbody" class="divide-y divide-slate-100">
+                <!-- Dipopulasikan otomatis -->
+            </tbody>
+        </table>
+    </div>
+</div>

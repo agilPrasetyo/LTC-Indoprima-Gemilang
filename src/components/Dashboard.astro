@@ -1,0 +1,210 @@
+<!-- KARTU STATISTIK UTAMA & TURNOVER -->
+<div class="flex flex-col lg:flex-row gap-6 animate-fadeIn">
+    <!-- BLOK KIRI: 4 Kartu Utama (2x2 Grid) -->
+    <div class="w-full lg:w-2/3 grid grid-cols-2 gap-4 sm:gap-6">
+        <!-- Card 1: Siswa Aktif -->
+        <div class="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-start justify-between cursor-pointer hover:-translate-y-1.5 hover:shadow-lg hover:border-teal-200 active:scale-[0.97] active:duration-75 transition-all duration-300 ease-out group" onclick="switchView('siswa')" title="Klik untuk lihat daftar siswa aktif">
+            <div>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="p-1.5 sm:p-2 rounded-lg bg-teal-50 text-brand-teal text-xs group-hover:bg-teal-100 transition-colors"><i
+                            class="fa-solid fa-user-check"></i></span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-textSub">Siswa Aktif</span>
+                </div>
+                <p class="text-2xl sm:text-4xl font-bold font-display text-brand-textMain mt-4" id="stat-siswa-aktif">0</p>
+                <span
+                    class="inline-flex items-center gap-1 mt-3 px-2 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-semibold">
+                    <i class="fa-solid fa-circle-check"></i> <span class="hidden sm:inline">Klik untuk lihat detail</span><span class="sm:hidden">Detail</span>
+                </span>
+            </div>
+            <div class="text-teal-400 group-hover:text-teal-600 transition-colors hidden sm:block">
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Card 2: Rata-Rata Performa -->
+        <div class="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-start justify-between cursor-pointer hover:-translate-y-1.5 hover:shadow-lg hover:border-blue-200 active:scale-[0.97] active:duration-75 transition-all duration-300 ease-out group" onclick="switchView('siswa')" title="Klik untuk lihat performa masing-masing siswa">
+            <div>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="p-1.5 sm:p-2 rounded-lg bg-blue-50 text-brand-blue text-xs group-hover:bg-blue-100 transition-colors"><i
+                            class="fa-solid fa-chart-line"></i></span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-textSub">Performa</span>
+                </div>
+                <p class="text-2xl sm:text-4xl font-bold font-display text-brand-textMain mt-4" id="stat-avg-performance">0%</p>
+                <span id="avg-performance-indicator"
+                    class="inline-flex items-center gap-1 mt-3 px-2 py-1 bg-blue-50 text-brand-blue rounded-lg text-[10px] font-semibold">
+                    <i class="fa-solid fa-users"></i> <span class="hidden sm:inline">Klik untuk detail performa</span><span class="sm:hidden">Detail</span>
+                </span>
+            </div>
+            <div class="text-blue-400 group-hover:text-blue-600 transition-colors hidden sm:block">
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Card 3: Persentase LTC -->
+        <div class="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-start justify-between cursor-pointer hover:-translate-y-1.5 hover:shadow-lg hover:border-indigo-200 active:scale-[0.97] active:duration-75 transition-all duration-300 ease-out group" onclick="switchView('admin'); switchAdminTab('kelola-populasi');" title="Klik untuk lihat rincian populasi di Admin">
+            <div>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="p-1.5 sm:p-2 rounded-lg bg-indigo-50 text-indigo-600 text-xs group-hover:bg-indigo-100 transition-colors"><i
+                            class="fa-solid fa-percent"></i></span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-textSub">Persentase LTC</span>
+                </div>
+                <p class="text-2xl sm:text-4xl font-bold font-display text-brand-textMain mt-4" id="stat-persentase-ltc">0.00%</p>
+                <span id="populasi-tanggal-indicator"
+                    class="inline-flex items-center gap-1 mt-3 px-2 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-semibold">
+                    <i class="fa-solid fa-clock-rotate-left"></i> <span id="stat-persentase-ltc-date">Terbaru</span>
+                </span>
+            </div>
+            <div class="text-indigo-400 group-hover:text-indigo-600 transition-colors hidden sm:block">
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </div>
+        </div>
+
+        <!-- Card 4: Biaya LTC Bulan Ini -->
+        <div class="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-start justify-between cursor-pointer hover:-translate-y-1.5 hover:shadow-lg hover:border-orange-200 active:scale-[0.97] active:duration-75 transition-all duration-300 ease-out group" onclick="switchView('keuangan')" title="Klik untuk kalkulator kustom">
+            <div>
+                <div class="flex items-center gap-1.5 sm:gap-2">
+                    <span class="p-1.5 sm:p-2 rounded-lg bg-orange-50 text-orange-600 text-xs group-hover:bg-orange-100 transition-colors"><i
+                            class="fa-solid fa-wallet"></i></span>
+                    <span class="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-brand-textSub"><span class="sm:inline hidden">Biaya LTC Bulan Ini</span><span class="sm:hidden">Biaya LTC</span></span>
+                </div>
+                <p class="text-xs font-semibold text-slate-400 mt-5 transition-all duration-300 animate-pulse tracking-widest uppercase" id="stat-ltc-cost">MENGHITUNG...</p>
+                <span
+                    class="inline-flex items-center gap-1 mt-3 px-2 py-1 bg-orange-50 text-orange-600 rounded-lg text-[10px] font-semibold">
+                    <i class="fa-solid fa-calendar-day"></i>
+                    <span id="stat-ltc-period-label">Bulan ini</span>
+                </span>
+            </div>
+            <div class="text-orange-400 group-hover:text-orange-600 transition-colors hidden sm:block">
+                <i class="fa-solid fa-arrow-right text-sm"></i>
+            </div>
+        </div>
+    </div>
+
+    <!-- BLOK KANAN: Widget Vertikal Turnover -->
+    <div class="w-full lg:w-1/3 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col justify-between group">
+        <div>
+            <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                <div class="flex items-center gap-2">
+                    <span class="p-2 rounded-lg bg-rose-50 text-rose-600 text-xs"><i class="fa-solid fa-user-minus"></i></span>
+                    <span class="text-xs font-bold uppercase tracking-wider text-brand-textSub">Statistik Turnover</span>
+                </div>
+                <span class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-bold" id="stat-siswa-lulus">0</span>
+            </div>
+            
+            <!-- Area Donut Chart -->
+            <div class="relative h-40 flex items-center justify-center mt-3">
+                <canvas id="dashboardTurnoverPieChart"></canvas>
+            </div>
+        </div>
+
+        <!-- Tabel Rincian Detail di Bawah Chart -->
+        <div class="mt-3 border-t border-slate-100 pt-3">
+            <table class="w-full text-xs text-left border-collapse">
+                <tbody>
+                    <tr class="border-b border-slate-50">
+                        <td class="py-1.5 flex items-center gap-2 font-semibold text-slate-500">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#F5C400]"></span> Resign
+                        </td>
+                        <td class="py-1.5 text-right font-bold text-brand-textMain" id="stat-turnover-resign-val">0 Siswa</td>
+                    </tr>
+                    <tr class="border-b border-slate-50">
+                        <td class="py-1.5 flex items-center gap-2 font-semibold text-slate-500">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#00A651]"></span> Lulus
+                        </td>
+                        <td class="py-1.5 text-right font-bold text-brand-textMain" id="stat-turnover-lulus-val">0 Siswa</td>
+                    </tr>
+                    <tr>
+                        <td class="py-1.5 flex items-center gap-2 font-semibold text-slate-500">
+                            <span class="w-2.5 h-2.5 rounded-full bg-[#D3222A]"></span> Indisipliner
+                        </td>
+                        <td class="py-1.5 text-right font-bold text-brand-textMain" id="stat-turnover-indisipliner-val">0 Siswa</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+    <!-- Grafik Performa Kelas -->
+    <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+                <h3 class="font-display font-bold text-lg text-brand-textMain">Grafik Performa LTC</h3>
+                <p class="text-xs text-brand-textSub">Analisis capaian nilai percent harian berdasarkan kelas</p>
+            </div>
+            <div>
+                <select id="class-chart-filter" onchange="updateLtcChart()"
+                    class="w-full sm:w-auto px-4 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue bg-white text-brand-textSub font-bold shadow-sm">
+                    <option value="all">Rata-rata Kelas (Semua)</option>
+                    <option value="Kelas 1">Kelas 1</option>
+                    <option value="Kelas 2">Kelas 2</option>
+                    <option value="Kelas 3">Kelas 3</option>
+                    <option value="Kelas 4">Kelas 4</option>
+                    <option value="Kelas 5">Kelas 5</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Rentang Tanggal Khusus Grafik -->
+        <div class="flex flex-wrap items-center gap-3 bg-slate-50 p-3 rounded-2xl text-xs">
+            <span class="font-semibold text-slate-600"><i class="fa-regular fa-calendar text-brand-blue mr-1"></i>
+                Filter Grafik:</span>
+            <div class="flex items-center gap-1.5">
+                <label for="chart-start-date" class="font-bold text-brand-textSub">MULAI</label>
+                <input type="date" id="chart-start-date" onchange="updateLtcChart()"
+                    class="px-2 py-1 border border-slate-200 rounded-lg outline-none focus:border-brand-blue bg-white text-slate-700">
+            </div>
+            <div class="flex items-center gap-1.5">
+                <label for="chart-end-date" class="font-bold text-brand-textSub">HINGGA</label>
+                <input type="date" id="chart-end-date" onchange="updateLtcChart()"
+                    class="px-2 py-1 border border-slate-200 rounded-lg outline-none focus:border-brand-blue bg-white text-slate-700">
+            </div>
+            <button onclick="resetChartLocalDates()"
+                class="px-2.5 py-1 bg-white hover:bg-slate-100 border border-slate-200 text-slate-600 rounded-lg font-bold transition-all-300 ml-auto">
+                Reset Grafik
+            </button>
+        </div>
+
+        <div class="relative h-72">
+            <canvas id="ltcPerformanceChart"></canvas>
+        </div>
+    </div>
+
+    <!-- Grafik Populasi LTC per Kelas -->
+    <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col justify-between space-y-4">
+        <div>
+            <h3 class="font-display font-bold text-lg text-brand-textMain mb-1">Populasi LTC per Kelas</h3>
+            <p class="text-xs text-brand-textSub mb-4">Persebaran jumlah siswa aktif berdasarkan kelas bulanan (Stacked Bar Chart)</p>
+        </div>
+        <div class="relative h-72">
+            <canvas id="classPopulationChart"></canvas>
+        </div>
+        <!-- Tabel Ringkasan Populasi Bulanan -->
+        <div class="mt-2 overflow-x-auto border border-slate-100 rounded-xl">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="text-brand-textSub bg-slate-50/70 uppercase font-bold border-b border-slate-100 text-[10px]">
+                        <th class="py-2 px-3.5">Bulan</th>
+                        <th class="py-2 px-3.5 text-center">Populasi LTC</th>
+                    </tr>
+                </thead>
+                <tbody id="class-population-tbody" class="divide-y divide-slate-50 text-brand-textMain font-semibold">
+                    <!-- Dipopulasikan otomatis via JS -->
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Grafik Perbandingan & Persentase Populasi LTC -->
+<div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4 mt-6 animate-fadeIn">
+    <div>
+        <h3 class="font-display font-bold text-lg text-brand-textMain">Populasi LTC vs Total Karyawan</h3>
+        <p class="text-xs text-brand-textSub">Perbandingan total seluruh karyawan (batang abu-biru), jumlah peserta LTC (batang biru), dan rasio persentase LTC terhadap karyawan (garis merah)</p>
+    </div>
+    <div class="relative h-80">
+        <canvas id="ltcRatioChart"></canvas>
+    </div>
+</div>
+
