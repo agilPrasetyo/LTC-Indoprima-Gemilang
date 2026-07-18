@@ -656,8 +656,13 @@
     };
 
 
-    function loginSuccess(user) {
+    function loginSuccess(user, bypassSplash = false) {
         currentUser = user;
+        try {
+            localStorage.setItem('currentUser', JSON.stringify(user));
+        } catch (e) {
+            console.error("Failed to save session:", e);
+        }
         document.getElementById('login-screen').classList.add('hidden');
 
         const _proceedToDashboard = () => {
@@ -695,14 +700,15 @@
                 const mainHeader = document.querySelector('main > header');
                 if (mainHeader) mainHeader.classList.remove('hidden');
                 
-                switchView('dashboard');
+                const savedView = localStorage.getItem('activeView') || 'dashboard';
+                switchView(savedView);
             }
             startRealtimeClock();
             loadDashboardData();
         };
 
         // Siswa langsung ke form tanpa video intro
-        if (currentUser.role === 'Siswa') {
+        if (currentUser.role === 'Siswa' || bypassSplash) {
             _proceedToDashboard();
         } else {
             // Admin & Visitor: tampilkan video intro dulu
@@ -1175,6 +1181,12 @@
     }
 
     function switchView(viewName) {
+        try {
+            localStorage.setItem('activeView', viewName);
+        } catch (e) {
+            console.error("Failed to save view state:", e);
+        }
+
         const views = ['view-dashboard', 'view-siswa', 'view-sisi-siswa', 'view-keuangan', 'view-turnover', 'view-absensi', 'view-admin'];
         views.forEach(v => {
             const el = document.getElementById(v);
@@ -1345,8 +1357,30 @@
 
     function logout() {
         currentUser = null;
+        try {
+            localStorage.removeItem('currentUser');
+            localStorage.removeItem('activeView');
+        } catch (e) {
+            console.error("Failed to clear session:", e);
+        }
         document.getElementById('app').classList.add('hidden');
         document.getElementById('login-screen').classList.remove('hidden');
         showToast('Sesi Anda telah diakhiri.', 'info');
     }
+
+    // Restore Session on Page Refresh
+    document.addEventListener('DOMContentLoaded', () => {
+        try {
+            const savedUserStr = localStorage.getItem('currentUser');
+            if (savedUserStr) {
+                const savedUser = JSON.parse(savedUserStr);
+                if (savedUser) {
+                    // Call loginSuccess and bypass the splash screen video
+                    loginSuccess(savedUser, true);
+                }
+            }
+        } catch (e) {
+            console.error("Failed to restore session on page load:", e);
+        }
+    });
 
