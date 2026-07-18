@@ -17,7 +17,7 @@ import Absensi from '../components/Absensi.astro';
        OPENING SPLASH SCREEN (Video Loading Intro)
        Muncul setelah login, sebelum masuk dashboard
        ============================================= -->
-  <div id="opening-splash" class="hidden fixed inset-0 z-[9999] bg-[#E6E6E6] items-center justify-center">
+  <div id="opening-splash" class="hidden fixed inset-0 z-[9999] bg-[#D6D6D6] items-center justify-center">
 
     <!-- VIDEO - Full screen, autoplay, no controls -->
     <video
@@ -29,9 +29,6 @@ import Absensi from '../components/Absensi.astro';
       playsinline
       preload="auto"
     ></video>
-
-    <!-- Overlay gradient bawah (selaras dengan warna abu-abu) -->
-    <div class="absolute inset-0 bg-gradient-to-t from-[#E6E6E6]/60 via-transparent to-transparent pointer-events-none"></div>
 
     <!-- Container Terpadu: Logo & Progress Bar di Pojok Kiri Bawah (Mencegah Tabrakan Layout) -->
     <div class="absolute bottom-10 left-6 sm:left-8 z-10 flex flex-col gap-3.5 opacity-95 max-w-[calc(100%-120px)]">
