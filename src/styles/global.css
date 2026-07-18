@@ -183,6 +183,11 @@ body {
     }
 }
 
+/* Force hide when hidden class is added via JS */
+#app-sidebar.hidden {
+    display: none !important;
+}
+
 /* Sidebar collapsed / mini-mode styles for desktop */
 @media (min-width: 768px) {
     /* 1. Shrunk sidebar state */

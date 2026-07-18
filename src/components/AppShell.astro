@@ -1,0 +1,409 @@
+---
+import Dashboard from '../components/Dashboard.astro';
+import Performance from '../components/Performance.astro';
+import Turnover from '../components/Turnover.astro';
+import SiswaPortal from '../components/SiswaPortal.astro';
+import Keuangan from '../components/Keuangan.astro';
+import Admin from '../components/Admin.astro';
+import Absensi from '../components/Absensi.astro';
+
+interface Props {
+  role?: 'Admin' | 'Visitor' | 'Siswa';
+}
+
+const { role } = Astro.props;
+---
+
+<script is:inline define:vars={{ role }}>
+  window.FORCED_ROLE = role;
+</script>
+
+<!-- Kontainer Notifikasi Toast -->
+<div id="toast-container" class="fixed top-5 right-5 z-50 flex flex-col gap-3 pointer-events-none"></div>
+
+<!-- =============================================
+     OPENING SPLASH SCREEN (Video Loading Intro)
+     Muncul setelah login, sebelum masuk dashboard
+     ============================================= -->
+<div id="opening-splash" class="hidden fixed inset-0 z-[9999] bg-[#D6D6D6] items-center justify-center">
+
+  <!-- VIDEO - Full screen, autoplay, no controls -->
+  <video
+    id="splash-video"
+    src="/videos/intro.mp4"
+    class="absolute inset-0 w-full h-full object-contain sm:object-cover transform -translate-y-6 sm:translate-y-0"
+    autoplay
+    muted
+    playsinline
+    preload="auto"
+  ></video>
+
+  <!-- Container Terpadu: Logo & Progress Bar di Pojok Kiri Bawah (Mencegah Tabrakan Layout) -->
+  <div class="absolute bottom-10 left-6 sm:left-8 z-10 flex flex-col gap-3.5 opacity-95 max-w-[calc(100%-120px)]">
+    <!-- Top: Logo & Title -->
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-xl bg-white/50 backdrop-blur-sm border border-slate-200/80 flex items-center justify-center p-1.5 shadow-sm">
+        <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Logo" onerror="this.style.display='none'" />
+      </div>
+      <div>
+        <p class="text-slate-800 font-extrabold text-sm leading-tight">
+          <span class="text-brand-blue">Indoprima</span>
+          <span class="text-brand-red"> Gemilang</span>
+        </p>
+        <p class="text-slate-500 text-[9px] font-bold tracking-widest uppercase">LTC Dashboard</p>
+      </div>
+    </div>
+
+    <!-- Bottom: Progress Bar + Status (Diletakkan di bawah logo) -->
+    <div class="flex flex-col gap-1.5 pl-1">
+      <div class="w-36 h-1 bg-slate-300/60 rounded-full overflow-hidden">
+        <div id="splash-progress-bar" class="h-full bg-brand-blue rounded-full" style="width: 0%; transition: width 0.1s linear;"></div>
+      </div>
+      <p class="text-slate-500 text-[8px] font-bold tracking-wider uppercase">Memuat data...</p>
+    </div>
+  </div>
+
+  <!-- Tombol Lewati (Pojok Kanan Bawah) -->
+  <button
+    onclick="skipSplashVideo()"
+    class="absolute bottom-10 right-6 sm:right-8 z-10 flex items-center gap-2 px-4.5 py-2 bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold rounded-full shadow-sm active:scale-95 transition-all duration-300 cursor-pointer"
+  >
+    Lewati <i class="fa-solid fa-chevron-right text-[10px]"></i>
+  </button>
+</div>
+
+<!-- Antarmuka Halaman Login -->
+<div id="login-screen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-md transition-all duration-300">
+  <div class="bg-white p-6 sm:p-8 md:p-10 rounded-[32px] shadow-2xl border border-slate-100 w-[calc(100%-2rem)] sm:w-full sm:max-w-md sm:mx-4">
+    <!-- Header Logo -->
+    <div class="text-center mb-5 sm:mb-8">
+      <div class="inline-flex items-center justify-center w-16 h-16 sm:w-24 sm:h-24 rounded-2xl bg-gradient-to-tr from-blue-50 to-red-50 mb-3 sm:mb-4 shadow-sm border border-slate-100 p-2">
+        <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Indoprima Gemilang" onerror="this.src='https://placehold.co/100x100?text=Indoprima'" />
+      </div>
+      <h2 class="font-display font-bold text-2xl sm:text-3xl tracking-tight">
+        <span class="text-brand-blue">Indoprima</span> <span class="text-brand-red">Gemilang</span>
+      </h2>
+      <p id="login-role-label" class="text-brand-textSub mt-1 text-xs sm:text-sm font-semibold tracking-wider uppercase">LTC Portal</p>
+    </div>
+
+    <!-- Quick Fill Buttons -->
+    <div id="quick-fill-container" class="grid grid-cols-3 gap-2 mb-4 sm:mb-6 bg-slate-100 p-1.5 rounded-xl text-xs font-semibold text-center">
+      <button id="quick-fill-admin" onclick="fillLogin('admin@indoprima.com', 'admin123', 'admin')" class="py-2 rounded-lg bg-brand-blue text-white shadow-sm transition-all duration-300 cursor-pointer">Admin</button>
+      <button id="quick-fill-visitor" onclick="fillLogin('visitor@indoprima.com', 'visitor123', 'visitor')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Visitor</button>
+      <button id="quick-fill-siswa" onclick="fillLogin('2601176@indoprima.com', 'siswa123', 'siswa')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Siswa</button>
+    </div>
+
+    <!-- Form Fields -->
+    <div class="space-y-3 sm:space-y-4">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5 sm:mb-2">Email / Nomor Registrasi</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+            <i class="fa-regular fa-envelope"></i>
+          </span>
+          <input type="email" id="login-email" class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin@indoprima.com" autocomplete="email" />
+        </div>
+      </div>
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5 sm:mb-2">Password</label>
+        <div class="relative">
+          <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
+            <i class="fa-solid fa-lock"></i>
+          </span>
+          <input type="password" id="login-pass" class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin123" autocomplete="current-password" />
+        </div>
+      </div>
+      <button onclick="handleLogin()" class="w-full py-3 sm:py-3.5 mt-1 sm:mt-2 bg-brand-blue text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-[0.97] active:bg-blue-800 transition-all duration-150 shadow-lg shadow-blue-500/20 flex items-center justify-center cursor-pointer">
+        Masuk Dashboard
+      </button>
+    </div>
+    
+    <div id="login-error" class="hidden mt-3 sm:mt-4 p-3 bg-rose-50 border border-rose-100 text-rose-600 rounded-xl text-center text-xs font-medium"></div>
+
+    <!-- Safe area for mobile bottom -->
+    <div class="h-safe-bottom sm:hidden"></div>
+  </div>
+</div>
+
+<!-- Struktur Navigasi Aplikasi Utama -->
+<div id="app" class="hidden min-h-screen flex flex-col md:flex-row">
+
+  <!-- =============================================
+       DESKTOP SIDEBAR (hanya terlihat di md ke atas)
+       ============================================= -->
+  <aside id="app-sidebar" class="relative w-full md:w-64 bg-white/70 backdrop-blur-xl border-r border-brand-border/60 md:sticky md:top-0 md:h-screen flex-col justify-between p-6 z-40 transition-all duration-300 text-brand-textMain">
+    
+    <!-- Button to toggle sidebar collapse -->
+    <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" class="absolute top-8 -right-3 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow flex items-center justify-center text-slate-500 hover:text-brand-blue hover:scale-110 active:scale-95 transition-all duration-300 z-50 cursor-pointer" title="Sembunyikan/Pin Sidebar">
+      <i class="fa-solid fa-chevron-left text-[10px]" id="sidebar-toggle-icon"></i>
+    </button>
+
+    <div>
+      <!-- Brand Logo & Name -->
+      <div class="flex items-center gap-3 mb-8 sidebar-brand-area">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-50 to-red-50 flex items-center justify-center p-1.5 border border-slate-100 shadow-sm brand-logo-container">
+          <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Indoprima Gemilang Logo" onerror="this.src='https://placehold.co/100x100?text=Indoprima'" />
+        </div>
+        <div class="brand-text-container transition-opacity duration-300">
+          <p class="font-display font-extrabold text-sm leading-tight text-brand-textMain">
+            <span class="text-brand-blue">Indoprima</span><br/><span class="text-brand-red">Gemilang</span>
+          </p>
+          <p class="text-[9px] font-bold tracking-widest text-brand-textSub uppercase mt-0.5">LTC</p>
+        </div>
+      </div>
+
+      <!-- Navigation Links -->
+      <nav class="space-y-1.5">
+        <button id="nav-dashboard" onclick="switchView('dashboard')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-white bg-blue-600 transition-all duration-300 text-left">
+          <i class="fa-solid fa-grid-2 text-base w-5 text-center"></i>
+          <span class="nav-text">Dashboard</span>
+        </button>
+
+        <button id="nav-siswa" onclick="switchView('siswa')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all duration-300 text-left">
+          <i class="fa-solid fa-user-graduate text-base w-5 text-center"></i>
+          <span class="nav-text">Performa LTC</span>
+        </button>
+
+        <button id="nav-turnover" onclick="switchView('turnover')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-user-minus text-base w-5 text-center"></i>
+          <span class="nav-text">Turnover</span>
+        </button>
+
+        <button id="nav-keuangan" onclick="switchView('keuangan')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-wallet text-base w-5 text-center"></i>
+          <span class="nav-text">Cost / Keuangan</span>
+        </button>
+
+        <button id="nav-absensi" onclick="switchView('absensi')" class="nav-btn w-full hidden flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-calendar-days text-base w-5 text-center"></i>
+          <span class="nav-text">Absensi Siswa</span>
+        </button>
+
+        <button id="nav-admin" onclick="switchView('admin')" class="nav-btn w-full hidden flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-sliders text-base w-5 text-center"></i>
+          <span class="nav-text">Admin</span>
+        </button>
+      </nav>
+    </div>
+
+    <!-- User Profile Area in Sidebar -->
+    <div class="border-t border-slate-100 pt-4 sidebar-user-area">
+      <div class="flex items-center gap-3 mb-4 user-info-container transition-opacity duration-300">
+        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200">
+          <i class="fa-solid fa-user text-sm"></i>
+        </div>
+        <div class="overflow-hidden">
+          <p class="font-bold text-xs text-brand-textMain truncate leading-tight" id="user-display-name">-</p>
+          <p class="text-[9px] font-semibold text-brand-textSub tracking-wider uppercase mt-0.5" id="user-display-role">-</p>
+        </div>
+      </div>
+      <button onclick="logout()" class="logout-btn w-full flex items-center justify-center gap-2 py-2.5 bg-slate-100/80 hover:bg-rose-500/10 hover:text-rose-600 rounded-xl text-xs font-semibold text-brand-textSub transition-all duration-300">
+        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+        <span class="logout-text">Keluar Sesi</span>
+      </button>
+    </div>
+  </aside>
+
+  <!-- =============================================
+       MOBILE BOTTOM NAVIGATION (hanya terlihat di sm kebawah)
+       ============================================= -->
+  <nav id="mobile-bottom-nav" class="fixed bottom-0 left-0 right-0 h-16 bg-white/80 backdrop-blur-lg border-t border-slate-200/80 items-center justify-around z-40 px-2 pb-safe hidden">
+    <!-- Dashboard -->
+    <button id="mobile-nav-dashboard" onclick="switchView('dashboard')" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-3 gap-1 text-brand-blue relative">
+      <i class="fa-solid fa-grid-2 text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Dash</span>
+    </button>
+    
+    <!-- Siswa -->
+    <button id="mobile-nav-siswa" onclick="switchView('siswa')" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-3 gap-1 text-slate-400">
+      <i class="fa-solid fa-user-graduate text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Siswa</span>
+    </button>
+
+    <!-- Turnover -->
+    <button id="mobile-nav-turnover" onclick="switchView('turnover')" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-3 gap-1 text-slate-400">
+      <i class="fa-solid fa-user-minus text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Turn</span>
+    </button>
+
+    <!-- Keuangan -->
+    <button id="mobile-nav-keuangan" onclick="switchView('keuangan')" class="mobile-nav-btn flex-1 flex flex-col items-center justify-center py-3 gap-1 text-slate-400">
+      <i class="fa-solid fa-wallet text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Cost</span>
+    </button>
+
+    <!-- Absensi -->
+    <button id="mobile-nav-absensi" onclick="switchView('absensi')" class="mobile-nav-btn flex-1 hidden flex-col items-center justify-center py-3 gap-1 text-slate-400">
+      <i class="fa-solid fa-calendar-days text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Absen</span>
+    </button>
+
+    <!-- Admin -->
+    <button id="mobile-nav-admin" onclick="switchView('admin')" class="mobile-nav-btn flex-1 hidden flex-col items-center justify-center py-3 gap-1 text-slate-400">
+      <i class="fa-solid fa-sliders text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Admin</span>
+    </button>
+
+    <!-- Logout -->
+    <button onclick="logout()" class="flex-1 flex flex-col items-center justify-center py-3 gap-1 text-slate-400 hover:text-rose-500 transition-colors">
+      <i class="fa-solid fa-arrow-right-from-bracket text-lg"></i>
+      <span class="text-[9px] font-bold uppercase tracking-wider">Keluar</span>
+    </button>
+  </nav>
+
+  <!-- =============================================
+       KONTEN UTAMA APLIKASI
+       ============================================= -->
+  <main class="flex-1 min-h-screen bg-brand-bg flex flex-col justify-between overflow-x-hidden pb-16 md:pb-0">
+    
+    <!-- HEADER UTAMA (Dashboard Header) -->
+    <header class="h-20 bg-white/70 backdrop-blur-xl border-b border-brand-border/60 sticky top-0 z-30 flex items-center justify-between px-6 md:px-8">
+      <div class="flex items-center gap-4">
+        <!-- Breadcrumb / View Title -->
+        <div>
+          <h1 class="font-display font-extrabold text-lg md:text-xl text-brand-textMain tracking-tight transition-all duration-300" id="header-view-title">Dashboard Monitor</h1>
+        </div>
+      </div>
+      
+      <!-- Right Header Actions (Sync, Status, Clock) -->
+      <div class="flex items-center gap-3 sm:gap-5">
+        <!-- Live Sync Dot & Text Status -->
+        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-semibold text-brand-textSub shadow-sm">
+          <span id="sync-live-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
+          <span id="header-conn-status">Terhubung ke server</span>
+        </div>
+
+        <button onclick="syncDataManual()" class="p-2.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-brand-blue active:scale-95 transition-all duration-300 shadow-sm border border-slate-100 bg-white flex items-center justify-center" title="Sinkronisasi Data Manual">
+          <i class="fa-solid fa-rotate text-sm" id="header-sync-spinner"></i>
+        </button>
+
+        <!-- Digital Realtime Clock -->
+        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-bold text-slate-500 tracking-wider shadow-sm uppercase select-none" id="realtime-clock">
+          <span>Memuat Jam...</span>
+        </div>
+      </div>
+    </header>
+
+    <!-- BINDING KONTEN VIEW (DITAMPILKAN BERDASARKAN NAVIGASI AKTIF) -->
+    <main class="flex-1 p-6 md:p-8">
+      
+      <!-- VIEW 1: Dashboard Monitor -->
+      <div id="view-dashboard" class="menu-view space-y-6">
+        <Dashboard />
+      </div>
+
+      <!-- VIEW 2: Performa & Tren LTC -->
+      <div id="view-siswa" class="menu-view hidden space-y-6">
+        <Performance />
+      </div>
+      
+      <!-- VIEW 3: Data Turnover & Terminasi -->
+      <div id="view-turnover" class="menu-view hidden space-y-6">
+        <Turnover />
+      </div>
+
+      <!-- VIEW 4: Portal Siswa (Sisi Siswa) -->
+      <div id="view-sisi-siswa" class="menu-view hidden space-y-6">
+        <SiswaPortal />
+      </div>
+
+      <!-- VIEW 5: Laporan Keuangan -->
+      <div id="view-keuangan" class="menu-view hidden space-y-6">
+        <Keuangan />
+      </div>
+
+      <!-- VIEW 6: Sistem Admin -->
+      <div id="view-admin" class="menu-view hidden space-y-6">
+        <Admin />
+      </div>
+
+      <!-- VIEW 7: Sistem Absensi -->
+      <div id="view-absensi" class="menu-view hidden space-y-6">
+        <Absensi />
+      </div>
+    </main>
+  </main>
+</div>
+
+<!-- MODAL DETAIL SISWA -->
+<div id="student-detail-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeStudentDetailModal()">
+  <div class="bg-white/80 backdrop-blur-xl border border-white/20 shadow-2xl rounded-[28px] w-full max-w-lg max-h-[90vh] overflow-y-auto">
+    <!-- Modal Header -->
+    <div class="p-6 border-b border-white/10 flex items-start justify-between">
+      <div class="flex items-center gap-4">
+        <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-100 to-blue-300 flex items-center justify-center">
+          <span class="text-xl font-bold text-brand-blue" id="sdm-avatar">A</span>
+        </div>
+        <div>
+          <h3 class="font-display font-bold text-lg text-brand-textMain leading-tight" id="sdm-nama">-</h3>
+          <p class="text-xs text-slate-400 font-mono mt-0.5" id="sdm-id">-</p>
+        </div>
+      </div>
+      <button onclick="closeStudentDetailModal()" class="p-2 hover:bg-white/40 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+    </div>
+    <!-- Modal Body -->
+    <div class="p-6 space-y-5">
+      <!-- Nilai Performa & Grafik Tren -->
+      <div class="bg-slate-50 rounded-2xl p-5">
+        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 text-center sm:text-left">Performa & Tren 2 Minggu Terakhir</p>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
+          <!-- Score Display -->
+          <div class="text-center sm:text-left sm:border-r border-slate-200/80 pr-2">
+            <p class="text-[10px] font-bold uppercase text-slate-400">Total Akumulasi</p>
+            <p class="text-4xl font-extrabold text-brand-textMain mt-1" id="sdm-nilai">0%</p>
+            <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold" id="sdm-label">-</span>
+          </div>
+          <!-- Line Chart Canvas -->
+          <div class="sm:col-span-2 h-28 relative">
+            <canvas id="sdm-chart-canvas"></canvas>
+          </div>
+        </div>
+      </div>
+
+      <!-- Info Grid -->
+      <div class="grid grid-cols-2 gap-3">
+        <div class="bg-slate-50 rounded-xl p-3">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Bagian</p>
+          <p class="text-sm font-semibold text-brand-textMain" id="sdm-bagian">-</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Kelas</p>
+          <p class="text-sm font-semibold text-brand-textMain" id="sdm-kelas">-</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3 col-span-2">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Penempatan / Asal</p>
+          <p class="text-sm font-semibold text-brand-textMain"><span id="sdm-wilayah">-</span> / <span id="sdm-daerah-asal">-</span></p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">SPV</p>
+          <p class="text-sm font-semibold text-brand-textMain" id="sdm-spv">-</p>
+        </div>
+        <div class="bg-slate-50 rounded-xl p-3">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Tanggal Masuk Program</p>
+          <p class="text-sm font-semibold text-brand-textMain" id="sdm-masuk">-</p>
+        </div>
+      </div>
+
+      <!-- Log Harian -->
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-3">Riwayat 10 Hari Terakhir</p>
+        <div class="overflow-x-auto rounded-xl border border-slate-100">
+          <table class="w-full text-left">
+            <thead>
+              <tr class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400">
+                <th class="px-3 py-2">Tanggal</th>
+                <th class="px-3 py-2">Hadir</th>
+                <th class="px-3 py-2">Plan</th>
+                <th class="px-3 py-2">Aktual</th>
+                <th class="px-3 py-2">%</th>
+              </tr>
+            </thead>
+            <tbody id="sdm-log-tbody" class="divide-y divide-slate-50"></tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

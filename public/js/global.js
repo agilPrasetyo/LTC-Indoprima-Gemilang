@@ -521,6 +521,11 @@
                 google.script.run
                     .withSuccessHandler(res => {
                         if (res.success) {
+                            if (window.FORCED_ROLE && res.user.role !== window.FORCED_ROLE) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                                return;
+                            }
                             loginSuccess(res.user);
                         } else {
                             errorBox.classList.remove('hidden');
@@ -534,12 +539,22 @@
                     })
                     .login(email, pass);
             } else {
+                let targetUser = null;
                 if (email === "admin@indoprima.com" && pass === "admin123") {
-                    loginSuccess({ namaLengkap: "Admin Utama", role: "Admin" });
+                    targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
                 } else if (email === "visitor@indoprima.com" && pass === "visitor123") {
-                    loginSuccess({ namaLengkap: "Executive Visitor", role: "Visitor" });
+                    targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
                 } else if (email === "2601176@indoprima.com" && pass === "siswa123") {
-                    loginSuccess({ namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" });
+                    targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
+                }
+
+                if (targetUser) {
+                    if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
+                        errorBox.classList.remove('hidden');
+                        errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                        return;
+                    }
+                    loginSuccess(targetUser);
                 } else {
                     errorBox.classList.remove('hidden');
                     errorBox.innerText = "Email / Nomor Registrasi salah.";
@@ -1371,10 +1386,34 @@
     // Restore Session on Page Refresh
     document.addEventListener('DOMContentLoaded', () => {
         try {
+            // Apply forced role adjustments first
+            if (window.FORCED_ROLE) {
+                const qfContainer = document.getElementById('quick-fill-container');
+                if (qfContainer) qfContainer.classList.add('hidden');
+                
+                const roleLabel = document.getElementById('login-role-label');
+                if (roleLabel) roleLabel.innerText = window.FORCED_ROLE.toUpperCase() + ' PORTAL';
+
+                if (window.FORCED_ROLE === 'Siswa') {
+                    fillLogin('2601176@indoprima.com', 'siswa123', 'siswa');
+                } else if (window.FORCED_ROLE === 'Admin') {
+                    fillLogin('admin@indoprima.com', 'admin123', 'admin');
+                } else if (window.FORCED_ROLE === 'Visitor') {
+                    fillLogin('visitor@indoprima.com', 'visitor123', 'visitor');
+                }
+            }
+
             const savedUserStr = localStorage.getItem('currentUser');
             if (savedUserStr) {
                 const savedUser = JSON.parse(savedUserStr);
                 if (savedUser) {
+                    // Check if the saved user role matches the forced role of the page
+                    if (window.FORCED_ROLE && savedUser.role !== window.FORCED_ROLE) {
+                        // Role mismatch! Clear session and require login for this specific page
+                        localStorage.removeItem('currentUser');
+                        localStorage.removeItem('activeView');
+                        return;
+                    }
                     // Call loginSuccess and bypass the splash screen video
                     loginSuccess(savedUser, true);
                 }
