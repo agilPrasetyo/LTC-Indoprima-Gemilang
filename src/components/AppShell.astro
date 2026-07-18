@@ -12,6 +12,7 @@ interface Props {
 }
 
 const { role } = Astro.props;
+const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
 ---
 
 <script is:inline define:vars={{ role }}>
@@ -407,3 +408,18 @@ const { role } = Astro.props;
     </div>
   </div>
 </div>
+
+<!-- Memuat Script Real-Time Engine secara teratur -->
+<script is:inline define:vars={{ gasUrl }}>
+  window.PUBLIC_GAS_WEB_APP_URL = gasUrl;
+</script>
+
+<script is:inline src="/js/api.js?v=7.1"></script>
+<script is:inline src="/js/global.js?v=7.1"></script>
+<script is:inline src="/js/dashboard.js?v=7.1"></script>
+<script is:inline src="/js/siswa.js?v=7.1"></script>
+<script is:inline src="/js/turnover.js?v=7.1"></script>
+<script is:inline src="/js/siswa_portal.js?v=7.1"></script>
+<script is:inline src="/js/keuangan.js?v=7.1"></script>
+<script is:inline src="/js/admin.js?v=7.1"></script>
+<script is:inline src="/js/absensi.js?v=7.1"></script>
