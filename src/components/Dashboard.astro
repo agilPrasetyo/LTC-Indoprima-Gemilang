@@ -1,7 +1,7 @@
 <!-- KARTU STATISTIK UTAMA & TURNOVER -->
 <div class="flex flex-col lg:flex-row gap-6 animate-fadeIn">
     <!-- BLOK KIRI: 4 Kartu Utama (2x2 Grid) -->
-    <div class="w-full lg:w-2/3 grid grid-cols-2 gap-4 sm:gap-6">
+    <div class="w-full lg:w-[58%] grid grid-cols-2 gap-4 sm:gap-6">
         <!-- Card 1: Siswa Aktif -->
         <div class="bg-white p-4 sm:p-6 rounded-[24px] border border-slate-100 shadow-sm flex items-start justify-between cursor-pointer hover:-translate-y-1.5 hover:shadow-lg hover:border-teal-200 active:scale-[0.97] active:duration-75 transition-all duration-300 ease-out group" onclick="switchView('siswa')" title="Klik untuk lihat daftar siswa aktif">
             <div>
@@ -81,7 +81,7 @@
     </div>
 
     <!-- BLOK KANAN: Widget Vertikal Turnover -->
-    <div class="w-full lg:w-1/3 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col justify-between group">
+    <div class="w-full lg:w-[42%] bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col justify-between group">
         <div>
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
@@ -92,13 +92,13 @@
             </div>
             
             <!-- Area Donut Chart -->
-            <div class="relative h-40 flex items-center justify-center mt-3">
+            <div class="relative h-52 flex items-center justify-center mt-3">
                 <canvas id="dashboardTurnoverPieChart"></canvas>
                 <!-- Central Circle Redesign -->
-                <div class="absolute w-[84px] h-[84px] rounded-full bg-white shadow-md border border-slate-50 flex flex-col items-center justify-center text-center p-1 pointer-events-none z-10">
-                    <p class="text-[8px] font-extrabold uppercase tracking-widest text-[#F5C400]">Turnover</p>
-                    <p class="text-slate-300 text-[8px] tracking-widest leading-none my-0.5">•••••</p>
-                    <p id="dashboard-turnover-total-center" class="text-xs font-extrabold text-brand-textMain">0 Siswa</p>
+                <div class="absolute w-[108px] h-[108px] rounded-full bg-white shadow-md border border-slate-50 flex flex-col items-center justify-center text-center p-1 pointer-events-none z-10">
+                    <p class="text-[10px] font-extrabold uppercase tracking-widest text-[#F5C400]">Turnover</p>
+                    <p class="text-slate-300 text-[10px] tracking-widest leading-none my-0.5">•••••</p>
+                    <p id="dashboard-turnover-total-center" class="text-base font-extrabold text-brand-textMain">0 Siswa</p>
                 </div>
             </div>
         </div>

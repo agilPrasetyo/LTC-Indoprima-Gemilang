@@ -448,7 +448,7 @@ function updateTurnoverPieChart() {
                     color: '#FFFFFF',
                     font: {
                         family: 'Inter',
-                        size: 10,
+                        size: 11,
                         weight: 'bold'
                     },
                     formatter: function(value, context) {
