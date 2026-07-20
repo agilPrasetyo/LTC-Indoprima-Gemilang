@@ -631,7 +631,19 @@
         document.getElementById('student-hk').value = s.hk || s.hariKerja || '6 Hari';
         document.getElementById('student-departemen').value = s.departemen || 'PRODUKSI';
         document.getElementById('student-section').value = s.section || 'PAINTING';
-        document.getElementById('student-spv').value = s.spv || '';
+        
+        const spvVal = (s.spv || '').toUpperCase().trim();
+        const spvSelect = document.getElementById('student-spv');
+        if (spvSelect) {
+            if (spvVal && !Array.from(spvSelect.options).some(opt => opt.value === spvVal)) {
+                const newOpt = document.createElement('option');
+                newOpt.value = spvVal;
+                newOpt.textContent = spvVal;
+                spvSelect.appendChild(newOpt);
+            }
+            spvSelect.value = spvVal;
+        }
+        
         document.getElementById('student-asal-daerah').value = s.daerahAsal || s.asalDaerah || '';
         document.getElementById('student-sekolah').value = s.asalSekolah || '';
         
