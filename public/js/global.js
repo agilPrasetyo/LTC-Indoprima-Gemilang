@@ -713,6 +713,13 @@
                 const mainHeader = document.querySelector('main > header');
                 if (mainHeader) mainHeader.classList.add('hidden');
                 
+                // Hide mobile bottom navigation bar for Siswa view
+                const bottomNav = document.getElementById('mobile-bottom-nav');
+                if (bottomNav) {
+                    bottomNav.classList.add('hidden');
+                    bottomNav.style.setProperty('display', 'none', 'important');
+                }
+                
                 switchView('sisi-siswa');
                 
                 // Show form view & hide success view on load
@@ -728,6 +735,13 @@
                 document.getElementById('app-sidebar').classList.remove('hidden');
                 const mainHeader = document.querySelector('main > header');
                 if (mainHeader) mainHeader.classList.remove('hidden');
+                
+                // Show mobile bottom navigation bar for Admin/Visitor views (restore default CSS media query behavior)
+                const bottomNav = document.getElementById('mobile-bottom-nav');
+                if (bottomNav) {
+                    bottomNav.classList.remove('hidden');
+                    bottomNav.style.removeProperty('display');
+                }
                 
                 const savedView = localStorage.getItem('activeView') || 'dashboard';
                 switchView(savedView);
