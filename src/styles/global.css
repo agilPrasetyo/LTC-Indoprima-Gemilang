@@ -99,24 +99,50 @@ body {
     cursor: pointer;
 }
 
-/* Glassmorphism Styles */
-.glass-modal-bg {
-    background: rgba(15, 23, 42, 0.35);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
+/* Glassmorphism Styles & Modal Overrides */
+.glass-modal-bg,
+#app [id$="-modal"] {
+    background: rgba(15, 23, 42, 0.65) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
 }
-.glass-modal-card {
-    background: rgba(255, 255, 255, 0.75);
-    backdrop-filter: blur(24px) saturate(180%);
-    -webkit-backdrop-filter: blur(24px) saturate(180%);
-    border: 1px solid rgba(255, 255, 255, 0.5);
-    box-shadow: 0 25px 60px rgba(15, 58, 140, 0.06), 0 10px 30px rgba(0, 0, 0, 0.03);
+.glass-modal-card,
+#app [id$="-modal"] > div {
+    background: #ffffff !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+    border: 1px solid #e2e8f0 !important;
+    box-shadow: 0 25px 50px -12px rgba(15, 23, 42, 0.35), 0 10px 25px -5px rgba(0, 0, 0, 0.15) !important;
 }
 .glass-panel {
     background: rgba(255, 255, 255, 0.65);
     backdrop-filter: blur(12px);
     -webkit-backdrop-filter: blur(12px);
     border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* Ensure modal input fields and selects are 100% solid, crisp and clear */
+.glass-modal-card input,
+.glass-modal-card select,
+.glass-modal-card textarea,
+#app [id$="-modal"] input,
+#app [id$="-modal"] select,
+#app [id$="-modal"] textarea {
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+}
+.glass-modal-card input:focus,
+.glass-modal-card select:focus,
+.glass-modal-card textarea:focus,
+#app [id$="-modal"] input:focus,
+#app [id$="-modal"] select:focus,
+#app [id$="-modal"] textarea:focus {
+    background-color: #ffffff !important;
+    border-color: #2563eb !important;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15) !important;
 }
 
 /* Glass Cards & Sidebar Override */
