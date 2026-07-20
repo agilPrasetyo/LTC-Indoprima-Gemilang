@@ -1437,3 +1437,30 @@
         }
     });
 
+    // Auto Upper Case for all text inputs & textareas
+    document.addEventListener('input', function (e) {
+        const target = e.target;
+        if (!target) return;
+        const tagName = target.tagName;
+        const type = (target.type || '').toLowerCase();
+        
+        if (
+            tagName === 'TEXTAREA' || 
+            (tagName === 'INPUT' && (type === 'text' || type === 'search' || !type))
+        ) {
+            const start = target.selectionStart;
+            const end = target.selectionEnd;
+            const upper = target.value.toUpperCase();
+            if (target.value !== upper) {
+                target.value = upper;
+                if (start !== null && end !== null) {
+                    try {
+                        target.setSelectionRange(start, end);
+                    } catch (err) {
+                        // Ignore for input types that don't support selectionRange
+                    }
+                }
+            }
+        }
+    });
+

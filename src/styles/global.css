@@ -326,3 +326,12 @@ body {
         height: 300px;
     }
 }
+
+/* Global Auto-Uppercase for text inputs & textareas */
+input[type="text"],
+input[type="search"],
+textarea,
+input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):not([type="number"]):not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]) {
+    text-transform: uppercase;
+}
+
