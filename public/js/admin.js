@@ -58,11 +58,11 @@
             if (typeof google !== 'undefined') {
                 google.script.run.withSuccessHandler(data => {
                     rawUsersData = data || [];
-                    displayAdminUsersTable(rawUsersData);
+                    filterAdminUsersTable();
                 }).getUsersList();
             } else {
                 rawUsersData = fallbackUsers;
-                displayAdminUsersTable(rawUsersData);
+                filterAdminUsersTable();
             }
         } else if (currentAdminTab === 'kelola-siswa') {
             renderAdminSiswaTable();
@@ -75,13 +75,43 @@
         }
     }
 
+    function filterAdminUsersTable() {
+        const input = document.getElementById('filter-user-query');
+        const query = input ? input.value.trim().toLowerCase() : '';
+        const users = rawUsersData || [];
+
+        if (!query) {
+            displayAdminUsersTable(users);
+            return;
+        }
+
+        const filtered = users.filter(u => {
+            const idStr = String(u.id || '').toLowerCase();
+            const namaStr = String(u.namaLengkap || '').toLowerCase();
+            const emailStr = String(u.email || '').toLowerCase();
+            const roleStr = String(u.role || '').toLowerCase();
+            const noregStr = String(u.nomorRegistrasi || '').toLowerCase();
+
+            return idStr.includes(query) ||
+                   namaStr.includes(query) ||
+                   emailStr.includes(query) ||
+                   roleStr.includes(query) ||
+                   noregStr.includes(query);
+        });
+
+        displayAdminUsersTable(filtered);
+    }
+
     function displayAdminUsersTable(users) {
         const tbody = document.getElementById('admin-tbody');
         if (!tbody) return;
         tbody.innerHTML = '';
 
         if (users.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada kredensial pengguna terdaftar.</td></tr>';
+            const input = document.getElementById('filter-user-query');
+            const query = input ? input.value.trim() : '';
+            const msg = query ? `Tidak ada akun yang cocok dengan pencarian "${query}".` : 'Tidak ada kredensial pengguna terdaftar.';
+            tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub italic">${msg}</td></tr>`;
             return;
         }
 
