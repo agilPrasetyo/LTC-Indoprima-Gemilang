@@ -905,245 +905,361 @@
     // ============================================================
 
     function initLogManpowerTab() {
-        const select = document.getElementById('log-mp-student');
-        if (!select) return;
-        
-        select.innerHTML = '';
-        const students = (activeData || []).filter(s => s.status === "Aktif");
-        
-        if (students.length === 0) {
-            select.innerHTML = '<option value="">-- Tidak ada siswa aktif --</option>';
-            document.getElementById('log-mp-label-info').textContent = '';
-            return;
-        }
-        
-        students.forEach(s => {
-            const opt = document.createElement('option');
-            opt.value = s.id;
-            opt.textContent = `${s.id} - ${s.namaLengkap}`;
-            select.appendChild(opt);
+        renderAdminManpowerTable();
+    }
+
+    function renderAdminManpowerTable() {
+        const tbody = document.getElementById('admin-manpower-tbody');
+        if (!tbody) return;
+
+        // Kumpulkan semua catatan dailyRecords dari seluruh siswa aktif
+        let logs = [];
+        (activeData || []).forEach(siswa => {
+            (siswa.dailyRecords || []).forEach(rec => {
+                logs.push({
+                    noreg: siswa.id,
+                    namaLengkap: siswa.namaLengkap,
+                    tanggal: rec.dateStr || rec.tanggal_record || '',
+                    hadir: rec.hadir || '✔',
+                    plan: rec.plan !== null && rec.plan !== undefined ? rec.plan : null,
+                    actual: rec.actual !== null && rec.actual !== undefined ? rec.actual : null,
+                    reject: rec.reject !== null && rec.reject !== undefined ? rec.reject : 0,
+                    percent: rec.percent !== null && rec.percent !== undefined ? rec.percent : null,
+                    shift: rec.shift || rec.Shift || 'Shift 1',
+                    bagian: rec.bagian || rec.Bagian || siswa.section || '-',
+                    mesin: rec.nomor_mesin || rec.nomorMesin || rec.NomorMesin || '-',
+                    model: rec.model || rec.Model || '-',
+                    spv: rec.nama_spv || rec.namaSpv || rec.NamaSPV || siswa.spv || '-',
+                    keterangan: rec.keterangan || rec.Keterangan || '-'
+                });
+            });
         });
 
-        // Set date to today
-        const dateInput = document.getElementById('log-mp-date');
-        if (dateInput && !dateInput.value) {
-            const today = new Date();
-            const yyyy = today.getFullYear();
-            const mm = String(today.getMonth() + 1).padStart(2, '0');
-            const dd = String(today.getDate()).padStart(2, '0');
-            dateInput.value = `${yyyy}-${mm}-${dd}`;
+        // Filter berdasarkan Query Pencarian
+        const queryInput = document.getElementById('filter-manpower-query');
+        const query = queryInput ? queryInput.value.trim().toLowerCase() : '';
+        if (query) {
+            logs = logs.filter(l => {
+                return (l.noreg || '').toLowerCase().includes(query) ||
+                       (l.namaLengkap || '').toLowerCase().includes(query) ||
+                       (l.bagian || '').toLowerCase().includes(query) ||
+                       (l.spv || '').toLowerCase().includes(query) ||
+                       (l.keterangan || '').toLowerCase().includes(query);
+            });
         }
-        
-        onLogStudentChange();
-    }
 
-    function onLogStudentChange() {
-        const select = document.getElementById('log-mp-student');
-        if (!select) return;
-        const noreg = select.value;
-        if (!noreg) return;
-        
-        const s = activeData.find(std => std.id === noreg);
-        if (!s) return;
-        
-        const infoLabel = document.getElementById('log-mp-label-info');
-        const isHadirRole = s.perfLabel === "Hadir";
-        
-        infoLabel.textContent = `Kategori Penilaian: ${s.perfLabel || 'Plan'} | Bagian: ${s.bagian}`;
-        
-        const prodFields = document.getElementById('log-mp-fields-productivity');
-        const attFields = document.getElementById('log-mp-fields-attendance');
-        
-        if (isHadirRole) {
-            prodFields.classList.add('hidden');
-            attFields.classList.remove('hidden');
-        } else {
-            prodFields.classList.remove('hidden');
-            attFields.classList.add('hidden');
+        // Filter berdasarkan Tanggal
+        const dateInput = document.getElementById('filter-manpower-date');
+        const dateVal = dateInput ? dateInput.value : '';
+        if (dateVal) {
+            logs = logs.filter(l => l.tanggal === dateVal);
         }
-        
-        renderStudentLogPreview(noreg);
-    }
 
-    function renderStudentLogPreview(noreg) {
-        const s = activeData.find(std => std.id === noreg);
-        const thead = document.getElementById('log-mp-preview-thead');
-        const tbody = document.getElementById('log-mp-preview-tbody');
-        if (!thead || !tbody) return;
+        // Urutkan berdasarkan Tanggal Terbaru (Descending)
+        logs.sort((a, b) => b.tanggal.localeCompare(a.tanggal));
 
-        thead.innerHTML = '';
         tbody.innerHTML = '';
 
-        if (!s) {
-            tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-xs text-brand-textSub italic">Data siswa tidak ditemukan.</td></tr>';
+        if (logs.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada catatan log manpower harian terdaftar. Klik "+ Input Log Manpower" untuk menambah baru.</td></tr>';
             return;
         }
 
-        const isHadir = s.perfLabel === "Hadir";
-        
-        if (isHadir) {
-            thead.innerHTML = `
-                <th class="py-3 px-4 font-semibold">Tanggal</th>
-                <th class="py-3 px-4 font-semibold">Kehadiran</th>
-                <th class="py-3 px-4 font-semibold text-right">Keterangan Aktivitas</th>
-            `;
-        } else {
-            thead.innerHTML = `
-                <th class="py-3 px-4 font-semibold">Tanggal</th>
-                <th class="py-3 px-4 font-semibold">Plan</th>
-                <th class="py-3 px-4 font-semibold">Aktual</th>
-                <th class="py-3 px-4 font-semibold">Reject</th>
-                <th class="py-3 px-4 font-semibold text-right">Persentase</th>
-            `;
-        }
-
-        const records = s.dailyRecords || [];
-        // Ambil 10 record terakhir
-        const last10 = records.slice(-10).reverse();
-
-        if (last10.length === 0) {
-            const cols = isHadir ? 3 : 5;
-            tbody.innerHTML = `<tr><td colspan="${cols}" class="py-8 text-center text-xs text-brand-textSub italic">Belum ada riwayat log.</td></tr>`;
-            return;
-        }
-
-        last10.forEach(rec => {
+        logs.forEach(r => {
             const tr = document.createElement('tr');
-            tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50";
-            
-            // Format tanggal
-            const dateFormatted = rec.dateStr ? rec.dateStr.split('-').reverse().join('/') : '-';
+            tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50 text-xs font-semibold";
 
-            if (isHadir) {
-                const badgeClass = rec.hadir === "✔" || rec.hadir === "Hadir" ? "bg-emerald-50 text-emerald-600" : "bg-slate-100 text-slate-400";
-                const presenceText = rec.hadir === "✔" || rec.hadir === "Hadir" ? "Hadir" : "Off / Libur";
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-semibold font-mono text-brand-textSub">${dateFormatted}</td>
-                    <td class="py-3.5 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeClass}">${presenceText}</span></td>
-                    <td class="py-3.5 px-4 text-brand-textSub text-right">${rec.keterangan || '-'}</td>
+            // Format tanggal display (DD/MM/YYYY)
+            let dateDisplay = r.tanggal;
+            if (r.tanggal && r.tanggal.includes('-')) {
+                dateDisplay = r.tanggal.split('-').reverse().join('/');
+            }
+
+            // Status Kehadiran Badge
+            let hadirBadge = '';
+            const hadirUpper = String(r.hadir || '').toUpperCase();
+            if (hadirUpper === 'IJIN') {
+                hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-600 border border-amber-200">Ijin</span>';
+            } else if (hadirUpper === 'SAKIT') {
+                hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">Sakit</span>';
+            } else if (hadirUpper === 'ALPHA' || hadirUpper === 'ABSEN') {
+                hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">Alpha</span>';
+            } else {
+                hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">✔ Hadir</span>';
+            }
+
+            // Format Plan/Aktual/Reject vs Hadir
+            let hasilDisplay = '';
+            if (r.plan !== null && r.plan > 0) {
+                const pct = Math.round((r.actual / r.plan) * 100);
+                const pctClass = pct >= 90 ? 'text-emerald-600' : (pct >= 75 ? 'text-amber-600' : 'text-rose-600');
+                hasilDisplay = `
+                    <div class="font-bold text-slate-800">T: ${r.plan} | H: ${r.actual} | R: ${r.reject || 0} <span class="${pctClass}">(${pct}%)</span></div>
+                    <div class="text-[10px] text-slate-400 font-normal">SPV: ${r.spv || '-'}</div>
                 `;
             } else {
-                const percentStyle = rec.percent >= 90 ? 'text-emerald-600' : (rec.percent >= 75 ? 'text-amber-500' : 'text-rose-600');
-                tr.innerHTML = `
-                    <td class="py-3.5 px-4 font-semibold font-mono text-brand-textSub">${dateFormatted}</td>
-                    <td class="py-3.5 px-4 text-brand-textMain font-bold">${rec.plan}</td>
-                    <td class="py-3.5 px-4 text-brand-textMain font-bold">${rec.actual}</td>
-                    <td class="py-3.5 px-4 text-slate-400">${rec.reject}</td>
-                    <td class="py-3.5 px-4 text-right font-bold ${percentStyle}">${rec.percent}%</td>
+                hasilDisplay = `
+                    <div class="font-bold text-slate-700">-</div>
+                    <div class="text-[10px] text-slate-400 font-normal">SPV: ${r.spv || '-'}</div>
                 `;
             }
+
+            tr.innerHTML = `
+                <td class="py-3 px-4 text-center whitespace-nowrap space-x-1">
+                    <button onclick="openManpowerLogModal('${r.noreg}', '${r.tanggal}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all">
+                        <i class="fa-solid fa-pen-to-square"></i> Edit
+                    </button>
+                    <button onclick="deleteManpowerLogConfirm('${r.noreg}', '${r.tanggal}', '${r.namaLengkap.replace(/'/g, "\\'")}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all">
+                        <i class="fa-solid fa-trash-can"></i> Hapus
+                    </button>
+                </td>
+                <td class="py-3 px-4 font-mono font-bold text-slate-700 whitespace-nowrap">${dateDisplay}</td>
+                <td class="py-3 px-4 font-mono text-slate-500 whitespace-nowrap">${r.noreg}</td>
+                <td class="py-3 px-4 font-bold text-brand-textMain whitespace-nowrap">${r.namaLengkap}</td>
+                <td class="py-3 px-4 text-center whitespace-nowrap">${hadirBadge}</td>
+                <td class="py-3 px-4 whitespace-nowrap">
+                    <div class="font-bold text-slate-700">${r.shift || 'Shift 1'} • ${r.bagian || '-'}</div>
+                    <div class="text-[10px] text-slate-400 font-normal">Mesin: ${r.mesin || '-'} | Model: ${r.model || '-'}</div>
+                </td>
+                <td class="py-3 px-4 whitespace-nowrap">${hasilDisplay}</td>
+                <td class="py-3 px-4 text-slate-600 max-w-xs truncate" title="${r.keterangan || ''}">${r.keterangan || '-'}</td>
+            `;
             tbody.appendChild(tr);
         });
     }
 
-    function saveManpowerLogAdmin() {
-        const select = document.getElementById('log-mp-student');
+    function openManpowerLogModal(noreg = null, tanggal = null) {
+        const modal = document.getElementById('manpower-log-modal');
+        if (!modal) return;
+
+        const isEdit = !!(noreg && tanggal);
+        document.getElementById('mp-modal-is-edit').value = isEdit ? "true" : "false";
+        document.getElementById('mp-modal-title').textContent = isEdit ? "Edit Log Manpower Harian" : "Input Log Manpower Harian";
+
+        // Populate dropdown siswa aktif
+        const studentSelect = document.getElementById('mp-modal-student');
+        if (studentSelect) {
+            studentSelect.innerHTML = '';
+            const students = (activeData || []).filter(s => s.status === "Aktif");
+            students.forEach(s => {
+                const opt = document.createElement('option');
+                opt.value = s.id;
+                opt.textContent = `${s.id} - ${s.namaLengkap}`;
+                studentSelect.appendChild(opt);
+            });
+            studentSelect.disabled = isEdit;
+        }
+
+        if (isEdit) {
+            if (studentSelect) studentSelect.value = noreg;
+            document.getElementById('mp-modal-date').value = tanggal;
+            document.getElementById('mp-modal-date').disabled = true;
+
+            // Cari rincian data dari activeData
+            const s = (activeData || []).find(std => std.id === noreg);
+            const rec = s ? (s.dailyRecords || []).find(r => r.dateStr === tanggal) : null;
+
+            if (rec) {
+                const hadirVal = rec.hadir === "✔" || rec.hadir === "Hadir" ? "✔" : (rec.hadir || "✔");
+                document.getElementById('mp-modal-hadir').value = hadirVal;
+                document.getElementById('mp-modal-shift').value = rec.shift || "Shift 1";
+                document.getElementById('mp-modal-bagian').value = rec.bagian || s.section || "PAINTING";
+                document.getElementById('mp-modal-mesin').value = rec.nomor_mesin || "";
+                document.getElementById('mp-modal-model').value = rec.model || "";
+                document.getElementById('mp-modal-plan').value = rec.plan !== null && rec.plan !== undefined ? rec.plan : 0;
+                document.getElementById('mp-modal-actual').value = rec.actual !== null && rec.actual !== undefined ? rec.actual : 0;
+                document.getElementById('mp-modal-reject').value = rec.reject !== null && rec.reject !== undefined ? rec.reject : 0;
+                document.getElementById('mp-modal-spv').value = rec.nama_spv || s.spv || "";
+                document.getElementById('mp-modal-keterangan').value = rec.keterangan || "";
+            }
+        } else {
+            if (studentSelect && studentSelect.options.length > 0) {
+                studentSelect.selectedIndex = 0;
+            }
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('mp-modal-date').value = `${yyyy}-${mm}-${dd}`;
+            document.getElementById('mp-modal-date').disabled = false;
+
+            document.getElementById('mp-modal-hadir').value = "✔";
+            document.getElementById('mp-modal-shift').value = "Shift 1";
+            document.getElementById('mp-modal-bagian').value = "PAINTING";
+            document.getElementById('mp-modal-mesin').value = "";
+            document.getElementById('mp-modal-model').value = "";
+            document.getElementById('mp-modal-plan').value = 0;
+            document.getElementById('mp-modal-actual').value = 0;
+            document.getElementById('mp-modal-reject').value = 0;
+            document.getElementById('mp-modal-spv').value = "";
+            document.getElementById('mp-modal-keterangan').value = "";
+        }
+
+        onMpModalStudentChange();
+        modal.classList.remove('hidden');
+    }
+
+    function closeManpowerLogModal() {
+        const modal = document.getElementById('manpower-log-modal');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function onMpModalStudentChange() {
+        const select = document.getElementById('mp-modal-student');
         if (!select) return;
         const noreg = select.value;
-        if (!noreg) {
-            showToast('Pilih siswa terlebih dahulu.', 'error');
-            return;
-        }
-
-        const dateVal = document.getElementById('log-mp-date').value;
-        if (!dateVal) {
-            showToast('Pilih tanggal record.', 'error');
-            return;
-        }
-
-        const s = activeData.find(std => std.id === noreg);
-        if (!s) return;
-
-        const isHadir = s.perfLabel === "Hadir";
-        
-        // Convert YYYY-MM-DD to DD/MM/YYYY
-        const parts = dateVal.split('-');
-        const dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-
-        let payload = {
-            NoReg: noreg,
-            TanggalRecord: dateFormatted
-        };
-
-        if (isHadir) {
-            const hadirVal = document.getElementById('log-mp-hadir').value;
-            const keteranganVal = document.getElementById('log-mp-keterangan').value.trim();
-            payload.hadir = hadirVal;
-            payload.keterangan = keteranganVal;
-        } else {
-            const planVal = document.getElementById('log-mp-plan').value;
-            const actualVal = document.getElementById('log-mp-actual').value;
-            const rejectVal = document.getElementById('log-mp-reject').value;
-
-            if (planVal === "" || actualVal === "" || rejectVal === "") {
-                showToast('Lengkapi nilai Plan, Aktual, dan Reject.', 'error');
-                return;
-            }
-
-            payload.plan = parseFloat(planVal);
-            payload.actual = parseFloat(actualVal);
-            payload.reject = parseFloat(rejectVal);
-
-            if (payload.plan < 0 || payload.actual < 0 || payload.reject < 0) {
-                showToast('Nilai manpower log tidak boleh bernilai negatif.', 'error');
-                return;
-            }
-        }
-
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success) {
-                    showToast('Log manpower harian berhasil disimpan!');
-                    clearLogFormFields(isHadir);
-                    loadDashboardData();
-                    setTimeout(() => renderStudentLogPreview(noreg), 1000);
-                } else {
-                    showToast('Gagal menyimpan log: ' + res.message, 'error');
+        const s = (activeData || []).find(std => std.id === noreg);
+        const infoLabel = document.getElementById('mp-modal-info-label');
+        if (s && infoLabel) {
+            infoLabel.textContent = `Bagian Default: ${s.section || s.bagian || '-'} | SPV: ${s.spv || '-'}`;
+            const bagianSelect = document.getElementById('mp-modal-bagian');
+            const isEdit = document.getElementById('mp-modal-is-edit').value === "true";
+            if (!isEdit && bagianSelect && s.section) {
+                const upperSec = s.section.toUpperCase();
+                if (Array.from(bagianSelect.options).some(o => o.value === upperSec)) {
+                    bagianSelect.value = upperSec;
                 }
-            }).saveManpowerLog(payload);
-        } else {
-            // Preview fallback
-            const studentIdx = fallbackSiswa.findIndex(std => std.id === noreg);
-            if (studentIdx !== -1) {
-                const recs = fallbackSiswa[studentIdx].dailyRecords || [];
-                const existIdx = recs.findIndex(r => r.dateStr === dateVal);
-                
-                const recPayload = { dateStr: dateVal };
-                if (isHadir) {
-                    recPayload.hadir = payload.hadir;
-                    recPayload.keterangan = payload.keterangan;
-                } else {
-                    recPayload.plan = payload.plan;
-                    recPayload.actual = payload.actual;
-                    recPayload.reject = payload.reject;
-                    recPayload.percent = payload.plan > 0 ? Math.round((payload.actual / payload.plan) * 100) : 0;
-                }
-
-                if (existIdx !== -1) {
-                    recs[existIdx] = recPayload;
-                } else {
-                    recs.push(recPayload);
-                }
-                
-                // Sort records by date
-                recs.sort((a,b) => new Date(a.dateStr) - new Date(b.dateStr));
-                fallbackSiswa[studentIdx].dailyRecords = recs;
-                
-                showToast('Mode Preview: Log manpower disimpan ke memori lokal.');
-                clearLogFormFields(isHadir);
-                loadDashboardData();
-                setTimeout(() => renderStudentLogPreview(noreg), 200);
             }
         }
     }
 
-    function clearLogFormFields(isHadir) {
-        if (isHadir) {
-            document.getElementById('log-mp-keterangan').value = '';
+    function saveManpowerLogModal() {
+        const studentSelect = document.getElementById('mp-modal-student');
+        const noreg = studentSelect ? studentSelect.value : '';
+        const dateVal = document.getElementById('mp-modal-date').value;
+        const hadirVal = document.getElementById('mp-modal-hadir').value;
+        const shiftVal = document.getElementById('mp-modal-shift').value;
+        const bagianVal = document.getElementById('mp-modal-bagian').value;
+        const mesinVal = document.getElementById('mp-modal-mesin').value.trim();
+        const modelVal = document.getElementById('mp-modal-model').value.trim();
+        const planVal = document.getElementById('mp-modal-plan').value;
+        const actualVal = document.getElementById('mp-modal-actual').value;
+        const rejectVal = document.getElementById('mp-modal-reject').value;
+        const spvVal = document.getElementById('mp-modal-spv').value;
+        const keteranganVal = document.getElementById('mp-modal-keterangan').value.trim();
+
+        if (!noreg || !dateVal) {
+            showToast('Pilih siswa dan tanggal record terlebih dahulu.', 'error');
+            return;
+        }
+
+        // Format tanggal YYYY-MM-DD ke DD/MM/YYYY untuk kompatibilitas API
+        const parts = dateVal.split('-');
+        const dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+
+        const payload = {
+            NoReg: noreg,
+            TanggalRecord: dateFormatted,
+            Hadir: hadirVal,
+            Shift: shiftVal,
+            Bagian: bagianVal,
+            NomorMesin: mesinVal || '-',
+            Model: modelVal || '-',
+            Plan: planVal !== "" ? parseFloat(planVal) : 0,
+            Aktual: actualVal !== "" ? parseFloat(actualVal) : 0,
+            Reject: rejectVal !== "" ? parseFloat(rejectVal) : 0,
+            NamaSPV: spvVal || '-',
+            Keterangan: keteranganVal || '-'
+        };
+
+        showToast('Menyimpan log manpower...', 'info');
+
+        if (typeof google !== 'undefined') {
+            google.script.run.withSuccessHandler(res => {
+                if (res.success) {
+                    showToast('Log manpower harian berhasil disimpan!', 'success');
+                    _updateLocalManpowerCache(noreg, dateVal, payload);
+                    closeManpowerLogModal();
+                    renderAdminManpowerTable();
+                    setTimeout(() => loadDashboardData(), 1000);
+                } else {
+                    showToast('Gagal menyimpan log: ' + (res.message || 'Unknown error'), 'error');
+                }
+            }).withFailureHandler(err => {
+                showToast('Error server: ' + (err.message || err.toString()), 'error');
+            }).saveManpowerLog(payload);
         } else {
-            document.getElementById('log-mp-plan').value = '';
-            document.getElementById('log-mp-actual').value = '';
-            document.getElementById('log-mp-reject').value = '';
+            // Mode preview lokal
+            showToast('Mode Preview: Log manpower disimpan ke data lokal.', 'success');
+            _updateLocalManpowerCache(noreg, dateVal, payload);
+            closeManpowerLogModal();
+            renderAdminManpowerTable();
+        }
+    }
+
+    function _updateLocalManpowerCache(noreg, dateVal, payload) {
+        const studentIdx = (activeData || []).findIndex(s => s.id === noreg);
+        if (studentIdx !== -1) {
+            const recs = activeData[studentIdx].dailyRecords || [];
+            const existIdx = recs.findIndex(r => r.dateStr === dateVal);
+
+            const newRec = {
+                dateStr: dateVal,
+                hadir: payload.Hadir,
+                plan: payload.Plan,
+                actual: payload.Aktual,
+                reject: payload.Reject,
+                percent: payload.Plan > 0 ? Math.round((payload.Aktual / payload.Plan) * 100) : 100,
+                shift: payload.Shift,
+                bagian: payload.Bagian,
+                nomor_mesin: payload.NomorMesin,
+                model: payload.Model,
+                nama_spv: payload.NamaSPV,
+                keterangan: payload.Keterangan
+            };
+
+            if (existIdx !== -1) {
+                recs[existIdx] = newRec;
+            } else {
+                recs.push(newRec);
+            }
+            activeData[studentIdx].dailyRecords = recs;
+        }
+    }
+
+    function deleteManpowerLogConfirm(noreg, tanggal, nama) {
+        showGlassModal({
+            title: "Hapus Log Manpower",
+            message: `Apakah Anda yakin ingin menghapus catatan log manpower untuk <strong>${nama}</strong> tanggal <strong>${tanggal}</strong>?`,
+            confirmText: "Ya, Hapus Log",
+            confirmClass: "bg-rose-600 hover:bg-rose-700 text-white",
+            onConfirm: () => {
+                executeManpowerLogDeletion(noreg, tanggal);
+            }
+        });
+    }
+
+    function executeManpowerLogDeletion(noreg, tanggal) {
+        let dateFormatted = tanggal;
+        if (tanggal && tanggal.includes('-')) {
+            const parts = tanggal.split('-');
+            dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+
+        if (typeof google !== 'undefined') {
+            google.script.run.withSuccessHandler(res => {
+                if (res.success !== false) {
+                    showToast('Log manpower berhasil dihapus!', 'success');
+                    _removeLocalManpowerCache(noreg, tanggal);
+                    renderAdminManpowerTable();
+                } else {
+                    showToast('Gagal menghapus: ' + (res.message || 'Unknown error'), 'error');
+                }
+            }).withFailureHandler(err => {
+                showToast('Error: ' + err.message, 'error');
+            }).deleteManpowerLog(noreg, dateFormatted);
+        } else {
+            showToast('Mode Preview: Log manpower dihapus dari memori lokal.', 'info');
+            _removeLocalManpowerCache(noreg, tanggal);
+            renderAdminManpowerTable();
+        }
+    }
+
+    function _removeLocalManpowerCache(noreg, tanggal) {
+        const studentIdx = (activeData || []).findIndex(s => s.id === noreg);
+        if (studentIdx !== -1) {
+            const recs = activeData[studentIdx].dailyRecords || [];
+            activeData[studentIdx].dailyRecords = recs.filter(r => r.dateStr !== tanggal);
         }
     }
 

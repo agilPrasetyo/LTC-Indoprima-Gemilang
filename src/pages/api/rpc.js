@@ -668,6 +668,11 @@ async function handleLocalSupabaseWrite(action, args) {
       keterangan: l.Keterangan ? l.Keterangan.toUpperCase() : ''
     }, { onConflict: 'noreg,tanggal' });
 
+  } else if (action === 'deleteManpowerLog') {
+    const noreg = args[0];
+    const tanggalRecord = args[1];
+    await supabase.from('manpower_log').delete().eq('noreg', noreg).eq('tanggal_record', tanggalRecord);
+
   } else if (action === 'saveTransaksiKeuangan') {
     const t = args[0];
     const normalizedTipe = t.tipe && t.tipe.toLowerCase() === 'pemasukan' ? 'Pemasukan' : 'Pengeluaran';
