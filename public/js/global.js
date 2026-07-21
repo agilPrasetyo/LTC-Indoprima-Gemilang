@@ -1476,6 +1476,12 @@
             if (savedUserStr) {
                 const savedUser = JSON.parse(savedUserStr);
                 if (savedUser) {
+                    // Jika di halaman utama tanpa FORCED_ROLE (ltcindoprima.web.id/), 
+                    // jangan auto-restore agar pengguna dapat bebas memilih akun/pindah user
+                    if (!window.FORCED_ROLE) {
+                        return;
+                    }
+
                     // Check if the saved user role matches the forced role of the page
                     if (window.FORCED_ROLE && savedUser.role !== window.FORCED_ROLE) {
                         // Role mismatch! Clear session and require login for this specific page
