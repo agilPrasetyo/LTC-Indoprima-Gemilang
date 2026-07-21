@@ -675,6 +675,9 @@
         currentUser = user;
         try {
             localStorage.setItem('currentUser', JSON.stringify(user));
+            if (user.role === 'Admin') {
+                localStorage.setItem('lastAdminActivity', String(Date.now()));
+            }
         } catch (e) {
             console.error("Failed to save session:", e);
         }
@@ -688,6 +691,9 @@
             };
             const targetRoute = roleRouteMap[user.role];
             if (targetRoute) {
+                try {
+                    sessionStorage.setItem('justLoggedIn', 'true');
+                } catch (e) {}
                 window.location.href = targetRoute;
                 return;
             }
@@ -750,11 +756,10 @@
             loadDashboardData();
         };
 
-        // Siswa langsung ke form tanpa video intro
-        if (currentUser.role === 'Siswa' || bypassSplash) {
+        // Tampilkan animasi loading (intro.mp4) untuk SEMUA role (Admin, Visitor, Siswa) saat login
+        if (bypassSplash) {
             _proceedToDashboard();
         } else {
-            // Admin & Visitor: tampilkan video intro dulu
             showSplashVideo(_proceedToDashboard);
         }
     }
@@ -1398,11 +1403,47 @@
         };
     }
 
+    const ADMIN_INACTIVITY_LIMIT_MS = 60 * 60 * 1000; // 1 Jam (3600000 ms)
+
+    function recordAdminActivity() {
+        if (currentUser && currentUser.role === 'Admin') {
+            const now = Date.now();
+            if (!window._lastActivitySaveTime || (now - window._lastActivitySaveTime > 3000)) {
+                window._lastActivitySaveTime = now;
+                try {
+                    localStorage.setItem('lastAdminActivity', String(now));
+                } catch (e) {}
+            }
+        }
+    }
+
+    ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click'].forEach(evtType => {
+        window.addEventListener(evtType, recordAdminActivity, { passive: true });
+    });
+
+    setInterval(() => {
+        if (currentUser && currentUser.role === 'Admin') {
+            const lastActiveStr = localStorage.getItem('lastAdminActivity');
+            const lastActive = lastActiveStr ? parseInt(lastActiveStr, 10) : 0;
+            if (lastActive && (Date.now() - lastActive >= ADMIN_INACTIVITY_LIMIT_MS)) {
+                console.warn("[LTC Admin] Inactive for 1 hour. Triggering auto-logout...");
+                logout();
+                const errorBox = document.getElementById('login-error');
+                if (errorBox) {
+                    errorBox.classList.remove('hidden');
+                    errorBox.innerText = 'Sesi Admin telah berakhir karena tidak ada aktivitas selama 1 jam. Silakan login kembali.';
+                }
+                showToast('Sesi Admin telah berakhir karena tidak ada aktivitas selama 1 jam.', 'error');
+            }
+        }
+    }, 10000);
+
     function logout() {
         currentUser = null;
         try {
             localStorage.removeItem('currentUser');
             localStorage.removeItem('activeView');
+            localStorage.removeItem('lastAdminActivity');
         } catch (e) {
             console.error("Failed to clear session:", e);
         }
@@ -1440,10 +1481,39 @@
                         // Role mismatch! Clear session and require login for this specific page
                         localStorage.removeItem('currentUser');
                         localStorage.removeItem('activeView');
+                        localStorage.removeItem('lastAdminActivity');
                         return;
                     }
-                    // Call loginSuccess and bypass the splash screen video
-                    loginSuccess(savedUser, true);
+
+                    // Check for Admin 1-hour inactivity expiration
+                    if (savedUser.role === 'Admin') {
+                        const lastActiveStr = localStorage.getItem('lastAdminActivity');
+                        const lastActive = lastActiveStr ? parseInt(lastActiveStr, 10) : 0;
+                        if (lastActive && (Date.now() - lastActive >= ADMIN_INACTIVITY_LIMIT_MS)) {
+                            localStorage.removeItem('currentUser');
+                            localStorage.removeItem('activeView');
+                            localStorage.removeItem('lastAdminActivity');
+                            const errorBox = document.getElementById('login-error');
+                            if (errorBox) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = 'Sesi Admin telah berakhir karena tidak ada aktivitas selama 1 jam. Silakan login kembali.';
+                            }
+                            return;
+                        }
+                    }
+
+                    // Check if just logged in from root page
+                    let justLoggedIn = false;
+                    try {
+                        justLoggedIn = sessionStorage.getItem('justLoggedIn') === 'true';
+                        if (justLoggedIn) sessionStorage.removeItem('justLoggedIn');
+                    } catch (e) {}
+
+                    if (justLoggedIn) {
+                        loginSuccess(savedUser, false);
+                    } else {
+                        loginSuccess(savedUser, true);
+                    }
                 }
             }
         } catch (e) {
