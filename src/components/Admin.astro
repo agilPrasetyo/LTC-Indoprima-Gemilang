@@ -253,6 +253,9 @@
                             <th class="py-3 px-4 font-semibold">NoReg</th>
                             <th class="py-3 px-4 font-semibold">Nama</th>
                             <th class="py-3 px-4 font-semibold">Bagian</th>
+                            <th class="py-3 px-4 font-semibold">Kelas</th>
+                            <th class="py-3 px-4 font-semibold">Kota / Daerah</th>
+                            <th class="py-3 px-4 font-semibold">Sekolah Asal</th>
                             <th class="py-3 px-4 font-semibold">Tgl Masuk</th>
                             <th class="py-3 px-4 font-semibold">Tgl Keluar</th>
                             <th class="py-3 px-4 font-semibold">Alasan</th>
@@ -376,16 +379,30 @@
                     <input type="text" id="turnover-nama" placeholder="Nama siswa" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
                 </div>
             </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Bagian</label>
+                    <select id="turnover-bagian" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
+                        <option value="PAINTING">PAINTING</option>
+                        <option value="GRINDING">GRINDING</option>
+                        <option value="CORE">CORE</option>
+                        <option value="LADLE">LADLE</option>
+                        <option value="ADM PPIC">ADM PPIC</option>
+                        <option value="ADMINISTRASI">ADMINISTRASI</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kelas</label>
+                    <input type="text" id="turnover-kelas" placeholder="Contoh: Kelas 1" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kota / Daerah</label>
+                    <input type="text" id="turnover-daerah" placeholder="Contoh: Gresik" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
+                </div>
+            </div>
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Bagian</label>
-                <select id="turnover-bagian" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
-                    <option value="PAINTING">PAINTING</option>
-                    <option value="GRINDING">GRINDING</option>
-                    <option value="CORE">CORE</option>
-                    <option value="LADLE">LADLE</option>
-                    <option value="ADM PPIC">ADM PPIC</option>
-                    <option value="ADMINISTRASI">ADMINISTRASI</option>
-                </select>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Sekolah Asal</label>
+                <input type="text" id="turnover-sekolah" placeholder="Contoh: SMK Negeri 1 Gresik" class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300">
             </div>
             <div class="grid grid-cols-2 gap-4">
                 <div>

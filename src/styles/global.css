@@ -260,6 +260,7 @@ body {
     
     /* 3. Hide text contents */
     .sidebar-collapsed .brand-full,
+    .sidebar-collapsed .brand-text-container,
     .sidebar-collapsed .user-info-container,
     .sidebar-collapsed nav button span,
     .sidebar-collapsed .logout-btn span {

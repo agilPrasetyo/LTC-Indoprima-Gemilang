@@ -578,8 +578,9 @@ function renderTurnoverView() {
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.kelas || '-'}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.tanggalKeluar || '-'}</td>
             <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${t.keterangan}</span></td>
-            <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.alasan}</td>
+            <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah || '-'}</td>
+            <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
+            <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.alasan || '-'}</td>
         `;
         tbody.appendChild(tr);
     });

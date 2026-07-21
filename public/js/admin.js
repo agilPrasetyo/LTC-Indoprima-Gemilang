@@ -1275,7 +1275,7 @@
         tbody.innerHTML = '';
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover terdaftar.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="11" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover terdaftar.</td></tr>';
             return;
         }
 
@@ -1292,10 +1292,13 @@
                 <td class="py-3 px-4 font-mono font-bold text-slate-700">${t.id}</td>
                 <td class="py-3 px-4 font-bold text-brand-textMain">${t.namaLengkap}</td>
                 <td class="py-3 px-4 text-brand-textSub">${t.bagian || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub">${t.kelas || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalDaerah || t.wilayah || t.asal || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
                 <td class="py-3 px-4 font-mono text-brand-textSub">${t.masuk ? t.masuk.split('-').reverse().join('/') : '-'}</td>
                 <td class="py-3 px-4 font-mono text-brand-textSub">${t.tanggalKeluar ? t.tanggalKeluar.split('-').reverse().join('/') : '-'}</td>
                 <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${alasanBadge}">${t.alasan || '-'}</span></td>
-                <td class="py-3 px-4 text-brand-textSub max-w-[160px] truncate">${t.keterangan || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub max-w-[160px] truncate" title="${t.keterangan || ''}">${t.keterangan || '-'}</td>
                 <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
                     <button onclick="editTurnoverTrigger(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-pen"></i> Edit
@@ -1320,6 +1323,12 @@
             document.getElementById('turnover-noreg').value = '';
             document.getElementById('turnover-nama').value = '';
             document.getElementById('turnover-bagian').value = 'PAINTING';
+            const kelasInput = document.getElementById('turnover-kelas');
+            if (kelasInput) kelasInput.value = '';
+            const daerahInput = document.getElementById('turnover-daerah');
+            if (daerahInput) daerahInput.value = '';
+            const sekolahInput = document.getElementById('turnover-sekolah');
+            if (sekolahInput) sekolahInput.value = '';
             document.getElementById('turnover-alasan').value = 'Resign';
             document.getElementById('turnover-keterangan').value = '';
             const today = new Date();
@@ -1343,6 +1352,12 @@
         document.getElementById('turnover-noreg').value = t.id;
         document.getElementById('turnover-nama').value = t.namaLengkap || '';
         document.getElementById('turnover-bagian').value = t.bagian || 'PAINTING';
+        const kelasInput = document.getElementById('turnover-kelas');
+        if (kelasInput) kelasInput.value = t.kelas || '';
+        const daerahInput = document.getElementById('turnover-daerah');
+        if (daerahInput) daerahInput.value = t.asalDaerah || t.wilayah || t.asal || '';
+        const sekolahInput = document.getElementById('turnover-sekolah');
+        if (sekolahInput) sekolahInput.value = t.asalSekolah || t.sekolah || '';
         document.getElementById('turnover-alasan').value = t.alasan || 'Resign';
         document.getElementById('turnover-keterangan').value = t.keterangan || '';
         document.getElementById('turnover-tgl-masuk').value = t.masuk || '';
@@ -1353,6 +1368,9 @@
         const noreg = document.getElementById('turnover-noreg').value.trim();
         const nama = document.getElementById('turnover-nama').value.trim();
         const bagian = document.getElementById('turnover-bagian').value;
+        const kelasVal = document.getElementById('turnover-kelas') ? document.getElementById('turnover-kelas').value.trim() : '';
+        const daerahVal = document.getElementById('turnover-daerah') ? document.getElementById('turnover-daerah').value.trim() : '';
+        const sekolahVal = document.getElementById('turnover-sekolah') ? document.getElementById('turnover-sekolah').value.trim() : '';
         const alasan = document.getElementById('turnover-alasan').value;
         const keterangan = document.getElementById('turnover-keterangan').value.trim();
         const tglMasuk = document.getElementById('turnover-tgl-masuk').value;
@@ -1368,6 +1386,7 @@
         const convertDate = d => { if (!d) return ''; const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
         const payload = {
             NoReg: noreg, NamaLengkap: nama, Bagian: bagian,
+            Kelas: kelasVal, AsalDaerah: daerahVal, Kota: daerahVal, AsalSekolah: sekolahVal, Sekolah: sekolahVal,
             TanggalMasuk: convertDate(tglMasuk), TanggalKeluar: convertDate(tglKeluar),
             Alasan: alasan, Keterangan: keterangan, isEdit, editId
         };
@@ -1386,13 +1405,13 @@
         } else {
             if (!isEdit) {
                 activeTurnoverData.unshift({
-                    id: noreg, namaLengkap: nama, bagian, alasan, keterangan,
+                    id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal, alasan, keterangan,
                     masuk: tglMasuk, tanggalKeluar: tglKeluar
                 });
             } else {
                 const idx = activeTurnoverData.findIndex(t => t.id === editId);
                 if (idx !== -1) {
-                    activeTurnoverData[idx] = { ...activeTurnoverData[idx], id: noreg, namaLengkap: nama, bagian, alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar };
+                    activeTurnoverData[idx] = { ...activeTurnoverData[idx], id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal, alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar };
                 }
             }
             showToast('Mode Preview: Data turnover disimpan di memori lokal.');

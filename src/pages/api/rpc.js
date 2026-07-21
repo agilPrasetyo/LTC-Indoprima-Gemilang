@@ -204,6 +204,7 @@ async function getStatsFromSupabase() {
     bagian: t.section ? t.section.toUpperCase() : (t.departemen ? t.departemen.toUpperCase() : ''),
     departemen: t.departemen,
     section: t.section,
+    kelas: t.kelas || (siswaList.find(s => s.id === t.noreg)?.kelas) || '-',
     masuk: t.tanggal_masuk,
     keluar: t.tanggal_keluar,
     tanggalKeluar: t.tanggal_keluar,
@@ -213,7 +214,8 @@ async function getStatsFromSupabase() {
     asal: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
     wilayah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
     asalDaerah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
-    sekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : ''
+    sekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : '',
+    asalSekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : ''
   }));
 
   let graduates = 0, resignVal = 0, indisVal = 0;
@@ -758,6 +760,9 @@ async function handleLocalSupabaseWrite(action, args) {
       nama_lengkap: t.NamaLengkap ? t.NamaLengkap.toUpperCase() : '',
       departemen: t.Departemen ? t.Departemen.toUpperCase() : (t.Bagian ? t.Bagian.toUpperCase() : null),
       section: t.Section ? t.Section.toUpperCase() : '',
+      kelas: t.Kelas ? t.Kelas.toUpperCase() : null,
+      asal_daerah: t.AsalDaerah || t.Kota ? (t.AsalDaerah || t.Kota).toUpperCase() : null,
+      asal_sekolah: t.AsalSekolah || t.Sekolah ? (t.AsalSekolah || t.Sekolah).toUpperCase() : null,
       tanggal_masuk: t.TanggalMasuk || null,
       tanggal_keluar: t.TanggalKeluar || null,
       alasan: t.Alasan ? t.Alasan.toUpperCase() : '',
