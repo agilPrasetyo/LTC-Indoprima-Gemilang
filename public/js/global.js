@@ -1447,6 +1447,12 @@
         } catch (e) {
             console.error("Failed to clear session:", e);
         }
+
+        // Panggil endpoint logout backend untuk menghapus HTTP-Only cookies
+        fetch('/api/auth/logout', { method: 'POST' }).catch(err => {
+            console.warn("Logout cookie clearance error:", err);
+        });
+
         document.getElementById('app').classList.add('hidden');
         document.getElementById('login-screen').classList.remove('hidden');
         showToast('Sesi Anda telah diakhiri.', 'info');

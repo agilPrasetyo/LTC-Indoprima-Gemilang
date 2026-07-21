@@ -1,6 +1,34 @@
 import { supabase } from '../../lib/supabase';
 
-export async function POST({ request }) {
+async function verifyUserSession(cookies) {
+  try {
+    const token = cookies.get('sb-access-token')?.value;
+    if (!token) return { isAuthenticated: false };
+
+    const { data: { user }, error } = await supabase.auth.getUser(token);
+    if (error || !user) return { isAuthenticated: false };
+
+    const { data: profile } = await supabase
+      .from('users')
+      .select('*')
+      .eq('id', user.id)
+      .single();
+
+    const rawRole = profile?.role || user.user_metadata?.role || 'VISITOR';
+    const roleUpper = String(rawRole).toUpperCase();
+
+    return {
+      isAuthenticated: true,
+      user,
+      profile,
+      role: roleUpper
+    };
+  } catch (err) {
+    return { isAuthenticated: false };
+  }
+}
+
+export async function POST({ request, cookies }) {
   try {
     const payload = await request.json();
     const action = payload.action;
@@ -43,7 +71,17 @@ export async function POST({ request }) {
       }
     }
 
+    // --- VERIFIKASI SESI COOKIE DENGAN SUPABASE AUTH ---
+    const authSession = await verifyUserSession(cookies);
+
+    // Verifikasi Otorisasi Peran (Role-Based Access Control)
+    const isAdmin = authSession.isAuthenticated && authSession.role === 'ADMIN';
+    const isSiswa = authSession.isAuthenticated && authSession.role === 'SISWA';
+
     if (action === 'saveHariKerja') {
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat mengedit Hari Kerja.' }), { status: 403 });
+      }
       const year = args[0];
       const month = args[1];
       const hk = args[2];
@@ -66,18 +104,35 @@ export async function POST({ request }) {
     }
 
     if (action === 'createUser') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat membuat akun.' }), { status: 403 });
       const res = await createUserInSupabase(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'updateUser') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat memperbarui akun.' }), { status: 403 });
       const res = await updateUserInSupabase(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'deleteUserById') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat menghapus akun.' }), { status: 403 });
       const res = await deleteUserFromSupabase(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // Aksi saveManpowerLog diperbolehkan untuk Admin, atau Siswa (khusus NoReg dirinya sendiri)
+    if (action === 'saveManpowerLog') {
+      const logPayload = args[0];
+      const isSelfLog = isSiswa && authSession.profile?.noreg && String(logPayload?.NoReg) === String(authSession.profile.noreg);
+      if (!isAdmin && !isSelfLog) {
+        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Anda tidak memiliki wewenang untuk mengisi log siswa ini.' }), { status: 403 });
+      }
+    } else {
+      // Semua aksi mutasi/penulisan lainnya wajib bertindak sebagai Admin
+      if (!isAdmin) {
+        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Sesi Admin yang valid diperlukan.' }), { status: 403 });
+      }
     }
 
     // --- PENULISAN DATA: LANGSUNG KE SUPABASE ---
