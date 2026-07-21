@@ -713,45 +713,21 @@
                 adminNav.classList.add('hidden');
             }
 
-            if (currentUser.role === 'Siswa') {
-                // Hide sidebar and global dashboard header for Siswa view
-                document.getElementById('app-sidebar').classList.add('hidden');
-                const mainHeader = document.querySelector('main > header');
-                if (mainHeader) mainHeader.classList.add('hidden');
-                
-                // Hide mobile bottom navigation bar for Siswa view
-                const bottomNav = document.getElementById('mobile-bottom-nav');
-                if (bottomNav) {
-                    bottomNav.classList.add('hidden');
-                    bottomNav.style.setProperty('display', 'none', 'important');
-                }
-                
-                switchView('sisi-siswa');
-                
-                // Show form view & hide success view on load
-                const formView = document.getElementById('siswa-portal-form-view');
-                const successView = document.getElementById('siswa-portal-success-view');
-                if (formView) formView.classList.remove('hidden');
-                if (successView) successView.classList.add('hidden');
-                
-                // Clear and reset form step
-                if (typeof resetSiswaPortalForm === 'function') resetSiswaPortalForm();
-            } else {
-                // Show sidebar and global dashboard header for Admin/Visitor views
-                document.getElementById('app-sidebar').classList.remove('hidden');
-                const mainHeader = document.querySelector('main > header');
-                if (mainHeader) mainHeader.classList.remove('hidden');
-                
-                // Show mobile bottom navigation bar for Admin/Visitor views (restore default CSS media query behavior)
-                const bottomNav = document.getElementById('mobile-bottom-nav');
-                if (bottomNav) {
-                    bottomNav.classList.remove('hidden');
-                    bottomNav.style.removeProperty('display');
-                }
-                
-                const savedView = localStorage.getItem('activeView') || 'dashboard';
-                switchView(savedView);
+            // Restore navigation & header visibility for all views
+            const appSidebar = document.getElementById('app-sidebar');
+            if (appSidebar) appSidebar.classList.remove('hidden');
+
+            const mainHeader = document.querySelector('main > header');
+            if (mainHeader) mainHeader.classList.remove('hidden');
+            
+            const bottomNav = document.getElementById('mobile-bottom-nav');
+            if (bottomNav) {
+                bottomNav.classList.remove('hidden');
+                bottomNav.style.removeProperty('display');
             }
+
+            // Always direct user to dashboard after login as requested
+            switchView('dashboard');
             startRealtimeClock();
             loadDashboardData();
         };
@@ -1242,9 +1218,6 @@
         });
 
         let targetView = 'view-' + viewName;
-        if (viewName === 'dashboard' && currentUser && currentUser.role === 'Siswa') {
-            targetView = 'view-sisi-siswa';
-        }
 
         const targetEl = document.getElementById(targetView);
         if (targetEl) targetEl.classList.remove('hidden');
