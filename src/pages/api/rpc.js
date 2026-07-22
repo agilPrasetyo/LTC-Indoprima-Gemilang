@@ -50,6 +50,19 @@ export async function POST({ request, cookies }) {
       const username = args[0];
       const password = args[1];
       const auth = await handleLogin(username, password);
+      if (auth.success && auth.session) {
+        const { access_token, refresh_token } = auth.session;
+        const cookieOptions = {
+          path: '/',
+          httpOnly: true,
+          secure: true,
+          sameSite: 'strict',
+          maxAge: 60 * 60 * 24 * 7 // 7 hari
+        };
+        cookies.set('sb-access-token', access_token, cookieOptions);
+        cookies.set('sb-refresh-token', refresh_token, cookieOptions);
+        delete auth.session; // Remove from payload for security
+      }
       return new Response(JSON.stringify(auth), { status: 200 });
     }
 
@@ -442,6 +455,7 @@ async function handleLogin(username, password) {
 
     return { 
       success: true, 
+      session: authData.session,
       user: { 
         namaLengkap: user.nama_lengkap, 
         role: normalizedRole, 
