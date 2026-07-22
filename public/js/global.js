@@ -726,8 +726,12 @@
                 bottomNav.style.removeProperty('display');
             }
 
-            // Always direct user to dashboard after login as requested
-            switchView('dashboard');
+            // Direct user based on role: Siswa goes to portal form, others to dashboard
+            if (currentUser && currentUser.role === 'Siswa') {
+                switchView('sisi-siswa');
+            } else {
+                switchView('dashboard');
+            }
             startRealtimeClock();
             loadDashboardData();
         };
