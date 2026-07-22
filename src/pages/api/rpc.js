@@ -751,24 +751,39 @@ async function handleLocalSupabaseWrite(action, args) {
     const isEdit = !!t.isEdit;
     const editId = t.editId || t.NoReg;
 
+    // Helper: normalize date to YYYY-MM-DD for PostgreSQL date column
+    const toISODate = (val) => {
+      if (!val) return null;
+      // Already YYYY-MM-DD
+      if (/^\d{4}-\d{2}-\d{2}$/.test(val)) return val;
+      // DD/MM/YYYY format
+      const parts = val.split('/');
+      if (parts.length === 3) return `${parts[2]}-${parts[1]}-${parts[0]}`;
+      return null;
+    };
+
     if (isEdit && editId !== t.NoReg) {
       await supabase.from('turnover').delete().eq('noreg', editId);
     }
 
-    await supabase.from('turnover').upsert({
+    const { error: upsertErr } = await supabase.from('turnover').upsert({
       noreg: t.NoReg,
       nama_lengkap: t.NamaLengkap ? t.NamaLengkap.toUpperCase() : '',
       departemen: t.Departemen ? t.Departemen.toUpperCase() : (t.Bagian ? t.Bagian.toUpperCase() : null),
-      section: t.Section ? t.Section.toUpperCase() : '',
+      section: t.Section ? t.Section.toUpperCase() : (t.Bagian ? t.Bagian.toUpperCase() : ''),
       kelas: t.Kelas ? t.Kelas.toUpperCase() : null,
       asal_daerah: t.AsalDaerah || t.Kota ? (t.AsalDaerah || t.Kota).toUpperCase() : null,
       asal_sekolah: t.AsalSekolah || t.Sekolah ? (t.AsalSekolah || t.Sekolah).toUpperCase() : null,
-      tanggal_masuk: t.TanggalMasuk || null,
-      tanggal_keluar: t.TanggalKeluar || null,
+      tanggal_masuk: toISODate(t.TanggalMasuk),
+      tanggal_keluar: toISODate(t.TanggalKeluar),
       alasan: t.Alasan ? t.Alasan.toUpperCase() : '',
       keterangan: t.Keterangan ? t.Keterangan.toUpperCase() : '',
       sync_at: new Date()
     });
+
+    if (upsertErr) {
+      throw new Error(upsertErr.message);
+    }
 
   } else if (action === 'deleteTurnoverRecord') {
     await supabase.from('turnover').delete().eq('noreg', args[0]);

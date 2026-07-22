@@ -1383,11 +1383,10 @@
             return;
         }
 
-        const convertDate = d => { if (!d) return ''; const p = d.split('-'); return `${p[2]}/${p[1]}/${p[0]}`; };
         const payload = {
             NoReg: noreg, NamaLengkap: nama, Bagian: bagian,
             Kelas: kelasVal, AsalDaerah: daerahVal, Kota: daerahVal, AsalSekolah: sekolahVal, Sekolah: sekolahVal,
-            TanggalMasuk: convertDate(tglMasuk), TanggalKeluar: convertDate(tglKeluar),
+            TanggalMasuk: tglMasuk || null, TanggalKeluar: tglKeluar || null,
             Alasan: alasan, Keterangan: keterangan, isEdit, editId
         };
 
@@ -1399,8 +1398,10 @@
                     loadDashboardData();
                     setTimeout(() => renderAdminTurnoverTable(), 1000);
                 } else {
-                    showToast('Gagal menyimpan: ' + res.message, 'error');
+                    showToast('Gagal menyimpan: ' + (res.message || 'Unknown error'), 'error');
                 }
+            }).withFailureHandler(err => {
+                showToast('Gagal menyimpan data turnover: ' + (err.message || err.toString()), 'error');
             }).saveTurnoverRecord(payload);
         } else {
             if (!isEdit) {
