@@ -1,4 +1,5 @@
 function renderKeuanganView() {
+    renderMonthlyHistoryTable();
     const tbody = document.getElementById('keuangan-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
