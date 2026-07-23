@@ -222,8 +222,8 @@ async function getStatsFromSupabase() {
     keluar: t.tanggal_keluar,
     tanggalKeluar: t.tanggal_keluar,
     pengganti: t.pengganti,
-    keterangan: t.alasan ? t.alasan.toUpperCase() : '',
-    alasan: t.keterangan ? t.keterangan.toUpperCase() : '',
+    keterangan: t.keterangan ? t.keterangan.toUpperCase() : '',
+    alasan: t.alasan ? t.alasan.toUpperCase() : '',
     asal: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
     wilayah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
     asalDaerah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
@@ -776,16 +776,15 @@ async function handleLocalSupabaseWrite(action, args) {
       return null;
     };
 
-    if (isEdit && editId !== t.NoReg) {
+    if (isEdit && editId) {
       await supabase.from('turnover').delete().eq('noreg', editId);
     }
 
-    const { error: upsertErr } = await supabase.from('turnover').upsert({
+    const { error: insertErr } = await supabase.from('turnover').insert({
       noreg: t.NoReg,
       nama_lengkap: t.NamaLengkap ? t.NamaLengkap.toUpperCase() : '',
       departemen: t.Departemen ? t.Departemen.toUpperCase() : (t.Bagian ? t.Bagian.toUpperCase() : null),
       section: t.Section ? t.Section.toUpperCase() : (t.Bagian ? t.Bagian.toUpperCase() : ''),
-      kelas: t.Kelas ? t.Kelas.toUpperCase() : null,
       asal_daerah: t.AsalDaerah || t.Kota ? (t.AsalDaerah || t.Kota).toUpperCase() : null,
       asal_sekolah: t.AsalSekolah || t.Sekolah ? (t.AsalSekolah || t.Sekolah).toUpperCase() : null,
       tanggal_masuk: toISODate(t.TanggalMasuk),
@@ -795,8 +794,8 @@ async function handleLocalSupabaseWrite(action, args) {
       sync_at: new Date()
     });
 
-    if (upsertErr) {
-      throw new Error(upsertErr.message);
+    if (insertErr) {
+      throw new Error(insertErr.message);
     }
 
   } else if (action === 'deleteTurnoverRecord') {

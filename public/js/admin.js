@@ -1351,14 +1351,41 @@
         document.getElementById('turnover-edit-id').value = t.id;
         document.getElementById('turnover-noreg').value = t.id;
         document.getElementById('turnover-nama').value = t.namaLengkap || '';
-        document.getElementById('turnover-bagian').value = t.bagian || 'PAINTING';
+        const bagianSelect = document.getElementById('turnover-bagian');
+        if (bagianSelect) {
+            const targetBg = String(t.bagian || '').toLowerCase();
+            let found = false;
+            for (let opt of bagianSelect.options) {
+                if (opt.value.toLowerCase() === targetBg) {
+                    bagianSelect.value = opt.value;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) bagianSelect.value = t.bagian || 'PAINTING';
+        }
+
         const kelasInput = document.getElementById('turnover-kelas');
         if (kelasInput) kelasInput.value = t.kelas || '';
         const daerahInput = document.getElementById('turnover-daerah');
         if (daerahInput) daerahInput.value = t.asalDaerah || t.wilayah || t.asal || '';
         const sekolahInput = document.getElementById('turnover-sekolah');
         if (sekolahInput) sekolahInput.value = t.asalSekolah || t.sekolah || '';
-        document.getElementById('turnover-alasan').value = t.alasan || 'Resign';
+
+        const alasanSelect = document.getElementById('turnover-alasan');
+        if (alasanSelect) {
+            const targetAlasan = String(t.alasan || '').toLowerCase();
+            let found = false;
+            for (let opt of alasanSelect.options) {
+                if (opt.value.toLowerCase() === targetAlasan) {
+                    alasanSelect.value = opt.value;
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) alasanSelect.value = t.alasan || 'Resign';
+        }
+
         document.getElementById('turnover-keterangan').value = t.keterangan || '';
         document.getElementById('turnover-tgl-masuk').value = t.masuk || '';
         document.getElementById('turnover-tgl-keluar').value = t.tanggalKeluar || '';
