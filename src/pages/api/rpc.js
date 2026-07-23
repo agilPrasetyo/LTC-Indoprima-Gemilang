@@ -134,20 +134,6 @@ export async function POST({ request, cookies }) {
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
-    // Aksi saveManpowerLog diperbolehkan untuk Admin, atau Siswa (khusus NoReg dirinya sendiri)
-    if (action === 'saveManpowerLog') {
-      const logPayload = args[0];
-      const isSelfLog = isSiswa && authSession.profile?.noreg && String(logPayload?.NoReg) === String(authSession.profile.noreg);
-      if (!isAdmin && !isSelfLog) {
-        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Anda tidak memiliki wewenang untuk mengisi log siswa ini.' }), { status: 403 });
-      }
-    } else {
-      // Semua aksi mutasi/penulisan lainnya wajib bertindak sebagai Admin
-      if (!isAdmin) {
-        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Sesi Admin yang valid diperlukan.' }), { status: 403 });
-      }
-    }
-
     // --- PENULISAN DATA: LANGSUNG KE SUPABASE ---
     await handleLocalSupabaseWrite(action, args);
     return new Response(JSON.stringify({ success: true }), { status: 200 });
