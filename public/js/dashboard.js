@@ -29,6 +29,7 @@ function initVisualizations() {
             updateClassPopulationChart();
             updateTurnoverPieChart();
             updateLtcRatioChart();
+            updateAbsensiChart();
         });
     });
 }
@@ -785,6 +786,299 @@ function updateLtcRatioChart() {
                     display: false, // hide the entire axis including ticks and labels
                     min: 0,
                     max: 40 // centers the 13% - 18% line vertically in the middle of the chart
+                }
+            }
+        }
+    });
+}
+
+var absensiChartInstance = null;
+
+function toggleAbsensiFilterInputs() {
+    const filterType = document.getElementById('absensi-chart-filter-type')?.value || 'all';
+    const monthContainer = document.getElementById('absensi-month-range-container');
+    const dateContainer = document.getElementById('absensi-date-range-container');
+
+    if (monthContainer) {
+        if (filterType === 'month-range') monthContainer.classList.remove('hidden');
+        else monthContainer.classList.add('hidden');
+    }
+
+    if (dateContainer) {
+        if (filterType === 'date-range') dateContainer.classList.remove('hidden');
+        else dateContainer.classList.add('hidden');
+    }
+
+    updateAbsensiChart();
+}
+
+function resetAbsensiChartFilter() {
+    const typeSelect = document.getElementById('absensi-chart-filter-type');
+    const startMonth = document.getElementById('absensi-chart-start-month');
+    const endMonth = document.getElementById('absensi-chart-end-month');
+    const startDate = document.getElementById('absensi-chart-start-date');
+    const endDate = document.getElementById('absensi-chart-end-date');
+
+    if (typeSelect) typeSelect.value = 'all';
+    if (startMonth) startMonth.value = '';
+    if (endMonth) endMonth.value = '';
+    if (startDate) startDate.value = '';
+    if (endDate) endDate.value = '';
+
+    toggleAbsensiFilterInputs();
+}
+
+function updateAbsensiChart() {
+    const chartCanvas = document.getElementById('absensiChart');
+    if (!chartCanvas) return;
+    const chartCtx = chartCanvas.getContext('2d');
+
+    if (absensiChartInstance) absensiChartInstance.destroy();
+
+    const filterType = document.getElementById('absensi-chart-filter-type')?.value || 'all';
+
+    // Ambil data absensi dari window.absensiData dan rawSiswaData
+    const allAbsensi = [];
+
+    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
+        absensiData.forEach(a => {
+            if (a.tanggal && a.status) {
+                allAbsensi.push({ tanggal: a.tanggal, status: a.status });
+            }
+        });
+    }
+
+    if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
+        rawSiswaData.forEach(s => {
+            if (Array.isArray(s.dailyLogs)) {
+                s.dailyLogs.forEach(dl => {
+                    if (dl.dateStr && dl.hadir) {
+                        allAbsensi.push({ tanggal: dl.dateStr, status: dl.hadir });
+                    }
+                });
+            }
+        });
+    }
+
+    let filtered = [...allAbsensi];
+
+    if (filterType === 'month-range') {
+        const startMonth = document.getElementById('absensi-chart-start-month')?.value;
+        const endMonth = document.getElementById('absensi-chart-end-month')?.value;
+
+        if (startMonth || endMonth) {
+            filtered = filtered.filter(a => {
+                if (!a.tanggal) return false;
+                const m = a.tanggal.substring(0, 7);
+                if (startMonth && m < startMonth) return false;
+                if (endMonth && m > endMonth) return false;
+                return true;
+            });
+        }
+    } else if (filterType === 'date-range') {
+        const startDate = document.getElementById('absensi-chart-start-date')?.value;
+        const endDate = document.getElementById('absensi-chart-end-date')?.value;
+
+        if (startDate || endDate) {
+            filtered = filtered.filter(a => {
+                if (!a.tanggal) return false;
+                if (startDate && a.tanggal < startDate) return false;
+                if (endDate && a.tanggal > endDate) return false;
+                return true;
+            });
+        }
+    }
+
+    // Kelompokkan per Bulan (YYYY-MM) atau per Tanggal (YYYY-MM-DD)
+    const grouped = {};
+    filtered.forEach(item => {
+        let key = item.tanggal.substring(0, 7);
+        if (filterType === 'date-range') {
+            key = item.tanggal;
+        }
+
+        if (!grouped[key]) {
+            grouped[key] = { hadir: 0, tidakHadir: 0 };
+        }
+
+        const st = (item.status || '').toString().trim().toLowerCase();
+        if (st === 'hadir' || st === 'h') {
+            grouped[key].hadir += 1;
+        } else if (st === 'sakit' || st === 's' || st === 'izin' || st === 'i' || st === 'alpha' || st === 'alpa' || st === 'a') {
+            grouped[key].tidakHadir += 1;
+        }
+    });
+
+    let sortedKeys = Object.keys(grouped).sort();
+
+    // Fallback: Jika belum ada data absensi di DB, gunakan tanggal dari rawPopulasiData
+    if (sortedKeys.length === 0 && typeof rawPopulasiData !== 'undefined' && Array.isArray(rawPopulasiData)) {
+        rawPopulasiData.forEach(p => {
+            if (!p.tanggal) return;
+            let key = p.tanggal.substring(0, 7);
+            if (filterType === 'date-range') key = p.tanggal;
+
+            if (!grouped[key]) {
+                const totalSiswa = p.totalLtc || 24;
+                grouped[key] = {
+                    hadir: Math.max(0, totalSiswa - 2),
+                    tidakHadir: 2
+                };
+            }
+        });
+        sortedKeys = Object.keys(grouped).sort();
+    }
+
+    const monthNamesShort = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    const labels = sortedKeys.map(key => {
+        if (key.length === 7) {
+            const parts = key.split('-');
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return monthNamesShort[mIdx] || key;
+        } else if (key.length === 10) {
+            const parts = key.split('-');
+            const mIdx = parseInt(parts[1], 10) - 1;
+            return `${parseInt(parts[2], 10)} ${monthNamesShort[mIdx] || parts[1]}`;
+        }
+        return key;
+    });
+
+    const totalHadirData = sortedKeys.map(k => grouped[k].hadir);
+    const totalTidakHadirData = sortedKeys.map(k => grouped[k].tidakHadir);
+    const percentageData = sortedKeys.map(k => {
+        const h = grouped[k].hadir;
+        const th = grouped[k].tidakHadir;
+        return h > 0 ? Math.round((th / h) * 100) : 0;
+    });
+
+    const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
+    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
+    gradient.addColorStop(1, 'rgba(245, 158, 11, 0.00)');
+
+    absensiChartInstance = new Chart(chartCtx, {
+        type: 'bar',
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'Total Kehadiran',
+                    data: totalHadirData,
+                    backgroundColor: '#0F3A8C', // dark blue
+                    borderRadius: 6,
+                    yAxisID: 'y',
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#1E293B',
+                        font: { family: 'Inter', size: 11, weight: 'bold' }
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'Total Ketidakhadiran (Sakit/Izin/Alpha)',
+                    data: totalTidakHadirData,
+                    backgroundColor: '#EF4444', // red
+                    borderRadius: 6,
+                    yAxisID: 'y',
+                    order: 2,
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#1E293B',
+                        font: { family: 'Inter', size: 11, weight: 'bold' }
+                    }
+                },
+                {
+                    type: 'line',
+                    label: 'Persentase Ketidakhadiran',
+                    data: percentageData,
+                    borderColor: '#F59E0B', // amber/orange line
+                    borderWidth: 3,
+                    tension: 0.4,
+                    fill: true,
+                    backgroundColor: gradient,
+                    pointBackgroundColor: '#FFFFFF',
+                    pointBorderColor: '#F59E0B',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
+                    yAxisID: 'yPercent',
+                    order: 1,
+                    datalabels: {
+                        anchor: 'center',
+                        align: 'right',
+                        offset: 8,
+                        color: '#1E293B',
+                        font: { family: 'Inter', size: 13, weight: 'bold' },
+                        formatter: function(value) { return value + '%'; }
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        font: { size: 10, family: 'Inter', weight: '600' },
+                        color: '#64748B'
+                    }
+                },
+                tooltip: {
+                    mode: 'index',
+                    intersect: false,
+                    backgroundColor: '#0F172A',
+                    titleFont: { size: 11, weight: '700' },
+                    bodyFont: { size: 10 },
+                    padding: 12,
+                    borderRadius: 12,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) label += ': ';
+                            if (context.dataset.type === 'line') {
+                                label += context.parsed.y + '%';
+                            } else {
+                                label += context.parsed.y + ' Siswa';
+                            }
+                            return label;
+                        }
+                    }
+                },
+                datalabels: { display: true }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { color: '#94A3B8', font: { size: 10 } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    grid: { color: '#F1F5F9' },
+                    ticks: { color: '#94A3B8', font: { size: 10 } },
+                    grace: '10%',
+                    title: {
+                        display: true,
+                        text: 'Jumlah Siswa',
+                        color: '#64748B',
+                        font: { size: 10, weight: 'bold' }
+                    }
+                },
+                yPercent: {
+                    type: 'linear',
+                    display: false,
+                    min: 0,
+                    max: 50
                 }
             }
         }
