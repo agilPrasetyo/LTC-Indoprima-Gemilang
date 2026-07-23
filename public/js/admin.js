@@ -1520,6 +1520,7 @@
                 <td class="py-3 px-4 text-brand-blue font-bold">${p.totalKaryawan.toLocaleString('id-ID')}</td>
                 <td class="py-3 px-4 text-brand-teal font-bold">${p.totalLtc.toLocaleString('id-ID')}</td>
                 <td class="py-3 px-4 text-indigo-600 font-bold">${pct}</td>
+                <td class="py-3 px-4 text-slate-700 font-bold">${p.order !== undefined && p.order !== null ? p.order : '-'}</td>
                 <td class="py-3 px-4 text-right space-x-1.5">
                     <button onclick="openPopulasiModal(true, '${p.tanggal}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
@@ -1550,6 +1551,8 @@
                 document.getElementById('populasi-kontrak').value = p.kontrak;
                 document.getElementById('populasi-outsourcing').value = p.outsourcing;
                 document.getElementById('populasi-satpam-supir').value = p.satpamSupir;
+                const orderInput = document.getElementById('populasi-order');
+                if (orderInput) orderInput.value = p.order !== undefined && p.order !== null ? p.order : '';
             }
         } else {
             title.innerText = "Tambah Data Populasi";
@@ -1558,6 +1561,8 @@
             document.getElementById('populasi-kontrak').value = '100';
             document.getElementById('populasi-outsourcing').value = '10';
             document.getElementById('populasi-satpam-supir').value = '5';
+            const orderInput = document.getElementById('populasi-order');
+            if (orderInput) orderInput.value = '';
         }
         
         if (modal) {
@@ -1576,13 +1581,15 @@
         const kontrak = parseInt(document.getElementById('populasi-kontrak').value) || 0;
         const outsourcing = parseInt(document.getElementById('populasi-outsourcing').value) || 0;
         const satpamSupir = parseInt(document.getElementById('populasi-satpam-supir').value) || 0;
+        const rawOrder = document.getElementById('populasi-order') ? parseInt(document.getElementById('populasi-order').value) : NaN;
+        const order = isNaN(rawOrder) ? null : rawOrder;
         
         if (!tanggal) {
             showToast('Tanggal wajib diisi.', 'error');
             return;
         }
 
-        const payload = { tanggal, kontrak, outsourcing, satpamSupir };
+        const payload = { tanggal, kontrak, outsourcing, satpamSupir, order };
 
         if (typeof google !== 'undefined') {
             google.script.run
@@ -1608,6 +1615,7 @@
                     kontrak, 
                     outsourcing, 
                     satpamSupir,
+                    order,
                     totalKaryawan: kontrak + rawPopulasiData[idx].ltc + outsourcing + satpamSupir
                 };
                 showToast('Mode Preview: Data populasi berhasil diperbarui.');
@@ -1620,6 +1628,7 @@
                     ltc: ltcCount,
                     outsourcing,
                     satpamSupir,
+                    order,
                     totalKaryawan: kontrak + ltcCount + outsourcing + satpamSupir,
                     totalLtc: ltcCount
                 });

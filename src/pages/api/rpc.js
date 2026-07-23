@@ -281,7 +281,8 @@ async function getStatsFromSupabase() {
       outsourcing: p.outsourcing,
       satpamSupir: p.satpam_supir,
       totalKaryawan: p.total_karyawan,
-      totalLtc: p.total_ltc
+      totalLtc: p.total_ltc,
+      order: p.no_order !== undefined && p.no_order !== null ? p.no_order : (p.order_val !== undefined && p.order_val !== null ? p.order_val : (p.order !== undefined && p.order !== null ? p.order : null))
     })),
     monthYear: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 }
   };
@@ -836,16 +837,24 @@ async function handleLocalSupabaseWrite(action, args) {
     }
     const activeCount = count || 0;
 
-    const { error: upsertErr } = await supabase.from('populasi').upsert({
+    const populasiObj = {
       tanggal: p.tanggal,
       karyawan_kontrak: p.kontrak,
       ltc: activeCount,
       outsourcing: p.outsourcing,
       satpam_supir: p.satpamSupir,
       total_ltc: activeCount
+    };
+
+    let { error: upsertErr } = await supabase.from('populasi').upsert({
+      ...populasiObj,
+      no_order: p.order !== undefined && p.order !== null ? p.order : null
     }, { onConflict: 'tanggal' });
 
-    if (upsertErr) {
+    if (upsertErr && upsertErr.message.includes('column')) {
+      const { error: fallbackErr } = await supabase.from('populasi').upsert(populasiObj, { onConflict: 'tanggal' });
+      if (fallbackErr) throw new Error(fallbackErr.message);
+    } else if (upsertErr) {
       throw new Error(upsertErr.message);
     }
 
