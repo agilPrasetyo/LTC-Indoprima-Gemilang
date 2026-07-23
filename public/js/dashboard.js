@@ -466,6 +466,120 @@ function updateTurnoverPieChart() {
 
 var ltcRatioChartInstance = null;
 
+function togglePopulasiFilterInputs() {
+    const filterType = document.getElementById('populasi-chart-filter-type')?.value || 'all';
+    const monthContainer = document.getElementById('populasi-month-range-container');
+    const dateContainer = document.getElementById('populasi-date-range-container');
+
+    if (monthContainer) {
+        if (filterType === 'month-range') monthContainer.classList.remove('hidden');
+        else monthContainer.classList.add('hidden');
+    }
+
+    if (dateContainer) {
+        if (filterType === 'date-range') dateContainer.classList.remove('hidden');
+        else dateContainer.classList.add('hidden');
+    }
+
+    updateLtcRatioChart();
+}
+
+function resetPopulasiChartFilter() {
+    const typeSelect = document.getElementById('populasi-chart-filter-type');
+    const startMonth = document.getElementById('populasi-filter-start-month');
+    const endMonth = document.getElementById('populasi-filter-end-month');
+    const startDate = document.getElementById('populasi-filter-start-date');
+    const endDate = document.getElementById('populasi-filter-end-date');
+
+    if (typeSelect) typeSelect.value = 'all';
+    if (startMonth) startMonth.value = '';
+    if (endMonth) endMonth.value = '';
+    if (startDate) startDate.value = '';
+    if (endDate) endDate.value = '';
+
+    togglePopulasiFilterInputs();
+}
+
+function renderPopulasiOrderSummaryTable(filteredData) {
+    const tbody = document.getElementById('populasi-order-tbody');
+    const indicator = document.getElementById('populasi-order-filter-indicator');
+    if (!tbody) return;
+
+    tbody.innerHTML = '';
+
+    if (!filteredData || filteredData.length === 0) {
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5" class="py-6 text-center text-xs text-brand-textSub italic font-medium">
+                    Tidak ada data order populasi pada periode ini.
+                </td>
+            </tr>
+        `;
+        if (indicator) indicator.textContent = '0 Data Ditampilkan';
+        return;
+    }
+
+    const monthNames = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
+    const groupedByMonth = {};
+
+    filteredData.forEach(item => {
+        if (!item.tanggal) return;
+        const monthKey = item.tanggal.substring(0, 7); // 'YYYY-MM'
+        if (!groupedByMonth[monthKey]) {
+            groupedByMonth[monthKey] = {
+                monthKey: monthKey,
+                records: [],
+                totalOrderSum: 0,
+                totalKaryawanSum: 0,
+                totalLtcSum: 0
+            };
+        }
+        
+        groupedByMonth[monthKey].records.push(item);
+        const orderVal = item.order || item.no_order || item.order_val || 0;
+        groupedByMonth[monthKey].totalOrderSum += parseFloat(orderVal) || 0;
+        groupedByMonth[monthKey].totalKaryawanSum += item.totalKaryawan || 0;
+        groupedByMonth[monthKey].totalLtcSum += item.totalLtc || 0;
+    });
+
+    const sortedMonths = Object.keys(groupedByMonth).sort();
+
+    if (indicator) {
+        indicator.textContent = `Menampilkan ${sortedMonths.length} Bulan (${filteredData.length} Record)`;
+    }
+
+    sortedMonths.forEach(mKey => {
+        const grp = groupedByMonth[mKey];
+        const parts = mKey.split('-');
+        const year = parts[0];
+        const monthIdx = parseInt(parts[1], 10) - 1;
+        const monthNameStr = monthNames[monthIdx] ? `${monthNames[monthIdx]} ${year}` : mKey;
+
+        const recordCount = grp.records.length;
+        const avgKaryawan = Math.round(grp.totalKaryawanSum / recordCount);
+        const avgLtc = Math.round(grp.totalLtcSum / recordCount);
+        const orderFormatted = grp.totalOrderSum > 0 ? grp.totalOrderSum.toLocaleString('id-ID') : '-';
+
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
+        tr.innerHTML = `
+            <td class="py-3 px-4 font-bold text-brand-textMain flex items-center gap-2">
+                <i class="fa-regular fa-calendar-days text-brand-blue"></i>
+                ${monthNameStr}
+            </td>
+            <td class="py-3 px-4 text-center text-brand-textSub">${recordCount} Record</td>
+            <td class="py-3 px-4 text-center text-brand-blue font-bold">${avgKaryawan.toLocaleString('id-ID')} Karyawan</td>
+            <td class="py-3 px-4 text-center text-amber-600 font-bold">${avgLtc.toLocaleString('id-ID')} LTC</td>
+            <td class="py-3 px-4 text-right font-extrabold text-indigo-600">${orderFormatted}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
 function updateLtcRatioChart() {
     const chartCanvas = document.getElementById('ltcRatioChart');
     if (!chartCanvas) return;
@@ -473,7 +587,40 @@ function updateLtcRatioChart() {
 
     if (ltcRatioChartInstance) ltcRatioChartInstance.destroy();
 
-    const sortedData = [...rawPopulasiData].sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+    const filterType = document.getElementById('populasi-chart-filter-type')?.value || 'all';
+    let filteredData = [...rawPopulasiData];
+
+    if (filterType === 'month-range') {
+        const startMonth = document.getElementById('populasi-filter-start-month')?.value;
+        const endMonth = document.getElementById('populasi-filter-end-month')?.value;
+
+        if (startMonth || endMonth) {
+            filteredData = filteredData.filter(p => {
+                if (!p.tanggal) return false;
+                const m = p.tanggal.substring(0, 7); // YYYY-MM
+                if (startMonth && m < startMonth) return false;
+                if (endMonth && m > endMonth) return false;
+                return true;
+            });
+        }
+    } else if (filterType === 'date-range') {
+        const startDate = document.getElementById('populasi-filter-start-date')?.value;
+        const endDate = document.getElementById('populasi-filter-end-date')?.value;
+
+        if (startDate || endDate) {
+            filteredData = filteredData.filter(p => {
+                if (!p.tanggal) return false;
+                if (startDate && p.tanggal < startDate) return false;
+                if (endDate && p.tanggal > endDate) return false;
+                return true;
+            });
+        }
+    }
+
+    const sortedData = [...filteredData].sort((a, b) => a.tanggal.localeCompare(b.tanggal));
+
+    // Render Tabel Order per Bulan di bawah grafik
+    renderPopulasiOrderSummaryTable(sortedData);
     
     const labels = sortedData.map(p => {
         if (p.tanggal && p.tanggal.includes('-')) {
