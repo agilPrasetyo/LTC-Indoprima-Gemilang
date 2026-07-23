@@ -1,4 +1,94 @@
-<!-- Row 1: Kalkulator Uang Saku LTC -->
+<!-- Row 1: Informasi Standar Biaya & Tarif Harian -->
+<div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm animate-fadeIn mb-6">
+    <div class="flex items-center justify-between pb-4 mb-5 border-b border-slate-100">
+        <div>
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-file-invoice-dollar text-brand-blue"></i>
+                Standar Biaya & Tarif Harian LTC
+            </h3>
+            <p class="text-xs text-brand-textSub mt-1">Rincian standar alokasi Uang Transport, Uang Saku bulanan, dan acuan tarif perhitungan harian per tingkat kelas.</p>
+        </div>
+    </div>
+
+    <!-- Tabel Standar Biaya (Sesuai Matriks Referensi) -->
+    <div class="overflow-x-auto rounded-2xl border border-slate-200/80 mb-6">
+        <table class="w-full text-center text-xs border-collapse">
+            <thead>
+                <tr class="bg-slate-50 text-slate-700 font-bold border-b border-slate-200">
+                    <th class="py-3.5 px-4 text-left font-bold text-brand-textMain w-44 bg-slate-100/60">Komponen</th>
+                    <th class="py-3.5 px-4 font-extrabold text-brand-blue">Kelas 1<br/><span class="text-[10px] font-normal text-slate-500">(Bulan ke-1)</span></th>
+                    <th class="py-3.5 px-4 font-extrabold text-brand-blue">Kelas 2<br/><span class="text-[10px] font-normal text-slate-500">(Bulan ke-2)</span></th>
+                    <th class="py-3.5 px-4 font-extrabold text-brand-blue">Kelas 3<br/><span class="text-[10px] font-normal text-slate-500">(Bulan ke-3)</span></th>
+                    <th class="py-3.5 px-4 font-extrabold text-brand-blue">Kelas 4<br/><span class="text-[10px] font-normal text-slate-500">(Bulan ke-4)</span></th>
+                    <th class="py-3.5 px-4 font-extrabold text-brand-blue">Kelas 5<br/><span class="text-[10px] font-normal text-slate-500">(Bulan ke-5)</span></th>
+                </tr>
+            </thead>
+            <tbody class="divide-y divide-slate-100 font-medium">
+                <tr class="hover:bg-slate-50/50">
+                    <td class="py-3.5 px-4 text-left font-bold text-slate-700 bg-slate-50/40">Uang Transport</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 750.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 750.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 750.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 750.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 750.000,-</td>
+                </tr>
+                <tr class="hover:bg-slate-50/50">
+                    <td class="py-3.5 px-4 text-left font-bold text-slate-700 bg-slate-50/40">Uang Saku</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 2.250.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 2.350.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 2.500.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 2.700.000,-</td>
+                    <td class="py-3.5 px-4 text-slate-700">Rp. 2.950.000,-</td>
+                </tr>
+                <tr class="bg-blue-50/40 font-bold border-t-2 border-slate-200">
+                    <td class="py-3.5 px-4 text-left font-extrabold text-brand-blue bg-blue-100/40">Total</td>
+                    <td class="py-3.5 px-4 text-brand-blue font-extrabold">Rp. 3.000.000,-</td>
+                    <td class="py-3.5 px-4 text-brand-blue font-extrabold">Rp. 3.100.000,-</td>
+                    <td class="py-3.5 px-4 text-brand-blue font-extrabold">Rp. 3.250.000,-</td>
+                    <td class="py-3.5 px-4 text-brand-blue font-extrabold">Rp. 3.450.000,-</td>
+                    <td class="py-3.5 px-4 text-brand-blue font-extrabold">Rp. 3.700.000,-</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Informasi Perhitungan Per Hari per Kelas -->
+    <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-brand-textSub mb-3 flex items-center gap-1.5">
+            <i class="fa-solid fa-clock text-amber-500"></i>
+            Acuan Perhitungan Tarif Per Hari (Per Kelas)
+        </p>
+        <div class="grid grid-cols-2 sm:grid-cols-5 gap-3">
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Kelas 1</span>
+                <span class="text-sm font-extrabold text-brand-textMain mt-1 block">Rp 120.000</span>
+                <span class="text-[9px] font-medium text-slate-500">per hari</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Kelas 2</span>
+                <span class="text-sm font-extrabold text-brand-textMain mt-1 block">Rp 124.000</span>
+                <span class="text-[9px] font-medium text-slate-500">per hari</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Kelas 3</span>
+                <span class="text-sm font-extrabold text-brand-textMain mt-1 block">Rp 130.000</span>
+                <span class="text-[9px] font-medium text-slate-500">per hari</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Kelas 4</span>
+                <span class="text-sm font-extrabold text-brand-textMain mt-1 block">Rp 138.000</span>
+                <span class="text-[9px] font-medium text-slate-500">per hari</span>
+            </div>
+            <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200/70 text-center">
+                <span class="text-[10px] font-bold uppercase text-slate-400 block">Kelas 5</span>
+                <span class="text-sm font-extrabold text-brand-textMain mt-1 block">Rp 148.000</span>
+                <span class="text-[9px] font-medium text-slate-500">per hari</span>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Row 2: Kalkulator Uang Saku LTC -->
 <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm animate-fadeIn">
     <div class="flex flex-col md:flex-row md:items-center justify-between pb-4 mb-6 border-b border-slate-100 gap-4">
         <div>
