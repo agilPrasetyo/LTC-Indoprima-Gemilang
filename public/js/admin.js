@@ -72,6 +72,8 @@
             renderAdminTurnoverTable();
         } else if (currentAdminTab === 'kelola-populasi') {
             renderAdminPopulasiTable();
+        } else if (currentAdminTab === 'kelola-k3') {
+            if (typeof filterAdminSafetyTable === 'function') filterAdminSafetyTable();
         }
     }
 

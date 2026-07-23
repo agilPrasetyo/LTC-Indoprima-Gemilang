@@ -22,6 +22,10 @@
             class="admin-tab-btn px-5 py-3 text-xs font-semibold border-b-2 border-transparent text-brand-textSub hover:text-brand-textMain transition-all duration-200 flex items-center gap-2 whitespace-nowrap">
             <i class="fa-solid fa-users-line"></i> Kelola Populasi
         </button>
+        <button onclick="switchAdminTab('kelola-k3')" id="tab-btn-kelola-k3"
+            class="admin-tab-btn px-5 py-3 text-xs font-semibold border-b-2 border-transparent text-brand-textSub hover:text-brand-textMain transition-all duration-200 flex items-center gap-2 whitespace-nowrap">
+            <i class="fa-solid fa-shield-halved"></i> Manajemen K3
+        </button>
     </div>
 
     <!-- TAB 1: Manajemen Akun -->
@@ -307,6 +311,84 @@
                     </thead>
                     <tbody id="admin-populasi-tbody" class="divide-y divide-slate-50 text-xs font-semibold">
                         <!-- Diisi Dinamis lewat JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 6: Manajemen K3 -->
+    <div id="admin-tab-kelola-k3" class="admin-tab-content hidden space-y-6">
+        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+                <div>
+                    <h3 class="font-display font-bold text-lg text-brand-textMain">Kelola Data Kecelakaan Kerja (Manajemen K3)</h3>
+                    <p class="text-xs text-brand-textSub mt-0.5">Tambah, edit, dan hapus riwayat kecelakaan kerja / insiden K3 peserta LTC</p>
+                </div>
+                <button onclick="openSafetyModal()" class="px-4 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-sm">
+                    <i class="fa-solid fa-plus"></i> Tambah Data K3 / Accident
+                </button>
+            </div>
+
+            <!-- Panel Filter & Pencarian Tabel K3 -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+                <div class="lg:col-span-2 relative">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                    <input type="text" id="admin-safety-search-input" onkeyup="filterAdminSafetyTable()" placeholder="Cari NoReg, Nama, SPV, Keterangan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <select id="admin-safety-filter-kelas" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="admin-safety-filter-bagian" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                        <option value="">Semua Bagian</option>
+                        <option value="GRINDING">GRINDING</option>
+                        <option value="PAINTING">PAINTING</option>
+                        <option value="CORE">CORE</option>
+                        <option value="PPIC">PPIC</option>
+                        <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
+                    </select>
+                </div>
+                <div>
+                    <select id="admin-safety-filter-kategori" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                        <option value="">Semua Kategori</option>
+                        <option value="Near Miss">Near Miss (Hampir Celaka)</option>
+                        <option value="Ringan">Ringan (First Aid)</option>
+                        <option value="Sedang">Sedang (Medical Treatment)</option>
+                        <option value="Berat">Berat (Lost Time Injury)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Tabel Data K3 dengan Kolom AKSI -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200/80">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead>
+                        <tr class="bg-slate-100/80 text-brand-textMain font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                            <th class="py-3 px-4">TANGGAL</th>
+                            <th class="py-3 px-4">NO REG</th>
+                            <th class="py-3 px-4">NAMA SISWA</th>
+                            <th class="py-3 px-4">KELAS</th>
+                            <th class="py-3 px-4">BAGIAN</th>
+                            <th class="py-3 px-4">SPV</th>
+                            <th class="py-3 px-4">JENIS KECELAKAAN</th>
+                            <th class="py-3 px-4">KATEGORI</th>
+                            <th class="py-3 px-4">KETERANGAN</th>
+                            <th class="py-3 px-4 text-center">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-safety-tbody" class="divide-y divide-slate-100 font-semibold text-brand-textMain">
+                        <tr>
+                            <td colspan="10" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
+                        </tr>
                     </tbody>
                 </table>
             </div>
@@ -796,7 +878,7 @@
                         <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
                         <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
                         <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
-                        <option value="MOHAMMAT YASIR MA'ARIF">MOHAMMAT YASIR MA'ARIF</option>
+                        <option value="MOHAMMAT YASIR MA&apos;ARIF">MOHAMMAT YASIR MA&apos;ARIF</option>
                         <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
                         <option value="MUHTADIN">MUHTADIN</option>
                         <option value="NANDA TITO PRASETYO, S.T">NANDA TITO PRASETYO, S.T</option>

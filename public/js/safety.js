@@ -135,6 +135,90 @@ function filterSafetyTable() {
     if (filtered.length === 0) {
         tbody.innerHTML = `
             <tr>
+                <td colspan="9" class="py-8 text-center text-slate-400 italic">
+                    Tidak ada data kecelakaan kerja yang sesuai dengan filter.
+                </td>
+            </tr>
+        `;
+        return;
+    }
+
+    filtered.forEach(item => {
+        const tr = document.createElement('tr');
+        tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
+
+        let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
+        const kat = (item.kategori || '').toLowerCase();
+        if (kat.includes('near') || kat.includes('hampir')) {
+            badgeClass = "bg-amber-50 text-amber-600 border-amber-200";
+        } else if (kat.includes('ringan') || kat.includes('first')) {
+            badgeClass = "bg-blue-50 text-blue-600 border-blue-200";
+        } else if (kat.includes('sedang')) {
+            badgeClass = "bg-orange-50 text-orange-600 border-orange-200";
+        } else if (kat.includes('berat') || kat.includes('lost')) {
+            badgeClass = "bg-rose-50 text-rose-600 border-rose-200";
+        }
+
+        tr.innerHTML = `
+            <td class="py-3 px-4 font-bold text-slate-600">${item.tanggal || '-'}</td>
+            <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
+            <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${item.kelas || '-'}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${item.bagian || '-'}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
+            <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
+            <td class="py-3 px-4">
+                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${badgeClass}">
+                    ${item.kategori || 'Ringan'}
+                </span>
+            </td>
+            <td class="py-3 px-4 text-brand-textSub max-w-xs truncate" title="${item.keterangan || '-'}">${item.keterangan || '-'}</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+function filterAdminSafetyTable() {
+    const tbody = document.getElementById('admin-safety-tbody');
+    if (!tbody) return;
+
+    const searchVal = (document.getElementById('admin-safety-search-input')?.value || '').toLowerCase().trim();
+    const kelasVal = (document.getElementById('admin-safety-filter-kelas')?.value || '').toLowerCase().trim();
+    const bagianVal = (document.getElementById('admin-safety-filter-bagian')?.value || '').toLowerCase().trim();
+    const kategoriVal = (document.getElementById('admin-safety-filter-kategori')?.value || '').toLowerCase().trim();
+
+    let filtered = [...safetyData];
+
+    if (searchVal) {
+        filtered = filtered.filter(item => {
+            const noreg = (item.noreg || '').toLowerCase();
+            const nama = (item.nama || '').toLowerCase();
+            const spv = (item.spv || '').toLowerCase();
+            const jenis = (item.jenisKecelakaan || '').toLowerCase();
+            const ket = (item.keterangan || '').toLowerCase();
+            return noreg.includes(searchVal) || nama.includes(searchVal) || spv.includes(searchVal) || jenis.includes(searchVal) || ket.includes(searchVal);
+        });
+    }
+
+    if (kelasVal) {
+        filtered = filtered.filter(item => (item.kelas || '').toLowerCase() === kelasVal);
+    }
+
+    if (bagianVal) {
+        filtered = filtered.filter(item => (item.bagian || '').toLowerCase().includes(bagianVal));
+    }
+
+    if (kategoriVal) {
+        filtered = filtered.filter(item => (item.kategori || '').toLowerCase().includes(kategoriVal));
+    }
+
+    filtered.sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
+
+    tbody.innerHTML = '';
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = `
+            <tr>
                 <td colspan="10" class="py-8 text-center text-slate-400 italic">
                     Tidak ada data kecelakaan kerja yang sesuai dengan filter.
                 </td>
@@ -495,6 +579,7 @@ function deleteSafetyRecord(id) {
 // Attach globals for inline HTML event handlers
 window.renderSafetyView = renderSafetyView;
 window.filterSafetyTable = filterSafetyTable;
+window.filterAdminSafetyTable = filterAdminSafetyTable;
 window.toggleSafetyFilterInputs = toggleSafetyFilterInputs;
 window.resetSafetyChartFilter = resetSafetyChartFilter;
 window.updateSafetyCharts = updateSafetyCharts;
