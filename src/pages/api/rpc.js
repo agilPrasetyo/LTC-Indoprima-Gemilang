@@ -152,6 +152,25 @@ async function getStatsFromSupabase() {
   const { data: absensi } = await supabase.from('absensi').select('*');
   const { data: populasi } = await supabase.from('populasi').select('*');
 
+  let safetyRecords = [];
+  try {
+    const { data: safety } = await supabase.from('safety_log').select('*');
+    safetyRecords = (safety || []).map(s => ({
+      id: s.id,
+      noreg: s.noreg,
+      nama: s.nama,
+      kelas: s.kelas,
+      bagian: s.bagian,
+      spv: s.spv,
+      jenisKecelakaan: s.jenis_kecelakaan,
+      kategori: s.kategori,
+      tanggal: s.tanggal,
+      keterangan: s.keterangan
+    }));
+  } catch (err) {
+    console.warn('tabel safety_log belum dibuat:', err?.message);
+  }
+
   const logsByStudent = {};
   mLogs?.forEach(log => {
     if (!logsByStudent[log.noreg]) logsByStudent[log.noreg] = [];
@@ -260,6 +279,7 @@ async function getStatsFromSupabase() {
     recent: financeRecords,
     costRates: (cost || []).map(c => ({ kelas: c.keterangan, uangSaku: parseFloat(c.uang_saku), transport: parseFloat(c.transport) })),
     absensi: absensiRecords,
+    safety: safetyRecords,
     populasi: (populasi || []).map(p => ({
       tanggal: p.tanggal,
       kontrak: p.karyawan_kontrak,
@@ -808,6 +828,28 @@ async function handleLocalSupabaseWrite(action, args) {
 
   } else if (action === 'deleteAbsensi') {
     await supabase.from('absensi').delete().eq('id', args[0]);
+
+  } else if (action === 'saveSafetyRecord') {
+    const s = args[0];
+    const payload = {
+      noreg: s.noreg,
+      nama: s.nama,
+      kelas: s.kelas,
+      bagian: s.bagian,
+      spv: s.spv,
+      jenis_kecelakaan: s.jenisKecelakaan,
+      kategori: s.kategori,
+      tanggal: s.tanggal,
+      keterangan: s.keterangan
+    };
+    if (s.id) payload.id = s.id;
+
+    const { error: sErr } = await supabase.from('safety_log').upsert(payload);
+    if (sErr) throw new Error(sErr.message);
+
+  } else if (action === 'deleteSafetyRecord') {
+    const { error: dErr } = await supabase.from('safety_log').delete().eq('id', args[0]);
+    if (dErr) throw new Error(dErr.message);
 
   } else if (action === 'savePopulasi') {
     const p = args[0];

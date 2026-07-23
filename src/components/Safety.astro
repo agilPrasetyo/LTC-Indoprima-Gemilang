@@ -1,0 +1,293 @@
+---
+---
+
+<div class="space-y-6">
+    <!-- Header Section -->
+    <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
+        <div>
+            <div class="flex items-center gap-2">
+                <h3 class="font-display font-bold text-xl text-brand-textMain">Kecelakaan Kerja / Safety (K3)</h3>
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold uppercase bg-emerald-50 text-emerald-600 border border-emerald-200">K3 Active</span>
+            </div>
+            <p class="text-xs text-brand-textSub mt-1">Monitoring data keselamatan kerja, insiden, dan penanganan K3 peserta LTC Indoprima Gemilang.</p>
+        </div>
+        <div class="flex items-center gap-3">
+            <button onclick="openSafetyModal()" class="px-4 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-sm">
+                <i class="fa-solid fa-plus"></i> Catat Insiden Safety
+            </button>
+        </div>
+    </div>
+
+    <!-- Ringkasan Kartu KPI Safety -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Total Insiden -->
+        <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center text-rose-500 text-lg">
+                <i class="fa-solid fa-triangle-exclamation"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-brand-textSub uppercase tracking-wider">Total Insiden Safety</p>
+                <h4 class="font-display font-black text-2xl text-brand-textMain mt-0.5" id="stat-safety-total">0</h4>
+            </div>
+        </div>
+
+        <!-- Zero Accident Days Counter -->
+        <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-50 border border-emerald-100 flex items-center justify-center text-emerald-600 text-lg">
+                <i class="fa-solid fa-shield-halved"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-brand-textSub uppercase tracking-wider">Hari Bebas Kecelakaan</p>
+                <h4 class="font-display font-black text-2xl text-emerald-600 mt-0.5" id="stat-safety-zero-days">0 Hari</h4>
+            </div>
+        </div>
+
+        <!-- Insiden Bulan Ini -->
+        <div class="bg-white p-5 rounded-[20px] border border-slate-100 shadow-sm flex items-center gap-4">
+            <div class="w-12 h-12 rounded-2xl bg-amber-50 border border-amber-100 flex items-center justify-center text-amber-600 text-lg">
+                <i class="fa-solid fa-calendar-check"></i>
+            </div>
+            <div>
+                <p class="text-[11px] font-bold text-brand-textSub uppercase tracking-wider">Insiden Bulan Ini</p>
+                <h4 class="font-display font-black text-2xl text-amber-600 mt-0.5" id="stat-safety-this-month">0</h4>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Grafik Visualisasi Safety -->
+    <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-6">
+        <!-- Header Grafik & Panel Filter Periode -->
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+                <h4 class="font-display font-bold text-base text-brand-textMain flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-brand-blue"></i>
+                    Visualisasi Data Kecelakaan Kerja
+                </h4>
+                <p class="text-xs text-brand-textSub mt-0.5">Filter grafik berdasarkan range tanggal atau rentang bulan tertentu</p>
+            </div>
+
+            <!-- Filter Panel Grafik -->
+            <div class="flex flex-wrap items-center gap-2.5">
+                <div class="flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 shadow-sm">
+                    <span class="text-[10px] font-bold uppercase text-brand-textSub">Mode:</span>
+                    <select id="safety-chart-filter-type" onchange="toggleSafetyFilterInputs()" class="bg-transparent text-xs font-semibold text-brand-textMain outline-none cursor-pointer">
+                        <option value="all">Semua Data</option>
+                        <option value="month-range">Range Bulan</option>
+                        <option value="date-range">Filter Per Tanggal</option>
+                    </select>
+                </div>
+
+                <div id="safety-month-range-container" class="hidden flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 shadow-sm">
+                    <span class="text-[10px] font-bold uppercase text-brand-textSub">Bulan:</span>
+                    <input type="month" id="safety-chart-start-month" onchange="updateSafetyCharts()" class="bg-transparent text-xs font-semibold text-brand-textMain outline-none">
+                    <span class="text-slate-300">s/d</span>
+                    <input type="month" id="safety-chart-end-month" onchange="updateSafetyCharts()" class="bg-transparent text-xs font-semibold text-brand-textMain outline-none">
+                </div>
+
+                <div id="safety-date-range-container" class="hidden flex items-center gap-1.5 bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 shadow-sm">
+                    <span class="text-[10px] font-bold uppercase text-brand-textSub">Tanggal:</span>
+                    <input type="date" id="safety-chart-start-date" onchange="updateSafetyCharts()" class="bg-transparent text-xs font-semibold text-brand-textMain outline-none">
+                    <span class="text-slate-300">s/d</span>
+                    <input type="date" id="safety-chart-end-date" onchange="updateSafetyCharts()" class="bg-transparent text-xs font-semibold text-brand-textMain outline-none">
+                </div>
+
+                <button onclick="resetSafetyChartFilter()" class="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all flex items-center gap-1">
+                    <i class="fa-solid fa-rotate-left text-[10px]"></i> Reset
+                </button>
+            </div>
+        </div>
+
+        <!-- 2 Kolom Grafik -->
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            <!-- Grafik Tren Kecelakaan Kerja (Bar + Line) -->
+            <div class="lg:col-span-2 space-y-2">
+                <h5 class="font-display font-bold text-xs text-brand-textMain">Tren Kecelakaan Kerja per Periode</h5>
+                <div class="relative h-72">
+                    <canvas id="safetyTrendChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Grafik Distribusi Kategori / Bagian Insiden -->
+            <div class="space-y-2">
+                <h5 class="font-display font-bold text-xs text-brand-textMain">Distribusi Kategori Insiden</h5>
+                <div class="relative h-72 flex items-center justify-center">
+                    <canvas id="safetyDistributionChart"></canvas>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Section Tabel Kelola Data Kecelakaan Kerja -->
+    <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100">
+            <div>
+                <h4 class="font-display font-bold text-base text-brand-textMain flex items-center gap-2">
+                    <i class="fa-solid fa-list-check text-brand-blue"></i>
+                    Daftar Riwayat Kecelakaan Kerja (Safety Log)
+                </h4>
+                <p class="text-xs text-brand-textSub mt-0.5">Kelola data insiden keselamatan kerja peserta LTC</p>
+            </div>
+
+            <!-- Total Baris Info -->
+            <span id="safety-table-info-badge" class="text-xs font-semibold text-brand-textSub bg-slate-100 px-3 py-1 rounded-full w-fit">
+                Memuat data...
+            </span>
+        </div>
+
+        <!-- Panel Filter & Pencarian Tabel -->
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
+            <!-- Input Pencarian Global -->
+            <div class="lg:col-span-2 relative">
+                <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="safety-search-input" onkeyup="filterSafetyTable()" placeholder="Cari NoReg, Nama, SPV, Keterangan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <!-- Filter Kelas -->
+            <div>
+                <select id="safety-filter-kelas" onchange="filterSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <option value="">Semua Kelas</option>
+                    <option value="Kelas 1">Kelas 1</option>
+                    <option value="Kelas 2">Kelas 2</option>
+                    <option value="Kelas 3">Kelas 3</option>
+                    <option value="Kelas 4">Kelas 4</option>
+                    <option value="Kelas 5">Kelas 5</option>
+                </select>
+            </div>
+
+            <!-- Filter Bagian -->
+            <div>
+                <select id="safety-filter-bagian" onchange="filterSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <option value="">Semua Bagian</option>
+                    <option value="GRINDING">GRINDING</option>
+                    <option value="PAINTING">PAINTING</option>
+                    <option value="CORE">CORE</option>
+                    <option value="PPIC">PPIC</option>
+                    <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                    <option value="MAINTENANCE">MAINTENANCE</option>
+                </select>
+            </div>
+
+            <!-- Filter Kategori Insiden -->
+            <div>
+                <select id="safety-filter-kategori" onchange="filterSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <option value="">Semua Kategori</option>
+                    <option value="Near Miss">Near Miss (Hampir Celaka)</option>
+                    <option value="Ringan">Ringan (First Aid)</option>
+                    <option value="Sedang">Sedang (Medical Treatment)</option>
+                    <option value="Berat">Berat (Lost Time Injury)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Tabel Data Safety -->
+        <div class="overflow-x-auto rounded-xl border border-slate-200/80">
+            <table class="w-full text-left text-xs border-collapse">
+                <thead>
+                    <tr class="bg-slate-100/80 text-brand-textMain font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                        <th class="py-3 px-4">TANGGAL</th>
+                        <th class="py-3 px-4">NO REG</th>
+                        <th class="py-3 px-4">NAMA SISWA</th>
+                        <th class="py-3 px-4">KELAS</th>
+                        <th class="py-3 px-4">BAGIAN</th>
+                        <th class="py-3 px-4">SPV</th>
+                        <th class="py-3 px-4">JENIS KECELAKAAN</th>
+                        <th class="py-3 px-4">KATEGORI</th>
+                        <th class="py-3 px-4">KETERANGAN</th>
+                        <th class="py-3 px-4 text-center">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody id="safety-tbody" class="divide-y divide-slate-100 font-semibold text-brand-textMain">
+                    <tr>
+                        <td colspan="10" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL FORM TAMBAH / EDIT DATA SAFETY -->
+<div id="safety-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeSafetyModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+            <div>
+                <h4 class="font-display font-bold text-base text-brand-textMain" id="safety-modal-title">Tambah Insiden Safety</h4>
+                <p class="text-xs text-brand-textSub mt-0.5">Catat riwayat insiden keselamatan kerja peserta LTC</p>
+            </div>
+            <button onclick="closeSafetyModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition-all">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body Form -->
+        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
+            <input type="hidden" id="safety-form-id" value="">
+
+            <!-- Pilih Siswa (Auto Complete NoReg & Nama) -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Pilih Siswa / Peserta LTC <span class="text-rose-500">*</span></label>
+                <select id="safety-form-siswa" onchange="autoFillSafetySiswaInfo()" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <option value="">-- Pilih Siswa --</option>
+                </select>
+            </div>
+
+            <!-- Tanggal Kejadian -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Tanggal Kejadian <span class="text-rose-500">*</span></label>
+                <input type="date" id="safety-form-tanggal" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <!-- Grid 2 Kolom: Kelas & Bagian (Auto Filled) -->
+            <div class="grid grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMain mb-1">Kelas</label>
+                    <input type="text" id="safety-form-kelas" readonly class="w-full px-3.5 py-2.5 text-xs bg-slate-100 border border-slate-200 rounded-xl font-semibold text-slate-500 outline-none">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-brand-textMain mb-1">Bagian / Departemen</label>
+                    <input type="text" id="safety-form-bagian" readonly class="w-full px-3.5 py-2.5 text-xs bg-slate-100 border border-slate-200 rounded-xl font-semibold text-slate-500 outline-none">
+                </div>
+            </div>
+
+            <!-- SPV / Supervisor -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Nama Supervisor (SPV)</label>
+                <input type="text" id="safety-form-spv" placeholder="Contoh: Bpk. Bambang / Agus" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <!-- Jenis Kecelakaan Kerja -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Jenis Kecelakaan Kerja <span class="text-rose-500">*</span></label>
+                <input type="text" id="safety-form-jenis" placeholder="Contoh: Tergores plat besi / Terjepit mesin" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <!-- Kategori Insiden -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Kategori Insiden <span class="text-rose-500">*</span></label>
+                <select id="safety-form-kategori" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <option value="Ringan">Ringan (First Aid / Pertolongan Pertama)</option>
+                    <option value="Near Miss">Near Miss (Hampir Celaka)</option>
+                    <option value="Sedang">Sedang (Medical Treatment / Pengobatan Klinik)</option>
+                    <option value="Berat">Berat (Lost Time Injury / Jam Kerja Hilang)</option>
+                </select>
+            </div>
+
+            <!-- Keterangan & Kronologi -->
+            <div>
+                <label class="block text-xs font-bold text-brand-textMain mb-1">Keterangan / Kronologi Kejadian & Penanganan</label>
+                <textarea id="safety-form-keterangan" rows="3" placeholder="Tuliskan kronologi singkat dan tindakan perbaikan K3 yang telah dilakukan..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all resize-none"></textarea>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="p-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-3">
+            <button onclick="closeSafetyModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all">
+                Batal
+            </button>
+            <button id="safety-modal-submit-btn" onclick="saveSafetyData()" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
+                Simpan Data Safety
+            </button>
+        </div>
+    </div>
+</div>

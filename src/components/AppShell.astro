@@ -6,6 +6,7 @@ import SiswaPortal from '../components/SiswaPortal.astro';
 import Keuangan from '../components/Keuangan.astro';
 import Admin from '../components/Admin.astro';
 import Absensi from '../components/Absensi.astro';
+import Safety from '../components/Safety.astro';
 
 interface Props {
   role?: 'Admin' | 'Visitor' | 'Siswa';
@@ -172,6 +173,11 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
           <span class="nav-text">Absensi Siswa</span>
         </button>
 
+        <button id="nav-safety" onclick="switchView('safety')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-shield-halved text-base w-5 text-center"></i>
+          <span class="nav-text">Safety / K3</span>
+        </button>
+
         <button id="nav-admin" onclick="switchView('admin')" class="nav-btn w-full hidden flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
           <i class="fa-solid fa-sliders text-base w-5 text-center"></i>
           <span class="nav-text">Admin</span>
@@ -314,6 +320,11 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
       <div id="view-absensi" class="menu-view hidden space-y-6">
         <Absensi />
       </div>
+
+      <!-- VIEW 8: Kecelakaan Kerja / Safety -->
+      <div id="view-safety" class="menu-view hidden space-y-6">
+        <Safety />
+      </div>
     </main>
   </main>
 </div>
@@ -415,3 +426,4 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
 <script is:inline src="/js/keuangan.js?v=7.1"></script>
 <script is:inline src="/js/admin.js?v=7.1"></script>
 <script is:inline src="/js/absensi.js?v=7.1"></script>
+<script is:inline src="/js/safety.js?v=7.1"></script>

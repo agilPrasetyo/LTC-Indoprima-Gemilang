@@ -71,6 +71,7 @@
     let financeData = [];
     let rawUsersData = []; 
     let absensiData = [];
+    let safetyData = [];
     let rawPopulasiData = [];
     let geoJsonCache = null;  
     let monthYearMetadata = { year: 2026, month: 3 };
@@ -958,8 +959,10 @@
         costRatesConfig = data.costRates || [];
         rawPopulasiData = data.populasi || [];
 
-        // Store absensi data from server
+        // Store absensi data & safety data from server
         absensiData = data.absensi || [];
+        safetyData = data.safety || [];
+        window.safetyData = safetyData;
         currentVersion = data.version || "";
 
         const cardStats = data.cards || {};
@@ -999,7 +1002,8 @@
             },
             'view-turnover': () => typeof renderTurnoverView === 'function' && renderTurnoverView(),
             'view-admin': () => typeof renderAdminView === 'function' && renderAdminView(),
-            'view-absensi': () => typeof renderAbsensiView === 'function' && renderAbsensiView()
+            'view-absensi': () => typeof renderAbsensiView === 'function' && renderAbsensiView(),
+            'view-safety': () => typeof renderSafetyView === 'function' && renderSafetyView()
         };
 
         Object.keys(activeViews).forEach(viewId => {
@@ -1216,7 +1220,7 @@
             console.error("Failed to save view state:", e);
         }
 
-        const views = ['view-dashboard', 'view-siswa', 'view-sisi-siswa', 'view-keuangan', 'view-turnover', 'view-absensi', 'view-admin'];
+        const views = ['view-dashboard', 'view-siswa', 'view-sisi-siswa', 'view-keuangan', 'view-turnover', 'view-absensi', 'view-safety', 'view-admin'];
         views.forEach(v => {
             const el = document.getElementById(v);
             if (el) el.classList.add('hidden');
