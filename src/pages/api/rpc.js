@@ -846,16 +846,32 @@ async function handleLocalSupabaseWrite(action, args) {
       total_ltc: activeCount
     };
 
-    let { error: upsertErr } = await supabase.from('populasi').upsert({
-      ...populasiObj,
-      no_order: p.order !== undefined && p.order !== null ? p.order : null
-    }, { onConflict: 'tanggal' });
+    let success = false;
+    if (p.order !== undefined && p.order !== null && !isNaN(p.order)) {
+      const res1 = await supabase.from('populasi').upsert({
+        ...populasiObj,
+        no_order: p.order
+      }, { onConflict: 'tanggal' });
 
-    if (upsertErr && upsertErr.message.includes('column')) {
+      if (!res1.error) {
+        success = true;
+      } else {
+        const res2 = await supabase.from('populasi').upsert({
+          ...populasiObj,
+          order_val: p.order
+        }, { onConflict: 'tanggal' });
+
+        if (!res2.error) {
+          success = true;
+        }
+      }
+    }
+
+    if (!success) {
       const { error: fallbackErr } = await supabase.from('populasi').upsert(populasiObj, { onConflict: 'tanggal' });
-      if (fallbackErr) throw new Error(fallbackErr.message);
-    } else if (upsertErr) {
-      throw new Error(upsertErr.message);
+      if (fallbackErr) {
+        throw new Error(fallbackErr.message);
+      }
     }
 
   } else if (action === 'deletePopulasi') {
