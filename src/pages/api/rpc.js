@@ -837,8 +837,21 @@ async function handleLocalSupabaseWrite(action, args) {
     }
     const activeCount = count || 0;
 
+    const rawDate = p.tanggal;
+    let cleanDate = rawDate;
+    if (rawDate && typeof rawDate === 'string') {
+      const partsSlash = rawDate.trim().split('/');
+      if (partsSlash.length === 3) {
+        if (partsSlash[0].length === 4) {
+          cleanDate = `${partsSlash[0]}-${partsSlash[1].padStart(2,'0')}-${partsSlash[2].padStart(2,'0')}`;
+        } else {
+          cleanDate = `${partsSlash[2]}-${partsSlash[1].padStart(2,'0')}-${partsSlash[0].padStart(2,'0')}`;
+        }
+      }
+    }
+
     const populasiObj = {
-      tanggal: p.tanggal,
+      tanggal: cleanDate,
       karyawan_kontrak: p.kontrak,
       ltc: activeCount,
       outsourcing: p.outsourcing,

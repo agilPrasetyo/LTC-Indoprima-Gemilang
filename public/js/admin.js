@@ -1534,19 +1534,49 @@
         });
     }
 
+    function formatToYYYYMMDD(str) {
+        if (!str) return '';
+        str = String(str).trim();
+        if (/^\d{4}-\d{2}-\d{2}$/.test(str)) return str;
+        const partsSlash = str.split('/');
+        if (partsSlash.length === 3) {
+            if (partsSlash[0].length === 4) return `${partsSlash[0]}-${partsSlash[1].padStart(2,'0')}-${partsSlash[2].padStart(2,'0')}`;
+            return `${partsSlash[2]}-${partsSlash[1].padStart(2,'0')}-${partsSlash[0].padStart(2,'0')}`;
+        }
+        const partsDash = str.split('-');
+        if (partsDash.length === 3 && partsDash[0].length !== 4) {
+            return `${partsDash[2]}-${partsDash[1].padStart(2,'0')}-${partsDash[0].padStart(2,'0')}`;
+        }
+        const d = new Date(str);
+        if (!isNaN(d.getTime())) {
+            const yyyy = d.getFullYear();
+            const mm = String(d.getMonth() + 1).padStart(2, '0');
+            const dd = String(d.getDate()).padStart(2, '0');
+            return `${yyyy}-${mm}-${dd}`;
+        }
+        return str;
+    }
+
     function openPopulasiModal(editMode = false, tanggal = '') {
         const modal = document.getElementById('populasi-form-modal');
         const title = document.getElementById('populasi-modal-title');
         const tglInput = document.getElementById('populasi-tanggal');
         
         document.getElementById('populasi-edit-mode').value = editMode ? 'true' : 'false';
-        
+        const isoDate = formatToYYYYMMDD(tanggal);
+
+        if (tglInput) {
+            tglInput.dataset.rawDate = isoDate || tanggal;
+        }
+
         if (editMode) {
             title.innerText = "Edit Data Populasi";
-            tglInput.value = tanggal;
-            tglInput.disabled = true; // Tanggal bertindak sebagai ID, tidak bisa diubah pas edit
+            if (tglInput) {
+                tglInput.value = isoDate || tanggal;
+                tglInput.disabled = true; // Tanggal bertindak sebagai ID, tidak bisa diubah pas edit
+            }
             
-            const p = rawPopulasiData.find(x => x.tanggal === tanggal);
+            const p = rawPopulasiData.find(x => x.tanggal === tanggal || formatToYYYYMMDD(x.tanggal) === isoDate);
             if (p) {
                 document.getElementById('populasi-kontrak').value = p.kontrak;
                 document.getElementById('populasi-outsourcing').value = p.outsourcing;
@@ -1556,8 +1586,10 @@
             }
         } else {
             title.innerText = "Tambah Data Populasi";
-            tglInput.value = '';
-            tglInput.disabled = false;
+            if (tglInput) {
+                tglInput.value = '';
+                tglInput.disabled = false;
+            }
             document.getElementById('populasi-kontrak').value = '100';
             document.getElementById('populasi-outsourcing').value = '10';
             document.getElementById('populasi-satpam-supir').value = '5';
@@ -1577,7 +1609,10 @@
     }
 
     function savePopulasiData() {
-        const tanggal = document.getElementById('populasi-tanggal').value;
+        const tglInput = document.getElementById('populasi-tanggal');
+        let tanggal = tglInput ? (tglInput.value || tglInput.dataset.rawDate) : '';
+        tanggal = formatToYYYYMMDD(tanggal);
+
         const kontrak = parseInt(document.getElementById('populasi-kontrak').value) || 0;
         const outsourcing = parseInt(document.getElementById('populasi-outsourcing').value) || 0;
         const satpamSupir = parseInt(document.getElementById('populasi-satpam-supir').value) || 0;
@@ -1608,7 +1643,7 @@
                 .savePopulasi(payload);
         } else {
             // Mode Pratinjau Lokal
-            const idx = rawPopulasiData.findIndex(x => x.tanggal === tanggal);
+            const idx = rawPopulasiData.findIndex(x => x.tanggal === tanggal || formatToYYYYMMDD(x.tanggal) === tanggal);
             if (idx !== -1) {
                 rawPopulasiData[idx] = { 
                     ...rawPopulasiData[idx], 
@@ -1632,6 +1667,12 @@
                     totalKaryawan: kontrak + ltcCount + outsourcing + satpamSupir,
                     totalLtc: ltcCount
                 });
+                showToast('Mode Preview: Data populasi baru berhasil ditambahkan.');
+            }
+            closePopulasiModal();
+            renderAdminPopulasiTable();
+        }
+    }
                 showToast('Mode Preview: Data populasi ditambahkan.');
             }
             closePopulasiModal();
