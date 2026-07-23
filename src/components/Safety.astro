@@ -197,96 +197,10 @@
                 </thead>
                 <tbody id="safety-tbody" class="divide-y divide-slate-100 font-semibold text-brand-textMain">
                     <tr>
-                        <td colspan="10" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
+                        <td colspan="9" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
                     </tr>
                 </tbody>
             </table>
-        </div>
-    </div>
-</div>
-
-<!-- MODAL FORM TAMBAH / EDIT DATA SAFETY -->
-<div id="safety-modal" class="hidden fixed inset-0 z-50 items-center justify-center bg-slate-900/50 backdrop-blur-sm p-4" onclick="if(event.target===this)closeSafetyModal()">
-    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl w-full max-w-lg overflow-hidden animate-fadeIn">
-        <!-- Modal Header -->
-        <div class="p-6 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
-            <div>
-                <h4 class="font-display font-bold text-base text-brand-textMain" id="safety-modal-title">Tambah Insiden Safety</h4>
-                <p class="text-xs text-brand-textSub mt-0.5">Catat riwayat insiden keselamatan kerja peserta LTC</p>
-            </div>
-            <button onclick="closeSafetyModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center text-xs transition-all">
-                <i class="fa-solid fa-xmark"></i>
-            </button>
-        </div>
-
-        <!-- Modal Body Form -->
-        <div class="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
-            <input type="hidden" id="safety-form-id" value="">
-
-            <!-- Pilih Siswa (Auto Complete NoReg & Nama) -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Pilih Siswa / Peserta LTC <span class="text-rose-500">*</span></label>
-                <select id="safety-form-siswa" onchange="autoFillSafetySiswaInfo()" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
-                    <option value="">-- Pilih Siswa --</option>
-                </select>
-            </div>
-
-            <!-- Tanggal Kejadian -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Tanggal Kejadian <span class="text-rose-500">*</span></label>
-                <input type="date" id="safety-form-tanggal" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
-            </div>
-
-            <!-- Grid 2 Kolom: Kelas & Bagian (Auto Filled) -->
-            <div class="grid grid-cols-2 gap-3">
-                <div>
-                    <label class="block text-xs font-bold text-brand-textMain mb-1">Kelas</label>
-                    <input type="text" id="safety-form-kelas" readonly class="w-full px-3.5 py-2.5 text-xs bg-slate-100 border border-slate-200 rounded-xl font-semibold text-slate-500 outline-none">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold text-brand-textMain mb-1">Bagian / Departemen</label>
-                    <input type="text" id="safety-form-bagian" readonly class="w-full px-3.5 py-2.5 text-xs bg-slate-100 border border-slate-200 rounded-xl font-semibold text-slate-500 outline-none">
-                </div>
-            </div>
-
-            <!-- SPV / Supervisor -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Nama Supervisor (SPV)</label>
-                <input type="text" id="safety-form-spv" placeholder="Contoh: Bpk. Bambang / Agus" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
-            </div>
-
-            <!-- Jenis Kecelakaan Kerja -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Jenis Kecelakaan Kerja <span class="text-rose-500">*</span></label>
-                <input type="text" id="safety-form-jenis" placeholder="Contoh: Tergores plat besi / Terjepit mesin" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
-            </div>
-
-            <!-- Kategori Insiden -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Kategori Insiden <span class="text-rose-500">*</span></label>
-                <select id="safety-form-kategori" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
-                    <option value="Ringan">Ringan (First Aid / Pertolongan Pertama)</option>
-                    <option value="Near Miss">Near Miss (Hampir Celaka)</option>
-                    <option value="Sedang">Sedang (Medical Treatment / Pengobatan Klinik)</option>
-                    <option value="Berat">Berat (Lost Time Injury / Jam Kerja Hilang)</option>
-                </select>
-            </div>
-
-            <!-- Keterangan & Kronologi -->
-            <div>
-                <label class="block text-xs font-bold text-brand-textMain mb-1">Keterangan / Kronologi Kejadian & Penanganan</label>
-                <textarea id="safety-form-keterangan" rows="3" placeholder="Tuliskan kronologi singkat dan tindakan perbaikan K3 yang telah dilakukan..." class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all resize-none"></textarea>
-            </div>
-        </div>
-
-        <!-- Modal Footer -->
-        <div class="p-6 border-t border-slate-100 bg-slate-50/50 flex items-center justify-end gap-3">
-            <button onclick="closeSafetyModal()" class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-600 rounded-xl text-xs font-bold transition-all">
-                Batal
-            </button>
-            <button id="safety-modal-submit-btn" onclick="saveSafetyData()" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl text-xs font-bold transition-all shadow-sm">
-                Simpan Data Safety
-            </button>
         </div>
     </div>
 </div>

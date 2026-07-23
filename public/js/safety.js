@@ -19,9 +19,12 @@ function populateSafetySiswaDropdown() {
     const currentVal = select.value;
     select.innerHTML = '<option value="">-- Pilih Siswa --</option>';
 
-    if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
-        // Sort students alphabetically by name
-        const sortedSiswa = [...rawSiswaData].sort((a, b) => (a.namaLengkap || a.nama || '').localeCompare(b.namaLengkap || b.nama || ''));
+    const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
+        ? rawSiswaData
+        : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
+
+    if (studentList.length > 0) {
+        const sortedSiswa = [...studentList].sort((a, b) => (a.namaLengkap || a.nama || '').localeCompare(b.namaLengkap || b.nama || ''));
         sortedSiswa.forEach(s => {
             const noreg = s.id || s.noreg;
             const nama = s.namaLengkap || s.nama;
@@ -43,13 +46,17 @@ function autoFillSafetySiswaInfo() {
     if (!select) return;
 
     const noreg = select.value;
-    if (!noreg || typeof rawSiswaData === 'undefined') {
+    const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
+        ? rawSiswaData
+        : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
+
+    if (!noreg || studentList.length === 0) {
         if (kelasInput) kelasInput.value = '';
         if (bagianInput) bagianInput.value = '';
         return;
     }
 
-    const siswa = rawSiswaData.find(s => (s.id || s.noreg) === noreg);
+    const siswa = studentList.find(s => (s.id || s.noreg) === noreg);
     if (siswa) {
         if (kelasInput) kelasInput.value = siswa.kelas || '-';
         if (bagianInput) bagianInput.value = siswa.departemen || siswa.bagian || siswa.section || '-';
