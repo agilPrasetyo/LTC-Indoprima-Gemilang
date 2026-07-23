@@ -862,6 +862,15 @@ async function handleLocalSupabaseWrite(action, args) {
 
         if (!res2.error) {
           success = true;
+        } else {
+          const res3 = await supabase.from('populasi').upsert({
+            ...populasiObj,
+            order: p.order
+          }, { onConflict: 'tanggal' });
+
+          if (!res3.error) {
+            success = true;
+          }
         }
       }
     }
