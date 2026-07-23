@@ -538,49 +538,77 @@ function saveSafetyData() {
         return;
     }
 
-    const siswaObj = rawSiswaData ? rawSiswaData.find(s => (s.id || s.noreg) === noreg) : null;
+    const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
+        ? rawSiswaData
+        : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
+
+    const siswaObj = studentList.find(s => (s.id || s.noreg) === noreg);
     const namaSiswa = siswaObj ? (siswaObj.namaLengkap || siswaObj.nama) : noreg;
 
     const payload = {
         id: formId ? parseInt(formId) : null,
         noreg,
         nama: namaSiswa,
-        kelas,
-        bagian,
-        spv,
+        kelas: kelas || (siswaObj ? siswaObj.kelas : ''),
+        bagian: bagian || (siswaObj ? (siswaObj.departemen || siswaObj.bagian || siswaObj.section) : ''),
+        spv: spv || '',
         jenisKecelakaan: jenis,
-        kategori,
+        kategori: kategori || 'Ringan',
         tanggal,
-        keterangan: ket
+        keterangan: ket || ''
     };
 
     const submitBtn = document.getElementById('safety-modal-submit-btn');
-    if (submitBtn) submitBtn.disabled = true;
+    if (submitBtn) {
+        submitBtn.disabled = true;
+        submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Menyimpan...';
+    }
 
-    executeGASCall('saveSafetyRecord', [payload], function(res) {
-        if (submitBtn) submitBtn.disabled = false;
+    executeGASCall('saveSafetyRecord', [payload])
+        .then(res => {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Data Safety';
+            }
 
-        if (res && res.success) {
-            showToast('Data Kecelakaan Kerja berhasil disimpan!');
-            closeSafetyModal();
-            loadDashboardData();
-        } else {
-            showToast('Gagal menyimpan data safety: ' + (res ? res.message : 'Unknown error'), 'error');
-        }
-    });
+            if (res && res.success) {
+                showToast('Data Kecelakaan Kerja berhasil disimpan!');
+                closeSafetyModal();
+                if (typeof loadDashboardData === 'function') {
+                    loadDashboardData();
+                }
+            } else {
+                showToast('Gagal menyimpan data safety: ' + (res ? res.message : 'Unknown error'), 'error');
+            }
+        })
+        .catch(err => {
+            if (submitBtn) {
+                submitBtn.disabled = false;
+                submitBtn.innerHTML = 'Simpan Data Safety';
+            }
+            console.error('Error saving safety data:', err);
+            showToast('Gagal menyimpan data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
+        });
 }
 
 function deleteSafetyRecord(id) {
     if (!confirm('Apakah Anda yakin ingin menghapus catatan kecelakaan kerja ini?')) return;
 
-    executeGASCall('deleteSafetyRecord', [id], function(res) {
-        if (res && res.success) {
-            showToast('Data Safety berhasil dihapus!');
-            loadDashboardData();
-        } else {
-            showToast('Gagal menghapus data safety: ' + (res ? res.message : 'Unknown error'), 'error');
-        }
-    });
+    executeGASCall('deleteSafetyRecord', [id])
+        .then(res => {
+            if (res && res.success) {
+                showToast('Data Safety berhasil dihapus!');
+                if (typeof loadDashboardData === 'function') {
+                    loadDashboardData();
+                }
+            } else {
+                showToast('Gagal menghapus data safety: ' + (res ? res.message : 'Unknown error'), 'error');
+            }
+        })
+        .catch(err => {
+            console.error('Error deleting safety record:', err);
+            showToast('Gagal menghapus data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
+        });
 }
 
 // Attach globals for inline HTML event handlers
