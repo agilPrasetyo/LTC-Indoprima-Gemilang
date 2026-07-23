@@ -255,28 +255,25 @@
         <canvas id="ltcRatioChart"></canvas>
     </div>
 
-    <!-- Tabel Order per Bulan -->
+    <!-- Tabel Order per Bulan (Format Horizontal: bulan | total order) -->
     <div class="pt-4 border-t border-slate-100">
         <div class="flex items-center justify-between mb-3">
             <h4 class="font-display font-bold text-sm text-brand-textMain flex items-center gap-2">
                 <i class="fa-solid fa-list-check text-brand-blue"></i>
-                Daftar Order Populasi per Bulan
+                Total Order Populasi per Bulan
             </h4>
             <span id="populasi-order-filter-indicator" class="text-[11px] font-semibold text-brand-textSub bg-slate-100 px-2.5 py-0.5 rounded-full">Semua Periode</span>
         </div>
         
-        <div class="overflow-x-auto rounded-xl border border-slate-100">
+        <div class="overflow-x-auto rounded-xl border border-slate-200/80">
             <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                    <tr class="bg-slate-50 text-brand-textSub uppercase text-[10px] font-bold border-b border-slate-100">
-                        <th class="py-2.5 px-4">Bulan / Periode</th>
-                        <th class="py-2.5 px-4 text-center">Jumlah Record</th>
-                        <th class="py-2.5 px-4 text-center">Total Karyawan</th>
-                        <th class="py-2.5 px-4 text-center">Total LTC</th>
-                        <th class="py-2.5 px-4 text-right">Jumlah Order</th>
+                    <tr id="populasi-order-thead-tr" class="bg-slate-100/80 text-brand-textMain font-bold border-b border-slate-200">
+                        <th class="py-3 px-4 uppercase text-[11px] font-extrabold w-36 bg-slate-200/70 text-slate-700 border-r border-slate-200">bulan</th>
+                        <!-- Dipopulasikan secara dinamis oleh JS -->
                     </tr>
                 </thead>
-                <tbody id="populasi-order-tbody" class="divide-y divide-slate-50 font-semibold text-brand-textMain">
+                <tbody id="populasi-order-tbody" class="divide-y divide-slate-100 font-semibold">
                     <!-- Dipopulasikan secara dinamis oleh JS -->
                 </tbody>
             </table>

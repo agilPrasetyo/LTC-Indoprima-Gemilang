@@ -501,17 +501,21 @@ function resetPopulasiChartFilter() {
 }
 
 function renderPopulasiOrderSummaryTable(filteredData) {
+    const theadTr = document.getElementById('populasi-order-thead-tr');
     const tbody = document.getElementById('populasi-order-tbody');
     const indicator = document.getElementById('populasi-order-filter-indicator');
-    if (!tbody) return;
+    if (!theadTr || !tbody) return;
 
+    // Reset header (keep first cell 'bulan')
+    theadTr.innerHTML = '<th class="py-3 px-4 uppercase text-[11px] font-extrabold w-36 bg-slate-200/70 text-slate-700 border-r border-slate-200">bulan</th>';
     tbody.innerHTML = '';
 
     if (!filteredData || filteredData.length === 0) {
         tbody.innerHTML = `
             <tr>
-                <td colspan="5" class="py-6 text-center text-xs text-brand-textSub italic font-medium">
-                    Tidak ada data order populasi pada periode ini.
+                <td class="py-3 px-4 font-bold uppercase text-[11px] text-slate-700 bg-slate-50 border-r border-slate-200">total order</td>
+                <td class="py-4 px-4 text-center text-xs text-brand-textSub italic font-medium">
+                    Tidak ada data order pada periode ini.
                 </td>
             </tr>
         `;
@@ -532,52 +536,44 @@ function renderPopulasiOrderSummaryTable(filteredData) {
         if (!groupedByMonth[monthKey]) {
             groupedByMonth[monthKey] = {
                 monthKey: monthKey,
-                records: [],
-                totalOrderSum: 0,
-                totalKaryawanSum: 0,
-                totalLtcSum: 0
+                totalOrderSum: 0
             };
         }
-        
-        groupedByMonth[monthKey].records.push(item);
         const orderVal = item.order || item.no_order || item.order_val || 0;
         groupedByMonth[monthKey].totalOrderSum += parseFloat(orderVal) || 0;
-        groupedByMonth[monthKey].totalKaryawanSum += item.totalKaryawan || 0;
-        groupedByMonth[monthKey].totalLtcSum += item.totalLtc || 0;
     });
 
     const sortedMonths = Object.keys(groupedByMonth).sort();
 
     if (indicator) {
-        indicator.textContent = `Menampilkan ${sortedMonths.length} Bulan (${filteredData.length} Record)`;
+        indicator.textContent = `Menampilkan ${sortedMonths.length} Bulan`;
     }
+
+    const orderTr = document.createElement('tr');
+    orderTr.className = "bg-white hover:bg-slate-50/50 transition-colors";
+    
+    let orderRowHtml = '<td class="py-3 px-4 font-bold uppercase text-[11px] text-slate-700 bg-slate-50 border-r border-slate-200">total order</td>';
 
     sortedMonths.forEach(mKey => {
         const grp = groupedByMonth[mKey];
         const parts = mKey.split('-');
         const year = parts[0];
         const monthIdx = parseInt(parts[1], 10) - 1;
-        const monthNameStr = monthNames[monthIdx] ? `${monthNames[monthIdx]} ${year}` : mKey;
+        const monthNameStr = monthNames[monthIdx] ? `${monthNames[monthIdx]}` : mKey;
 
-        const recordCount = grp.records.length;
-        const avgKaryawan = Math.round(grp.totalKaryawanSum / recordCount);
-        const avgLtc = Math.round(grp.totalLtcSum / recordCount);
-        const orderFormatted = grp.totalOrderSum > 0 ? grp.totalOrderSum.toLocaleString('id-ID') : '-';
+        // Append Month Header
+        const th = document.createElement('th');
+        th.className = "py-3 px-4 font-extrabold text-center text-brand-blue border-r border-slate-200 min-w-[100px]";
+        th.textContent = monthNameStr;
+        theadTr.appendChild(th);
 
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
-        tr.innerHTML = `
-            <td class="py-3 px-4 font-bold text-brand-textMain flex items-center gap-2">
-                <i class="fa-regular fa-calendar-days text-brand-blue"></i>
-                ${monthNameStr}
-            </td>
-            <td class="py-3 px-4 text-center text-brand-textSub">${recordCount} Record</td>
-            <td class="py-3 px-4 text-center text-brand-blue font-bold">${avgKaryawan.toLocaleString('id-ID')} Karyawan</td>
-            <td class="py-3 px-4 text-center text-amber-600 font-bold">${avgLtc.toLocaleString('id-ID')} LTC</td>
-            <td class="py-3 px-4 text-right font-extrabold text-indigo-600">${orderFormatted}</td>
-        `;
-        tbody.appendChild(tr);
+        // Append Order Value Cell
+        const orderFormatted = grp.totalOrderSum > 0 ? grp.totalOrderSum.toLocaleString('id-ID') : '0';
+        orderRowHtml += `<td class="py-3 px-4 font-extrabold text-center text-indigo-600 text-sm border-r border-slate-100">${orderFormatted}</td>`;
     });
+
+    orderTr.innerHTML = orderRowHtml;
+    tbody.appendChild(orderTr);
 }
 
 function updateLtcRatioChart() {
