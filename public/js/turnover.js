@@ -41,12 +41,17 @@ function populateTurnoverCitiesDropdown() {
 
 function normalizeCityName(name) {
     if (!name) return "";
-    return name.toUpperCase()
-               .replace("KABUPATEN ", "")
-               .replace("KOTA ", "")
-               .replace("KAB. ", "")
-               .replace("KOT. ", "")
-               .trim();
+    let norm = name.toUpperCase()
+                   .replace("KABUPATEN ", "")
+                   .replace("KOTA ", "")
+                   .replace("KAB. ", "")
+                   .replace("KOT. ", "")
+                   .trim();
+    if (norm === "GRSIK") norm = "GRESIK";
+    if (norm === "SBY") norm = "SURABAYA";
+    if (norm === "MLG") norm = "MALANG";
+    if (norm === "SMG") norm = "SEMARANG";
+    return norm;
 }
 
 // Render peta fallback yang disederhanakan tanpa menampilkan garis batas biru putus-putus
@@ -311,27 +316,30 @@ function initTurnoverMap(filteredData) {
 
         if (activeCityFilter) {
             const coord = coordsJawa[activeCityFilter];
-            if (coord) {
-                mapTurnoverInstance.flyTo(coord, 11, { animate: true, duration: 1.2 });
-                
-                const targetMarker = window.turnoverMarkers[activeCityFilter];
-                if (targetMarker) {
-                    setTimeout(() => {
-                        targetMarker.openPopup();
-                    }, 1300);
-                }
-            } else {
-                let matchedBounds = null;
+            let matchedLayer = null;
+            if (geoJsonLayer) {
                 geoJsonLayer.eachLayer(layer => {
                     const name = normalizeCityName(layer.feature.properties.name || layer.feature.properties.KABKOT || layer.feature.properties.NAME_2);
                     if (name === activeCityFilter) {
-                        matchedBounds = layer.getBounds();
+                        matchedLayer = layer;
                     }
                 });
-                if (matchedBounds) {
-                    mapTurnoverInstance.fitBounds(matchedBounds, { padding: [50, 50], animate: true, duration: 1.5 });
-                }
             }
+
+            if (matchedLayer) {
+                mapTurnoverInstance.fitBounds(matchedLayer.getBounds(), { padding: [40, 40], animate: true, duration: 1.0 });
+            } else if (coord) {
+                mapTurnoverInstance.flyTo(coord, 11, { animate: true, duration: 1.0 });
+            }
+
+            setTimeout(() => {
+                const targetMarker = window.turnoverMarkers[activeCityFilter];
+                if (targetMarker) {
+                    targetMarker.openPopup();
+                } else if (matchedLayer) {
+                    matchedLayer.openPopup();
+                }
+            }, 600);
         } else {
             mapTurnoverInstance.setView([-7.7, 112.5], 8);
             mapTurnoverInstance.closePopup();
@@ -551,7 +559,7 @@ function renderTurnoverView() {
         filtered = filtered.filter(t => t.namaLengkap.toLowerCase().includes(searchVal) || t.id.toLowerCase().includes(searchVal));
     }
     if (filterWil) {
-        filtered = filtered.filter(t => t.wilayah.toLowerCase() === filterWil.toLowerCase());
+        filtered = filtered.filter(t => normalizeCityName(t.wilayah) === normalizeCityName(filterWil));
     }
     if (filterTipe) {
         filtered = filtered.filter(t => t.keterangan.toLowerCase() === filterTipe.toLowerCase());
