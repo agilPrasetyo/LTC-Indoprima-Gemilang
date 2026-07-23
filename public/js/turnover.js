@@ -1,4 +1,4 @@
-// Dropdown Kota Dinamis dari Data Geografis coordsJawa
+// Dropdown Kota Dinamis dari Data Turnover Siswa
 function populateTurnoverCitiesDropdown() {
     const select = document.getElementById('filter-turnover-wilayah');
     if (!select) return;
@@ -8,22 +8,15 @@ function populateTurnoverCitiesDropdown() {
     
     const filteredSet = new Set();
 
-    // 1. Tambahkan semua kota yang ada di data turnover
+    // Tambahkan HANYA kota yang ada di data turnover siswa
     const currentTurnoverDataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
     currentTurnoverDataset.forEach(s => {
-        if (s.wilayah) {
-            const normCity = normalizeCityName(s.wilayah);
-            if (normCity) {
+        const rawCity = s.wilayah || s.asalDaerah || s.asal || s.Kota;
+        if (rawCity) {
+            const normCity = normalizeCityName(rawCity);
+            if (normCity && normCity !== "-" && normCity !== "NULL") {
                 filteredSet.add(normCity);
             }
-        }
-    });
-
-    // 2. Tambahkan juga kota dari coordsJawa untuk kelengkapan daerah
-    Object.keys(coordsJawa).forEach(city => {
-        const normCity = normalizeCityName(city);
-        if (normCity && normCity.length > 3) {
-            filteredSet.add(normCity);
         }
     });
 
@@ -36,7 +29,11 @@ function populateTurnoverCitiesDropdown() {
         select.appendChild(opt);
     });
 
-    select.value = currentSelected;
+    if (currentSelected && filteredSet.has(currentSelected)) {
+        select.value = currentSelected;
+    } else {
+        select.value = "";
+    }
 }
 
 function normalizeCityName(name) {
@@ -47,7 +44,7 @@ function normalizeCityName(name) {
                    .replace("KAB. ", "")
                    .replace("KOT. ", "")
                    .trim();
-    if (norm === "GRSIK") norm = "GRESIK";
+    if (norm === "GRSIK" || norm === "GRSK" || norm === "GRESK") norm = "GRESIK";
     if (norm === "SBY") norm = "SURABAYA";
     if (norm === "MLG") norm = "MALANG";
     if (norm === "SMG") norm = "SEMARANG";
@@ -357,25 +354,22 @@ function draw3DSilverPinsOnMap(geojson, cityStats) {
     turnoverMarkerGroup.clearLayers();
     window.turnoverMarkers = {};
 
-    geojson.features.forEach(feature => {
-        const geoCityName = normalizeCityName(feature.properties.name || feature.properties.KABKOT || feature.properties.NAME_2);
-        const coord = coordsJawa[geoCityName];
-        
-        if (coord) {
-            const stat = cityStats[geoCityName];
+    Object.keys(cityStats).forEach(cityName => {
+        const normCity = normalizeCityName(cityName);
+        const coord = coordsJawa[normCity] || coordsJawa[cityName];
+        const stat = cityStats[cityName];
+
+        if (coord && stat && (stat.resign > 0 || stat.lulus > 0 || stat.indisipliner > 0 || stat.students.length > 0)) {
             let markerClass = 'map-marker-blue';
+            const totalNeg = stat.resign + stat.indisipliner;
+            const totalPos = stat.lulus;
 
-            if (stat) {
-                const totalNeg = stat.resign + stat.indisipliner;
-                const totalPos = stat.lulus;
-
-                if (totalNeg > totalPos) {
-                    markerClass = 'map-marker-red';
-                } else if (totalPos > totalNeg) {
-                    markerClass = 'map-marker-green';
-                } else if (totalPos === totalNeg && totalPos > 0) {
-                    markerClass = 'map-marker-yellow';
-                }
+            if (totalNeg > totalPos) {
+                markerClass = 'map-marker-red';
+            } else if (totalPos > totalNeg) {
+                markerClass = 'map-marker-green';
+            } else if (totalPos === totalNeg && totalPos > 0) {
+                markerClass = 'map-marker-yellow';
             }
 
             const coloredPinIcon = L.divIcon({
@@ -385,31 +379,23 @@ function draw3DSilverPinsOnMap(geojson, cityStats) {
                 iconAnchor: [8, 8]
             });
 
+            const totalCases = stat.resign + stat.lulus + stat.indisipliner;
             let popupContent = `<div class="p-2 font-sans">
-                <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${geoCityName}</h4>`;
-            
-            if (stat) {
-                const totalCases = stat.resign + stat.lulus + stat.indisipliner;
-                popupContent += `
-                    <p class="text-xs text-slate-600 mt-2">Total Kasus: <b>${totalCases} Siswa</b></p>
-                    <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-semibold">
-                        <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
-                        <p class="text-amber-600 font-semibold">● Resign Kerja: ${stat.resign} orang</p>
-                        <p class="text-rose-600 font-semibold">● Indisipliner: ${stat.indisipliner} orang</p>
-                    </div>
-                `;
-            } else {
-                popupContent += `
-                    <p class="text-xs text-slate-500 mt-2">Kondisi operasional magang sangat kondusif.</p>
-                `;
-            }
-            popupContent += `</div>`;
+                <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${normCity}</h4>
+                <p class="text-xs text-slate-600 mt-2">Total Kasus: <b>${totalCases} Siswa</b></p>
+                <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-semibold">
+                    <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
+                    <p class="text-amber-600 font-semibold">● Resign Kerja: ${stat.resign} orang</p>
+                    <p class="text-rose-600 font-semibold">● Indisipliner: ${stat.indisipliner} orang</p>
+                </div>
+            </div>`;
 
             const marker = L.marker(coord, { icon: coloredPinIcon })
              .addTo(turnoverMarkerGroup)
              .bindPopup(popupContent);
 
-            window.turnoverMarkers[geoCityName] = marker;
+            window.turnoverMarkers[normCity] = marker;
+            window.turnoverMarkers[cityName] = marker;
         }
     });
 }
