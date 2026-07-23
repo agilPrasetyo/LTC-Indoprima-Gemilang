@@ -1673,13 +1673,6 @@
             renderAdminPopulasiTable();
         }
     }
-                showToast('Mode Preview: Data populasi ditambahkan.');
-            }
-            closePopulasiModal();
-            renderAdminView();
-            if (typeof calculateDynamicPerformance === 'function') calculateDynamicPerformance();
-        }
-    }
 
     function deletePopulasiAdmin(tanggal) {
         showGlassModal({
