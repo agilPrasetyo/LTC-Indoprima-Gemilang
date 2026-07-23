@@ -618,10 +618,20 @@ function updateLtcRatioChart() {
     // Render Tabel Order per Bulan di bawah grafik
     renderPopulasiOrderSummaryTable(sortedData);
     
+    const monthNamesShort = [
+        'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+        'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
+    ];
+
     const labels = sortedData.map(p => {
         if (p.tanggal && p.tanggal.includes('-')) {
             const parts = p.tanggal.split('-');
-            return `${parts[2]}/${parts[1]}`;
+            const monthIdx = parseInt(parts[1], 10) - 1;
+            const mName = monthNamesShort[monthIdx] || parts[1];
+            if (filterType === 'date-range') {
+                return `${parseInt(parts[2], 10)} ${mName}`;
+            }
+            return mName;
         }
         return p.tanggal;
     });
