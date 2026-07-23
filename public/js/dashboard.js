@@ -836,98 +836,89 @@ function updateAbsensiChart() {
     if (absensiChartInstance) absensiChartInstance.destroy();
 
     const filterType = document.getElementById('absensi-chart-filter-type')?.value || 'all';
+    const startMonth = document.getElementById('absensi-chart-start-month')?.value;
+    const endMonth = document.getElementById('absensi-chart-end-month')?.value;
+    const startDate = document.getElementById('absensi-chart-start-date')?.value;
+    const endDate = document.getElementById('absensi-chart-end-date')?.value;
 
-    // Ambil data absensi dari window.absensiData dan rawSiswaData
-    const allAbsensi = [];
+    const grouped = {};
 
-    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
-        absensiData.forEach(a => {
-            if (a.tanggal && a.status) {
-                allAbsensi.push({ tanggal: a.tanggal, status: a.status });
-            }
-        });
-    }
-
+    // 1. Agregasi dari rawSiswaData (log harian siswa)
     if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
         rawSiswaData.forEach(s => {
-            if (Array.isArray(s.dailyLogs)) {
-                s.dailyLogs.forEach(dl => {
-                    if (dl.dateStr && dl.hadir) {
-                        allAbsensi.push({ tanggal: dl.dateStr, status: dl.hadir });
+            const logs = s.dailyLogs || s.dailyRecords || [];
+            if (Array.isArray(logs)) {
+                logs.forEach(dl => {
+                    const dateStr = dl.dateStr || dl.tanggal || dl.tanggal_record;
+                    if (!dateStr) return;
+
+                    let key = dateStr.substring(0, 7); // YYYY-MM
+                    if (filterType === 'date-range') {
+                        key = dateStr; // YYYY-MM-DD
+                    }
+
+                    if (!grouped[key]) {
+                        grouped[key] = { hadir: 0, tidakHadir: 0 };
+                    }
+
+                    const hVal = (dl.hadir || '').toString().trim().toLowerCase();
+                    const ketVal = (dl.keterangan || '').toString().trim().toLowerCase();
+
+                    if (ketVal.includes('sakit') || hVal === 'sakit' || hVal === 's' ||
+                        ketVal.includes('izin') || hVal === 'izin' || hVal === 'i' ||
+                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'alpa' || hVal === 'a') {
+                        grouped[key].tidakHadir += 1;
+                    } else {
+                        grouped[key].hadir += 1;
                     }
                 });
             }
         });
     }
 
-    let filtered = [...allAbsensi];
+    // 2. Agregasi dari absensiData (catatan absensi manual)
+    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
+        absensiData.forEach(a => {
+            if (!a.tanggal) return;
+            let key = a.tanggal.substring(0, 7);
+            if (filterType === 'date-range') {
+                key = a.tanggal;
+            }
 
+            if (!grouped[key]) {
+                grouped[key] = { hadir: 0, tidakHadir: 0 };
+            }
+
+            const st = (a.status || '').toString().trim().toLowerCase();
+            if (st === 'alpha' || st === 'alpa' || st === 'a' || st === 'sakit' || st === 's' || st === 'izin' || st === 'i') {
+                grouped[key].tidakHadir += 1;
+            }
+        });
+    }
+
+    let sortedKeys = Object.keys(grouped).sort();
+
+    // Filter berdasarkan mode
     if (filterType === 'month-range') {
-        const startMonth = document.getElementById('absensi-chart-start-month')?.value;
-        const endMonth = document.getElementById('absensi-chart-end-month')?.value;
-
         if (startMonth || endMonth) {
-            filtered = filtered.filter(a => {
-                if (!a.tanggal) return false;
-                const m = a.tanggal.substring(0, 7);
-                if (startMonth && m < startMonth) return false;
-                if (endMonth && m > endMonth) return false;
+            sortedKeys = sortedKeys.filter(k => {
+                if (startMonth && k < startMonth) return false;
+                if (endMonth && k > endMonth) return false;
                 return true;
             });
         }
     } else if (filterType === 'date-range') {
-        const startDate = document.getElementById('absensi-chart-start-date')?.value;
-        const endDate = document.getElementById('absensi-chart-end-date')?.value;
-
         if (startDate || endDate) {
-            filtered = filtered.filter(a => {
-                if (!a.tanggal) return false;
-                if (startDate && a.tanggal < startDate) return false;
-                if (endDate && a.tanggal > endDate) return false;
+            sortedKeys = sortedKeys.filter(k => {
+                if (startDate && k < startDate) return false;
+                if (endDate && k > endDate) return false;
                 return true;
             });
         }
     }
 
-    // Kelompokkan per Bulan (YYYY-MM) atau per Tanggal (YYYY-MM-DD)
-    const grouped = {};
-    filtered.forEach(item => {
-        let key = item.tanggal.substring(0, 7);
-        if (filterType === 'date-range') {
-            key = item.tanggal;
-        }
-
-        if (!grouped[key]) {
-            grouped[key] = { hadir: 0, tidakHadir: 0 };
-        }
-
-        const st = (item.status || '').toString().trim().toLowerCase();
-        if (st === 'hadir' || st === 'h') {
-            grouped[key].hadir += 1;
-        } else if (st === 'sakit' || st === 's' || st === 'izin' || st === 'i' || st === 'alpha' || st === 'alpa' || st === 'a') {
-            grouped[key].tidakHadir += 1;
-        }
-    });
-
-    let sortedKeys = Object.keys(grouped).sort();
-
-    // Fallback: Jika belum ada data absensi di DB, gunakan tanggal dari rawPopulasiData
-    if (sortedKeys.length === 0 && typeof rawPopulasiData !== 'undefined' && Array.isArray(rawPopulasiData)) {
-        rawPopulasiData.forEach(p => {
-            if (!p.tanggal) return;
-            let key = p.tanggal.substring(0, 7);
-            if (filterType === 'date-range') key = p.tanggal;
-
-            if (!grouped[key]) {
-                const totalSiswa = p.totalLtc || 24;
-                grouped[key] = {
-                    hadir: Math.max(0, totalSiswa - 2),
-                    tidakHadir: 2
-                };
-            }
-        });
-        sortedKeys = Object.keys(grouped).sort();
-    }
+    // Hindari bulan tanpa data nyata jika ada
+    sortedKeys = sortedKeys.filter(k => (grouped[k].hadir + grouped[k].tidakHadir) > 0);
 
     const monthNamesShort = [
         'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
