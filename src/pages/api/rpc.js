@@ -238,11 +238,10 @@ async function getStatsFromSupabase() {
 
   let graduates = 0, resignVal = 0, indisVal = 0;
   turnoverList.forEach(t => {
-    const alasanLower = String(t.alasan || '').toLowerCase();
-    const ketLower = String(t.keterangan || '').toLowerCase();
-    if (alasanLower.includes("lulus") || ketLower.includes("lulus")) graduates++;
-    else if (alasanLower.includes("resign") || ketLower.includes("resign")) resignVal++;
-    else if (alasanLower.includes("indisipliner") || ketLower.includes("indisipliner")) indisVal++;
+    const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+    if (statusStr.includes("lulus")) graduates++;
+    else if (statusStr.includes("resign")) resignVal++;
+    else if (statusStr.includes("indisipliner") || statusStr.includes("indisiplin")) indisVal++;
   });
 
   let income = 0, expense = 0;

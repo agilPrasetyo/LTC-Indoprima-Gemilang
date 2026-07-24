@@ -391,12 +391,12 @@ function updateTurnoverPieChart() {
 
     const records = activeTurnoverData || [];
     records.forEach(item => {
-        const ket = String(item.keterangan || '').trim().toLowerCase();
-        if (ket === 'resign') {
+        const statusStr = String(item.alasan || item.alasanDetail || item.alasan_detail || item.keterangan || '').trim().toLowerCase();
+        if (statusStr.includes('resign')) {
             resignCount++;
-        } else if (ket === 'lulus') {
+        } else if (statusStr.includes('lulus')) {
             lulusCount++;
-        } else if (ket === 'indisipliner') {
+        } else if (statusStr.includes('indisipliner') || statusStr.includes('indisiplin')) {
             indisiplinerCount++;
         }
     });

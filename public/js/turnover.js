@@ -159,12 +159,12 @@ function initTurnoverMap(filteredData) {
     const cityStats = {};
 
     currentTurnoverDataset.forEach(s => {
-        const cityClean = normalizeCityName(s.wilayah);
+        const cityClean = normalizeCityName(s.wilayah || s.asalDaerah || s.asal || s.Kota);
         if (!cityStats[cityClean]) {
             cityStats[cityClean] = { resign: 0, lulus: 0, indisipliner: 0, students: [] };
         }
         
-        const status = s.keterangan.toLowerCase();
+        const status = String(s.alasan || s.alasanDetail || s.alasan_detail || s.keterangan || '').toLowerCase();
         if (status.includes('resign')) {
             cityStats[cityClean].resign++;
         } else if (status.includes('lulus')) {
@@ -548,7 +548,10 @@ function renderTurnoverView() {
         filtered = filtered.filter(t => normalizeCityName(t.wilayah) === normalizeCityName(filterWil));
     }
     if (filterTipe) {
-        filtered = filtered.filter(t => t.keterangan.toLowerCase() === filterTipe.toLowerCase());
+        filtered = filtered.filter(t => {
+            const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+            return statusStr.includes(filterTipe.toLowerCase());
+        });
     }
 
     filtered.forEach(t => {
@@ -556,14 +559,16 @@ function renderTurnoverView() {
         tr.className = "hover:bg-slate-50/50 transition-all-300";
         
         let badgeStyle = "bg-slate-50 text-slate-600";
-        const ketLower = t.keterangan.toLowerCase();
-        if (ketLower.includes("resign")) {
+        const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+        if (statusStr.includes("resign")) {
             badgeStyle = "bg-amber-50 text-amber-600";
-        } else if (ketLower.includes("lulus")) {
+        } else if (statusStr.includes("lulus")) {
             badgeStyle = "bg-emerald-50 text-emerald-600";
-        } else if (ketLower.includes("indisipliner") || ketLower.includes("indisiplin")) {
+        } else if (statusStr.includes("indisipliner") || statusStr.includes("indisiplin")) {
             badgeStyle = "bg-rose-50 text-rose-600";
         }
+
+        const statusLabel = t.alasan || t.keterangan || '-';
 
         tr.innerHTML = `
             <td class="py-3 px-4 font-semibold text-brand-textSub text-xs">${t.id}</td>
@@ -571,20 +576,20 @@ function renderTurnoverView() {
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.bagian || '-'}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.kelas || '-'}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.tanggalKeluar || '-'}</td>
-            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${t.keterangan}</span></td>
+            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${statusLabel}</span></td>
             <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah || '-'}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.alasan || '-'}</td>
+            <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.keterangan || t.alasan || '-'}</td>
         `;
         tbody.appendChild(tr);
     });
 
     let rCount = 0, lCount = 0, iCount = 0;
     dataset.forEach(t => {
-        const ketLower = t.keterangan.toLowerCase();
-        if (ketLower.includes("resign")) rCount++;
-        else if (ketLower.includes("lulus")) lCount++;
-        else if (ketLower.includes("indisipliner") || ketLower.includes("indisiplin")) iCount++;
+        const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+        if (statusStr.includes("resign")) rCount++;
+        else if (statusStr.includes("lulus")) lCount++;
+        else if (statusStr.includes("indisipliner") || statusStr.includes("indisiplin")) iCount++;
     });
     
     const kpiResign = document.getElementById('turnover-kpi-resign');
