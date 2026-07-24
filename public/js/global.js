@@ -723,15 +723,22 @@
             if (mainHeader) mainHeader.classList.remove('hidden');
             
             const bottomNav = document.getElementById('mobile-bottom-nav');
-            if (bottomNav) {
-                bottomNav.classList.remove('hidden');
-                bottomNav.style.removeProperty('display');
-            }
+            const sidebarNavLinks = document.getElementById('sidebar-nav-links');
 
             // Direct user based on role: Siswa goes to portal form, others to dashboard
             if (currentUser && currentUser.role === 'Siswa') {
+                if (sidebarNavLinks) sidebarNavLinks.classList.add('hidden');
+                if (bottomNav) {
+                    bottomNav.classList.add('hidden');
+                    bottomNav.style.setProperty('display', 'none', 'important');
+                }
                 switchView('sisi-siswa');
             } else {
+                if (sidebarNavLinks) sidebarNavLinks.classList.remove('hidden');
+                if (bottomNav) {
+                    bottomNav.classList.remove('hidden');
+                    bottomNav.style.removeProperty('display');
+                }
                 switchView('dashboard');
             }
             startRealtimeClock();
@@ -1214,6 +1221,28 @@
     }
 
     function switchView(viewName) {
+        // Enforce Siswa role to strictly stay on portal form view
+        if ((currentUser && currentUser.role === 'Siswa') || viewName === 'sisi-siswa') {
+            viewName = 'sisi-siswa';
+        }
+
+        const sidebarNavLinks = document.getElementById('sidebar-nav-links');
+        const mobileBottomNav = document.getElementById('mobile-bottom-nav');
+
+        if ((currentUser && currentUser.role === 'Siswa') || viewName === 'sisi-siswa') {
+            if (sidebarNavLinks) sidebarNavLinks.classList.add('hidden');
+            if (mobileBottomNav) {
+                mobileBottomNav.classList.add('hidden');
+                mobileBottomNav.style.setProperty('display', 'none', 'important');
+            }
+        } else {
+            if (sidebarNavLinks) sidebarNavLinks.classList.remove('hidden');
+            if (mobileBottomNav) {
+                mobileBottomNav.classList.remove('hidden');
+                mobileBottomNav.style.removeProperty('display');
+            }
+        }
+
         try {
             localStorage.setItem('activeView', viewName);
         } catch (e) {
