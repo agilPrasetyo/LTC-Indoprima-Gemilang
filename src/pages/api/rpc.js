@@ -142,19 +142,37 @@ export async function POST({ request, cookies }) {
   }
 }
 
+// HELPER PAGINASI UNTUK MENGAMBIL SELURUH BARIS DATA TANPA BATASAN 1000 ROWS SUPABASE
+async function fetchAllRowsFromSupabase(tableName) {
+  let allData = [];
+  let from = 0;
+  const step = 1000;
+  while (true) {
+    const { data, error } = await supabase
+      .from(tableName)
+      .select('*')
+      .range(from, from + step - 1);
+    if (error || !data || data.length === 0) break;
+    allData.push(...data);
+    if (data.length < step) break;
+    from += step;
+  }
+  return allData;
+}
+
 // FUNGSI UTAMA UNTUK MENGAMBIL STATS DARI SUPABASE
 async function getStatsFromSupabase() {
-  const { data: siswa } = await supabase.from('siswa').select('*');
-  const { data: mLogs } = await supabase.from('manpower_log').select('*');
-  const { data: turnover } = await supabase.from('turnover').select('*');
-  const { data: keuangan } = await supabase.from('keuangan').select('*');
-  const { data: cost } = await supabase.from('cost').select('*');
-  const { data: absensi } = await supabase.from('absensi').select('*');
-  const { data: populasi } = await supabase.from('populasi').select('*');
+  const siswa = await fetchAllRowsFromSupabase('siswa');
+  const mLogs = await fetchAllRowsFromSupabase('manpower_log');
+  const turnover = await fetchAllRowsFromSupabase('turnover');
+  const keuangan = await fetchAllRowsFromSupabase('keuangan');
+  const cost = await fetchAllRowsFromSupabase('cost');
+  const absensi = await fetchAllRowsFromSupabase('absensi');
+  const populasi = await fetchAllRowsFromSupabase('populasi');
 
   let safetyRecords = [];
   try {
-    const { data: safety } = await supabase.from('safety_log').select('*');
+    const safety = await fetchAllRowsFromSupabase('safety_log');
     safetyRecords = (safety || []).map(s => ({
       id: s.id,
       noreg: s.noreg,
