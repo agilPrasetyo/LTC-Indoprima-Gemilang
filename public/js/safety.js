@@ -63,6 +63,19 @@ function autoFillSafetySiswaInfo() {
     }
 }
 
+function getSafetyDataset() {
+    if (typeof safetyData !== 'undefined' && Array.isArray(safetyData) && safetyData.length > 0) {
+        return safetyData;
+    }
+    if (typeof window.safetyData !== 'undefined' && Array.isArray(window.safetyData) && window.safetyData.length > 0) {
+        return window.safetyData;
+    }
+    if (typeof fallbackStats !== 'undefined' && Array.isArray(fallbackStats.safety) && fallbackStats.safety.length > 0) {
+        return fallbackStats.safety;
+    }
+    return [];
+}
+
 function updateSafetyKPIStats() {
     const totalEl = document.getElementById('stat-safety-total');
     const zeroDaysEl = document.getElementById('stat-safety-zero-days');
@@ -70,19 +83,20 @@ function updateSafetyKPIStats() {
 
     if (!totalEl || !zeroDaysEl || !thisMonthEl) return;
 
-    const totalCount = safetyData.length;
+    const data = getSafetyDataset();
+    const totalCount = data.length;
     totalEl.textContent = totalCount;
 
     // Hitung Insiden Bulan Ini
     const currentMonthKey = new Date().toISOString().substring(0, 7); // YYYY-MM
-    const thisMonthCount = safetyData.filter(s => s.tanggal && s.tanggal.substring(0, 7) === currentMonthKey).length;
+    const thisMonthCount = data.filter(s => s.tanggal && s.tanggal.substring(0, 7) === currentMonthKey).length;
     thisMonthEl.textContent = thisMonthCount;
 
     // Hitung Zero Accident Days (Hari Bebas Kecelakaan sejak insiden terakhir)
     if (totalCount === 0) {
         zeroDaysEl.textContent = '365+ Hari';
     } else {
-        const dates = safetyData.map(s => new Date(s.tanggal)).filter(d => !isNaN(d));
+        const dates = data.map(s => new Date(s.tanggal)).filter(d => !isNaN(d));
         if (dates.length === 0) {
             zeroDaysEl.textContent = '365+ Hari';
         } else {
@@ -105,7 +119,8 @@ function filterSafetyTable() {
     const bagianVal = (document.getElementById('safety-filter-bagian')?.value || '').toLowerCase().trim();
     const kategoriVal = (document.getElementById('safety-filter-kategori')?.value || '').toLowerCase().trim();
 
-    let filtered = [...safetyData];
+    const data = getSafetyDataset();
+    let filtered = [...data];
 
     if (searchVal) {
         filtered = filtered.filter(item => {
@@ -134,7 +149,7 @@ function filterSafetyTable() {
     filtered.sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
 
     if (badge) {
-        badge.textContent = `Menampilkan ${filtered.length} dari ${safetyData.length} Record`;
+        badge.textContent = `Menampilkan ${filtered.length} dari ${data.length} Record`;
     }
 
     tbody.innerHTML = '';
@@ -194,7 +209,8 @@ function filterAdminSafetyTable() {
     const bagianVal = (document.getElementById('admin-safety-filter-bagian')?.value || '').toLowerCase().trim();
     const kategoriVal = (document.getElementById('admin-safety-filter-kategori')?.value || '').toLowerCase().trim();
 
-    let filtered = [...safetyData];
+    const data = getSafetyDataset();
+    let filtered = [...data];
 
     if (searchVal) {
         filtered = filtered.filter(item => {
@@ -327,7 +343,7 @@ function updateSafetyCharts() {
     const startDate = document.getElementById('safety-chart-start-date')?.value;
     const endDate = document.getElementById('safety-chart-end-date')?.value;
 
-    let filtered = [...safetyData];
+    let filtered = [...getSafetyDataset()];
 
     if (filterType === 'month-range') {
         if (startMonth || endMonth) {
@@ -473,7 +489,7 @@ function openSafetyModal(idToEdit = null) {
     populateSafetySiswaDropdown();
 
     if (idToEdit) {
-        const record = safetyData.find(s => s.id === idToEdit);
+        const record = getSafetyDataset().find(s => s.id === idToEdit);
         if (record) {
             title.textContent = 'Edit Data Kecelakaan Kerja';
             formId.value = record.id;

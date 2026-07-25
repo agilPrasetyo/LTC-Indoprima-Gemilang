@@ -1461,6 +1461,7 @@
             'keuangan': 'Cost / Keuangan',
             'turnover': 'Turnover',
             'absensi': 'Absensi Siswa',
+            'safety': 'Safety / K3',
             'admin': 'Admin'
         };
         
@@ -1478,6 +1479,7 @@
         if (viewName === 'turnover') renderTurnoverView();
         if (viewName === 'admin') renderAdminView();
         if (viewName === 'absensi' && typeof renderAbsensiView === 'function') renderAbsensiView();
+        if (viewName === 'safety' && typeof renderSafetyView === 'function') renderSafetyView();
         
         if (viewName === 'turnover' && mapTurnoverInstance) {
             setTimeout(() => mapTurnoverInstance.invalidateSize(), 200);
