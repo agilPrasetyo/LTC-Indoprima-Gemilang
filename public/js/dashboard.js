@@ -286,11 +286,11 @@ function updateClassPopulationChart() {
     });
 
     const colorPalette = {
-        'Kelas 1': '#4F46E5', // Soft Modern Indigo
-        'Kelas 2': '#38BDF8', // Soft Sky Blue
-        'Kelas 3': '#10B981', // Soft Emerald Teal
-        'Kelas 4': '#F59E0B', // Soft Warm Amber
-        'Kelas 5': '#EC4899'  // Soft Rose Pink / Magenta
+        'Kelas 1': '#D3222A', // Merah (Bottom)
+        'Kelas 2': '#F5C400', // Kuning
+        'Kelas 3': '#00A651', // Hijau
+        'Kelas 4': '#0072C6', // Biru
+        'Kelas 5': '#A6A6A6'  // Abu-abu (Top)
     };
 
     const classKeys = Object.keys(classData);
