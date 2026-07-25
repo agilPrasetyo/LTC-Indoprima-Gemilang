@@ -435,6 +435,153 @@
         { id: "USER-20260620-0003", namaLengkap: "MUHAMMAD ROJI", email: "2601176@indoprima.com", role: "Siswa", nomorRegistrasi: "2601176" }
     ];
 
+    const fallbackSafety = [
+        {
+            id: 1,
+            noreg: "2601190",
+            nama: "FARANDI SATRIA NUGRAHA",
+            kelas: "Kelas 1",
+            bagian: "POURING",
+            spv: "BIMA AGUNG SETYAWAN",
+            jenisKecelakaan: "Percikan Cairan Logam Panas (Molten Metal Splash)",
+            kategori: "Ringan",
+            tanggal: "2026-04-14",
+            keterangan: "Terkena percikan besi cair (FC/FCD) pada apron lengan kiri saat penuangan ke dalam mold. Kompres dingin & First Aid poliklinik."
+        },
+        {
+            id: 2,
+            noreg: "2602006",
+            nama: "HANDIKA PRADANA PUTRA",
+            kelas: "Kelas 2",
+            bagian: "COREMAKING",
+            spv: "AMIR SUPRAPTO",
+            jenisKecelakaan: "Terpapar Debu Pasir Silika & Iritasi Mata",
+            kategori: "Ringan",
+            tanggal: "2026-04-22",
+            keterangan: "Hembusan debu pasir core ke mata kanan saat pembersihan cetakan inti. Pembilasan eyewash station, tidak ada cedera permanen."
+        },
+        {
+            id: 3,
+            noreg: "2603130",
+            nama: "BERLIANO ABISYAH ENANTA",
+            kelas: "Kelas 5",
+            bagian: "GRINDING & FETTLING",
+            spv: "MOHAMMAT YASIR MA'ARIF",
+            jenisKecelakaan: "Tergores Tajam Sisa Riser (Burr Scratch)",
+            kategori: "Ringan",
+            tanggal: "2026-05-06",
+            keterangan: "Lengan kanan tergores sirip benda kerja hasil casting galah saat pemotongan riser gerinda. Pembersihan luka dan balut kassa."
+        },
+        {
+            id: 4,
+            noreg: "2605046",
+            nama: "ARDO ARDIANTARA FARREL",
+            kelas: "Kelas 3",
+            bagian: "MOLDING LINE",
+            spv: "AMIR SUPRAPTO",
+            jenisKecelakaan: "Terjepit Rangka Cetakan (Flask Pinch Injury)",
+            kategori: "Sedang",
+            tanggal: "2026-05-18",
+            keterangan: "Jari telunjuk kanan tersepit saat perakitan cope and drag rangka cetakan manual. Rontgen klinik perusahaan (tidak ada fraktur)."
+        },
+        {
+            id: 5,
+            noreg: "2602002",
+            nama: "ANDHIKA RISKI SAPUTRA",
+            kelas: "Kelas 2",
+            bagian: "MELTING (TUNGKU INDUKSI)",
+            spv: "BIMA AGUNG SETYAWAN",
+            jenisKecelakaan: "Kait Ladle Miring (Near Miss Hook Crane)",
+            kategori: "Near Miss",
+            tanggal: "2026-05-27",
+            keterangan: "Kait crane penopang Ladle besi cair 500kg sempat tersangkut stopper. Tidak ada tumpahan, inspeksi ulang safety latch crane."
+        },
+        {
+            id: 6,
+            noreg: "2603143",
+            nama: "MUHAMMAD MUZAKY BASTOMI",
+            kelas: "Kelas 5",
+            bagian: "SHOTBLAST",
+            spv: "MOHAMMAT YASIR MA'ARIF",
+            jenisKecelakaan: "Terkena Pantulan Steel Shot (Peluru Pasir Besi)",
+            kategori: "Ringan",
+            tanggal: "2026-06-03",
+            keterangan: "Satu butir steel shot meluncur dari celah seal pintu mesin shotblast mengenai paha kanan. Penambahan rubber curtain di pintu mesin."
+        },
+        {
+            id: 7,
+            noreg: "2605043",
+            nama: "LEO WIBISONO",
+            kelas: "Kelas 3",
+            bagian: "PATTERN SHOP",
+            spv: "BIMA AGUNG SETYAWAN",
+            jenisKecelakaan: "Tertimpa Model Cetakan Kayu (Pattern Foot Contusion)",
+            kategori: "Ringan",
+            tanggal: "2026-06-12",
+            keterangan: "Model cetakan cylinder liner terjatuh dari rak penyimpanan mengenai sepatu safety. Sepatu safety menahan dampak, memar ringan."
+        },
+        {
+            id: 8,
+            noreg: "2601176",
+            nama: "MUHAMMAD ROJI",
+            kelas: "Kelas 1",
+            bagian: "POURING",
+            spv: "AINUN UMAMI",
+            jenisKecelakaan: "Uap Terperangkap Saat Penuangan (Mold Gas Pop)",
+            kategori: "Near Miss",
+            tanggal: "2026-06-25",
+            keterangan: "Letupan uap gas kecil dari lubang penambah (riser vent) akibat kelembaban pasir cetak. APD Face Shield melindungi muka penuh."
+        },
+        {
+            id: 9,
+            noreg: "2602130",
+            nama: "MUHAMMAD RIZKY",
+            kelas: "Kelas 2",
+            bagian: "QUALITY CONTROL CASTING",
+            spv: "MOHAMMAT YASIR MA'ARIF",
+            jenisKecelakaan: "Tersenggol Benda Kerja Panas (Hot Casting Touch)",
+            kategori: "Ringan",
+            tanggal: "2026-07-02",
+            keterangan: "Sarung tangan menyentuh benda kerja pasir shake-out yang belum dingin 100%. Luka bakar ringan derajat 1 pada kulit telapak."
+        },
+        {
+            id: 10,
+            noreg: "2603155",
+            nama: "AYU AGUSTINA",
+            kelas: "Kelas 3",
+            bagian: "LABORATORIUM METALOGRAFI",
+            spv: "WIRA ATMOJO SASELAH",
+            jenisKecelakaan: "Tumpahan Reagen Sketsa Cairan Asam Etching",
+            kategori: "Near Miss",
+            tanggal: "2026-07-09",
+            keterangan: "Botol nital 2% tersenggol saat persiapan pengujian mikrostruktur logam pengecoran. Cairan tertampung di tray, netralisasi NaHCO3."
+        },
+        {
+            id: 11,
+            noreg: "2601190",
+            nama: "FARANDI SATRIA NUGRAHA",
+            kelas: "Kelas 1",
+            bagian: "POURING",
+            spv: "BIMA AGUNG SETYAWAN",
+            jenisKecelakaan: "Tergelincir Di Area Sand Handling",
+            kategori: "Ringan",
+            tanggal: "2026-07-16",
+            keterangan: "Tergelincir pasir cetak basah di jalur walk-way lantai pouring. Terjadi terkilir pergelangan kaki ringan, kompres gel analgesic."
+        },
+        {
+            id: 12,
+            noreg: "2605046",
+            nama: "ARDO ARDIANTARA FARREL",
+            kelas: "Kelas 3",
+            bagian: "GRINDING & FETTLING",
+            spv: "AMIR SUPRAPTO",
+            jenisKecelakaan: "Serpihan Gram Masuk Kacamata Safety",
+            kategori: "Ringan",
+            tanggal: "2026-07-21",
+            keterangan: "Gram halus gerinda melayang masuk celah kacamata saat pembersihan produk casting. Pembersihan mata irigasi cairan steril."
+        }
+    ];
+
     const fallbackStats = {
         cards: { 
             totalSiswa: 5, 
@@ -449,6 +596,7 @@
         siswa: fallbackSiswa,
         monthYear: { year: 2026, month: 3 },
         turnover: fallbackTurnover,
+        safety: fallbackSafety,
         populasi: [
             { tanggal: "2026-06-20", kontrak: 100, ltc: 5, outsourcing: 10, satpamSupir: 5, totalKaryawan: 120, totalLtc: 5 }
         ],
