@@ -290,7 +290,7 @@ function updateClassPopulationChart() {
         'Kelas 2': '#38BDF8', // Soft Sky Blue
         'Kelas 3': '#10B981', // Soft Emerald Teal
         'Kelas 4': '#F59E0B', // Soft Warm Amber
-        'Kelas 5': '#8B5CF6'  // Soft Violet Purple
+        'Kelas 5': '#EC4899'  // Soft Rose Pink / Magenta
     };
 
     const datasets = Object.keys(classData).map(className => {
@@ -299,8 +299,11 @@ function updateClassPopulationChart() {
             data: classData[className],
             backgroundColor: colorPalette[className],
             borderColor: '#FFFFFF',
-            borderWidth: 1.5,
-            borderRadius: 6,
+            borderWidth: 2,
+            borderRadius: 14,
+            borderSkipped: false,
+            barPercentage: 0.45,
+            categoryPercentage: 0.6,
             stack: 'Stack 0'
         };
     });
