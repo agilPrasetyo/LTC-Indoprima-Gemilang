@@ -569,12 +569,13 @@ function renderTurnoverView() {
         }
 
         const statusLabel = t.alasan || t.keterangan || '-';
+        const kelasDisplay = (t.kelas && t.kelas !== '-') ? t.kelas : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(t.masuk || t.tanggalMasuk, t.tanggalKeluar || t.keluar) : '-');
 
         tr.innerHTML = `
             <td class="py-3 px-4 font-semibold text-brand-textSub text-xs">${t.id}</td>
             <td class="py-3 px-4 font-bold text-brand-textMain text-xs">${t.namaLengkap}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.bagian || '-'}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs">${t.kelas || '-'}</td>
+            <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${kelasDisplay}</td>
             <td class="py-3 px-4 text-brand-textSub text-xs">${t.tanggalKeluar || '-'}</td>
             <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${statusLabel}</span></td>
             <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah || '-'}</td>

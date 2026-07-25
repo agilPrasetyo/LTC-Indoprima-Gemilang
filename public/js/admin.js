@@ -1290,11 +1290,13 @@
                 'Indisipliner': 'bg-amber-50 text-amber-700'
             };
             const alasanBadge = alasanColors[t.alasan] || 'bg-slate-50 text-slate-500';
+            const kelasDisplay = (t.kelas && t.kelas !== '-') ? t.kelas : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(t.masuk || t.tanggalMasuk, t.tanggalKeluar || t.keluar) : (typeof hitungKelas === 'function' ? hitungKelas(t.masuk) : '-'));
+
             tr.innerHTML = `
                 <td class="py-3 px-4 font-mono font-bold text-slate-700">${t.id}</td>
                 <td class="py-3 px-4 font-bold text-brand-textMain">${t.namaLengkap}</td>
                 <td class="py-3 px-4 text-brand-textSub">${t.bagian || '-'}</td>
-                <td class="py-3 px-4 text-brand-textSub">${t.kelas || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub font-semibold">${kelasDisplay}</td>
                 <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalDaerah || t.wilayah || t.asal || '-'}</td>
                 <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
                 <td class="py-3 px-4 font-mono text-brand-textSub">${t.masuk ? t.masuk.split('-').reverse().join('/') : '-'}</td>

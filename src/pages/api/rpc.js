@@ -232,27 +232,48 @@ async function getStatsFromSupabase() {
     };
   });
 
+  function computeTurnoverKelas(masukStr, targetDateStr) {
+    if (!masukStr) return 'Kelas 1';
+    const start = new Date(masukStr);
+    if (isNaN(start.getTime())) return 'Kelas 1';
+    let end = targetDateStr ? new Date(targetDateStr) : new Date();
+    if (isNaN(end.getTime())) end = new Date();
+    let bulan = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+    if (end.getDate() < start.getDate()) bulan--;
+    if (bulan < 0) bulan = 0;
+    let num = bulan + 1;
+    if (num > 5) num = 5;
+    return `Kelas ${num}`;
+  }
+
   const totalSiswa = siswaList.filter(s => s.status === "Aktif").length;
-  const turnoverList = (turnover || []).map(t => ({
-    id: t.noreg,
-    nama: t.nama_lengkap ? t.nama_lengkap.toUpperCase() : '',
-    namaLengkap: t.nama_lengkap ? t.nama_lengkap.toUpperCase() : '',
-    bagian: t.section ? t.section.toUpperCase() : (t.departemen ? t.departemen.toUpperCase() : ''),
-    departemen: t.departemen,
-    section: t.section,
-    kelas: t.kelas || (siswaList.find(s => s.id === t.noreg)?.kelas) || '-',
-    masuk: t.tanggal_masuk,
-    keluar: t.tanggal_keluar,
-    tanggalKeluar: t.tanggal_keluar,
-    pengganti: t.pengganti,
-    keterangan: t.keterangan ? t.keterangan.toUpperCase() : '',
-    alasan: t.alasan ? t.alasan.toUpperCase() : '',
-    asal: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
-    wilayah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
-    asalDaerah: t.asal_daerah ? t.asal_daerah.toUpperCase() : '',
-    sekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : '',
-    asalSekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : ''
-  }));
+  const turnoverList = (turnover || []).map(t => {
+    const student = siswaList.find(s => s.id === t.noreg);
+    const masukDate = t.tanggal_masuk || (student ? student.masuk : null);
+    const keluarDate = t.tanggal_keluar || (student ? student.keluar : null);
+    const kelasVal = t.kelas || (student ? student.kelas : null) || computeTurnoverKelas(masukDate, keluarDate);
+
+    return {
+      id: t.noreg,
+      nama: t.nama_lengkap ? t.nama_lengkap.toUpperCase() : (student ? student.namaLengkap : ''),
+      namaLengkap: t.nama_lengkap ? t.nama_lengkap.toUpperCase() : (student ? student.namaLengkap : ''),
+      bagian: t.section ? t.section.toUpperCase() : (t.departemen ? t.departemen.toUpperCase() : (student ? (student.section || student.departemen) : '')),
+      departemen: t.departemen || (student ? student.departemen : ''),
+      section: t.section || (student ? student.section : ''),
+      kelas: kelasVal,
+      masuk: masukDate,
+      keluar: keluarDate,
+      tanggalKeluar: keluarDate,
+      pengganti: t.pengganti,
+      keterangan: t.keterangan ? t.keterangan.toUpperCase() : '',
+      alasan: t.alasan ? t.alasan.toUpperCase() : '',
+      asal: t.asal_daerah ? t.asal_daerah.toUpperCase() : (student ? student.asalDaerah : ''),
+      wilayah: t.asal_daerah ? t.asal_daerah.toUpperCase() : (student ? student.asalDaerah : ''),
+      asalDaerah: t.asal_daerah ? t.asal_daerah.toUpperCase() : (student ? student.asalDaerah : ''),
+      sekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : (student ? student.asalSekolah : ''),
+      asalSekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : (student ? student.asalSekolah : '')
+    };
+  });
 
   let graduates = 0, resignVal = 0, indisVal = 0;
   turnoverList.forEach(t => {
