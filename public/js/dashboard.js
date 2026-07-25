@@ -286,11 +286,11 @@ function updateClassPopulationChart() {
     });
 
     const colorPalette = {
-        'Kelas 1': '#D3222A',
-        'Kelas 2': '#F5C400',
-        'Kelas 3': '#00A651',
-        'Kelas 4': '#0072C6',
-        'Kelas 5': '#A6A6A6'
+        'Kelas 1': '#4F46E5', // Soft Modern Indigo
+        'Kelas 2': '#38BDF8', // Soft Sky Blue
+        'Kelas 3': '#10B981', // Soft Emerald Teal
+        'Kelas 4': '#F59E0B', // Soft Warm Amber
+        'Kelas 5': '#8B5CF6'  // Soft Violet Purple
     };
 
     const datasets = Object.keys(classData).map(className => {
@@ -298,6 +298,9 @@ function updateClassPopulationChart() {
             label: className,
             data: classData[className],
             backgroundColor: colorPalette[className],
+            borderColor: '#FFFFFF',
+            borderWidth: 1.5,
+            borderRadius: 6,
             stack: 'Stack 0'
         };
     });
