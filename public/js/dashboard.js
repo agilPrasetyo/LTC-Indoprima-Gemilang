@@ -293,14 +293,26 @@ function updateClassPopulationChart() {
         'Kelas 5': '#EC4899'  // Soft Rose Pink / Magenta
     };
 
-    const datasets = Object.keys(classData).map(className => {
+    const classKeys = Object.keys(classData);
+    const datasets = classKeys.map((className, index) => {
+        let radius = 0;
+        if (index === 0) {
+            // Bottom layer (Kelas 1): round bottom corners only
+            radius = { bottomLeft: 14, bottomRight: 14, topLeft: 0, topRight: 0 };
+        } else if (index === classKeys.length - 1) {
+            // Top layer (Kelas 5): round top corners only
+            radius = { topLeft: 14, topRight: 14, bottomLeft: 0, bottomRight: 0 };
+        } else {
+            // Middle layers: seamless flat corners
+            radius = 0;
+        }
+
         return {
             label: className,
             data: classData[className],
             backgroundColor: colorPalette[className],
-            borderColor: '#FFFFFF',
-            borderWidth: 2,
-            borderRadius: 14,
+            borderWidth: 0,
+            borderRadius: radius,
             borderSkipped: false,
             barPercentage: 0.45,
             categoryPercentage: 0.6,
