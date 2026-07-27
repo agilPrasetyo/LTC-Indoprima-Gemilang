@@ -104,7 +104,10 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
           <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
             <i class="fa-solid fa-lock"></i>
           </span>
-          <input type="password" id="login-pass" class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin123" autocomplete="current-password" />
+          <input type="password" id="login-pass" class="w-full pl-11 pr-10 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin123" autocomplete="current-password" />
+          <button type="button" onclick="toggleLoginPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors cursor-pointer" title="Tampilkan/Sembunyikan Password">
+            <i class="fa-solid fa-eye text-sm" id="login-pass-toggle-icon"></i>
+          </button>
         </div>
       </div>
       <button onclick="handleLogin()" class="w-full py-3 sm:py-3.5 mt-1 sm:mt-2 bg-brand-blue text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-[0.97] active:bg-blue-800 transition-all duration-150 shadow-lg shadow-blue-500/20 flex items-center justify-center cursor-pointer">

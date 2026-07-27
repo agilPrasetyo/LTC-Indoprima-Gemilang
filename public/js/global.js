@@ -660,6 +660,22 @@
         });
     }
 
+    function toggleLoginPasswordVisibility() {
+        const passInput = document.getElementById('login-pass');
+        const icon = document.getElementById('login-pass-toggle-icon');
+        if (!passInput || !icon) return;
+
+        if (passInput.type === 'password') {
+            passInput.type = 'text';
+            icon.classList.remove('fa-eye');
+            icon.classList.add('fa-eye-slash');
+        } else {
+            passInput.type = 'password';
+            icon.classList.remove('fa-eye-slash');
+            icon.classList.add('fa-eye');
+        }
+    }
+
     function handleLogin() {
         try {
             const email = document.getElementById('login-email').value;
