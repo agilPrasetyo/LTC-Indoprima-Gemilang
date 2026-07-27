@@ -759,15 +759,26 @@ if (typeof Chart !== 'undefined') {
 
     function handleLogin() {
         try {
-            const email = document.getElementById('login-email').value;
-            const pass = document.getElementById('login-pass').value;
+            const emailInput = document.getElementById('login-email');
+            const passInput = document.getElementById('login-pass');
             const errorBox = document.getElementById('login-error');
-            errorBox.classList.add('hidden');
+            if (errorBox) errorBox.classList.add('hidden');
+
+            const loginVal = (emailInput?.value || '').trim();
+            const passVal = passInput?.value || ''; // Strictly preserve original password case!
+
+            if (!loginVal || !passVal) {
+                if (errorBox) {
+                    errorBox.classList.remove('hidden');
+                    errorBox.innerText = "Email / Nomor Registrasi dan Password wajib diisi.";
+                }
+                return;
+            }
 
             if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
                 google.script.run
                     .withSuccessHandler(res => {
-                        if (res.success) {
+                        if (res && res.success) {
                             if (window.FORCED_ROLE && res.user.role !== window.FORCED_ROLE) {
                                 errorBox.classList.remove('hidden');
                                 errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
@@ -776,7 +787,7 @@ if (typeof Chart !== 'undefined') {
                             loginSuccess(res.user);
                         } else {
                             errorBox.classList.remove('hidden');
-                            errorBox.innerText = res.message;
+                            errorBox.innerText = (res && res.message) ? res.message : "Email / Nomor Registrasi atau Password salah.";
                         }
                     })
                     .withFailureHandler(err => {
@@ -784,28 +795,86 @@ if (typeof Chart !== 'undefined') {
                         errorBox.innerText = "Google Apps Script Error: " + (err.message || err.toString());
                         console.error("Login server error:", err);
                     })
-                    .login(email, pass);
+                    .login(loginVal, passVal);
             } else {
-                let targetUser = null;
-                if (email === "admin@indoprima.com" && pass === "admin123") {
-                    targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
-                } else if (email === "visitor@indoprima.com" && pass === "visitor123") {
-                    targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
-                } else if (email === "2601176@indoprima.com" && pass === "siswa123") {
-                    targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
-                }
+                // Submit to backend API /api/auth/login
+                fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username: loginVal, password: passVal })
+                })
+                .then(async r => {
+                    const res = await r.json().catch(() => null);
+                    if (r.ok && res && res.success && res.user) {
+                        if (window.FORCED_ROLE && res.user.role !== window.FORCED_ROLE) {
+                            if (errorBox) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                            }
+                            return;
+                        }
+                        loginSuccess(res.user);
+                    } else {
+                        // Strict Local Fallback (STRICT CASE-SENSITIVE PASSWORD CHECK)
+                        let targetUser = null;
+                        const lowerEmail = loginVal.toLowerCase();
 
-                if (targetUser) {
-                    if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
-                        errorBox.classList.remove('hidden');
-                        errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
-                        return;
+                        // Password MUST MATCH EXACT CASE (e.g. "admin123" !== "ADMIN123")
+                        if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && passVal === "admin123") {
+                            targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
+                        } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && passVal === "visitor123") {
+                            targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
+                        } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176") && passVal === "siswa123") {
+                            targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
+                        }
+
+                        if (targetUser) {
+                            if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
+                                if (errorBox) {
+                                    errorBox.classList.remove('hidden');
+                                    errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                                }
+                                return;
+                            }
+                            loginSuccess(targetUser);
+                        } else {
+                            if (errorBox) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = (res && res.message) ? res.message : "Email / Nomor Registrasi atau Password salah.";
+                            }
+                        }
                     }
-                    loginSuccess(targetUser);
-                } else {
-                    errorBox.classList.remove('hidden');
-                    errorBox.innerText = "Email / Nomor Registrasi salah.";
-                }
+                })
+                .catch(err => {
+                    console.warn("API Login fetch error, executing local fallback:", err);
+                    let targetUser = null;
+                    const lowerEmail = loginVal.toLowerCase();
+
+                    // Strict Case-Sensitive Password Match
+                    if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && passVal === "admin123") {
+                        targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
+                    } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && passVal === "visitor123") {
+                        targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
+                    } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176") && passVal === "siswa123") {
+                        targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
+                    }
+
+                    if (targetUser) {
+                        if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
+                            if (errorBox) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                            }
+                            return;
+                        }
+                        loginSuccess(targetUser);
+                    } else {
+                        if (errorBox) {
+                            errorBox.classList.remove('hidden');
+                            errorBox.innerText = "Email / Nomor Registrasi atau Password salah.";
+                        }
+                    }
+                });
             }
         } catch (e) {
             const errorBox = document.getElementById('login-error');

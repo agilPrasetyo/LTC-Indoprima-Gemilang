@@ -12,10 +12,10 @@ export const POST = async ({ request, cookies }) => {
       });
     }
 
-    let targetEmail = loginInput;
+    let targetEmail = (loginInput || '').trim().toLowerCase();
 
     // Deteksi jika input adalah NoReg (hanya angka)
-    const isNoreg = /^\d+$/.test(loginInput);
+    const isNoreg = /^\d+$/.test(loginInput.trim());
     let noregVal = isNoreg ? loginInput : null;
 
     if (isNoreg) {
