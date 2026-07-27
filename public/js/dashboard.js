@@ -241,7 +241,8 @@ function updateClassPopulationChart() {
 
         let evalDate = endOfMonth;
         const today = new Date();
-        if (year === today.getFullYear() && monthIdx === today.getMonth()) {
+        const isCurrentMonth = (year === today.getFullYear() && monthIdx === today.getMonth());
+        if (isCurrentMonth) {
             evalDate = today;
         }
 
@@ -253,17 +254,10 @@ function updateClassPopulationChart() {
             'Kelas 5': 0
         };
 
-        combinedStudents.forEach(s => {
+        // 1. Process Active Students (Strictly Active Status)
+        activeData.forEach(s => {
             const startD = parseDateYYYYMMDD(s.masuk || s.tanggalMasuk || s.tanggal_masuk);
             if (!startD || startD > evalDate) return;
-
-            const exitStr = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi;
-            if (exitStr) {
-                const exitD = parseDateYYYYMMDD(exitStr);
-                if (exitD && exitD < startOfMonth) return;
-            } else if (s.status && s.status !== 'Aktif') {
-                return;
-            }
 
             let monthsActive = (evalDate.getFullYear() - startD.getFullYear()) * 12;
             monthsActive -= startD.getMonth();
@@ -272,12 +266,38 @@ function updateClassPopulationChart() {
                 monthsActive--;
             }
 
-            const classNum = monthsActive + 1;
+            const classNum = Math.max(1, monthsActive + 1);
             if (classNum === 1) counts['Kelas 1']++;
             else if (classNum === 2) counts['Kelas 2']++;
             else if (classNum === 3) counts['Kelas 3']++;
             else if (classNum === 4) counts['Kelas 4']++;
-            else if (classNum >= 5) counts['Kelas 5']++;
+            else counts['Kelas 5']++;
+        });
+
+        // 2. Process Historical Turnover Students (Only included if active during past months before exit)
+        activeTurnoverData.forEach(s => {
+            const startD = parseDateYYYYMMDD(s.masuk || s.tanggalMasuk || s.tanggal_masuk);
+            if (!startD || startD > evalDate) return;
+
+            const exitStr = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi || s.tanggal;
+            const exitD = exitStr ? parseDateYYYYMMDD(exitStr) : null;
+
+            if (exitD && exitD < startOfMonth) return;
+            if (!exitD && isCurrentMonth) return;
+
+            let monthsActive = (evalDate.getFullYear() - startD.getFullYear()) * 12;
+            monthsActive -= startD.getMonth();
+            monthsActive += evalDate.getMonth();
+            if (evalDate.getDate() < startD.getDate()) {
+                monthsActive--;
+            }
+
+            const classNum = Math.max(1, monthsActive + 1);
+            if (classNum === 1) counts['Kelas 1']++;
+            else if (classNum === 2) counts['Kelas 2']++;
+            else if (classNum === 3) counts['Kelas 3']++;
+            else if (classNum === 4) counts['Kelas 4']++;
+            else counts['Kelas 5']++;
         });
 
         classData['Kelas 1'].push(counts['Kelas 1']);
