@@ -1137,7 +1137,7 @@ function updateAbsensiChart() {
         }
     });
 
-    // Populate Breakdown Kehadiran per Kelas
+    // Populate Breakdown Kehadiran per Kelas (Synchronized with absensiData & rawSiswaData)
     const classBreakdown = {
         'Kelas 1': { hadir: 0, tidakHadir: 0 },
         'Kelas 2': { hadir: 0, tidakHadir: 0 },
@@ -1146,6 +1146,7 @@ function updateAbsensiChart() {
         'Kelas 5': { hadir: 0, tidakHadir: 0 }
     };
 
+    // 1. Process daily logs from activeData
     if (typeof activeData !== 'undefined' && Array.isArray(activeData)) {
         activeData.forEach(s => {
             let k = s.kelas || 'Kelas 1';
@@ -1158,8 +1159,8 @@ function updateAbsensiChart() {
                     const hVal = (dl.hadir || '').toString().trim().toLowerCase();
                     const ketVal = (dl.keterangan || '').toString().trim().toLowerCase();
                     if (ketVal.includes('sakit') || hVal === 'sakit' || hVal === 's' ||
-                        ketVal.includes('izin') || hVal === 'izin' || hVal === 'i' ||
-                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'a') {
+                        ketVal.includes('izin') || ketVal.includes('ijin') || hVal === 'izin' || hVal === 'ijin' || hVal === 'i' ||
+                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'alpa' || hVal === 'a') {
                         classBreakdown[kKey].tidakHadir += 1;
                     } else {
                         classBreakdown[kKey].hadir += 1;
@@ -1167,6 +1168,32 @@ function updateAbsensiChart() {
                 });
             } else {
                 classBreakdown[kKey].hadir += 20;
+            }
+        });
+    }
+
+    // 2. Process real absensi records from absensiData (Sakit, Izin, Alpha)
+    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
+        const studentClassMap = {};
+        if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
+            rawSiswaData.forEach(s => {
+                const idKey = s.noreg || s.id || s.no_reg;
+                if (idKey) studentClassMap[idKey] = s.kelas;
+            });
+        }
+
+        absensiData.forEach(a => {
+            let k = a.kelas || studentClassMap[a.noreg || a.id || a.siswa_id] || 'Kelas 1';
+            const num = parseInt(String(k).replace(/Kelas\s+/i, ''));
+            const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
+
+            const st = (a.status || a.keterangan || '').toString().trim().toLowerCase();
+            if (st.includes('alpha') || st.includes('alpa') || st === 'a' ||
+                st.includes('sakit') || st === 's' ||
+                st.includes('izin') || st.includes('ijin') || st === 'i') {
+                classBreakdown[kKey].tidakHadir += 1;
+            } else if (st.includes('hadir') || st === 'h') {
+                classBreakdown[kKey].hadir += 1;
             }
         });
     }
@@ -1198,7 +1225,7 @@ function updateAbsensiChart() {
                 </div>
                 <div class="flex items-center justify-between text-[8px] text-slate-400 font-semibold pt-0.5">
                     <span>Hadir: ${h}</span>
-                    <span>Absen: ${th}</span>
+                    <span class="${th > 0 ? 'text-rose-600 font-bold' : ''}">Absen: ${th}</span>
                 </div>
             `;
             bdContainer.appendChild(card);
