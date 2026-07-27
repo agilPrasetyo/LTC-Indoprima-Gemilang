@@ -1,9 +1,75 @@
 
-    // Registrasi plugin datalabels secara global
-    Chart.register(ChartDataLabels);
-    Chart.defaults.set('plugins.datalabels', {
-        display: false
-    });
+// Custom Universal Data Labels Plugin for Chart.js (Bar, Line & Donut/Pie Charts)
+const globalChartDataLabelsPlugin = {
+    id: 'globalChartDataLabels',
+    afterDatasetsDraw(chart) {
+        if (chart.options && chart.options.plugins && chart.options.plugins.datalabels && chart.options.plugins.datalabels.display === false) {
+            return;
+        }
+
+        const { ctx } = chart;
+        
+        chart.data.datasets.forEach((dataset, datasetIndex) => {
+            const meta = chart.getDatasetMeta(datasetIndex);
+            if (!meta || meta.hidden) return;
+
+            meta.data.forEach((element, index) => {
+                const val = dataset.data[index];
+                if (val === null || val === undefined || val === 0 || val === '0') return;
+
+                ctx.save();
+                const isPieOrDonut = chart.config.type === 'pie' || chart.config.type === 'doughnut';
+
+                if (isPieOrDonut) {
+                    const position = element.tooltipPosition();
+                    const total = dataset.data.reduce((a, b) => a + (Number(b) || 0), 0);
+                    const pct = total > 0 ? Math.round((Number(val) / total) * 100) : 0;
+                    
+                    ctx.font = 'bold 11px Inter, sans-serif';
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.6)';
+                    ctx.shadowBlur = 4;
+
+                    const labelText = total > 1 && pct > 0 ? `${val} (${pct}%)` : `${val}`;
+                    ctx.fillText(labelText, position.x, position.y);
+                } else if (dataset.type === 'line' || meta.type === 'line') {
+                    const position = element.tooltipPosition();
+                    ctx.font = 'bold 10px Inter, sans-serif';
+                    ctx.fillStyle = dataset.borderColor || '#0F3A8C';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.8)';
+                    ctx.shadowBlur = 2;
+
+                    const formattedVal = typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(1) + '%' : String(val);
+                    ctx.fillText(formattedVal, position.x, position.y - 6);
+                } else {
+                    const position = element.tooltipPosition();
+                    ctx.font = 'bold 11px Inter, sans-serif';
+                    ctx.fillStyle = '#334155';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    
+                    ctx.fillText(String(val), position.x, position.y - 4);
+                }
+
+                ctx.restore();
+            });
+        });
+    }
+};
+
+if (typeof Chart !== 'undefined') {
+    try {
+        Chart.register(globalChartDataLabelsPlugin);
+    } catch (e) {
+        console.warn("Chart.js plugin registration error:", e);
+    }
+}
 
     // Helper Fungsi Parsing Tanggal & Hitung Kelas Dinamis (DATEDIF "m" + 1)
     function parseDateDDMMYYYY(dateStr) {
