@@ -863,18 +863,23 @@
                 adminNav.classList.add('hidden');
             }
 
-            // Restore navigation & header visibility for all views
             const appSidebar = document.getElementById('app-sidebar');
-            if (appSidebar) appSidebar.classList.remove('hidden');
-
             const mainHeader = document.querySelector('main > header');
-            if (mainHeader) mainHeader.classList.remove('hidden');
-            
             const bottomNav = document.getElementById('mobile-bottom-nav');
             const sidebarNavLinks = document.getElementById('sidebar-nav-links');
 
             // Direct user based on role: Siswa goes to portal form, others to dashboard
             if (currentUser && currentUser.role === 'Siswa') {
+                document.body.classList.add('role-siswa');
+                document.documentElement.classList.add('role-siswa');
+                if (appSidebar) {
+                    appSidebar.classList.add('hidden');
+                    appSidebar.style.setProperty('display', 'none', 'important');
+                }
+                if (mainHeader) {
+                    mainHeader.classList.add('hidden');
+                    mainHeader.style.setProperty('display', 'none', 'important');
+                }
                 if (sidebarNavLinks) sidebarNavLinks.classList.add('hidden');
                 if (bottomNav) {
                     bottomNav.classList.add('hidden');
@@ -882,6 +887,16 @@
                 }
                 switchView('sisi-siswa');
             } else {
+                document.body.classList.remove('role-siswa');
+                document.documentElement.classList.remove('role-siswa');
+                if (appSidebar) {
+                    appSidebar.classList.remove('hidden');
+                    appSidebar.style.removeProperty('display');
+                }
+                if (mainHeader) {
+                    mainHeader.classList.remove('hidden');
+                    mainHeader.style.removeProperty('display');
+                }
                 if (sidebarNavLinks) sidebarNavLinks.classList.remove('hidden');
                 if (bottomNav) {
                     bottomNav.classList.remove('hidden');
@@ -1374,16 +1389,38 @@
             viewName = 'sisi-siswa';
         }
 
+        const appSidebar = document.getElementById('app-sidebar');
+        const mainHeader = document.querySelector('main > header');
         const sidebarNavLinks = document.getElementById('sidebar-nav-links');
         const mobileBottomNav = document.getElementById('mobile-bottom-nav');
 
         if ((currentUser && currentUser.role === 'Siswa') || viewName === 'sisi-siswa') {
+            document.body.classList.add('role-siswa');
+            document.documentElement.classList.add('role-siswa');
+            if (appSidebar) {
+                appSidebar.classList.add('hidden');
+                appSidebar.style.setProperty('display', 'none', 'important');
+            }
+            if (mainHeader) {
+                mainHeader.classList.add('hidden');
+                mainHeader.style.setProperty('display', 'none', 'important');
+            }
             if (sidebarNavLinks) sidebarNavLinks.classList.add('hidden');
             if (mobileBottomNav) {
                 mobileBottomNav.classList.add('hidden');
                 mobileBottomNav.style.setProperty('display', 'none', 'important');
             }
         } else {
+            document.body.classList.remove('role-siswa');
+            document.documentElement.classList.remove('role-siswa');
+            if (appSidebar) {
+                appSidebar.classList.remove('hidden');
+                appSidebar.style.removeProperty('display');
+            }
+            if (mainHeader) {
+                mainHeader.classList.remove('hidden');
+                mainHeader.style.removeProperty('display');
+            }
             if (sidebarNavLinks) sidebarNavLinks.classList.remove('hidden');
             if (mobileBottomNav) {
                 mobileBottomNav.classList.remove('hidden');

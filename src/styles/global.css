@@ -237,8 +237,11 @@ body {
     }
 }
 
-/* Force hide when hidden class is added via JS */
-#app-sidebar.hidden {
+/* Force hide when hidden class is added via JS or when role is Siswa */
+#app-sidebar.hidden,
+.role-siswa #app-sidebar,
+.role-siswa #mobile-bottom-nav,
+.role-siswa main > header {
     display: none !important;
 }
 
