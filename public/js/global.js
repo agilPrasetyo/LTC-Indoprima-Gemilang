@@ -1300,14 +1300,40 @@ if (typeof Chart !== 'undefined') {
     }
 
     function renderData(data) {
-        rawSiswaData = data.siswa || [];
+        rawSiswaData = (data.siswa || []).map(s => {
+            const masukVal = s.masuk || s.tanggal_masuk || s.tanggalMasuk || s.tgl_masuk || '';
+            const exitVal = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi || s.tgl_keluar || '';
+            return {
+                ...s,
+                id: s.id || s.noreg || s.no_reg || '',
+                namaLengkap: s.namaLengkap || s.nama_lengkap || s.nama || '',
+                masuk: masukVal,
+                tanggal_masuk: masukVal,
+                tanggalKeluar: exitVal,
+                bagian: s.bagian || s.section || '',
+                section: s.section || s.bagian || '',
+                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || ''
+            };
+        });
         activeData = JSON.parse(JSON.stringify(rawSiswaData)).filter(s => String(s.status || '').toUpperCase() === "AKTIF"); 
         
-        rawTurnoverData = data.turnover || [];
+        rawTurnoverData = (data.turnover || []).map(s => {
+            const masukVal = s.masuk || s.tanggal_masuk || s.tanggalMasuk || s.tgl_masuk || '';
+            const exitVal = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi || s.tgl_keluar || '';
+            return {
+                ...s,
+                id: s.id || s.noreg || s.no_reg || '',
+                namaLengkap: s.namaLengkap || s.nama_lengkap || s.nama || '',
+                masuk: masukVal,
+                tanggal_masuk: masukVal,
+                tanggalKeluar: exitVal,
+                bagian: s.bagian || s.section || '',
+                section: s.section || s.bagian || '',
+                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || ''
+            };
+        });
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
 
-        // Tetap gunakan kelas dari data sumber (spreadsheet) agar tidak salah sinkronisasi.
-        // Hanya jika kelas kosong di spreadsheet, kita hitung secara dinamis sebagai cadangan.
         activeData.forEach(s => {
             if (!s.kelas || s.kelas === "-" || s.kelas === "null") {
                 if (s.masuk) {
@@ -1317,8 +1343,7 @@ if (typeof Chart !== 'undefined') {
                     s.kelas = "Kelas 1";
                 }
             } else {
-                // Pastikan formatnya seragam "Kelas X" jika hanya berisi angka
-                const num = parseInt(s.kelas.replace(/Kelas\s+/i, ''));
+                const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
                 if (!isNaN(num)) {
                     s.kelas = "Kelas " + num;
                 }
@@ -1333,7 +1358,7 @@ if (typeof Chart !== 'undefined') {
                     s.kelas = "Kelas 1";
                 }
             } else {
-                const num = parseInt(s.kelas.replace(/Kelas\s+/i, ''));
+                const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
                 if (!isNaN(num)) {
                     s.kelas = "Kelas " + num;
                 }
