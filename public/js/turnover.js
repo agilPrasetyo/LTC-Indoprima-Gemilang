@@ -421,89 +421,24 @@ function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
         turnoverPieChartInstance.destroy();
     }
 
-    const centerTextPlugin = {
-        id: 'centerText',
-        beforeDraw: function(chart) {
-            const width = chart.width,
-                  height = chart.height,
-                  ctx = chart.ctx;
-            ctx.restore();
-            
-            const total = chart.data.datasets[0].data.reduce((a, b) => a + b, 0);
-            
-            ctx.font = "bold 10px Inter";
-            ctx.textBaseline = "middle";
-            ctx.fillStyle = "#64748B";
-            const text1 = "TOTAL",
-                  text1X = Math.round((width - ctx.measureText(text1).width) / 2),
-                  text1Y = height / 2 - 18;
-            ctx.fillText(text1, text1X, text1Y);
-
-            ctx.font = "extrabold 28px Urbanist";
-            ctx.fillStyle = "#0F172A";
-            const text2 = total.toString(),
-                  text2X = Math.round((width - ctx.measureText(text2).width) / 2),
-                  text2Y = height / 2 + 2;
-            ctx.fillText(text2, text2X, text2Y);
-
-            ctx.font = "bold 10px Inter";
-            ctx.fillStyle = "#64748B";
-            const text3 = "SISWA",
-                  text3X = Math.round((width - ctx.measureText(text3).width) / 2),
-                  text3Y = height / 2 + 20;
-            ctx.fillText(text3, text3X, text3Y);
-            
-            ctx.save();
-        }
-    };
-
     turnoverPieChartInstance = new Chart(chartCtx, {
-        type: 'doughnut',
-        plugins: [ChartDataLabels, centerTextPlugin],
+        type: 'bar',
         data: {
             labels: ['Lulus Magang', 'Resign Kerja', 'Indisipliner'],
             datasets: [{
+                label: 'Jumlah Siswa',
                 data: [lCount, rCount, iCount],
-                backgroundColor: ['#8B5CF6', '#F59E0B', '#F43F5E'], 
-                hoverBackgroundColor: ['#7C3AED', '#D97706', '#E11D48'],
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                hoverBorderWidth: 4,
-                hoverBorderColor: '#FFFFFF',
-                hoverOffset: 15 
+                backgroundColor: ['#8B5CF6', '#F59E0B', '#F43F5E'],
+                borderRadius: 8,
+                barPercentage: 0.4,
+                categoryPercentage: 0.6
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '65%', 
-            layout: {
-                padding: 12 
-            },
             plugins: {
-                legend: {
-                    display: false 
-                },
-                datalabels: {
-                    display: true,
-                    formatter: (value, ctx) => {
-                        let sum = 0;
-                        let dataArr = ctx.chart.data.datasets[0].data;
-                        dataArr.map(data => {
-                            sum += data;
-                        });
-                        let percentage = sum > 0 ? Math.round((value * 100) / sum) + "%" : "0%";
-                        return percentage;
-                    },
-                    color: '#FFFFFF',
-                    font: {
-                        weight: 'bold',
-                        size: 12,
-                        family: 'Inter'
-                    },
-                    textShadowColor: 'rgba(0,0,0,0.5)',
-                    textShadowBlur: 4
-                },
+                legend: { display: false },
                 tooltip: {
                     backgroundColor: '#0F172A',
                     titleFont: { size: 12, weight: '700', family: 'Inter' },
@@ -517,6 +452,16 @@ function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
                             return ` Jumlah: ${val} Siswa (${pct}%)`;
                         }
                     }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 11, family: 'Inter', weight: '600' } }
+                },
+                y: {
+                    beginAtZero: true,
+                    ticks: { precision: 0, font: { size: 10, family: 'Inter' } }
                 }
             },
             animation: false
