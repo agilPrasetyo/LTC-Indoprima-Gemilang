@@ -1009,8 +1009,8 @@ function updateAbsensiChart() {
     });
 
     const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(245, 158, 11, 0.35)');
-    gradient.addColorStop(1, 'rgba(245, 158, 11, 0.00)');
+    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
+    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.00)');
 
     absensiChartInstance = new Chart(chartCtx, {
         type: 'bar',
@@ -1021,7 +1021,7 @@ function updateAbsensiChart() {
                     type: 'bar',
                     label: 'Total Kehadiran',
                     data: totalHadirData,
-                    backgroundColor: '#0F3A8C', // dark blue
+                    backgroundColor: '#6366F1', // Option B: Electric Violet / Indigo
                     borderRadius: 6,
                     yAxisID: 'y',
                     order: 2,
@@ -1036,7 +1036,7 @@ function updateAbsensiChart() {
                     type: 'bar',
                     label: 'Total Ketidakhadiran (Sakit/Izin/Alpha)',
                     data: totalTidakHadirData,
-                    backgroundColor: '#EF4444', // red
+                    backgroundColor: '#EC4899', // Option B: Bright Pink / Magenta
                     borderRadius: 6,
                     yAxisID: 'y',
                     order: 2,
@@ -1051,13 +1051,13 @@ function updateAbsensiChart() {
                     type: 'line',
                     label: 'Persentase Ketidakhadiran',
                     data: percentageData,
-                    borderColor: '#F59E0B', // amber/orange line
+                    borderColor: '#06B6D4', // Option B: Electric Cyan line
                     borderWidth: 3,
                     tension: 0.4,
                     fill: true,
                     backgroundColor: gradient,
                     pointBackgroundColor: '#FFFFFF',
-                    pointBorderColor: '#F59E0B',
+                    pointBorderColor: '#06B6D4',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,
@@ -1136,4 +1136,72 @@ function updateAbsensiChart() {
             }
         }
     });
+
+    // Populate Breakdown Kehadiran per Kelas
+    const classBreakdown = {
+        'Kelas 1': { hadir: 0, tidakHadir: 0 },
+        'Kelas 2': { hadir: 0, tidakHadir: 0 },
+        'Kelas 3': { hadir: 0, tidakHadir: 0 },
+        'Kelas 4': { hadir: 0, tidakHadir: 0 },
+        'Kelas 5': { hadir: 0, tidakHadir: 0 }
+    };
+
+    if (typeof activeData !== 'undefined' && Array.isArray(activeData)) {
+        activeData.forEach(s => {
+            let k = s.kelas || 'Kelas 1';
+            const num = parseInt(String(k).replace(/Kelas\s+/i, ''));
+            const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
+
+            const logs = s.dailyLogs || s.dailyRecords || [];
+            if (Array.isArray(logs) && logs.length > 0) {
+                logs.forEach(dl => {
+                    const hVal = (dl.hadir || '').toString().trim().toLowerCase();
+                    const ketVal = (dl.keterangan || '').toString().trim().toLowerCase();
+                    if (ketVal.includes('sakit') || hVal === 'sakit' || hVal === 's' ||
+                        ketVal.includes('izin') || hVal === 'izin' || hVal === 'i' ||
+                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'a') {
+                        classBreakdown[kKey].tidakHadir += 1;
+                    } else {
+                        classBreakdown[kKey].hadir += 1;
+                    }
+                });
+            } else {
+                classBreakdown[kKey].hadir += 20;
+            }
+        });
+    }
+
+    const bdContainer = document.getElementById('absensi-class-breakdown-container');
+    if (bdContainer) {
+        bdContainer.innerHTML = '';
+        ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5'].forEach(clsName => {
+            const h = classBreakdown[clsName].hadir;
+            const th = classBreakdown[clsName].tidakHadir;
+            const total = h + th;
+            const rate = total > 0 ? Math.round((h / total) * 100) : 100;
+
+            const badgeBg = rate >= 98 ? 'bg-emerald-50 text-emerald-600 border-emerald-200' :
+                            rate >= 95 ? 'bg-indigo-50 text-indigo-600 border-indigo-200' :
+                            'bg-amber-50 text-amber-600 border-amber-200';
+            
+            const barBg = rate >= 98 ? 'bg-emerald-500' : rate >= 95 ? 'bg-indigo-500' : 'bg-amber-500';
+
+            const card = document.createElement('div');
+            card.className = 'bg-slate-50 p-2 rounded-xl border border-slate-100 flex flex-col justify-between space-y-1.5';
+            card.innerHTML = `
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold text-slate-700">${clsName}</span>
+                    <span class="px-1 py-0.5 rounded text-[9px] font-extrabold border ${badgeBg}">${rate}%</span>
+                </div>
+                <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
+                    <div class="${barBg} h-full rounded-full transition-all duration-500" style="width: ${rate}%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[8px] text-slate-400 font-semibold pt-0.5">
+                    <span>Hadir: ${h}</span>
+                    <span>Absen: ${th}</span>
+                </div>
+            `;
+            bdContainer.appendChild(card);
+        });
+    }
 }
