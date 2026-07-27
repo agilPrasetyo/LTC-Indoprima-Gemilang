@@ -274,8 +274,8 @@ function filterAdminSafetyTable() {
             <td class="py-3 px-4 font-semibold text-slate-600">${item.bagian || '-'}</td>
             <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
-            <td class="py-3 px-4">
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${badgeClass}">
+            <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
+                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold border whitespace-nowrap inline-block ${badgeClass}">
                     ${item.kategori || 'Ringan'}
                 </span>
             </td>
