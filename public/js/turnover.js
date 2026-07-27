@@ -481,19 +481,21 @@ function getMonthlyTurnoverStats(dataset) {
     };
 }
 
+let turnoverPageBarChartInstance = null;
+
 function updateTurnoverBarChart(dataset) {
     const chartCanvas = document.getElementById('turnoverPieChart');
     if (!chartCanvas) return;
     const chartCtx = chartCanvas.getContext('2d');
 
-    if (turnoverPieChartInstance) {
-        turnoverPieChartInstance.destroy();
-        turnoverPieChartInstance = null;
+    if (turnoverPageBarChartInstance) {
+        try { turnoverPageBarChartInstance.destroy(); } catch(e){}
+        turnoverPageBarChartInstance = null;
     }
 
     const monthlyStats = getMonthlyTurnoverStats(dataset);
 
-    turnoverPieChartInstance = new Chart(chartCtx, {
+    turnoverPageBarChartInstance = new Chart(chartCtx, {
         type: 'bar',
         data: {
             labels: monthlyStats.labels,
@@ -665,10 +667,14 @@ function renderTurnoverView() {
     const docICnt = document.getElementById('donut-indis-cnt');
     if (docICnt) docICnt.innerText = `(${iCount})`;
 
+    updateTurnoverBarChart(dataset);
     requestAnimationFrame(() => {
         updateTurnoverBarChart(dataset);
         initTurnoverMap(filtered);
     });
+    setTimeout(() => {
+        updateTurnoverBarChart(dataset);
+    }, 150);
 }
 
 function triggerTurnoverFilter() {
