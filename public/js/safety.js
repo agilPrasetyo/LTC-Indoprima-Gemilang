@@ -165,9 +165,21 @@ function filterSafetyTable() {
         return;
     }
 
+    const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
+        ? rawSiswaData
+        : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
+
     filtered.forEach(item => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
+
+        const matchSiswa = studentList.find(s => String(s.id || s.noreg || s.nomorRegistrasi) === String(item.noreg));
+        const syncedBagian = (matchSiswa && (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen)) 
+            ? (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen) 
+            : (item.bagian || '-');
+        const syncedKelas = (matchSiswa && matchSiswa.kelas) 
+            ? matchSiswa.kelas 
+            : (item.kelas || '-');
 
         let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
         const kat = (item.kategori || '').toLowerCase();
@@ -185,12 +197,12 @@ function filterSafetyTable() {
             <td class="py-3 px-4 font-bold text-slate-600">${item.tanggal || '-'}</td>
             <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${item.kelas || '-'}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${item.bagian || '-'}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600 whitespace-nowrap min-w-[90px]">${syncedKelas}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${syncedBagian}</td>
             <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
-            <td class="py-3 px-4">
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border ${badgeClass}">
+            <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
+                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold border whitespace-nowrap inline-block ${badgeClass}">
                     ${item.kategori || 'Ringan'}
                 </span>
             </td>
@@ -250,9 +262,21 @@ function filterAdminSafetyTable() {
         return;
     }
 
+    const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
+        ? rawSiswaData
+        : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
+
     filtered.forEach(item => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
+
+        const matchSiswa = studentList.find(s => String(s.id || s.noreg || s.nomorRegistrasi) === String(item.noreg));
+        const syncedBagian = (matchSiswa && (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen)) 
+            ? (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen) 
+            : (item.bagian || '-');
+        const syncedKelas = (matchSiswa && matchSiswa.kelas) 
+            ? matchSiswa.kelas 
+            : (item.kelas || '-');
 
         let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
         const kat = (item.kategori || '').toLowerCase();
@@ -270,8 +294,8 @@ function filterAdminSafetyTable() {
             <td class="py-3 px-4 font-bold text-slate-600">${item.tanggal || '-'}</td>
             <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${item.kelas || '-'}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${item.bagian || '-'}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600 whitespace-nowrap min-w-[90px]">${syncedKelas}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${syncedBagian}</td>
             <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
             <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
