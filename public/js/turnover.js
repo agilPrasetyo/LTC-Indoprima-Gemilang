@@ -415,46 +415,136 @@ function changeThematicStyle(styleName) {
     renderTurnoverView();
 }
 
-function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
+function getMonthlyTurnoverStats(dataset) {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    const monthMap = {};
+
+    dataset.forEach(item => {
+        const dateStr = item.tanggalKeluar || item.tanggal_keluar || item.tanggal || item.masuk || '';
+        let d = null;
+        if (dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const p0 = parseInt(parts[0]), p1 = parseInt(parts[1]), p2 = parseInt(parts[2]);
+                if (p1 > 12) {
+                    d = new Date(p2, p0 - 1, p1);
+                } else {
+                    d = new Date(p2, p1 - 1, p0);
+                }
+            }
+        } else if (dateStr.includes('-')) {
+            const parts = dateStr.split('-');
+            if (parts.length === 3) {
+                d = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            }
+        }
+
+        if (!d || isNaN(d.getTime())) {
+            d = new Date(2026, 4, 1);
+        }
+
+        const y = d.getFullYear();
+        const m = d.getMonth();
+        const key = `${y}-${String(m + 1).padStart(2, '0')}`;
+        const label = `${monthNames[m]} ${y}`;
+
+        if (!monthMap[key]) {
+            monthMap[key] = { label, key, lulus: 0, resign: 0, indisipliner: 0, order: y * 12 + m };
+        }
+
+        const status = String(item.alasan || item.alasanDetail || item.alasan_detail || item.keterangan || '').toLowerCase();
+        if (status.includes('resign')) {
+            monthMap[key].resign++;
+        } else if (status.includes('lulus')) {
+            monthMap[key].lulus++;
+        } else if (status.includes('indisipliner') || status.includes('indisiplin')) {
+            monthMap[key].indisipliner++;
+        }
+    });
+
+    const sortedKeys = Object.keys(monthMap).sort((a, b) => monthMap[a].order - monthMap[b].order);
+
+    if (sortedKeys.length === 0) {
+        return {
+            labels: ['Mei 2026'],
+            lulusData: [3],
+            resignData: [3],
+            indisiplinData: [2]
+        };
+    }
+
+    return {
+        labels: sortedKeys.map(k => monthMap[k].label),
+        lulusData: sortedKeys.map(k => monthMap[k].lulus),
+        resignData: sortedKeys.map(k => monthMap[k].resign),
+        indisiplinData: sortedKeys.map(k => monthMap[k].indisipliner)
+    };
+}
+
+function updateTurnoverBarChart(dataset) {
     const chartCanvas = document.getElementById('turnoverPieChart');
     if (!chartCanvas) return;
     const chartCtx = chartCanvas.getContext('2d');
 
     if (turnoverPieChartInstance) {
         turnoverPieChartInstance.destroy();
+        turnoverPieChartInstance = null;
     }
+
+    const monthlyStats = getMonthlyTurnoverStats(dataset);
 
     turnoverPieChartInstance = new Chart(chartCtx, {
         type: 'bar',
         data: {
-            labels: ['Lulus Magang', 'Resign Kerja', 'Indisipliner'],
-            datasets: [{
-                label: 'Jumlah Siswa',
-                data: [lCount, rCount, iCount],
-                backgroundColor: ['#8B5CF6', '#F59E0B', '#F43F5E'],
-                borderRadius: 8,
-                barPercentage: 0.4,
-                categoryPercentage: 0.6
-            }]
+            labels: monthlyStats.labels,
+            datasets: [
+                {
+                    label: 'Lulus Magang',
+                    data: monthlyStats.lulusData,
+                    backgroundColor: '#8B5CF6',
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.6
+                },
+                {
+                    label: 'Resign Kerja',
+                    data: monthlyStats.resignData,
+                    backgroundColor: '#F59E0B',
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.6
+                },
+                {
+                    label: 'Indisipliner',
+                    data: monthlyStats.indisiplinData,
+                    backgroundColor: '#F43F5E',
+                    borderRadius: 6,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.6
+                }
+            ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
             plugins: {
-                legend: { display: false },
+                legend: {
+                    display: true,
+                    position: 'top',
+                    labels: {
+                        font: { size: 11, family: 'Inter', weight: '600' },
+                        usePointStyle: true,
+                        boxWidth: 8
+                    }
+                },
                 tooltip: {
+                    mode: 'index',
+                    intersect: false,
                     backgroundColor: '#0F172A',
                     titleFont: { size: 12, weight: '700', family: 'Inter' },
                     bodyFont: { size: 11, family: 'Inter' },
                     padding: 10,
-                    borderRadius: 12,
-                    callbacks: {
-                        label: function(context) {
-                            const val = context.raw || 0;
-                            const pct = context.dataIndex === 0 ? lPct : (context.dataIndex === 1 ? rPct : iPct);
-                            return ` Jumlah: ${val} Siswa (${pct}%)`;
-                        }
-                    }
+                    borderRadius: 12
                 }
             },
             scales: {
@@ -470,6 +560,11 @@ function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
             animation: false
         }
     });
+}
+
+function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
+    const dataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
+    updateTurnoverBarChart(dataset);
 }
 
 function renderTurnoverView() {
@@ -571,7 +666,7 @@ function renderTurnoverView() {
     if (docICnt) docICnt.innerText = `(${iCount})`;
 
     requestAnimationFrame(() => {
-        updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct);
+        updateTurnoverBarChart(dataset);
         initTurnoverMap(filtered);
     });
 }
