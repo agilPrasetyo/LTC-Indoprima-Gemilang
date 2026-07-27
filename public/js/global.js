@@ -835,9 +835,9 @@
         // Redirect to role-specific URL if on root page (no FORCED_ROLE)
         if (!window.FORCED_ROLE) {
             const roleRouteMap = {
-                'Admin': '/admin',
-                'Visitor': '/visitor',
-                'Siswa': '/siswa'
+                'Admin': '/portal-adm-x89k21',
+                'Visitor': '/portal-vst-q81z56',
+                'Siswa': '/portal-ssw-m47v93'
             };
             const targetRoute = roleRouteMap[user.role];
             if (targetRoute) {
