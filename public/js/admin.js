@@ -448,7 +448,7 @@
         const asalFilter = document.getElementById('filter-siswa-asal')?.value || '';
         const sekolahFilter = document.getElementById('filter-siswa-sekolah')?.value || '';
 
-        let filtered = students.filter(s => s.status === "Aktif");
+        let filtered = students.filter(s => String(s.status || '').toUpperCase() === "AKTIF");
 
         if (sectionFilter) {
             filtered = filtered.filter(s => s.section === sectionFilter);
@@ -1042,7 +1042,7 @@
         const studentSelect = document.getElementById('mp-modal-student');
         if (studentSelect) {
             studentSelect.innerHTML = '';
-            const students = (activeData || []).filter(s => s.status === "Aktif");
+            const students = (activeData || []).filter(s => String(s.status || '').toUpperCase() === "AKTIF");
             students.forEach(s => {
                 const opt = document.createElement('option');
                 opt.value = s.id;

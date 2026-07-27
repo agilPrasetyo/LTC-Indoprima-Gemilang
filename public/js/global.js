@@ -1301,7 +1301,7 @@ if (typeof Chart !== 'undefined') {
 
     function renderData(data) {
         rawSiswaData = data.siswa || [];
-        activeData = JSON.parse(JSON.stringify(rawSiswaData)).filter(s => s.status === "Aktif"); 
+        activeData = JSON.parse(JSON.stringify(rawSiswaData)).filter(s => String(s.status || '').toUpperCase() === "AKTIF"); 
         
         rawTurnoverData = data.turnover || [];
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
