@@ -7,6 +7,12 @@ var currentSiswaStep = 1;
 function resetSiswaPortalForm() {
     currentSiswaStep = 1;
     
+    // Explicitly show form view & hide success view
+    const formView = document.getElementById('siswa-portal-form-view');
+    const successView = document.getElementById('siswa-portal-success-view');
+    if (formView) formView.classList.remove('hidden');
+    if (successView) successView.classList.add('hidden');
+
     // Reset form fields
     const form = document.getElementById('form-siswa-daily');
     if (form) form.reset();
@@ -347,6 +353,12 @@ function showSuccessSiswaPortal() {
 
 function populateSiswaPortalFields() {
     if (!currentUser || currentUser.role !== 'Siswa') return;
+    
+    // Always ensure Siswa form starts fresh on Step 1
+    if (typeof resetSiswaPortalForm === 'function') {
+        resetSiswaPortalForm();
+    }
+
     const noreg = currentUser.studentId || currentUser.nomorRegistrasi;
     const me = (activeData || []).find(s => String(s.id) === String(noreg));
     if (!me) return;

@@ -1646,6 +1646,11 @@
             console.error("Failed to clear session:", e);
         }
 
+        // Reset Siswa form to Step 1 & hide success view
+        if (typeof resetSiswaPortalForm === 'function') {
+            resetSiswaPortalForm();
+        }
+
         // Panggil endpoint logout backend untuk menghapus HTTP-Only cookies
         fetch('/api/auth/logout', { method: 'POST' }).catch(err => {
             console.warn("Logout cookie clearance error:", err);
