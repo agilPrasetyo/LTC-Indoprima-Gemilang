@@ -254,13 +254,15 @@ function updateClassPopulationChart() {
         };
 
         combinedStudents.forEach(s => {
-            const startD = parseDateYYYYMMDD(s.masuk);
+            const startD = parseDateYYYYMMDD(s.masuk || s.tanggalMasuk || s.tanggal_masuk);
             if (!startD || startD > evalDate) return;
 
-            const exitStr = s.tanggalKeluar || s.keluar;
+            const exitStr = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi;
             if (exitStr) {
                 const exitD = parseDateYYYYMMDD(exitStr);
                 if (exitD && exitD < startOfMonth) return;
+            } else if (s.status && s.status !== 'Aktif') {
+                return;
             }
 
             let monthsActive = (evalDate.getFullYear() - startD.getFullYear()) * 12;
