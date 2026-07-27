@@ -19,6 +19,12 @@ const globalChartDataLabelsPlugin = {
                 const isBarDataset = dataset.type === 'bar' || meta.type === 'bar' || chart.config.type === 'bar';
                 const isPieOrDonut = chart.config.type === 'pie' || chart.config.type === 'doughnut';
 
+                const isStackedBar = isBarDataset && (
+                    (chart.options && chart.options.scales && chart.options.scales.x && chart.options.scales.x.stacked) ||
+                    (chart.options && chart.options.scales && chart.options.scales.y && chart.options.scales.y.stacked) ||
+                    dataset.stack !== undefined
+                );
+
                 meta.data.forEach((element, index) => {
                     try {
                         const val = dataset.data[index];
@@ -55,9 +61,51 @@ const globalChartDataLabelsPlugin = {
 
                             const formattedVal = typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(1) + '%' : String(val);
                             ctx.fillText(formattedVal, position.x, position.y - 12);
+                        } else if (isStackedBar) {
+                            const base = element.base !== undefined ? element.base : element.y;
+                            const sliceHeight = Math.abs(base - element.y);
+                            
+                            // Render label INSIDE slice if height is sufficient
+                            if (sliceHeight >= 14) {
+                                const yCenter = (element.y + base) / 2;
+                                ctx.font = 'bold 11px Inter, sans-serif';
+                                ctx.fillStyle = '#FFFFFF';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
+                                ctx.shadowBlur = 2;
+                                ctx.fillText(String(val), element.x, yCenter);
+                            }
+
+                            // Render TOTAL STACK SUM on top of the highest stacked segment
+                            let isTopMost = true;
+                            let topY = element.y;
+                            let stackSum = 0;
+
+                            for (let dIdx = 0; dIdx < numDatasets; dIdx++) {
+                                const dMeta = chart.getDatasetMeta(dIdx);
+                                if (!dMeta || dMeta.hidden) continue;
+                                const dVal = Number(chart.data.datasets[dIdx].data[index]) || 0;
+                                stackSum += dVal;
+
+                                const dElem = dMeta.data[index];
+                                if (dElem && dElem.y < topY - 1) {
+                                    isTopMost = false;
+                                }
+                            }
+
+                            if (isTopMost && stackSum > 0) {
+                                ctx.font = 'bold 12px Inter, sans-serif';
+                                ctx.fillStyle = '#0F172A';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+                                ctx.shadowBlur = 3;
+                                ctx.fillText(String(stackSum), element.x, topY - 5);
+                            }
                         } else if (isBarDataset) {
                             ctx.font = 'bold 11px Inter, sans-serif';
-                            ctx.fillStyle = dataset.backgroundColor || '#0F172A';
+                            ctx.fillStyle = '#334155';
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'bottom';
                             
