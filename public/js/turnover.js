@@ -68,7 +68,10 @@ function renderSimplifiedFallbackMap(filteredData, cityStats) {
 
     // Pasang PIN interaktif untuk setiap kota yang memiliki data turnover
     Object.keys(cityStats).forEach(cityName => {
-        const coord = coordsJawa[cityName] || coordsJawa['SBY'];
+        const normCity = normalizeCityName(cityName);
+        const coord = coordsJawa[normCity] || coordsJawa[cityName];
+        if (!coord) return;
+        
         const stat = cityStats[cityName];
         
         // Menentukan class bulatan berdasarkan kondisi turnover asli daerah tersebut

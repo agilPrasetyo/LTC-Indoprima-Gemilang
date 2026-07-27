@@ -501,7 +501,7 @@ if (typeof Chart !== 'undefined') {
 
     const fallbackTurnover = [
         { id: "2601111", namaLengkap: "AQSAL RAIHAN M.", bagian: "CORE", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "10/05/2026", keterangan: "Lulus", alasan: "Lulus Magang Kerja Unggulan", wilayah: "JEMBER" },
-        { id: "2601183", namaLengkap: "TRIO FARIT HENDRAWAN", bagian: "PAINTING", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "11/05/2026", keterangan: "Indisipliner", alasan: "Pelanggaran berulang tata tertib mesin", wilayah: "SURABAYA" },
+        { id: "2601183", namaLengkap: "TRIO FARIT HENDRAWAN", bagian: "PAINTING", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "11/05/2026", keterangan: "Indisipliner", alasan: "Pelanggaran berulang tata tertib mesin", wilayah: "SIDOARJO" },
         { id: "2602003", namaLengkap: "AHMAD HANIFAN", bagian: "GRINDING", kelas: "Kelas 5", masuk: "2025-12-20", tanggalKeluar: "12/05/2026", keterangan: "Indisipliner", alasan: "Sering tidak hadir tanpa keterangan", wilayah: "MALANG" },
         { id: "2602010", namaLengkap: "FAIS WAHYUDA", bagian: "LADLE", kelas: "Kelas 4", masuk: "2026-01-20", tanggalKeluar: "15/05/2026", keterangan: "Resign", alasan: "Membantu usaha keluarga", wilayah: "MADIUN" },
         { id: "2602022", namaLengkap: "FAHNI AZIZCAHYO", bagian: "CORE", kelas: "Kelas 3", masuk: "2026-02-20", tanggalKeluar: "17/05/2026", keterangan: "Resign", alasan: "Kondisi kesehatan tidak mendukung", wilayah: "KEDIRI" },
