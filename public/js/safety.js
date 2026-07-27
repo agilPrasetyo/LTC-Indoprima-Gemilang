@@ -59,7 +59,7 @@ function autoFillSafetySiswaInfo() {
     const siswa = studentList.find(s => (s.id || s.noreg) === noreg);
     if (siswa) {
         if (kelasInput) kelasInput.value = siswa.kelas || '-';
-        if (bagianInput) bagianInput.value = siswa.departemen || siswa.bagian || siswa.section || '-';
+        if (bagianInput) bagianInput.value = siswa.section || siswa.bagian || siswa.departemen || '-';
     }
 }
 
@@ -174,9 +174,9 @@ function filterSafetyTable() {
         tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
 
         const matchSiswa = studentList.find(s => String(s.id || s.noreg || s.nomorRegistrasi) === String(item.noreg));
-        const syncedBagian = (matchSiswa && (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen)) 
-            ? (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen) 
-            : (item.bagian || '-');
+        const syncedSection = (matchSiswa && (matchSiswa.section || matchSiswa.bagian || matchSiswa.departemen)) 
+            ? (matchSiswa.section || matchSiswa.bagian || matchSiswa.departemen) 
+            : (item.section || item.bagian || '-');
         const syncedKelas = (matchSiswa && matchSiswa.kelas) 
             ? matchSiswa.kelas 
             : (item.kelas || '-');
@@ -198,7 +198,7 @@ function filterSafetyTable() {
             <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
             <td class="py-3 px-4 font-semibold text-slate-600 whitespace-nowrap min-w-[90px]">${syncedKelas}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${syncedBagian}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${syncedSection}</td>
             <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
             <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
@@ -271,9 +271,9 @@ function filterAdminSafetyTable() {
         tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
 
         const matchSiswa = studentList.find(s => String(s.id || s.noreg || s.nomorRegistrasi) === String(item.noreg));
-        const syncedBagian = (matchSiswa && (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen)) 
-            ? (matchSiswa.bagian || matchSiswa.section || matchSiswa.departemen) 
-            : (item.bagian || '-');
+        const syncedSection = (matchSiswa && (matchSiswa.section || matchSiswa.bagian || matchSiswa.departemen)) 
+            ? (matchSiswa.section || matchSiswa.bagian || matchSiswa.departemen) 
+            : (item.section || item.bagian || '-');
         const syncedKelas = (matchSiswa && matchSiswa.kelas) 
             ? matchSiswa.kelas 
             : (item.kelas || '-');
@@ -295,7 +295,7 @@ function filterAdminSafetyTable() {
             <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
             <td class="py-3 px-4 font-semibold text-slate-600 whitespace-nowrap min-w-[90px]">${syncedKelas}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${syncedBagian}</td>
+            <td class="py-3 px-4 font-semibold text-slate-600">${syncedSection}</td>
             <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
             <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
             <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
