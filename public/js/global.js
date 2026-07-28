@@ -1625,7 +1625,29 @@ if (typeof Chart !== 'undefined') {
         }
     }
 
+    function toggleMobileSidebar(show) {
+        const sidebar = document.getElementById('app-sidebar');
+        const overlay = document.getElementById('sidebar-drawer-overlay');
+        if (!sidebar) return;
+
+        const isHidden = sidebar.classList.contains('-translate-x-full');
+        const targetShow = (typeof show === 'boolean') ? show : isHidden;
+
+        if (targetShow) {
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            if (overlay) overlay.classList.remove('hidden');
+        } else {
+            sidebar.classList.add('-translate-x-full');
+            sidebar.classList.remove('translate-x-0');
+            if (overlay) overlay.classList.add('hidden');
+        }
+    }
+
     function switchView(viewName) {
+        // Auto-close mobile / split-screen sidebar drawer
+        toggleMobileSidebar(false);
+
         // Enforce Siswa role to strictly stay on portal form view
         if ((currentUser && currentUser.role === 'Siswa') || viewName === 'sisi-siswa') {
             viewName = 'sisi-siswa';

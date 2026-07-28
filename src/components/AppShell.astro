@@ -123,16 +123,24 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
 </div>
 
 <!-- Struktur Navigasi Aplikasi Utama -->
-<div id="app" class="hidden min-h-screen flex flex-col md:flex-row">
+<div id="app" class="hidden min-h-screen flex flex-col lg:flex-row">
+
+  <!-- Backdrop Overlay untuk Mobile/Split-Screen Drawer -->
+  <div id="sidebar-drawer-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden" onclick="toggleMobileSidebar(false)"></div>
 
   <!-- =============================================
-       DESKTOP SIDEBAR (hanya terlihat di md ke atas)
+       DESKTOP & SPLIT-SCREEN SIDEBAR DRAWER
        ============================================= -->
-  <aside id="app-sidebar" class="relative w-full md:w-64 bg-white/70 backdrop-blur-xl border-r border-brand-border/60 md:sticky md:top-0 md:h-screen flex-col justify-between p-6 z-40 transition-all duration-300 text-brand-textMain">
+  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-brand-border/60 p-6 flex-col justify-between transition-transform duration-300 ease-in-out text-brand-textMain -translate-x-full lg:translate-x-0 lg:static lg:sticky lg:top-0 lg:h-screen lg:flex shadow-2xl lg:shadow-none flex">
     
     <!-- Button to toggle sidebar collapse -->
-    <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" class="absolute top-8 -right-3 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow flex items-center justify-center text-slate-500 hover:text-brand-blue hover:scale-110 active:scale-95 transition-all duration-300 z-50 cursor-pointer" title="Sembunyikan/Pin Sidebar">
+    <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" class="hidden lg:flex absolute top-8 -right-3 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow items-center justify-center text-slate-500 hover:text-brand-blue hover:scale-110 active:scale-95 transition-all duration-300 z-50 cursor-pointer" title="Sembunyikan/Pin Sidebar">
       <i class="fa-solid fa-chevron-left text-[10px]" id="sidebar-toggle-icon"></i>
+    </button>
+    
+    <!-- Close button inside sidebar on split-screen / mobile -->
+    <button onclick="toggleMobileSidebar(false)" class="lg:hidden absolute top-6 right-5 p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors" title="Tutup Menu">
+      <i class="fa-solid fa-xmark text-lg"></i>
     </button>
 
     <div>
@@ -260,7 +268,12 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
     
     <!-- HEADER UTAMA (Dashboard Header) -->
     <header class="h-20 bg-white/70 backdrop-blur-xl border-b border-brand-border/60 sticky top-0 z-30 flex items-center justify-between px-6 md:px-8">
-      <div class="flex items-center gap-4">
+      <div class="flex items-center gap-3 sm:gap-4">
+        <!-- Hamburger Button untuk Split Screen / Tablet / Mobile -->
+        <button id="mobile-hamburger-btn" onclick="toggleMobileSidebar()" class="lg:hidden p-2.5 rounded-xl bg-slate-100/90 hover:bg-slate-200 text-slate-700 active:scale-95 transition-all duration-200 flex items-center justify-center cursor-pointer shadow-sm border border-slate-200" title="Buka Menu Navigasi">
+          <i class="fa-solid fa-bars text-base"></i>
+        </button>
+
         <!-- Breadcrumb / View Title -->
         <div>
           <h1 class="font-display font-extrabold text-lg md:text-xl text-brand-textMain tracking-tight transition-all duration-300" id="header-view-title">Dashboard Monitor</h1>
@@ -506,13 +519,13 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
   window.PUBLIC_GAS_WEB_APP_URL = gasUrl;
 </script>
 
-<script is:inline src="/js/api.js?v=8.2"></script>
-<script is:inline src="/js/global.js?v=8.2"></script>
-<script is:inline src="/js/dashboard.js?v=8.2"></script>
-<script is:inline src="/js/siswa.js?v=8.2"></script>
-<script is:inline src="/js/turnover.js?v=8.2"></script>
-<script is:inline src="/js/siswa_portal.js?v=8.2"></script>
-<script is:inline src="/js/keuangan.js?v=8.2"></script>
-<script is:inline src="/js/admin.js?v=8.2"></script>
-<script is:inline src="/js/absensi.js?v=8.2"></script>
-<script is:inline src="/js/safety.js?v=8.2"></script>
+<script is:inline src="/js/api.js?v=8.3"></script>
+<script is:inline src="/js/global.js?v=8.3"></script>
+<script is:inline src="/js/dashboard.js?v=8.3"></script>
+<script is:inline src="/js/siswa.js?v=8.3"></script>
+<script is:inline src="/js/turnover.js?v=8.3"></script>
+<script is:inline src="/js/siswa_portal.js?v=8.3"></script>
+<script is:inline src="/js/keuangan.js?v=8.3"></script>
+<script is:inline src="/js/admin.js?v=8.3"></script>
+<script is:inline src="/js/absensi.js?v=8.3"></script>
+<script is:inline src="/js/safety.js?v=8.3"></script>
