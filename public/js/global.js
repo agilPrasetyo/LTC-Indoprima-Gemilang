@@ -377,7 +377,7 @@ if (typeof Chart !== 'undefined') {
         const now = new Date();
         const cost = calculateCurrentMonthLTCCost();
         costEl.innerText = 'Rp ' + Math.round(cost).toLocaleString('id-ID');
-        costEl.className = 'text-2xl sm:text-4xl font-bold font-display text-brand-textMain mt-4';
+        costEl.className = 'text-[10px] xs:text-xs sm:text-xl md:text-2xl lg:text-3xl font-bold font-display text-brand-textMain mt-2 sm:mt-4 tracking-tight leading-tight truncate';
         // Update label periode
         const periodLabel = document.getElementById('stat-ltc-period-label');
         if (periodLabel) periodLabel.innerText = monthNames[now.getMonth()] + ' ' + now.getFullYear();
