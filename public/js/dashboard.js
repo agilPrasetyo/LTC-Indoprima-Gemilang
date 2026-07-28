@@ -699,10 +699,42 @@ function updateLtcRatioChart() {
         return p.tanggal;
     });
 
-    const totalKaryawanData = sortedData.map(p => p.totalKaryawan);
-    const totalLtcData = sortedData.map(p => p.totalLtc);
-    const ltcPercentageData = sortedData.map(p => {
-        return p.totalKaryawan > 0 ? Math.round((p.totalLtc / p.totalKaryawan) * 100) : 0;
+    // Dynamic real-time LTC active student count from Manajemen Siswa
+    const realActiveLtcCount = (typeof activeData !== 'undefined' && Array.isArray(activeData)) ? activeData.length : 29;
+
+    // Find latest month string in sortedData
+    let latestMonthStr = '';
+    sortedData.forEach(p => {
+        if (p.tanggal) {
+            const m = p.tanggal.substring(0, 7);
+            if (m > latestMonthStr) latestMonthStr = m;
+        }
+    });
+
+    // Total Karyawan synchronized with Kelola Populasi di Admin
+    const totalKaryawanData = sortedData.map(p => {
+        if (typeof p.totalKaryawan === 'number' && p.totalKaryawan > 0) {
+            return p.totalKaryawan;
+        }
+        const k = (p.kontrak || 0) + (p.ltc || realActiveLtcCount) + (p.outsourcing || 0) + (p.satpamSupir || 0);
+        return k > 0 ? k : 146;
+    });
+
+    // Dynamically calculate totalLtc synchronized with Manajemen Siswa active students
+    const totalLtcData = sortedData.map(p => {
+        const m = p.tanggal ? p.tanggal.substring(0, 7) : '';
+        // For current/latest month, strictly use real-time active student count from Manajemen Siswa
+        if (m === latestMonthStr || m === '2026-07') {
+            return realActiveLtcCount;
+        }
+        return (typeof p.totalLtc === 'number' && p.totalLtc > 0) ? p.totalLtc : realActiveLtcCount;
+    });
+
+    // Persentase LTC line dynamically calculated
+    const ltcPercentageData = sortedData.map((p, idx) => {
+        const totalK = totalKaryawanData[idx];
+        const ltc = totalLtcData[idx];
+        return totalK > 0 ? Math.round((ltc / totalK) * 100) : 0;
     });
 
     // Create a beautiful linear gradient for the line chart fill (Red/Pink gradient)

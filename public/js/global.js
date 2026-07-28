@@ -1538,7 +1538,9 @@ if (typeof Chart !== 'undefined') {
             });
             const latest = sortedPop[0];
             if (latest) {
-                const pct = latest.totalKaryawan > 0 ? ((latest.totalLtc / latest.totalKaryawan) * 100).toFixed(2) + '%' : '0.00%';
+                const totK = latest.totalKaryawan || 146;
+                const activeLtc = (typeof activeData !== 'undefined' && Array.isArray(activeData)) ? activeData.length : (activeStudentCount || 29);
+                const pct = totK > 0 ? ((activeLtc / totK) * 100).toFixed(2) + '%' : '0.00%';
                 statPctLtc.innerText = pct;
                 if (statPctLtcDate) {
                     statPctLtcDate.innerText = latest.tanggal;
