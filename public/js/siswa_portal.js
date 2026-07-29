@@ -152,7 +152,50 @@ function goToSiswaStep(step) {
     const container = document.getElementById('step-container-' + step);
     if (container) container.classList.remove('hidden');
     
-    // Update step dot highlights
+    // Update Horizontal Progress Bar & Step Pills UI
+    const stepTitles = {
+        1: 'Langkah 1 dari 3: Identitas Siswa',
+        2: 'Langkah 2 dari 3: Detail Operasional',
+        3: 'Langkah 3 dari 3: Hasil & Validasi'
+    };
+    const stepPercents = { 1: '33%', 2: '66%', 3: '100%' };
+
+    const titleEl = document.getElementById('step-progress-title');
+    if (titleEl) titleEl.innerText = stepTitles[step] || 'Langkah ' + step;
+
+    const percentEl = document.getElementById('step-progress-percent');
+    if (percentEl) percentEl.innerText = stepPercents[step] || (step * 33) + '%';
+
+    const progressBarEl = document.getElementById('step-progress-bar');
+    if (progressBarEl) progressBarEl.style.width = stepPercents[step] || (step * 33) + '%';
+
+    // Update 3 Step Pills
+    [1, 2, 3].forEach(i => {
+        const pill = document.getElementById('step-pill-' + i);
+        if (!pill) return;
+        const numDot = pill.querySelector('.pill-num');
+        if (i < step) {
+            pill.className = "flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/80 transition-all duration-300";
+            if (numDot) {
+                numDot.className = "pill-num w-4 h-4 rounded-full bg-emerald-600 text-white flex items-center justify-center text-[9px]";
+                numDot.innerHTML = '<i class="fa-solid fa-check text-[7px]"></i>';
+            }
+        } else if (i === step) {
+            pill.className = "flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-blue-600 text-white shadow-md shadow-blue-500/20 transition-all duration-300";
+            if (numDot) {
+                numDot.className = "pill-num w-4 h-4 rounded-full bg-white text-blue-600 flex items-center justify-center text-[9px]";
+                numDot.innerText = i;
+            }
+        } else {
+            pill.className = "flex items-center justify-center gap-1 sm:gap-1.5 px-2 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold bg-white text-slate-400 border border-slate-200/80 transition-all duration-300";
+            if (numDot) {
+                numDot.className = "pill-num w-4 h-4 rounded-full bg-slate-100 text-slate-400 flex items-center justify-center text-[9px]";
+                numDot.innerText = i;
+            }
+        }
+    });
+
+    // Update step dot highlights (backward compatibility)
     document.querySelectorAll('.step-indicator .step-dot').forEach((dot, idx) => {
         const dotStep = idx + 1;
         if (dotStep < step) {
@@ -164,16 +207,6 @@ function goToSiswaStep(step) {
         } else {
             dot.className = "step-dot w-6 h-6 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center text-xs font-bold transition-all duration-300";
             dot.innerHTML = dotStep;
-        }
-    });
-
-    // Update step text labels
-    document.querySelectorAll('.step-indicator p').forEach((p, idx) => {
-        const pStep = idx + 1;
-        if (pStep === step) {
-            p.className = "text-xs font-bold text-slate-800 transition-all duration-300";
-        } else {
-            p.className = "text-xs font-bold text-slate-400 transition-all duration-300";
         }
     });
     
