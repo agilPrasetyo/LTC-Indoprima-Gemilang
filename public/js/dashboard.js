@@ -1041,8 +1041,8 @@ function updateAbsensiChart() {
     });
 
     const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
-    gradient.addColorStop(0, 'rgba(6, 182, 212, 0.35)');
-    gradient.addColorStop(1, 'rgba(6, 182, 212, 0.00)');
+    gradient.addColorStop(0, 'rgba(234, 179, 8, 0.35)');
+    gradient.addColorStop(1, 'rgba(234, 179, 8, 0.00)');
 
     absensiChartInstance = new Chart(chartCtx, {
         type: 'bar',
@@ -1083,13 +1083,13 @@ function updateAbsensiChart() {
                     type: 'line',
                     label: 'Persentase Ketidakhadiran',
                     data: percentageData,
-                    borderColor: '#06B6D4', // Option B: Electric Cyan line
+                    borderColor: '#EAB308', // Vibrant Amber Yellow line
                     borderWidth: 3,
                     tension: 0.4,
                     fill: true,
                     backgroundColor: gradient,
                     pointBackgroundColor: '#FFFFFF',
-                    pointBorderColor: '#06B6D4',
+                    pointBorderColor: '#EAB308',
                     pointBorderWidth: 2,
                     pointRadius: 4,
                     pointHoverRadius: 6,

@@ -59,7 +59,10 @@ const globalChartDataLabelsPlugin = {
                             ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
                             ctx.shadowBlur = 3;
 
-                            const formattedVal = typeof val === 'number' && !Number.isInteger(val) ? val.toFixed(1) + '%' : String(val);
+                            const isPercentLine = (dataset.label && dataset.label.toLowerCase().includes('persentase')) || dataset.yAxisID === 'yPercent';
+                            const formattedVal = typeof val === 'number' 
+                                ? (isPercentLine || !Number.isInteger(val) ? (Number.isInteger(val) ? val + '%' : val.toFixed(1) + '%') : String(val))
+                                : String(val);
                             ctx.fillText(formattedVal, position.x, position.y - 12);
                         } else if (isStackedBar) {
                             const base = element.base !== undefined ? element.base : element.y;
