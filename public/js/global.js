@@ -1377,13 +1377,11 @@ if (typeof Chart !== 'undefined') {
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
 
         activeData.forEach(s => {
-            if (!s.kelas || s.kelas === "-" || s.kelas === "null") {
-                if (s.masuk) {
-                    const exitStr = s.tanggalKeluar || s.keluar;
-                    s.kelas = hitungKelasSiswa(s.masuk, exitStr ? parseDateYYYYMMDD(exitStr) : new Date());
-                } else {
-                    s.kelas = "Kelas 1";
-                }
+            if (s.masuk) {
+                const exitStr = s.tanggalKeluar || s.keluar;
+                s.kelas = hitungKelasSiswa(s.masuk, exitStr ? parseDateYYYYMMDD(exitStr) : new Date());
+            } else if (!s.kelas || s.kelas === "-" || s.kelas === "null") {
+                s.kelas = "Kelas 1";
             } else {
                 const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
                 if (!isNaN(num)) {

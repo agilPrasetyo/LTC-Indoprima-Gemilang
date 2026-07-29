@@ -510,14 +510,14 @@
                 <td class="py-3 px-4 min-w-[100px]">
                     <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border whitespace-nowrap
                         ${(() => { 
-                            const k = s.kelas || hitungKelas(s.masuk); 
+                            const k = (s.masuk ? hitungKelas(s.masuk) : s.kelas) || 'Kelas 1'; 
                             if (k.includes('Kelas 1')) return 'bg-red-100 text-red-800 border-red-300';
                             if (k.includes('Kelas 2')) return 'bg-amber-100 text-amber-800 border-amber-300';
                             if (k.includes('Kelas 3')) return 'bg-emerald-100 text-emerald-800 border-emerald-300';
                             if (k.includes('Kelas 4')) return 'bg-sky-100 text-sky-800 border-sky-300';
                             return 'bg-slate-200 text-slate-800 border-slate-300'; 
                         })()}
-                    ">${s.kelas || hitungKelas(s.masuk)}</span>
+                    ">${(s.masuk ? hitungKelas(s.masuk) : s.kelas) || 'Kelas 1'}</span>
                 </td>
                 <!-- 8. Masuk LTC -->
                 <td class="py-3 px-4 min-w-[100px] text-brand-textSub font-mono">${masukFormatted}</td>
