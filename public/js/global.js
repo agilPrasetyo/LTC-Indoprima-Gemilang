@@ -219,11 +219,10 @@ if (typeof Chart !== 'undefined') {
             connText.innerText = 'Menghubungkan...';
         } else if (status === 'done') {
             dot.className = 'w-2 h-2 rounded-full bg-emerald-500';
-            const verSuffix = currentVersion ? ` (${currentVersion})` : '';
             if (typeof google !== 'undefined') {
-                connText.innerText = 'Terhubung ke server' + verSuffix;
+                connText.innerText = 'Terhubung ke server';
             } else {
-                connText.innerText = 'Mode Preview' + verSuffix;
+                connText.innerText = 'Mode Preview';
             }
         } else {
             dot.className = 'w-2 h-2 rounded-full bg-rose-500';
