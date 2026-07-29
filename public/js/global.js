@@ -811,6 +811,20 @@ if (typeof Chart !== 'undefined') {
         }
     }
 
+    function setLoginButtonState(loading, text = 'Memverifikasi...') {
+        const btn = document.getElementById('btn-login-submit');
+        if (!btn) return;
+        if (loading) {
+            btn.disabled = true;
+            btn.className = "w-full py-3 sm:py-3.5 mt-1 sm:mt-2 bg-blue-700/85 text-white font-semibold rounded-xl transition-all duration-150 shadow-md flex items-center justify-center gap-2 cursor-not-allowed opacity-90";
+            btn.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin text-sm"></i> <span>${text}</span>`;
+        } else {
+            btn.disabled = false;
+            btn.className = "w-full py-3 sm:py-3.5 mt-1 sm:mt-2 bg-brand-blue text-white font-semibold rounded-xl hover:bg-blue-700 active:scale-[0.97] active:bg-blue-800 transition-all duration-150 shadow-lg shadow-blue-500/20 flex items-center justify-center cursor-pointer";
+            btn.innerHTML = `<span>Masuk Dashboard</span>`;
+        }
+    }
+
     function handleLogin() {
         try {
             const emailInput = document.getElementById('login-email');
@@ -826,27 +840,41 @@ if (typeof Chart !== 'undefined') {
                     errorBox.classList.remove('hidden');
                     errorBox.innerText = "Email / Nomor Registrasi dan Password wajib diisi.";
                 }
+                setLoginButtonState(false);
                 return;
             }
+
+            // Trigger instant visual loading feedback on button immediately!
+            setLoginButtonState(true, 'Memverifikasi...');
 
             if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
                 google.script.run
                     .withSuccessHandler(res => {
                         if (res && res.success) {
                             if (window.FORCED_ROLE && res.user.role !== window.FORCED_ROLE) {
-                                errorBox.classList.remove('hidden');
-                                errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                                setLoginButtonState(false);
+                                if (errorBox) {
+                                    errorBox.classList.remove('hidden');
+                                    errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
+                                }
                                 return;
                             }
+                            setLoginButtonState(true, 'Menyiapkan Portal...');
                             loginSuccess(res.user);
                         } else {
-                            errorBox.classList.remove('hidden');
-                            errorBox.innerText = (res && res.message) ? res.message : "Email / Nomor Registrasi atau Password salah.";
+                            setLoginButtonState(false);
+                            if (errorBox) {
+                                errorBox.classList.remove('hidden');
+                                errorBox.innerText = (res && res.message) ? res.message : "Email / Nomor Registrasi atau Password salah.";
+                            }
                         }
                     })
                     .withFailureHandler(err => {
-                        errorBox.classList.remove('hidden');
-                        errorBox.innerText = "Google Apps Script Error: " + (err.message || err.toString());
+                        setLoginButtonState(false);
+                        if (errorBox) {
+                            errorBox.classList.remove('hidden');
+                            errorBox.innerText = "Google Apps Script Error: " + (err.message || err.toString());
+                        }
                         console.error("Login server error:", err);
                     })
                     .login(loginVal, passVal);
@@ -861,12 +889,14 @@ if (typeof Chart !== 'undefined') {
                     const res = await r.json().catch(() => null);
                     if (r.ok && res && res.success && res.user) {
                         if (window.FORCED_ROLE && res.user.role !== window.FORCED_ROLE) {
+                            setLoginButtonState(false);
                             if (errorBox) {
                                 errorBox.classList.remove('hidden');
                                 errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
                             }
                             return;
                         }
+                        setLoginButtonState(true, 'Menyiapkan Portal...');
                         loginSuccess(res.user);
                     } else {
                         // Strict Local Fallback (STRICT CASE-SENSITIVE PASSWORD CHECK)
@@ -884,14 +914,17 @@ if (typeof Chart !== 'undefined') {
 
                         if (targetUser) {
                             if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
+                                setLoginButtonState(false);
                                 if (errorBox) {
                                     errorBox.classList.remove('hidden');
                                     errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
                                 }
                                 return;
                             }
+                            setLoginButtonState(true, 'Menyiapkan Portal...');
                             loginSuccess(targetUser);
                         } else {
+                            setLoginButtonState(false);
                             if (errorBox) {
                                 errorBox.classList.remove('hidden');
                                 errorBox.innerText = (res && res.message) ? res.message : "Email / Nomor Registrasi atau Password salah.";
@@ -915,14 +948,17 @@ if (typeof Chart !== 'undefined') {
 
                     if (targetUser) {
                         if (window.FORCED_ROLE && targetUser.role !== window.FORCED_ROLE) {
+                            setLoginButtonState(false);
                             if (errorBox) {
                                 errorBox.classList.remove('hidden');
                                 errorBox.innerText = "Hanya akun " + window.FORCED_ROLE + " yang dapat masuk di halaman ini.";
                             }
                             return;
                         }
+                        setLoginButtonState(true, 'Menyiapkan Portal...');
                         loginSuccess(targetUser);
                     } else {
+                        setLoginButtonState(false);
                         if (errorBox) {
                             errorBox.classList.remove('hidden');
                             errorBox.innerText = "Email / Nomor Registrasi atau Password salah.";
@@ -931,6 +967,7 @@ if (typeof Chart !== 'undefined') {
                 });
             }
         } catch (e) {
+            setLoginButtonState(false);
             const errorBox = document.getElementById('login-error');
             if (errorBox) {
                 errorBox.classList.remove('hidden');
