@@ -776,14 +776,17 @@ if (typeof Chart !== 'undefined') {
     }
 
     function fillLogin(email, pass, role) {
-        document.getElementById('login-email').value = email;
-        document.getElementById('login-pass').value = pass;
+        const emailEl = document.getElementById('login-email');
+        const passEl = document.getElementById('login-pass');
+        if (emailEl) emailEl.value = email || '';
+        if (passEl) passEl.value = pass || '';
 
+        const activeRole = (role || '').toLowerCase();
         const roles = ['admin', 'visitor', 'siswa'];
         roles.forEach(r => {
             const btn = document.getElementById('quick-fill-' + r);
             if (btn) {
-                if (r === role) {
+                if (r === activeRole) {
                     btn.className = "py-2 rounded-lg bg-brand-blue text-white shadow-sm transition-all duration-300 cursor-pointer";
                 } else {
                     btn.className = "py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer";
@@ -1939,11 +1942,11 @@ if (typeof Chart !== 'undefined') {
                 if (roleLabel) roleLabel.innerText = window.FORCED_ROLE.toUpperCase() + ' PORTAL';
 
                 if (window.FORCED_ROLE === 'Siswa') {
-                    fillLogin('2601176@indoprima.com', 'siswa123', 'siswa');
+                    fillLogin('', '', 'siswa');
                 } else if (window.FORCED_ROLE === 'Admin') {
-                    fillLogin('admin@indoprima.com', 'admin123', 'admin');
+                    fillLogin('', '', 'admin');
                 } else if (window.FORCED_ROLE === 'Visitor') {
-                    fillLogin('visitor@indoprima.com', 'visitor123', 'visitor');
+                    fillLogin('', '', 'visitor');
                 }
             }
 

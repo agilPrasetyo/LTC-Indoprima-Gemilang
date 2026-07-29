@@ -80,11 +80,11 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
       <p id="login-role-label" class="text-brand-textSub mt-1 text-xs sm:text-sm font-semibold tracking-wider uppercase">LTC Portal</p>
     </div>
 
-    <!-- Quick Fill Buttons -->
+    <!-- Quick Fill / Role Selection Buttons -->
     <div id="quick-fill-container" class="grid grid-cols-3 gap-2 mb-4 sm:mb-6 bg-slate-100 p-1.5 rounded-xl text-xs font-semibold text-center">
-      <button id="quick-fill-admin" onclick="fillLogin('admin@indoprima.com', 'admin123', 'admin')" class="py-2 rounded-lg bg-brand-blue text-white shadow-sm transition-all duration-300 cursor-pointer">Admin</button>
-      <button id="quick-fill-visitor" onclick="fillLogin('visitor@indoprima.com', 'visitor123', 'visitor')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Visitor</button>
-      <button id="quick-fill-siswa" onclick="fillLogin('2601176@indoprima.com', 'siswa123', 'siswa')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Siswa</button>
+      <button id="quick-fill-admin" onclick="fillLogin('', '', 'admin')" class="py-2 rounded-lg bg-brand-blue text-white shadow-sm transition-all duration-300 cursor-pointer">Admin</button>
+      <button id="quick-fill-visitor" onclick="fillLogin('', '', 'visitor')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Visitor</button>
+      <button id="quick-fill-siswa" onclick="fillLogin('', '', 'siswa')" class="py-2 rounded-lg text-brand-textSub hover:bg-white hover:text-brand-textMain transition-all duration-300 shadow-sm cursor-pointer">Siswa</button>
     </div>
 
     <!-- Form Fields -->
@@ -95,7 +95,7 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
           <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
             <i class="fa-regular fa-envelope"></i>
           </span>
-          <input type="email" id="login-email" class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin@indoprima.com" autocomplete="email" />
+          <input type="text" id="login-email" class="w-full pl-11 pr-4 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="" placeholder="Masukkan email atau noreg" autocomplete="username" />
         </div>
       </div>
       <div>
@@ -104,7 +104,7 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
           <span class="absolute inset-y-0 left-0 flex items-center pl-4 text-slate-400">
             <i class="fa-solid fa-lock"></i>
           </span>
-          <input type="password" id="login-pass" class="w-full pl-11 pr-10 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="admin123" autocomplete="current-password" />
+          <input type="password" id="login-pass" class="w-full pl-11 pr-10 py-2.5 sm:py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-brand-blue focus:bg-white transition-all duration-300 text-sm" value="" placeholder="Masukkan password" autocomplete="current-password" />
           <button type="button" onclick="toggleLoginPasswordVisibility()" class="absolute inset-y-0 right-0 flex items-center pr-3.5 text-slate-400 hover:text-slate-600 focus:outline-none transition-colors cursor-pointer" title="Tampilkan/Sembunyikan Password">
             <i class="fa-solid fa-eye text-sm" id="login-pass-toggle-icon"></i>
           </button>
@@ -519,13 +519,13 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
   window.PUBLIC_GAS_WEB_APP_URL = gasUrl;
 </script>
 
-<script is:inline src="/js/api.js?v=8.9"></script>
-<script is:inline src="/js/global.js?v=8.9"></script>
-<script is:inline src="/js/dashboard.js?v=8.9"></script>
-<script is:inline src="/js/siswa.js?v=8.9"></script>
-<script is:inline src="/js/turnover.js?v=8.9"></script>
-<script is:inline src="/js/siswa_portal.js?v=8.9"></script>
-<script is:inline src="/js/keuangan.js?v=8.9"></script>
-<script is:inline src="/js/admin.js?v=8.9"></script>
-<script is:inline src="/js/absensi.js?v=8.9"></script>
-<script is:inline src="/js/safety.js?v=8.9"></script>
+<script is:inline src="/js/api.js?v=9.0"></script>
+<script is:inline src="/js/global.js?v=9.0"></script>
+<script is:inline src="/js/dashboard.js?v=9.0"></script>
+<script is:inline src="/js/siswa.js?v=9.0"></script>
+<script is:inline src="/js/turnover.js?v=9.0"></script>
+<script is:inline src="/js/siswa_portal.js?v=9.0"></script>
+<script is:inline src="/js/keuangan.js?v=9.0"></script>
+<script is:inline src="/js/admin.js?v=9.0"></script>
+<script is:inline src="/js/absensi.js?v=9.0"></script>
+<script is:inline src="/js/safety.js?v=9.0"></script>
