@@ -477,6 +477,35 @@ function updateTurnoverPieChart() {
     const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
     if (totalCenterEl) totalCenterEl.innerText = totalTurnover + ' Siswa';
 
+    // Calculate 3 Mini Metrics for Turnover Card
+    const lulusRate = totalTurnover > 0 ? Math.round((lulusCount / totalTurnover) * 100) + '%' : '0%';
+    const evalRate = totalTurnover > 0 ? Math.round(((resignCount + indisiplinerCount) / totalTurnover) * 100) + '%' : '0%';
+
+    const now = new Date();
+    const curYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+    const curMonthLabel = monthNamesIndo[now.getMonth()] + ' ' + now.getFullYear();
+
+    let curMonthCount = 0;
+    records.forEach(item => {
+        const tgl = String(item.tgl_keluar || item.tanggal || item.created_at || '').substring(0, 7);
+        if (tgl === curYearMonth) {
+            curMonthCount++;
+        }
+    });
+
+    const lulusRateEl = document.getElementById('stat-turnover-lulus-rate');
+    if (lulusRateEl) lulusRateEl.innerText = lulusRate;
+
+    const evalRateEl = document.getElementById('stat-turnover-eval-rate');
+    if (evalRateEl) evalRateEl.innerText = evalRate;
+
+    const curMonthCountEl = document.getElementById('stat-turnover-month-count');
+    if (curMonthCountEl) curMonthCountEl.innerText = curMonthCount + ' Siswa';
+
+    const curMonthLabelEl = document.getElementById('stat-turnover-month-label');
+    if (curMonthLabelEl) curMonthLabelEl.innerText = curMonthLabel;
+
     turnoverPieChartInstance = new Chart(chartCtx, {
         type: 'doughnut',
         data: {

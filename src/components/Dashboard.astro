@@ -284,6 +284,39 @@
                     </table>
                 </div>
             </div>
+
+            <!-- Mini Metrics Row (Pengisi Space Bawah) -->
+            <div class="pt-4 mt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
+                <!-- Mini Metric 1: Rasio Kelulusan -->
+                <div class="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-emerald-50">
+                    <div class="flex items-center gap-1.5 text-emerald-700">
+                        <span class="p-1 rounded-md bg-emerald-100/80 text-[10px]"><i class="fa-solid fa-graduation-cap"></i></span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-800 truncate">Rasio Lulus</span>
+                    </div>
+                    <p id="stat-turnover-lulus-rate" class="text-base sm:text-lg font-black text-emerald-700 mt-2">0%</p>
+                    <span class="text-[8px] font-bold text-emerald-600/90 mt-0.5 truncate">Total Siswa Lulus</span>
+                </div>
+
+                <!-- Mini Metric 2: Rasio Evaluasi Resiko -->
+                <div class="bg-rose-50/70 border border-rose-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-rose-50">
+                    <div class="flex items-center gap-1.5 text-rose-700">
+                        <span class="p-1 rounded-md bg-rose-100/80 text-[10px]"><i class="fa-solid fa-triangle-exclamation"></i></span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-rose-800 truncate">Rasio Evaluasi</span>
+                    </div>
+                    <p id="stat-turnover-eval-rate" class="text-base sm:text-lg font-black text-rose-700 mt-2">0%</p>
+                    <span class="text-[8px] font-bold text-rose-600/90 mt-0.5 truncate">Resign & Indisiplin</span>
+                </div>
+
+                <!-- Mini Metric 3: Turnover Bulan Ini -->
+                <div class="bg-sky-50/70 border border-sky-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-sky-50">
+                    <div class="flex items-center gap-1.5 text-sky-700">
+                        <span class="p-1 rounded-md bg-sky-100/80 text-[10px]"><i class="fa-solid fa-calendar-day"></i></span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-800 truncate">Bulan Ini</span>
+                    </div>
+                    <p id="stat-turnover-month-count" class="text-base sm:text-lg font-black text-sky-700 mt-2">0 Siswa</p>
+                    <span id="stat-turnover-month-label" class="text-[8px] font-bold text-sky-600/90 mt-0.5 truncate">Juli 2026</span>
+                </div>
+            </div>
         </div>
     </div>
 </div>
