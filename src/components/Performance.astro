@@ -1,6 +1,41 @@
 <!-- HALAMAN PERFORMA SISWA (Redesain Menyeluruh) -->
 <div class="animate-fadeIn space-y-6">
 
+    <!-- 2 Top Charts: Populasi LTC by Kelas & Performa LTC per Kelas -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- Chart 1: Populasi LTC by Kelas (Stacked Bar Chart) -->
+        <div class="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="font-display font-bold text-base text-slate-800">Populasi LTC by Kelas</h3>
+                    <p class="text-[11px] text-slate-400">Rekapitulasi jumlah populasi peserta per tingkat kelas per bulan</p>
+                </div>
+                <div class="px-2.5 py-1 bg-blue-50 text-blue-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-column mr-1"></i> Stacked Bar
+                </div>
+            </div>
+            <div class="relative w-full h-[280px]">
+                <canvas id="chart-populasi-ltc-kelas"></canvas>
+            </div>
+        </div>
+
+        <!-- Chart 2: Performa LTC per Kelas (Combo Bar & Line) -->
+        <div class="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm flex flex-col justify-between">
+            <div class="flex items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-3">
+                <div>
+                    <h3 class="font-display font-bold text-base text-slate-800">Performa LTC per Kelas</h3>
+                    <p class="text-[11px] text-slate-400">Perbandingan Total Plan, Total Aktual, dan Persentase Capaian (%)</p>
+                </div>
+                <div class="px-2.5 py-1 bg-emerald-50 text-emerald-600 rounded-lg text-[10px] font-bold uppercase tracking-wider">
+                    <i class="fa-solid fa-chart-line mr-1"></i> Combo Chart
+                </div>
+            </div>
+            <div class="relative w-full h-[280px]">
+                <canvas id="chart-performa-ltc-kelas"></canvas>
+            </div>
+        </div>
+    </div>
+
     <!-- Header & Filter Bar -->
     <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-5">
