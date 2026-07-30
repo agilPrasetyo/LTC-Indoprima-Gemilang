@@ -1269,6 +1269,35 @@
     // KELOLA TURNOVER (TAB 4)
     // ============================================================
 
+    function populateAdminTurnoverMonthFilter() {
+        const select = document.getElementById('filter-admin-turnover-bulan');
+        if (!select) return;
+
+        const currentVal = select.value;
+        const records = activeTurnoverData || [];
+        const monthSet = new Set();
+
+        records.forEach(t => {
+            const exitDate = String(t.tanggalKeluar || t.keluar || t.masuk || '').substring(0, 7);
+            if (exitDate && exitDate.match(/^\d{4}-\d{2}$/)) {
+                monthSet.add(exitDate);
+            }
+        });
+
+        const months = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
+        const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+        let html = '<option value="">Semua Bulan</option>';
+        months.forEach(m => {
+            const [year, monthNum] = m.split('-');
+            const monthName = monthNamesIndo[parseInt(monthNum, 10) - 1] || m;
+            const label = `${monthName} ${year}`;
+            html += `<option value="${m}" ${currentVal === m ? 'selected' : ''}>${label}</option>`;
+        });
+
+        select.innerHTML = html;
+    }
+
     function renderAdminTurnoverTable() {
         const tbody = document.getElementById('admin-turnover-tbody');
         if (!tbody) return;
@@ -1281,7 +1310,59 @@
             return;
         }
 
-        records.forEach((t, idx) => {
+        // Populate month dropdown options dynamically
+        populateAdminTurnoverMonthFilter();
+
+        const searchQuery = (document.getElementById('filter-admin-turnover-search')?.value || '').toLowerCase().trim();
+        const selectedMonth = document.getElementById('filter-admin-turnover-bulan')?.value || '';
+
+        // 1. Filter by Search Query & Selected Month
+        let filtered = records.filter(t => {
+            if (selectedMonth) {
+                const exitStr = String(t.tanggalKeluar || t.keluar || t.masuk || '').substring(0, 7);
+                if (exitStr !== selectedMonth) return false;
+            }
+
+            if (searchQuery) {
+                const idStr = String(t.id || t.noreg || '').toLowerCase();
+                const namaStr = String(t.namaLengkap || t.nama || '').toLowerCase();
+                const bagianStr = String(t.bagian || t.section || '').toLowerCase();
+                const daerahStr = String(t.asalDaerah || t.wilayah || t.asal || '').toLowerCase();
+                const sekolahStr = String(t.asalSekolah || t.sekolah || '').toLowerCase();
+                const alasanStr = String(t.alasan || '').toLowerCase();
+                const ketStr = String(t.keterangan || '').toLowerCase();
+                const tglMasukStr = String(t.masuk || '').toLowerCase();
+                const tglKeluarStr = String(t.tanggalKeluar || t.keluar || '').toLowerCase();
+
+                const matchSearch = idStr.includes(searchQuery) ||
+                                    namaStr.includes(searchQuery) ||
+                                    bagianStr.includes(searchQuery) ||
+                                    daerahStr.includes(searchQuery) ||
+                                    sekolahStr.includes(searchQuery) ||
+                                    alasanStr.includes(searchQuery) ||
+                                    ketStr.includes(searchQuery) ||
+                                    tglMasukStr.includes(searchQuery) ||
+                                    tglKeluarStr.includes(searchQuery);
+
+                if (!matchSearch) return false;
+            }
+
+            return true;
+        });
+
+        // 2. Sort by NEWEST DATE FIRST (Descending by tanggalKeluar or masuk)
+        filtered.sort((a, b) => {
+            const dateA = a.tanggalKeluar || a.keluar || a.masuk || '';
+            const dateB = b.tanggalKeluar || b.keluar || b.masuk || '';
+            return dateB.localeCompare(dateA);
+        });
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="11" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover yang sesuai filter pencarian.</td></tr>';
+            return;
+        }
+
+        filtered.forEach(t => {
             const tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50";
             const alasanColors = {
@@ -1304,7 +1385,7 @@
                 <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${alasanBadge}">${t.alasan || '-'}</span></td>
                 <td class="py-3 px-4 text-brand-textSub max-w-[160px] truncate" title="${t.keterangan || ''}">${t.keterangan || '-'}</td>
                 <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                    <button onclick="editTurnoverTrigger(${idx})" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
+                    <button onclick="editTurnoverTrigger('${t.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-pen"></i> Edit
                     </button>
                     <button onclick="deleteTurnoverConfirm('${t.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300">
@@ -1348,8 +1429,13 @@
         if (modal) modal.classList.add('hidden');
     }
 
-    function editTurnoverTrigger(idx) {
-        const t = activeTurnoverData[idx];
+    function editTurnoverTrigger(idOrIdx) {
+        let t = null;
+        if (typeof idOrIdx === 'string') {
+            t = (activeTurnoverData || []).find(x => String(x.id) === String(idOrIdx));
+        } else {
+            t = (activeTurnoverData || [])[idOrIdx];
+        }
         if (!t) return;
         openTurnoverModal(true);
         document.getElementById('turnover-edit-id').value = t.id;
