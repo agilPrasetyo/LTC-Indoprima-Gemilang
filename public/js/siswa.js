@@ -267,9 +267,9 @@ function renderSiswaView() {
     const filterBagian = document.getElementById('filter-bagian-siswa')?.value || '';
     const sortBy = document.getElementById('sort-siswa')?.value || 'nama-asc';
 
-    // Synchronize kelas dynamically for activeData
+    // Synchronize kelas dynamically for activeData matching Admin Management
     (activeData || []).forEach(s => {
-        s.kelas = typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(s) : (s.kelas || 'Kelas 1');
+        s.kelas = typeof hitungKelas === 'function' ? hitungKelas(s) : (typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(s) : (s.kelas || 'Kelas 1'));
     });
 
     let filtered = [...activeData];
