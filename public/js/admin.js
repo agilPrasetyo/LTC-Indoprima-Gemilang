@@ -7,12 +7,11 @@
     // Sama persis dengan rumus Excel yang digunakan
     // ============================================================
     function hitungKelas(sOrMasuk) {
-        if (typeof getStudentCurrentKelas === 'function') {
-            if (typeof sOrMasuk === 'object' && sOrMasuk !== null) return getStudentCurrentKelas(sOrMasuk);
-            return getStudentCurrentKelas({ masuk: sOrMasuk });
+        let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
+        if (!tgl) return (typeof sOrMasuk === 'object' && sOrMasuk ? sOrMasuk.kelas : 'Kelas 1') || 'Kelas 1';
+        if (typeof hitungKelasSiswa === 'function') {
+            return hitungKelasSiswa(tgl, new Date());
         }
-        if (!sOrMasuk) return 'Kelas 1';
-        if (typeof hitungKelasSiswa === 'function') return hitungKelasSiswa(sOrMasuk, new Date());
         return 'Kelas 1';
     }
 

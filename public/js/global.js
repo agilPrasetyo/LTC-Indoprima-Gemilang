@@ -179,8 +179,7 @@ if (typeof Chart !== 'undefined') {
         }
         
         let kelasNum = Math.max(1, months + 1);
-        const isAdmin = currentUser && currentUser.role === 'Admin';
-        if (!isAdmin && kelasNum > 5) {
+        if (kelasNum > 5) {
             kelasNum = 5;
         }
         return "Kelas " + kelasNum;
