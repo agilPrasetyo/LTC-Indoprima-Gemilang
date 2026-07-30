@@ -186,6 +186,21 @@ if (typeof Chart !== 'undefined') {
         return "Kelas " + kelasNum;
     }
 
+    function getStudentCurrentKelas(s) {
+        if (!s) return 'Kelas 1';
+        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk || s.tgl_masuk;
+        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tgl_keluar;
+        if (tglMasuk) {
+            return hitungKelasSiswa(tglMasuk, tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
+        }
+        if (s.kelas && s.kelas !== '-' && s.kelas !== 'null') {
+            const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
+            if (!isNaN(num)) return 'Kelas ' + num;
+            return s.kelas;
+        }
+        return 'Kelas 1';
+    }
+
     let currentUser = null;
     let chartInstance = null;
     let mapInstance = null;
@@ -1377,32 +1392,10 @@ if (typeof Chart !== 'undefined') {
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
 
         activeData.forEach(s => {
-            if (s.masuk) {
-                const exitStr = s.tanggalKeluar || s.keluar;
-                s.kelas = hitungKelasSiswa(s.masuk, exitStr ? parseDateYYYYMMDD(exitStr) : new Date());
-            } else if (!s.kelas || s.kelas === "-" || s.kelas === "null") {
-                s.kelas = "Kelas 1";
-            } else {
-                const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
-                if (!isNaN(num)) {
-                    s.kelas = "Kelas " + num;
-                }
-            }
+            s.kelas = getStudentCurrentKelas(s);
         });
         activeTurnoverData.forEach(s => {
-            if (!s.kelas || s.kelas === "-" || s.kelas === "null") {
-                if (s.masuk) {
-                    const exitStr = s.tanggalKeluar || s.keluar;
-                    s.kelas = hitungKelasSiswa(s.masuk, exitStr ? parseDateYYYYMMDD(exitStr) : new Date());
-                } else {
-                    s.kelas = "Kelas 1";
-                }
-            } else {
-                const num = parseInt(String(s.kelas).replace(/Kelas\s+/i, ''));
-                if (!isNaN(num)) {
-                    s.kelas = "Kelas " + num;
-                }
-            }
+            s.kelas = getStudentCurrentKelas(s);
         });
 
         financeData = data.recent || [];

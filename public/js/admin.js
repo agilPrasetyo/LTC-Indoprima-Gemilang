@@ -6,17 +6,14 @@
     // Rumus: =DATEDIF(tgl_masuk, TODAY(), "m") + 1
     // Sama persis dengan rumus Excel yang digunakan
     // ============================================================
-    function hitungKelas(tanggalMasuk) {
-        if (!tanggalMasuk) return 'Kelas 1';
-        const masuk = new Date(tanggalMasuk);
-        if (isNaN(masuk.getTime())) return 'Kelas 1';
-        const now = new Date();
-        // Hitung bulan penuh (DATEDIF dengan "m")
-        let bulan = (now.getFullYear() - masuk.getFullYear()) * 12 + (now.getMonth() - masuk.getMonth());
-        // Jika hari ini belum mencapai hari masuk di bulan ini, kurangi 1 bulan
-        if (now.getDate() < masuk.getDate()) bulan--;
-        if (bulan < 0) bulan = 0;
-        return `Kelas ${bulan + 1}`;
+    function hitungKelas(sOrMasuk) {
+        if (typeof getStudentCurrentKelas === 'function') {
+            if (typeof sOrMasuk === 'object' && sOrMasuk !== null) return getStudentCurrentKelas(sOrMasuk);
+            return getStudentCurrentKelas({ masuk: sOrMasuk });
+        }
+        if (!sOrMasuk) return 'Kelas 1';
+        if (typeof hitungKelasSiswa === 'function') return hitungKelasSiswa(sOrMasuk, new Date());
+        return 'Kelas 1';
     }
 
     function switchAdminTab(tabId) {
@@ -510,14 +507,14 @@
                 <td class="py-3 px-4 min-w-[100px]">
                     <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border whitespace-nowrap
                         ${(() => { 
-                            const k = (s.masuk ? hitungKelas(s.masuk) : s.kelas) || 'Kelas 1'; 
+                            const k = hitungKelas(s); 
                             if (k.includes('Kelas 1')) return 'bg-red-100 text-red-800 border-red-300';
                             if (k.includes('Kelas 2')) return 'bg-amber-100 text-amber-800 border-amber-300';
                             if (k.includes('Kelas 3')) return 'bg-emerald-100 text-emerald-800 border-emerald-300';
                             if (k.includes('Kelas 4')) return 'bg-sky-100 text-sky-800 border-sky-300';
                             return 'bg-slate-200 text-slate-800 border-slate-300'; 
                         })()}
-                    ">${(s.masuk ? hitungKelas(s.masuk) : s.kelas) || 'Kelas 1'}</span>
+                    ">${hitungKelas(s)}</span>
                 </td>
                 <!-- 8. Masuk LTC -->
                 <td class="py-3 px-4 min-w-[100px] text-brand-textSub font-mono">${masukFormatted}</td>

@@ -269,9 +269,7 @@ function renderSiswaView() {
 
     // Synchronize kelas dynamically for activeData
     (activeData || []).forEach(s => {
-        if (s.masuk) {
-            s.kelas = typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(s.masuk, new Date()) : (s.kelas || 'Kelas 1');
-        }
+        s.kelas = typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(s) : (s.kelas || 'Kelas 1');
     });
 
     let filtered = [...activeData];
