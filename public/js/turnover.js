@@ -569,13 +569,45 @@ function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
     updateTurnoverBarChart(dataset);
 }
 
+function populateTurnoverHistoryMonthFilter(dataset) {
+    const select = document.getElementById('turnover-history-filter-bulan');
+    if (!select) return;
+
+    const currentVal = select.value;
+    const monthSet = new Set();
+
+    (dataset || []).forEach(t => {
+        const exitDate = String(t.tanggalKeluar || t.tgl_keluar || t.keluar || t.masuk || '').substring(0, 7);
+        if (exitDate && exitDate.match(/^\d{4}-\d{2}$/)) {
+            monthSet.add(exitDate);
+        }
+    });
+
+    const months = Array.from(monthSet).sort((a, b) => b.localeCompare(a));
+    const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    let html = '<option value="">Semua Bulan</option>';
+    months.forEach(m => {
+        const [year, monthNum] = m.split('-');
+        const monthName = monthNamesIndo[parseInt(monthNum, 10) - 1] || m;
+        const label = `${monthName} ${year}`;
+        html += `<option value="${m}" ${currentVal === m ? 'selected' : ''}>${label}</option>`;
+    });
+
+    select.innerHTML = html;
+}
+
+function renderTurnoverHistoryTable() {
+    renderTurnoverView();
+}
+
 function renderTurnoverView() {
     const tbody = document.getElementById('turnover-tbody');
     if (!tbody) return;
     tbody.innerHTML = '';
 
     const searchInput = document.getElementById('search-turnover');
-    const searchVal = searchInput ? searchInput.value.toLowerCase() : "";
+    const searchVal = searchInput ? searchInput.value.toLowerCase().trim() : "";
     
     const selectWil = document.getElementById('filter-turnover-wilayah');
     const filterWil = selectWil ? selectWil.value : "";
@@ -584,51 +616,99 @@ function renderTurnoverView() {
     const filterTipe = selectTipe ? selectTipe.value : "";
 
     const dataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
-    
-    let filtered = dataset;
-    if (searchVal) {
-        filtered = filtered.filter(t => t.namaLengkap.toLowerCase().includes(searchVal) || t.id.toLowerCase().includes(searchVal));
-    }
-    if (filterWil) {
-        filtered = filtered.filter(t => normalizeCityName(t.wilayah) === normalizeCityName(filterWil));
-    }
-    if (filterTipe) {
-        filtered = filtered.filter(t => {
-            const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
-            return statusStr.includes(filterTipe.toLowerCase());
-        });
-    }
 
-    filtered.forEach(t => {
-        const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/50 transition-all-300";
-        
-        let badgeStyle = "bg-slate-50 text-slate-600";
-        const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
-        if (statusStr.includes("resign")) {
-            badgeStyle = "bg-amber-50 text-amber-600";
-        } else if (statusStr.includes("lulus")) {
-            badgeStyle = "bg-emerald-50 text-emerald-600";
-        } else if (statusStr.includes("indisipliner") || statusStr.includes("indisiplin")) {
-            badgeStyle = "bg-rose-50 text-rose-600";
+    // Populate Month Filter Dropdown Dynamically
+    populateTurnoverHistoryMonthFilter(dataset);
+
+    const historySearchVal = (document.getElementById('turnover-history-search')?.value || '').toLowerCase().trim();
+    const historyMonthVal = document.getElementById('turnover-history-filter-bulan')?.value || '';
+    
+    let filtered = dataset.filter(t => {
+        // Top filters
+        if (searchVal) {
+            const matchTopSearch = String(t.namaLengkap || '').toLowerCase().includes(searchVal) ||
+                                   String(t.id || '').toLowerCase().includes(searchVal);
+            if (!matchTopSearch) return false;
+        }
+        if (filterWil) {
+            if (normalizeCityName(t.wilayah || t.asalDaerah || t.asal) !== normalizeCityName(filterWil)) return false;
+        }
+        if (filterTipe) {
+            const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+            if (!statusStr.includes(filterTipe.toLowerCase())) return false;
         }
 
-        const statusLabel = t.alasan || t.keterangan || '-';
-        const kelasDisplay = (t.kelas && t.kelas !== '-') ? t.kelas : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(t.masuk || t.tanggalMasuk, t.tanggalKeluar || t.keluar) : '-');
+        // Log Riwayat Siswa Keluar Card filters
+        if (historyMonthVal) {
+            const exitStr = String(t.tanggalKeluar || t.tgl_keluar || t.keluar || t.masuk || '').substring(0, 7);
+            if (exitStr !== historyMonthVal) return false;
+        }
+        if (historySearchVal) {
+            const idStr = String(t.id || t.noreg || '').toLowerCase();
+            const namaStr = String(t.namaLengkap || t.nama || '').toLowerCase();
+            const bagianStr = String(t.bagian || t.section || '').toLowerCase();
+            const daerahStr = String(t.wilayah || t.asalDaerah || t.asal || '').toLowerCase();
+            const sekolahStr = String(t.asalSekolah || t.sekolah || '').toLowerCase();
+            const alasanStr = String(t.alasan || '').toLowerCase();
+            const ketStr = String(t.keterangan || '').toLowerCase();
+            const tglKeluarStr = String(t.tanggalKeluar || t.tgl_keluar || t.keluar || '').toLowerCase();
 
-        tr.innerHTML = `
-            <td class="py-3 px-4 font-semibold text-brand-textSub text-xs">${t.id}</td>
-            <td class="py-3 px-4 font-bold text-brand-textMain text-xs">${t.namaLengkap}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs">${t.bagian || '-'}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${kelasDisplay}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs">${t.tanggalKeluar || '-'}</td>
-            <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${statusLabel}</span></td>
-            <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah || '-'}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
-            <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.keterangan || t.alasan || '-'}</td>
-        `;
-        tbody.appendChild(tr);
+            const matchCardSearch = idStr.includes(historySearchVal) ||
+                                    namaStr.includes(historySearchVal) ||
+                                    bagianStr.includes(historySearchVal) ||
+                                    daerahStr.includes(historySearchVal) ||
+                                    sekolahStr.includes(historySearchVal) ||
+                                    alasanStr.includes(historySearchVal) ||
+                                    ketStr.includes(historySearchVal) ||
+                                    tglKeluarStr.includes(historySearchVal);
+
+            if (!matchCardSearch) return false;
+        }
+
+        return true;
     });
+
+    // Sort by NEWEST DATE FIRST (Descending by exit date or enter date)
+    filtered.sort((a, b) => {
+        const dateA = a.tanggalKeluar || a.tgl_keluar || a.keluar || a.masuk || '';
+        const dateB = b.tanggalKeluar || b.tgl_keluar || b.keluar || b.masuk || '';
+        return dateB.localeCompare(dateA);
+    });
+
+    if (filtered.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="9" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data riwayat siswa keluar yang sesuai filter.</td></tr>';
+    } else {
+        filtered.forEach(t => {
+            const tr = document.createElement('tr');
+            tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50";
+            
+            let badgeStyle = "bg-slate-50 text-slate-600";
+            const statusStr = String(t.alasan || t.alasanDetail || t.alasan_detail || t.keterangan || '').toLowerCase();
+            if (statusStr.includes("resign")) {
+                badgeStyle = "bg-amber-50 text-amber-600";
+            } else if (statusStr.includes("lulus")) {
+                badgeStyle = "bg-emerald-50 text-emerald-600";
+            } else if (statusStr.includes("indisipliner") || statusStr.includes("indisiplin")) {
+                badgeStyle = "bg-rose-50 text-rose-600";
+            }
+
+            const statusLabel = t.alasan || t.keterangan || '-';
+            const kelasDisplay = (t.kelas && t.kelas !== '-') ? t.kelas : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(t.masuk || t.tanggalMasuk, t.tanggalKeluar || t.keluar) : '-');
+
+            tr.innerHTML = `
+                <td class="py-3 px-4 font-semibold text-brand-textSub text-xs font-mono">${t.id}</td>
+                <td class="py-3 px-4 font-bold text-brand-textMain text-xs">${t.namaLengkap}</td>
+                <td class="py-3 px-4 text-brand-textSub text-xs">${t.bagian || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub text-xs font-semibold whitespace-nowrap">${kelasDisplay}</td>
+                <td class="py-3 px-4 text-brand-textSub text-xs font-mono whitespace-nowrap">${t.tanggalKeluar || '-'}</td>
+                <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${badgeStyle}">${statusLabel}</span></td>
+                <td class="py-3 px-4 text-brand-textSub text-xs font-bold">${t.wilayah || t.asalDaerah || t.asal || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub text-xs font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
+                <td class="py-3 px-4 text-brand-textSub text-xs text-right">${t.keterangan || t.alasan || '-'}</td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
 
     let rCount = 0, lCount = 0, iCount = 0;
     dataset.forEach(t => {
