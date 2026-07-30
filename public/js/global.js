@@ -1479,7 +1479,10 @@ if (typeof Chart !== 'undefined') {
         if (keuView && !keuView.classList.contains('hidden')) {
             if (typeof calculateLTCCosts === 'function') calculateLTCCosts();
             if (typeof renderMonthlyHistoryTable === 'function') renderMonthlyHistoryTable();
-         function calculateDynamicPerformance() {
+        }
+    }
+
+    function calculateDynamicPerformance() {
         let startInput = document.getElementById('filter-start-date');
         let endInput = document.getElementById('filter-end-date');
         
@@ -1540,7 +1543,6 @@ if (typeof Chart !== 'undefined') {
             totalOverallScore += dynamicScore;
             activeStudentCount++;
         });
-    }      });
         
         const statSiswaAktif = document.getElementById('stat-siswa-aktif');
         if (statSiswaAktif) statSiswaAktif.innerText = activeStudentCount;
