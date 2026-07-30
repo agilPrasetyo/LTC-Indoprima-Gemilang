@@ -249,6 +249,9 @@ function renderPerformaTopCharts() {
 }
 
 function renderSiswaView() {
+    if (typeof calculateDynamicPerformance === 'function') {
+        calculateDynamicPerformance();
+    }
     populateBagianFilter();
     renderPerformaTopCharts();
 
@@ -263,6 +266,13 @@ function renderSiswaView() {
     const filterKelas = document.getElementById('filter-kelas-siswa')?.value || '';
     const filterBagian = document.getElementById('filter-bagian-siswa')?.value || '';
     const sortBy = document.getElementById('sort-siswa')?.value || 'nama-asc';
+
+    // Synchronize kelas dynamically for activeData
+    (activeData || []).forEach(s => {
+        if (s.masuk) {
+            s.kelas = typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(s.masuk, new Date()) : (s.kelas || 'Kelas 1');
+        }
+    });
 
     let filtered = [...activeData];
 
@@ -345,10 +355,7 @@ function renderSiswaView() {
                 <span class="text-xs font-semibold text-slate-600">${s.bagian || '-'}</span>
             </td>
             <td class="py-3.5 px-4">
-                <div>
-                    <p class="text-[11px] font-semibold text-slate-600">${spvLabel}</p>
-                    <p class="text-[10px] text-slate-400">Penempatan: ${s.wilayah || '-'} | Asal: ${s.daerahAsal || '-'}</p>
-                </div>
+                <span class="text-xs font-semibold text-slate-600">${spvLabel}</span>
             </td>
             <td class="py-3.5 px-4">
                 <span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[10px] font-bold whitespace-nowrap ${kelasColor.bg} ${kelasColor.text}">

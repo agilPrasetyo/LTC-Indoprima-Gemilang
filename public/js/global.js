@@ -1486,49 +1486,36 @@ if (typeof Chart !== 'undefined') {
         if (keuView && !keuView.classList.contains('hidden')) {
             if (typeof calculateLTCCosts === 'function') calculateLTCCosts();
             if (typeof renderMonthlyHistoryTable === 'function') renderMonthlyHistoryTable();
-        }
-    }
-
-    function calculateDynamicPerformance() {
+         function calculateDynamicPerformance() {
         let startInput = document.getElementById('filter-start-date');
         let endInput = document.getElementById('filter-end-date');
         
-        // Fallback ke input tanggal chart jika input filter global tidak ada di HTML
         if (!startInput) startInput = document.getElementById('chart-start-date');
         if (!endInput) endInput = document.getElementById('chart-end-date');
         
-        if (!startInput || !endInput) return;
-
-        const startDateVal = startInput.value;
-        const endDateVal = endInput.value;
-        
-        if (!startDateVal || !endDateVal) return;
+        const startDateVal = startInput ? startInput.value : '';
+        const endDateVal = endInput ? endInput.value : '';
         
         let totalOverallScore = 0;
         let activeStudentCount = 0;
 
-        activeData.forEach(siswa => {
+        (activeData || []).forEach(siswa => {
             let activeDays = 0; // count of Hadir-days
             let checkmarkCount = 0; // count of Hadir-days present
             let totalPlan = 0;
             let totalActual = 0;
             let planDays = 0; // count of Plan-days
             
-            const recordsInRange = (siswa.dailyRecords || []).filter(rec => rec.dateStr >= startDateVal && rec.dateStr <= endDateVal);
+            let recordsInRange = siswa.dailyRecords || [];
+            if (startDateVal && endDateVal) {
+                recordsInRange = recordsInRange.filter(rec => rec.dateStr >= startDateVal && rec.dateStr <= endDateVal);
+            }
             
             recordsInRange.forEach(rec => {
                 const parsedDate = parseDateYYYYMMDD(rec.dateStr);
                 const isSunday = parsedDate ? (parsedDate.getDay() === 0) : false;
                 if (isSunday) return; // Ignore Sundays from all calculations
                 
-                const isBagianHadir = (siswa.section || '').toUpperCase().includes('ADM') || 
-                                      (siswa.section || '').toUpperCase().includes('ADMINISTRASI') || 
-                                      (siswa.section || '').toUpperCase().includes('PPIC') ||
-                                      (siswa.bagian || '').toUpperCase().includes('ADM') || 
-                                      (siswa.bagian || '').toUpperCase().includes('ADMINISTRASI') || 
-                                      (siswa.bagian || '').toUpperCase().includes('PPIC');
-                
-                // Adaptive day-by-day classification: if plan > 0, it is a production day, not a simple attendance checkmark day
                 const isHadirDay = (rec.plan === null || rec.plan === 0 || isNaN(rec.plan)) && (rec.hadir !== "" && rec.hadir !== undefined && rec.hadir !== null);
                 
                 if (isHadirDay) {
@@ -1536,10 +1523,10 @@ if (typeof Chart !== 'undefined') {
                     if (rec.hadir === "✔" || rec.hadir === "Hadir") {
                         checkmarkCount++;
                     }
-                } else {
+                } else if (rec.plan && rec.plan > 0) {
                     planDays++;
-                    totalPlan += rec.plan;
-                    totalActual += rec.actual;
+                    totalPlan += Number(rec.plan) || 0;
+                    totalActual += Number(rec.actual) || 0;
                 }
             });
             
@@ -1550,6 +1537,8 @@ if (typeof Chart !== 'undefined') {
             if (totalDays > 0) {
                 const sumOfScores = checkmarkCount + (planDays * planScore);
                 dynamicScore = Math.round((sumOfScores / totalDays) * 100);
+            } else if (siswa.nilai !== undefined && siswa.nilai !== null && siswa.nilai > 0) {
+                dynamicScore = siswa.nilai;
             }
             
             if (dynamicScore > 100) dynamicScore = 100;
@@ -1558,6 +1547,7 @@ if (typeof Chart !== 'undefined') {
             totalOverallScore += dynamicScore;
             activeStudentCount++;
         });
+    }      });
         
         const statSiswaAktif = document.getElementById('stat-siswa-aktif');
         if (statSiswaAktif) statSiswaAktif.innerText = activeStudentCount;
