@@ -58,19 +58,42 @@ function renderPerformaTopCharts() {
     // CHART 1: Populasi LTC by Kelas (Stacked Bar Chart)
     // ----------------------------------------------------
     const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli'];
+    const monthEndDates = [
+        '2026-01-31', '2026-02-28', '2026-03-31', '2026-04-30', '2026-05-31', '2026-06-30', '2026-07-31'
+    ];
+    const monthStartDates = [
+        '2026-01-01', '2026-02-01', '2026-03-01', '2026-04-01', '2026-05-01', '2026-06-01', '2026-07-01'
+    ];
 
-    // Dynamic current month student counts per class
-    const k1Count = (activeData || []).filter(s => s.kelas === 'Kelas 1').length || 10;
-    const k2Count = (activeData || []).filter(s => s.kelas === 'Kelas 2').length || 0;
-    const k3Count = (activeData || []).filter(s => s.kelas === 'Kelas 3').length || 15;
-    const k4Count = (activeData || []).filter(s => s.kelas === 'Kelas 4').length || 0;
-    const k5Count = (activeData || []).filter(s => s.kelas === 'Kelas 5' || parseInt((s.kelas||'').replace('Kelas ','')) >= 5).length || 5;
+    const dataKls1 = [0, 0, 0, 0, 0, 0, 0];
+    const dataKls2 = [0, 0, 0, 0, 0, 0, 0];
+    const dataKls3 = [0, 0, 0, 0, 0, 0, 0];
+    const dataKls4 = [0, 0, 0, 0, 0, 0, 0];
+    const dataKls5 = [0, 0, 0, 0, 0, 0, 0];
 
-    const dataKls1 = [12, 8, 7, 2, 14, 14, k1Count];
-    const dataKls2 = [11, 8, 6, 4, 2, 2, k2Count];
-    const dataKls3 = [11, 9, 7, 7, 8, 6, k3Count];
-    const dataKls4 = [9, 8, 12, 11, 6, 3, k4Count];
-    const dataKls5 = [9, 9, 7, 9, 5, 7, k5Count];
+    const allStudentsForPop = [...(activeData || []), ...(activeTurnoverData || [])];
+
+    allStudentsForPop.forEach(s => {
+        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk;
+        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar;
+        if (!tglMasuk) return;
+
+        monthEndDates.forEach((mEnd, mIdx) => {
+            const mStart = monthStartDates[mIdx];
+            // Check if student was active during month mIdx
+            if (tglMasuk <= mEnd && (!tglKeluar || tglKeluar >= mStart)) {
+                const kInMonth = typeof hitungKelasSiswa === 'function' 
+                    ? hitungKelasSiswa(tglMasuk, mEnd) 
+                    : (s.kelas || 'Kelas 1');
+                
+                if (kInMonth.includes('1')) dataKls1[mIdx]++;
+                else if (kInMonth.includes('2')) dataKls2[mIdx]++;
+                else if (kInMonth.includes('3')) dataKls3[mIdx]++;
+                else if (kInMonth.includes('4')) dataKls4[mIdx]++;
+                else dataKls5[mIdx]++;
+            }
+        });
+    });
 
     if (populasiLtcKelasChartInstance) populasiLtcKelasChartInstance.destroy();
 
@@ -124,7 +147,7 @@ function renderPerformaTopCharts() {
     const actualPerKelas = [0, 0, 0, 0, 0];
 
     (activeData || []).forEach(s => {
-        const kStr = s.kelas || 'Kelas 1';
+        const kStr = typeof hitungKelas === 'function' ? hitungKelas(s) : (s.kelas || 'Kelas 1');
         let idx = 0;
         if (kStr.includes('1')) idx = 0;
         else if (kStr.includes('2')) idx = 1;
@@ -132,29 +155,18 @@ function renderPerformaTopCharts() {
         else if (kStr.includes('4')) idx = 3;
         else idx = 4;
 
-        let totalP = 0;
-        let totalA = 0;
         if (s.dailyRecords && s.dailyRecords.length > 0) {
             s.dailyRecords.forEach(rec => {
                 if (rec.plan && rec.plan > 0) {
-                    totalP += Number(rec.plan) || 0;
-                    totalA += Number(rec.actual) || 0;
+                    planPerKelas[idx] += Number(rec.plan) || 0;
+                    actualPerKelas[idx] += Number(rec.actual) || 0;
                 }
             });
         }
-        if (totalP === 0) {
-            totalP = 100;
-            totalA = s.nilai || 0;
-        }
-        planPerKelas[idx] += totalP;
-        actualPerKelas[idx] += totalA;
     });
 
-    const defaultPlan = [1200, 800, 1500, 600, 900];
-    const defaultActual = [1020, 720, 1275, 480, 810];
-
-    const finalPlan = planPerKelas.map((val, i) => val > 0 ? val : defaultPlan[i]);
-    const finalActual = actualPerKelas.map((val, i) => val > 0 ? val : defaultActual[i]);
+    const finalPlan = planPerKelas;
+    const finalActual = actualPerKelas;
 
     const pctPerKelas = finalPlan.map((plan, i) => {
         const act = finalActual[i];
