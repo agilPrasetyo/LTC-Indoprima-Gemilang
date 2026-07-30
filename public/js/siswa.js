@@ -71,20 +71,15 @@ function renderPerformaTopCharts() {
     const dataKls4 = [0, 0, 0, 0, 0, 0, 0];
     const dataKls5 = [0, 0, 0, 0, 0, 0, 0];
 
-    const allStudentsForPop = [...(activeData || []), ...(activeTurnoverData || [])];
-
-    allStudentsForPop.forEach(s => {
+    (activeData || []).forEach(s => {
         const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk;
-        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar;
         if (!tglMasuk) return;
 
         monthEndDates.forEach((mEnd, mIdx) => {
-            const mStart = monthStartDates[mIdx];
-            // Check if student was active during month mIdx
-            if (tglMasuk <= mEnd && (!tglKeluar || tglKeluar >= mStart)) {
-                const kInMonth = typeof hitungKelasSiswa === 'function' 
-                    ? hitungKelasSiswa(tglMasuk, mEnd) 
-                    : (s.kelas || 'Kelas 1');
+            if (tglMasuk <= mEnd) {
+                const kInMonth = mIdx === 6
+                    ? (typeof hitungKelas === 'function' ? hitungKelas(s) : (s.kelas || 'Kelas 1'))
+                    : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(tglMasuk, mEnd) : (s.kelas || 'Kelas 1'));
                 
                 if (kInMonth.includes('1')) dataKls1[mIdx]++;
                 else if (kInMonth.includes('2')) dataKls2[mIdx]++;
