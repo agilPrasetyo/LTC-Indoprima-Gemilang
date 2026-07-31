@@ -71,15 +71,33 @@ function renderPerformaTopCharts() {
     const dataKls4 = [0, 0, 0, 0, 0, 0, 0];
     const dataKls5 = [0, 0, 0, 0, 0, 0, 0];
 
+    const currentMonthIdx = 6; // Juli 2026
+
+    // 1. Current Month (Juli): Pure 100% activeData (30 active students in Manajemen Siswa)
     (activeData || []).forEach(s => {
+        const kInMonth = typeof hitungKelas === 'function' ? hitungKelas(s) : (s.kelas || 'Kelas 1');
+        if (kInMonth.includes('1')) dataKls1[currentMonthIdx]++;
+        else if (kInMonth.includes('2')) dataKls2[currentMonthIdx]++;
+        else if (kInMonth.includes('3')) dataKls3[currentMonthIdx]++;
+        else if (kInMonth.includes('4')) dataKls4[currentMonthIdx]++;
+        else dataKls5[currentMonthIdx]++;
+    });
+
+    // 2. Historical Months (Januari - Juni): Combined activeData + activeTurnoverData (physical active count in past months)
+    const allHistoricalStudents = [...(activeData || []), ...(activeTurnoverData || [])];
+    allHistoricalStudents.forEach(s => {
         const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk;
+        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar;
         if (!tglMasuk) return;
 
-        monthEndDates.forEach((mEnd, mIdx) => {
-            if (tglMasuk <= mEnd) {
-                const kInMonth = mIdx === 6
-                    ? (typeof hitungKelas === 'function' ? hitungKelas(s) : (s.kelas || 'Kelas 1'))
-                    : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(tglMasuk, mEnd) : (s.kelas || 'Kelas 1'));
+        for (let mIdx = 0; mIdx < currentMonthIdx; mIdx++) {
+            const mStart = monthStartDates[mIdx];
+            const mEnd = monthEndDates[mIdx];
+
+            if (tglMasuk <= mEnd && (!tglKeluar || tglKeluar >= mStart)) {
+                const kInMonth = typeof hitungKelasSiswa === 'function' 
+                    ? hitungKelasSiswa(tglMasuk, mEnd) 
+                    : (s.kelas || 'Kelas 1');
                 
                 if (kInMonth.includes('1')) dataKls1[mIdx]++;
                 else if (kInMonth.includes('2')) dataKls2[mIdx]++;
@@ -87,7 +105,7 @@ function renderPerformaTopCharts() {
                 else if (kInMonth.includes('4')) dataKls4[mIdx]++;
                 else dataKls5[mIdx]++;
             }
-        });
+        }
     });
 
     if (populasiLtcKelasChartInstance) populasiLtcKelasChartInstance.destroy();
