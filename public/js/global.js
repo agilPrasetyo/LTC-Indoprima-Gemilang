@@ -1194,7 +1194,7 @@ if (typeof Chart !== 'undefined') {
         if (spinner) spinner.classList.add('animate-spin');
         _updateSyncIndicator('syncing');
 
-        if (typeof google !== 'undefined') {
+        if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
             google.script.run
                 .withSuccessHandler(data => {
                     if (spinner) spinner.classList.remove('animate-spin');
@@ -1228,7 +1228,7 @@ if (typeof Chart !== 'undefined') {
         if (spinner) spinner.classList.add('animate-spin');
         _updateSyncIndicator('syncing');
 
-        if (typeof google !== 'undefined') {
+        if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
             google.script.run
                 .withSuccessHandler(syncResult => {
                     if (syncResult && syncResult.success) {

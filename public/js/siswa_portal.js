@@ -327,7 +327,7 @@ function submitSiswaDailyReport() {
 function _sendSiswaReport(payload) {
     _updateSyncIndicator('syncing');
     
-    if (typeof google !== 'undefined') {
+    if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
         google.script.run.withSuccessHandler(res => {
             if (res.success) {
                 showToast('Laporan harian berhasil dikirim!', 'success');
