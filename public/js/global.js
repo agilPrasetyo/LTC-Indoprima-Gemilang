@@ -1804,6 +1804,7 @@ if (typeof Chart !== 'undefined') {
         }
         if (viewName === 'turnover') renderTurnoverView();
         if (viewName === 'admin') renderAdminView();
+        if (viewName === 'sisi-siswa' && typeof populateSiswaPortalFields === 'function') populateSiswaPortalFields();
         if (viewName === 'absensi' && typeof renderAbsensiView === 'function') renderAbsensiView();
         if (viewName === 'safety' && typeof renderSafetyView === 'function') renderSafetyView();
         
