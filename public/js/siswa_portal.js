@@ -422,7 +422,20 @@ function populateSiswaPortalFields() {
     // Calculate Average Score for this student
     let totalScore = 0;
     let daysCount = 0;
+    let countSakit = 0;
+    let countIjin = 0;
+    let countAlpha = 0;
+
     (me.dailyRecords || []).forEach(rec => {
+        const h = String(rec.hadir || '').trim().toLowerCase();
+        if (h.includes('sakit')) {
+            countSakit++;
+        } else if (h.includes('ijin') || h.includes('izin')) {
+            countIjin++;
+        } else if (h.includes('alpha') || h.includes('alpa') || h === 'absen' || h.includes('tanpa keterangan')) {
+            countAlpha++;
+        }
+
         if (rec.plan > 0) {
             const pct = rec.plan > 0 ? (rec.actual / rec.plan) * 100 : 0;
             totalScore += pct;
@@ -430,13 +443,23 @@ function populateSiswaPortalFields() {
         } else if (rec.hadir === '✔' || rec.hadir === 'Hadir') {
             totalScore += 100;
             daysCount++;
-        } else if (rec.hadir === 'Absen') {
+        } else if (rec.hadir === 'Absen' || h.includes('alpha') || h.includes('sakit') || h.includes('ijin')) {
             daysCount++;
         }
     });
+
     const avgScore = daysCount > 0 ? Math.round(totalScore / daysCount) : 0;
     const scoreValEl = document.getElementById('siswa-portal-nilai');
     if (scoreValEl) scoreValEl.innerText = avgScore + '%';
+
+    // Populate Catatan Absensi Siswa (Sakit, Ijin, Alpha)
+    const sakitEl = document.getElementById('input-siswa-rekap-sakit');
+    const ijinEl = document.getElementById('input-siswa-rekap-ijin');
+    const alphaEl = document.getElementById('input-siswa-rekap-alpha');
+
+    if (sakitEl) sakitEl.innerText = countSakit + ' Hari';
+    if (ijinEl) ijinEl.innerText = countIjin + ' Hari';
+    if (alphaEl) alphaEl.innerText = countAlpha + ' Hari';
     
     // Render personal logs table
     if (typeof renderStudentPersonalLogs === 'function') {
