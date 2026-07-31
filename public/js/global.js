@@ -218,6 +218,7 @@ if (typeof Chart !== 'undefined') {
     let financeData = [];
     let rawUsersData = []; 
     let absensiData = [];
+    window.ABSENSI_CUTOFF_DATE = '2026-08-02'; // Tanggal resmi Go-Live Cut-Off System Absensi
     let safetyData = [];
     let rawPopulasiData = [];
     let geoJsonCache = null;  

@@ -419,7 +419,10 @@ function populateSiswaPortalFields() {
     if (pNama) pNama.innerText = me.namaLengkap || '';
     if (pNoreg) pNoreg.innerText = me.id || '';
 
-    // Calculate Average Score & Attendance Record for this student
+    // Calculate Average Score & Attendance Record for this student using Cut-off Date (2026-08-02)
+    const CUTOFF = window.ABSENSI_CUTOFF_DATE || '2026-08-02';
+    const myNoreg = String(me.id || '').trim();
+
     let totalScore = 0;
     let daysCount = 0;
     let countSakit = 0;
@@ -433,47 +436,82 @@ function populateSiswaPortalFields() {
     if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
         absensiData.forEach(rec => {
             const recNoreg = String(rec.noreg || rec.studentId || '').trim();
-            const myNoreg = String(me.id || '').trim();
             if (recNoreg === myNoreg) {
                 const dateKey = rec.tanggal || rec.dateStr;
                 const statusStr = String(rec.status || rec.hadir || '').trim();
                 if (dateKey && statusStr) {
-                    dateAttendanceMap[dateKey] = statusStr;
+                    dateAttendanceMap[dateKey] = { status: statusStr, plan: 0, actual: 0, fromAbsensiTab: true };
                 }
             }
         });
     }
 
-    // 2. Add me.dailyRecords if not already present
+    // 2. Add me.dailyRecords (Manpower logs)
     (me.dailyRecords || []).forEach(rec => {
         const dateKey = rec.dateStr || rec.tanggal;
-        const statusStr = String(rec.hadir || '').trim();
-        if (dateKey && statusStr && !dateAttendanceMap[dateKey]) {
-            dateAttendanceMap[dateKey] = statusStr;
-        }
+        if (!dateKey) return;
 
-        // Calculate performance score
-        if (rec.plan > 0) {
-            const pct = (rec.actual / rec.plan) * 100;
-            totalScore += pct;
-            daysCount++;
-        } else if (rec.hadir === '✔' || rec.hadir === 'Hadir') {
-            totalScore += 100;
-            daysCount++;
-        } else if (rec.hadir === 'Absen') {
-            daysCount++;
+        const statusStr = String(rec.hadir || '').trim();
+        const planVal = Number(rec.plan) || 0;
+        const actualVal = Number(rec.actual) || 0;
+
+        if (!dateAttendanceMap[dateKey]) {
+            dateAttendanceMap[dateKey] = { status: statusStr || (planVal > 0 ? 'Hadir' : ''), plan: planVal, actual: actualVal, fromManpower: true };
+        } else {
+            dateAttendanceMap[dateKey].plan = planVal;
+            dateAttendanceMap[dateKey].actual = actualVal;
         }
     });
 
-    // 3. Count Sakit, Ijin, Alpha from merged attendance records
-    Object.values(dateAttendanceMap).forEach(statusVal => {
-        const h = statusVal.toLowerCase();
-        if (h.includes('sakit')) {
+    // 3. Process Auto-Alpha for dates >= CUTOFF up to today
+    const todayObj = new Date();
+    const cutoffDateObj = typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(CUTOFF) : new Date(CUTOFF);
+    const masukDateObj = me.masuk ? (typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(me.masuk) : new Date(me.masuk)) : null;
+
+    if (cutoffDateObj && !isNaN(cutoffDateObj.getTime())) {
+        let curr = new Date(cutoffDateObj.getTime());
+        while (curr <= todayObj) {
+            const dStr = curr.toISOString().split('T')[0];
+            const isSun = curr.getDay() === 0;
+            const isSat = curr.getDay() === 6;
+            const isWorkDay = !isSun && (!isSat || !String(me.hk || '').includes('5'));
+            const isEnrolled = !masukDateObj || (curr >= masukDateObj);
+
+            if (isWorkDay && isEnrolled && !dateAttendanceMap[dStr]) {
+                // Auto-Alpha for missing log starting on Cutoff Date
+                dateAttendanceMap[dStr] = { status: 'Alpha', plan: 0, actual: 0, autoAlpha: true };
+            }
+            curr.setDate(curr.getDate() + 1);
+        }
+    }
+
+    // 4. Calculate Attendance Counts & Performance Scores
+    Object.keys(dateAttendanceMap).forEach(dStr => {
+        const item = dateAttendanceMap[dStr];
+        const statusVal = item.status.toLowerCase();
+        const isBeforeCutoff = dStr < CUTOFF;
+
+        if (statusVal.includes('sakit')) {
             countSakit++;
-        } else if (h.includes('ijin') || h.includes('izin')) {
+            // Sakit is excluded from divider
+        } else if (statusVal.includes('ijin') || statusVal.includes('izin')) {
             countIjin++;
-        } else if (h.includes('alpha') || h.includes('alpa') || h === 'absen' || h.includes('tanpa keterangan')) {
-            countAlpha++;
+            // Ijin is excluded from divider
+        } else if (statusVal.includes('alpha') || statusVal.includes('alpa') || statusVal === 'absen' || statusVal.includes('tanpa keterangan')) {
+            if (!isBeforeCutoff || item.fromAbsensiTab) {
+                countAlpha++;
+                daysCount++; // Penalize performance divider
+            }
+        } else {
+            // Hadir or Performance log
+            if (item.plan > 0) {
+                const pct = Math.min(100, (item.actual / item.plan) * 100);
+                totalScore += pct;
+                daysCount++;
+            } else if (statusVal.includes('hadir') || statusVal === '✔' || statusVal.includes('y')) {
+                totalScore += 100;
+                daysCount++;
+            }
         }
     });
 
