@@ -392,18 +392,29 @@ function populateSiswaPortalFields() {
         resetSiswaPortalForm();
     }
 
-    const noreg = currentUser.studentId || currentUser.nomorRegistrasi || currentUser.id;
-    if (!noreg) return;
+    const noreg = String(currentUser.studentId || currentUser.nomorRegistrasi || currentUser.id || '').trim();
+    
+    // Dataset fallback: activeData or fallbackStats.siswaData
+    const dataset = (typeof activeData !== 'undefined' && activeData && activeData.length > 0) 
+        ? activeData 
+        : ((typeof fallbackStats !== 'undefined' && fallbackStats && fallbackStats.siswaData) ? fallbackStats.siswaData : []);
+
+    let me = dataset.find(s => String(s.id).trim() === noreg || String(s.noreg || '').trim() === noreg);
+    if (!me && currentUser.namaLengkap) {
+        me = dataset.find(s => s.namaLengkap && s.namaLengkap.toLowerCase().includes(currentUser.namaLengkap.toLowerCase()));
+    }
 
     // ============================================================
-    // 1. INSTANT PRE-FILL FROM CURRENTUSER & LOCALSTORAGE CACHE (0ms)
+    // 1. INSTANT PRE-FILL FROM CURRENTUSER / ME / CACHE (0ms)
     // ============================================================
-    const cacheKey = 'ltc_siswa_cache_' + noreg;
+    const cacheKey = 'ltc_siswa_cache_' + (noreg || (me ? me.id : 'default'));
     let cachedData = null;
     try {
         const rawCache = localStorage.getItem(cacheKey);
         if (rawCache) cachedData = JSON.parse(rawCache);
     } catch(e) {}
+
+    const targetData = me || cachedData || {};
 
     const namaInput = document.getElementById('input-siswa-nama');
     const noregInput = document.getElementById('input-siswa-noreg');
@@ -414,50 +425,33 @@ function populateSiswaPortalFields() {
     const pNama = document.getElementById('siswa-portal-dashboard-nama');
     const pNoreg = document.getElementById('siswa-portal-dashboard-noreg');
 
-    const initialNama = currentUser.namaLengkap || (cachedData ? cachedData.namaLengkap : '');
-    const initialNoreg = String(noreg);
-    const initialKelas = (cachedData ? cachedData.kelas : '') || currentUser.kelas || 'Kelas 1';
-    const initialMasuk = cachedData && cachedData.masuk ? cachedData.masuk.split('-').reverse().join('/') : '-';
-    const initialKeluar = cachedData && (cachedData.tanggalKeluar || cachedData.keluar) ? (cachedData.tanggalKeluar || cachedData.keluar).split('-').reverse().join('/') : '-';
+    const valNama = targetData.namaLengkap || currentUser.namaLengkap || '';
+    const valNoreg = String(targetData.id || noreg || '');
+    const valKelas = typeof hitungKelas === 'function' && me ? hitungKelas(me) : (targetData.kelas || currentUser.kelas || 'Kelas 1');
+    
+    const rawMasuk = targetData.masuk || currentUser.masuk || '';
+    const valMasuk = rawMasuk ? rawMasuk.split('-').reverse().join('/') : '-';
+    
+    const rawKeluar = targetData.tanggalKeluar || targetData.keluar || currentUser.keluar || '';
+    const valKeluar = rawKeluar ? rawKeluar.split('-').reverse().join('/') : '-';
 
-    if (namaInput && !namaInput.value) namaInput.value = initialNama;
-    if (noregInput && !noregInput.value) noregInput.value = initialNoreg;
-    if (kelasInput && !kelasInput.value) kelasInput.value = initialKelas;
-    if (masukInput && (!masukInput.value || masukInput.value === '-')) masukInput.value = initialMasuk;
-    if (keluarInput && (!keluarInput.value || keluarInput.value === '-')) keluarInput.value = initialKeluar;
+    if (namaInput) namaInput.value = valNama;
+    if (noregInput) noregInput.value = valNoreg;
+    if (kelasInput) kelasInput.value = valKelas;
+    if (masukInput) masukInput.value = valMasuk;
+    if (keluarInput) keluarInput.value = valKeluar;
 
-    if (pNama && !pNama.innerText) pNama.innerText = initialNama;
-    if (pNoreg && !pNoreg.innerText) pNoreg.innerText = initialNoreg;
+    if (pNama) pNama.innerText = valNama;
+    if (pNoreg) pNoreg.innerText = valNoreg;
 
-    // Fill cached stats instantly if available
-    if (cachedData) {
-        _calculateAndDisplaySiswaPortalStats(cachedData);
-    }
-
-    // ============================================================
-    // 2. SERVER DATA SYNC (When activeData is available)
-    // ============================================================
-    const me = (activeData || []).find(s => String(s.id) === String(noreg));
+    // Calculate stats & render logs if student record is available
     if (me) {
-        // Save to cache for instant 0-second load next time
         try {
             localStorage.setItem(cacheKey, JSON.stringify(me));
         } catch(e) {}
-
-        if (namaInput) namaInput.value = me.namaLengkap || initialNama;
-        if (noregInput) noregInput.value = me.id || initialNoreg;
-        if (kelasInput) kelasInput.value = typeof hitungKelas === 'function' ? hitungKelas(me) : (me.kelas || initialKelas);
-        
-        const masukFormatted = me.masuk ? me.masuk.split('-').reverse().join('/') : initialMasuk;
-        const keluarFormatted = me.tanggalKeluar ? me.tanggalKeluar.split('-').reverse().join('/') : (me.keluar ? me.keluar.split('-').reverse().join('/') : initialKeluar);
-        
-        if (masukInput) masukInput.value = masukFormatted;
-        if (keluarInput) keluarInput.value = keluarFormatted;
-
-        if (pNama) pNama.innerText = me.namaLengkap || initialNama;
-        if (pNoreg) pNoreg.innerText = me.id || initialNoreg;
-
         _calculateAndDisplaySiswaPortalStats(me);
+    } else if (cachedData) {
+        _calculateAndDisplaySiswaPortalStats(cachedData);
     }
 }
 
