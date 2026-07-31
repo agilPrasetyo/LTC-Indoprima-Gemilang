@@ -1796,4 +1796,142 @@
         }
     }
 
+    // ============================================================
+    // EXPORT TO EXCEL FITUR UNTUK 6 TAB ADMIN
+    // ============================================================
+    window.exportDataArrayToExcel = function(headers, rows, fileName, sheetName = 'Sheet1') {
+        if (typeof XLSX !== 'undefined') {
+            const wsData = [headers, ...rows];
+            const ws = XLSX.utils.aoa_to_sheet(wsData);
+            const wb = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(wb, ws, sheetName);
+            XLSX.writeFile(wb, fileName);
+            if (typeof showToast === 'function') showToast(`Berhasil mengeksport file ${fileName}`);
+        } else {
+            let csvContent = '\uFEFF' + headers.map(h => `"${h}"`).join(',') + '\n';
+            rows.forEach(row => {
+                csvContent += row.map(v => `"${String(v !== undefined && v !== null ? v : '').replace(/"/g, '""')}"`).join(',') + '\n';
+            });
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            const url = URL.createObjectURL(blob);
+            link.setAttribute('href', url);
+            link.setAttribute('download', fileName.replace('.xlsx', '.csv'));
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            if (typeof showToast === 'function') showToast(`Berhasil mengeksport data ke file CSV (${fileName.replace('.xlsx', '.csv')})`);
+        }
+    };
+
+    window.exportAdminAkunToExcel = function() {
+        const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'NoReg', 'Role', 'Status'];
+        const rows = (usersData || []).map(u => [
+            u.id || '-',
+            u.namaLengkap || '-',
+            u.email || u.username || '-',
+            u.nomorRegistrasi || '-',
+            u.role || '-',
+            u.status || 'AKTIF'
+        ]);
+        exportDataArrayToExcel(headers, rows, 'Data_Manajemen_Akun_LTC.xlsx', 'Manajemen Akun');
+    };
+
+    window.exportAdminSiswaToExcel = function() {
+        const headers = ['NoReg', 'Nama Lengkap', 'Departemen', 'Section', 'HK', 'Kelas', 'Masuk LTC', 'Distribusi', 'Akhir LTC', 'SPV', 'Daerah Asal', 'Sekolah'];
+        const rows = (activeData || []).map(s => [
+            s.id || '-',
+            s.namaLengkap || '-',
+            s.departemen || 'PRODUKSI',
+            s.section || s.bagian || '-',
+            s.hk || s.hariKerja || '6 HARI',
+            typeof hitungKelas === 'function' ? hitungKelas(s) : (s.kelas || 'Kelas 1'),
+            s.masuk || s.tanggalMasuk || '-',
+            s.distribusi || '-',
+            s.tanggalKeluar || s.keluar || '-',
+            s.spv || '-',
+            s.daerahAsal || s.asalDaerah || '-',
+            s.asalSekolah || '-'
+        ]);
+        exportDataArrayToExcel(headers, rows, 'Data_Manajemen_Siswa_Aktif_LTC.xlsx', 'Siswa Aktif');
+    };
+
+    window.exportAdminManpowerToExcel = function() {
+        const headers = ['Tanggal', 'NoReg', 'Nama Siswa', 'Bagian / Section', 'Kehadiran', 'Shift', 'Mesin', 'Target / Plan', 'Hasil / Actual', 'Reject', 'SPV', 'Keterangan'];
+        const rows = [];
+        (activeData || []).forEach(s => {
+            (s.dailyRecords || []).forEach(r => {
+                rows.push([
+                    r.dateStr || '-',
+                    s.id || '-',
+                    s.namaLengkap || '-',
+                    s.bagian || s.section || '-',
+                    r.hadir || 'Hadir',
+                    r.shift || '-',
+                    r.mesin || '-',
+                    r.plan !== null && r.plan !== undefined ? r.plan : '-',
+                    r.actual !== null && r.actual !== undefined ? r.actual : '-',
+                    r.reject !== null && r.reject !== undefined ? r.reject : '-',
+                    r.spv || s.spv || '-',
+                    r.keterangan || '-'
+                ]);
+            });
+        });
+        exportDataArrayToExcel(headers, rows, 'Data_Log_Manpower_Harian_LTC.xlsx', 'Log Manpower');
+    };
+
+    window.exportAdminTurnoverToExcel = function() {
+        const headers = ['NoReg', 'Nama Lengkap', 'Bagian / Section', 'Kelas', 'Kota / Daerah', 'Sekolah Asal', 'Tgl Masuk', 'Tgl Keluar', 'Tipe Turnover / Alasan', 'Keterangan'];
+        const rows = (activeTurnoverData || []).map(s => [
+            s.id || '-',
+            s.namaLengkap || '-',
+            s.bagian || s.section || '-',
+            s.kelas || 'Kelas 1',
+            s.daerahAsal || s.asalDaerah || s.wilayah || '-',
+            s.asalSekolah || '-',
+            s.masuk || s.tanggalMasuk || '-',
+            s.tanggalKeluar || s.keluar || '-',
+            s.tipeTurnover || s.alasan || '-',
+            s.keterangan || '-'
+        ]);
+        exportDataArrayToExcel(headers, rows, 'Data_Kelola_Turnover_LTC.xlsx', 'Kelola Turnover');
+    };
+
+    window.exportAdminPopulasiToExcel = function() {
+        const headers = ['Tanggal Rekap', 'Karyawan Kontrak', 'LTC', 'Outsourcing', 'Satpam & Supir', 'Total Karyawan MP', 'Total LTC', 'Persentase LTC %', 'Order'];
+        const rows = (rawPopulasiData || []).map(p => {
+            const totK = p.totalKaryawan || 146;
+            const totL = p.totalLtc || 30;
+            const pct = totK > 0 ? ((totL / totK) * 100).toFixed(2) + '%' : '0%';
+            return [
+                p.tanggal || '-',
+                p.kontrak || '-',
+                p.ltc || '-',
+                p.outsourcing || '-',
+                p.satpamSupir || '-',
+                totK,
+                totL,
+                pct,
+                p.order || '-'
+            ];
+        });
+        exportDataArrayToExcel(headers, rows, 'Data_Kelola_Populasi_LTC.xlsx', 'Kelola Populasi');
+    };
+
+    window.exportAdminK3ToExcel = function() {
+        const headers = ['Tanggal', 'NoReg', 'Nama Siswa', 'Kelas', 'Section', 'SPV', 'Jenis Kecelakaan', 'Kategori', 'Keterangan'];
+        const rows = (safetyIncidentsData || []).map(i => [
+            i.tanggal || '-',
+            i.studentId || i.noreg || '-',
+            i.namaSiswa || i.namaLengkap || '-',
+            i.kelas || '-',
+            i.section || i.bagian || '-',
+            i.spv || '-',
+            i.jenisKecelakaan || '-',
+            i.kategori || '-',
+            i.keterangan || '-'
+        ]);
+        exportDataArrayToExcel(headers, rows, 'Data_Manajemen_K3_LTC.xlsx', 'Manajemen K3');
+    };
+
 

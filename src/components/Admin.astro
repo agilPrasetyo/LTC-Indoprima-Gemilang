@@ -84,6 +84,10 @@
                                 class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm">
                             <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                         </div>
+                        <button onclick="exportAdminAkunToExcel()"
+                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-file-excel"></i> Export Excel
+                        </button>
                         <button onclick="syncExternalToLocalAdmin()"
                             class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-brand-blue font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300">
                             <i class="fa-solid fa-arrows-spin"></i> Sinkronisasi Siswa Eksternal
@@ -120,10 +124,16 @@
                     <h3 class="font-display font-bold text-lg text-brand-textMain">Manajemen Siswa Aktif</h3>
                     <p class="text-xs text-brand-textSub">Kelola data pendaftaran siswa aktif program LTC</p>
                 </div>
-                <button onclick="openStudentModal()"
-                    class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
-                    <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
-                </button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="exportAdminSiswaToExcel()"
+                        class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="openStudentModal()"
+                        class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
+                        <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
+                    </button>
+                </div>
             </div>
 
             <!-- Baris Filter untuk Kelola Siswa -->
@@ -194,10 +204,16 @@
                     <h3 class="font-display font-bold text-lg text-brand-textMain">Log Manpower Harian</h3>
                     <p class="text-xs text-brand-textSub">Kelola dan pantau seluruh catatan kinerja harian peserta LTC</p>
                 </div>
-                <button onclick="openManpowerLogModal()"
-                    class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
-                    <i class="fa-solid fa-plus"></i> Input Log Manpower
-                </button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="exportAdminManpowerToExcel()"
+                        class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="openManpowerLogModal()"
+                        class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
+                        <i class="fa-solid fa-plus"></i> Input Log Manpower
+                    </button>
+                </div>
             </div>
 
             <!-- Baris Filter untuk Log Manpower -->
@@ -246,9 +262,15 @@
                     <h3 class="font-display font-bold text-lg text-brand-textMain">Kelola Data Turnover</h3>
                     <p class="text-xs text-brand-textSub">Tambah, edit, dan hapus data riwayat turnover peserta LTC</p>
                 </div>
-                <button onclick="openTurnoverModal()" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
-                    <i class="fa-solid fa-plus"></i> Tambah Turnover
-                </button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="exportAdminTurnoverToExcel()"
+                        class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="openTurnoverModal()" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
+                        <i class="fa-solid fa-plus"></i> Tambah Turnover
+                    </button>
+                </div>
             </div>
 
             <!-- Baris Filter & Search untuk Kelola Turnover -->
@@ -313,6 +335,9 @@
                         <input type="text" id="filter-populasi-tanggal" oninput="renderAdminPopulasiTable()" placeholder="Cari tanggal (cth: 2026-06-20)..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
                     </div>
+                    <button onclick="exportAdminPopulasiToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
                     <button onclick="openPopulasiModal(false)" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
                         <i class="fa-solid fa-plus"></i> Tambah Data Populasi
                     </button>
@@ -350,9 +375,14 @@
                     <h3 class="font-display font-bold text-lg text-brand-textMain">Kelola Data Kecelakaan Kerja (Manajemen K3)</h3>
                     <p class="text-xs text-brand-textSub mt-0.5">Tambah, edit, dan hapus riwayat kecelakaan kerja / insiden K3 peserta LTC</p>
                 </div>
-                <button onclick="openSafetyModal()" class="px-4 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-sm">
-                    <i class="fa-solid fa-plus"></i> Tambah Data K3 / Accident
-                </button>
+                <div class="flex flex-wrap items-center gap-3">
+                    <button onclick="exportAdminK3ToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-sm cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="openSafetyModal()" class="px-4 py-2.5 bg-brand-blue hover:bg-blue-700 text-white rounded-xl font-bold text-xs transition-all duration-300 flex items-center gap-2 shadow-sm">
+                        <i class="fa-solid fa-plus"></i> Tambah Data K3 / Accident
+                    </button>
+                </div>
             </div>
 
             <!-- Panel Filter & Pencarian Tabel K3 -->
