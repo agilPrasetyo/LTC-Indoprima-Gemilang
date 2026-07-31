@@ -419,32 +419,61 @@ function populateSiswaPortalFields() {
     if (pNama) pNama.innerText = me.namaLengkap || '';
     if (pNoreg) pNoreg.innerText = me.id || '';
 
-    // Calculate Average Score for this student
+    // Calculate Average Score & Attendance Record for this student
     let totalScore = 0;
     let daysCount = 0;
     let countSakit = 0;
     let countIjin = 0;
     let countAlpha = 0;
 
+    // Merge date-based attendance records from both absensiData (Tab Absensi) and me.dailyRecords (Daily Manpower)
+    const dateAttendanceMap = {};
+
+    // 1. Prioritize absensiData (Data Absensi dari Tab Absensi Dashboard)
+    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
+        absensiData.forEach(rec => {
+            const recNoreg = String(rec.noreg || rec.studentId || '').trim();
+            const myNoreg = String(me.id || '').trim();
+            if (recNoreg === myNoreg) {
+                const dateKey = rec.tanggal || rec.dateStr;
+                const statusStr = String(rec.status || rec.hadir || '').trim();
+                if (dateKey && statusStr) {
+                    dateAttendanceMap[dateKey] = statusStr;
+                }
+            }
+        });
+    }
+
+    // 2. Add me.dailyRecords if not already present
     (me.dailyRecords || []).forEach(rec => {
-        const h = String(rec.hadir || '').trim().toLowerCase();
+        const dateKey = rec.dateStr || rec.tanggal;
+        const statusStr = String(rec.hadir || '').trim();
+        if (dateKey && statusStr && !dateAttendanceMap[dateKey]) {
+            dateAttendanceMap[dateKey] = statusStr;
+        }
+
+        // Calculate performance score
+        if (rec.plan > 0) {
+            const pct = (rec.actual / rec.plan) * 100;
+            totalScore += pct;
+            daysCount++;
+        } else if (rec.hadir === '✔' || rec.hadir === 'Hadir') {
+            totalScore += 100;
+            daysCount++;
+        } else if (rec.hadir === 'Absen') {
+            daysCount++;
+        }
+    });
+
+    // 3. Count Sakit, Ijin, Alpha from merged attendance records
+    Object.values(dateAttendanceMap).forEach(statusVal => {
+        const h = statusVal.toLowerCase();
         if (h.includes('sakit')) {
             countSakit++;
         } else if (h.includes('ijin') || h.includes('izin')) {
             countIjin++;
         } else if (h.includes('alpha') || h.includes('alpa') || h === 'absen' || h.includes('tanpa keterangan')) {
             countAlpha++;
-        }
-
-        if (rec.plan > 0) {
-            const pct = rec.plan > 0 ? (rec.actual / rec.plan) * 100 : 0;
-            totalScore += pct;
-            daysCount++;
-        } else if (rec.hadir === '✔' || rec.hadir === 'Hadir') {
-            totalScore += 100;
-            daysCount++;
-        } else if (rec.hadir === 'Absen' || h.includes('alpha') || h.includes('sakit') || h.includes('ijin')) {
-            daysCount++;
         }
     });
 
