@@ -4,6 +4,22 @@
 
 var currentSiswaStep = 1;
 
+function openSiswaTutorialModal() {
+    const modal = document.getElementById('modal-siswa-tutorial');
+    if (modal) {
+        modal.classList.remove('hidden');
+        modal.classList.add('flex');
+    }
+}
+
+function closeSiswaTutorialModal() {
+    const modal = document.getElementById('modal-siswa-tutorial');
+    if (modal) {
+        modal.classList.add('hidden');
+        modal.classList.remove('flex');
+    }
+}
+
 function resetSiswaPortalForm() {
     currentSiswaStep = 1;
     

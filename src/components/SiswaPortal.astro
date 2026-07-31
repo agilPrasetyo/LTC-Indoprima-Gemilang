@@ -58,12 +58,24 @@
                             <span class="truncate">Hasil</span>
                         </div>
                     </div>
+
+                    <!-- Action Buttons: Tutorial Pengisian & Bantuan Admin WA -->
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-3">
+                        <button type="button" onclick="openSiswaTutorialModal()" class="w-full py-2.5 px-3 bg-blue-50 hover:bg-blue-100 text-blue-700 border border-blue-200/80 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-book-open-reader text-blue-600 text-sm"></i>
+                            <span>Tutorial Pengisian</span>
+                        </button>
+                        <a href="https://wa.me/6285171236206?text=Halo%20Admin%20LTC,%20saya%20butuh%20bantuan%20pengisian%20formulir%20laporan%20harian" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-sm">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
+                            <span>Bantuan Admin</span>
+                        </a>
+                    </div>
                 </div>
             </div>
 
             <div class="mt-4 pt-3 border-t border-slate-200/60 text-[10px] text-slate-400 leading-relaxed bg-blue-50/50 border border-blue-100/80 p-2.5 rounded-xl flex items-center gap-2">
                 <i class="fa-solid fa-shield-halved text-blue-600 text-xs flex-shrink-0"></i>
-                <span>Data disimpan langsung ke database pusat Supabase.</span>
+                <span>Data disimpan langsung ke database pusat.</span>
             </div>
         </div>
 
@@ -534,6 +546,83 @@
 
             <!-- Bottom gradient accent -->
             <div class="h-1 w-full bg-gradient-to-r from-red-500 via-orange-400 to-yellow-400"></div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL TUTORIAL PENGISIAN FORMULIR SISWA -->
+<div id="modal-siswa-tutorial" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto" onclick="if(event.target===this)closeSiswaTutorialModal()">
+    <div class="bg-white p-6 sm:p-8 rounded-[28px] w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg shadow-sm">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-800 text-base sm:text-lg">Tutorial Pengisian Formulir</h3>
+                    <p class="text-xs text-slate-500 font-medium">Panduan langkah demi langkah laporan harian peserta LTC</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Body Content: 3 Step Cards -->
+        <div class="space-y-4 text-xs">
+            <!-- Step 1 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 1</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Identitas & Status Kehadiran Hari Ini</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Periksa Identitas:</strong> Nama Lengkap, NoReg, dan Kelas akan terisi secara otomatis.</li>
+                    <li><strong class="text-slate-800">Pilih Kehadiran:</strong>
+                        <ul class="list-circle list-inside pl-4 mt-1 space-y-1 text-slate-500">
+                            <li><span class="font-semibold text-blue-700">Hadir:</span> Untuk melanjutkan ke pengisian data operasional & produksi (Langkah 2).</li>
+                            <li><span class="font-semibold text-amber-700">Ijin / Sakit:</span> Wajib memilih nama <strong class="text-slate-700">Supervisor (SPV)</strong> yang telah Anda hubungi untuk konfirmasi, lalu tuliskan alasan ijin/sakit Anda.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Step 2 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 2</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Data Operasional & Hasil Produksi (Khusus Hadir)</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja yang Anda jalani.</li>
+                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian / stasiun kerja Anda bertugas.</li>
+                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah unit <strong class="text-slate-700">Target (Plan)</strong>, <strong class="text-slate-700">Aktual</strong> yang selesai, dan barang <strong class="text-slate-700">Reject</strong> (isi 0 jika tidak ada).</li>
+                    <li><strong class="text-slate-800">Supervisor Shift:</strong> Pilih nama Supervisor yang bertugas pada shift Anda.</li>
+                </ul>
+            </div>
+
+            <!-- Step 3 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 3</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Verifikasi Kinerja & Kirim Laporan</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Cek Persentase Kinerja:</strong> Sistem akan menghitung otomatis persentase pencapaian kinerja Anda hari ini <code class="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-[10px] text-blue-700 font-mono">(Aktual ÷ Target) × 100%</code>.</li>
+                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol <strong class="text-blue-600">Kirim Laporan Harian</strong>. Data Anda akan langsung tersimpan aman ke database pusat.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <a href="https://wa.me/6285171236206?text=Halo%20Admin%20LTC,%20saya%20butuh%20bantuan%20pengisian%20formulir%20laporan%20harian" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm shadow-emerald-500/20">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Bantuan Admin WA (+6285171236206)
+            </a>
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-sm">
+                Saya Mengerti
+            </button>
         </div>
     </div>
 </div>
