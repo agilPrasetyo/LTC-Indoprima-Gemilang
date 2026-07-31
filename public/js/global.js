@@ -2024,10 +2024,11 @@ if (typeof Chart !== 'undefined') {
         }
     });
 
-    // Auto Upper Case for all text inputs & textareas
+    // Auto Upper Case for all text inputs & textareas (except login fields)
     document.addEventListener('input', function (e) {
         const target = e.target;
         if (!target) return;
+        if (target.id === 'login-email' || target.id === 'login-pass' || target.closest('#view-login')) return;
         const tagName = target.tagName;
         const type = (target.type || '').toLowerCase();
         
