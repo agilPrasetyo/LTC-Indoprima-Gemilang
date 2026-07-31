@@ -20,6 +20,16 @@ function closeSiswaTutorialModal() {
     }
 }
 
+function openAdminWhatsAppHelp() {
+    const inputNama = document.getElementById('input-siswa-nama')?.value || '';
+    const userNama = (typeof currentUser !== 'undefined' && currentUser && currentUser.namaLengkap) ? currentUser.namaLengkap : '';
+    const namaSiswa = (userNama || inputNama || 'Siswa LTC').trim();
+    
+    const messageText = `Halo, nama saya ${namaSiswa}, saya butuh bantuan pengisian formulir laporan harian.`;
+    const waUrl = `https://wa.me/6285171236206?text=${encodeURIComponent(messageText)}`;
+    window.open(waUrl, '_blank');
+}
+
 function resetSiswaPortalForm() {
     currentSiswaStep = 1;
     

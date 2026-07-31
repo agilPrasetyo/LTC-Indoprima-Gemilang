@@ -65,10 +65,10 @@
                             <i class="fa-solid fa-book-open-reader text-blue-600 text-sm"></i>
                             <span>Tutorial Pengisian</span>
                         </button>
-                        <a href="https://wa.me/6285171236206?text=Halo%20Admin%20LTC,%20saya%20butuh%20bantuan%20pengisian%20formulir%20laporan%20harian" target="_blank" rel="noopener noreferrer" class="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-xl text-xs font-bold flex items-center justify-center gap-2 transition-all duration-300 shadow-sm">
-                            <i class="fa-brands fa-whatsapp text-emerald-600 text-base"></i>
-                            <span>Bantuan Admin</span>
-                        </a>
+                        <button type="button" onclick="openAdminWhatsAppHelp()" class="w-full py-2.5 px-3 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 border border-emerald-200/80 rounded-xl text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 transition-all duration-300 shadow-sm cursor-pointer">
+                            <i class="fa-brands fa-whatsapp text-emerald-600 text-base flex-shrink-0"></i>
+                            <span class="truncate">Jika Butuh Bantuan Hubungi Admin</span>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -564,7 +564,7 @@
                     <p class="text-xs text-slate-500 font-medium">Panduan langkah demi langkah laporan harian peserta LTC</p>
                 </div>
             </div>
-            <button type="button" onclick="closeSiswaTutorialModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all">
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all cursor-pointer">
                 <i class="fa-solid fa-xmark text-sm"></i>
             </button>
         </div>
@@ -595,9 +595,9 @@
                     <h4 class="font-bold text-slate-800 text-xs">Data Operasional & Hasil Produksi (Khusus Hadir)</h4>
                 </div>
                 <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja yang Anda jalani.</li>
-                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian / stasiun kerja Anda bertugas.</li>
-                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah unit <strong class="text-slate-700">Target (Plan)</strong>, <strong class="text-slate-700">Aktual</strong> yang selesai, dan barang <strong class="text-slate-700">Reject</strong> (isi 0 jika tidak ada).</li>
+                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja.</li>
+                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian pekerjaan Anda.</li>
+                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah target, aktual yang selesai dan barang reject (isi 0 jika tidak ada).</li>
                     <li><strong class="text-slate-800">Supervisor Shift:</strong> Pilih nama Supervisor yang bertugas pada shift Anda.</li>
                 </ul>
             </div>
@@ -609,18 +609,17 @@
                     <h4 class="font-bold text-slate-800 text-xs">Verifikasi Kinerja & Kirim Laporan</h4>
                 </div>
                 <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Cek Persentase Kinerja:</strong> Sistem akan menghitung otomatis persentase pencapaian kinerja Anda hari ini <code class="bg-white px-1.5 py-0.5 rounded border border-slate-200 text-[10px] text-blue-700 font-mono">(Aktual ÷ Target) × 100%</code>.</li>
-                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol <strong class="text-blue-600">Kirim Laporan Harian</strong>. Data Anda akan langsung tersimpan aman ke database pusat.</li>
+                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol kirim laporan harian maka data akan terkirim ke database.</li>
                 </ul>
             </div>
         </div>
 
         <!-- Footer -->
         <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <a href="https://wa.me/6285171236206?text=Halo%20Admin%20LTC,%20saya%20butuh%20bantuan%20pengisian%20formulir%20laporan%20harian" target="_blank" rel="noopener noreferrer" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm shadow-emerald-500/20">
-                <i class="fa-brands fa-whatsapp text-sm"></i> Bantuan Admin WA (+6285171236206)
-            </a>
-            <button type="button" onclick="closeSiswaTutorialModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-sm">
+            <button type="button" onclick="openAdminWhatsAppHelp()" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm shadow-emerald-500/20 cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Jika Butuh Bantuan Hubungi Admin
+            </button>
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer">
                 Saya Mengerti
             </button>
         </div>
