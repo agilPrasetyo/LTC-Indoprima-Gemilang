@@ -72,9 +72,9 @@ if (typeof google === 'undefined' || typeof google.script === 'undefined') {
 async function executeGASCall(functionName, args) {
   try {
     const payload = { action: functionName, args: args };
-    const targetUrl = GAS_URL || '/api/rpc';
     
-    const response = await fetch(targetUrl, {
+    // Arahkan semua request ke endpoint Astro API lokal
+    const response = await fetch('/api/rpc', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -85,7 +85,7 @@ async function executeGASCall(functionName, args) {
     if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
     return await response.json();
   } catch (error) {
-    console.warn(`[Astro RPC Info] Method ${functionName} offline / fallback to local dataset:`, error);
+    console.error(`[Astro Supabase Error] pada method ${functionName}:`, error);
     throw error;
   }
 }

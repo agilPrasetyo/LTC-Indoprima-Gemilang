@@ -327,7 +327,7 @@ function submitSiswaDailyReport() {
 function _sendSiswaReport(payload) {
     _updateSyncIndicator('syncing');
     
-    if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
+    if (typeof google !== 'undefined') {
         google.script.run.withSuccessHandler(res => {
             if (res.success) {
                 showToast('Laporan harian berhasil dikirim!', 'success');
@@ -392,73 +392,36 @@ function populateSiswaPortalFields() {
         resetSiswaPortalForm();
     }
 
-    const noreg = String(currentUser.studentId || currentUser.nomorRegistrasi || currentUser.id || '').trim();
+    const noreg = currentUser.studentId || currentUser.nomorRegistrasi;
+    const me = (activeData || []).find(s => String(s.id) === String(noreg));
+    if (!me) return;
     
-    // Dataset fallback: activeData or fallbackStats.siswaData
-    const dataset = (typeof activeData !== 'undefined' && activeData && activeData.length > 0) 
-        ? activeData 
-        : ((typeof fallbackStats !== 'undefined' && fallbackStats && fallbackStats.siswaData) ? fallbackStats.siswaData : []);
-
-    let me = dataset.find(s => String(s.id).trim() === noreg || String(s.noreg || '').trim() === noreg);
-    if (!me && currentUser.namaLengkap) {
-        me = dataset.find(s => s.namaLengkap && s.namaLengkap.toLowerCase().includes(currentUser.namaLengkap.toLowerCase()));
-    }
-
-    // ============================================================
-    // 1. INSTANT PRE-FILL FROM CURRENTUSER / ME / CACHE (0ms)
-    // ============================================================
-    const cacheKey = 'ltc_siswa_cache_' + (noreg || (me ? me.id : 'default'));
-    let cachedData = null;
-    try {
-        const rawCache = localStorage.getItem(cacheKey);
-        if (rawCache) cachedData = JSON.parse(rawCache);
-    } catch(e) {}
-
-    const targetData = me || cachedData || {};
-
+    // Set Step 1 identity fields
     const namaInput = document.getElementById('input-siswa-nama');
     const noregInput = document.getElementById('input-siswa-noreg');
     const kelasInput = document.getElementById('input-siswa-kelas');
     const masukInput = document.getElementById('input-siswa-masuk');
     const keluarInput = document.getElementById('input-siswa-keluar');
+    
+    if (namaInput) namaInput.value = me.namaLengkap || '';
+    if (noregInput) noregInput.value = me.id || '';
+    if (kelasInput) kelasInput.value = me.kelas || 'Kelas 1';
+    
+    const masukFormatted = me.masuk ? me.masuk.split('-').reverse().join('/') : '-';
+    const keluarFormatted = me.tanggalKeluar ? me.tanggalKeluar.split('-').reverse().join('/') : (me.keluar ? me.keluar.split('-').reverse().join('/') : '-');
+    
+    if (masukInput) masukInput.value = masukFormatted;
+    if (keluarInput) keluarInput.value = keluarFormatted;
 
+    // Set other fields in SiswaPortal view
     const pNama = document.getElementById('siswa-portal-dashboard-nama');
     const pNoreg = document.getElementById('siswa-portal-dashboard-noreg');
+    if (pNama) pNama.innerText = me.namaLengkap || '';
+    if (pNoreg) pNoreg.innerText = me.id || '';
 
-    const valNama = targetData.namaLengkap || currentUser.namaLengkap || '';
-    const valNoreg = String(targetData.id || noreg || '');
-    const valKelas = typeof hitungKelas === 'function' && me ? hitungKelas(me) : (targetData.kelas || currentUser.kelas || 'Kelas 1');
-    
-    const rawMasuk = targetData.masuk || currentUser.masuk || '';
-    const valMasuk = rawMasuk ? rawMasuk.split('-').reverse().join('/') : '-';
-    
-    const rawKeluar = targetData.tanggalKeluar || targetData.keluar || currentUser.keluar || '';
-    const valKeluar = rawKeluar ? rawKeluar.split('-').reverse().join('/') : '-';
-
-    if (namaInput) namaInput.value = valNama;
-    if (noregInput) noregInput.value = valNoreg;
-    if (kelasInput) kelasInput.value = valKelas;
-    if (masukInput) masukInput.value = valMasuk;
-    if (keluarInput) keluarInput.value = valKeluar;
-
-    if (pNama) pNama.innerText = valNama;
-    if (pNoreg) pNoreg.innerText = valNoreg;
-
-    // Calculate stats & render logs if student record is available
-    if (me) {
-        try {
-            localStorage.setItem(cacheKey, JSON.stringify(me));
-        } catch(e) {}
-        _calculateAndDisplaySiswaPortalStats(me);
-    } else if (cachedData) {
-        _calculateAndDisplaySiswaPortalStats(cachedData);
-    }
-}
-
-function _calculateAndDisplaySiswaPortalStats(me) {
-    if (!me) return;
+    // Calculate Average Score & Attendance Record for this student using Cut-off Date (2026-08-02)
     const CUTOFF = window.ABSENSI_CUTOFF_DATE || '2026-08-02';
-    const myNoreg = String(me.id || me.studentId || me.nomorRegistrasi || '').trim();
+    const myNoreg = String(me.id || '').trim();
 
     let totalScore = 0;
     let daysCount = 0;
@@ -466,8 +429,10 @@ function _calculateAndDisplaySiswaPortalStats(me) {
     let countIjin = 0;
     let countAlpha = 0;
 
+    // Merge date-based attendance records from both absensiData (Tab Absensi) and me.dailyRecords (Daily Manpower)
     const dateAttendanceMap = {};
 
+    // 1. Prioritize absensiData (Data Absensi dari Tab Absensi Dashboard)
     if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
         absensiData.forEach(rec => {
             const recNoreg = String(rec.noreg || rec.studentId || '').trim();
@@ -481,6 +446,7 @@ function _calculateAndDisplaySiswaPortalStats(me) {
         });
     }
 
+    // 2. Add me.dailyRecords (Manpower logs)
     (me.dailyRecords || []).forEach(rec => {
         const dateKey = rec.dateStr || rec.tanggal;
         if (!dateKey) return;
@@ -497,6 +463,7 @@ function _calculateAndDisplaySiswaPortalStats(me) {
         }
     });
 
+    // 3. Process Auto-Alpha for dates >= CUTOFF up to today
     const todayObj = new Date();
     const cutoffDateObj = typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(CUTOFF) : new Date(CUTOFF);
     const masukDateObj = me.masuk ? (typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(me.masuk) : new Date(me.masuk)) : null;
@@ -511,12 +478,14 @@ function _calculateAndDisplaySiswaPortalStats(me) {
             const isEnrolled = !masukDateObj || (curr >= masukDateObj);
 
             if (isWorkDay && isEnrolled && !dateAttendanceMap[dStr]) {
+                // Auto-Alpha for missing log starting on Cutoff Date
                 dateAttendanceMap[dStr] = { status: 'Alpha', plan: 0, actual: 0, autoAlpha: true };
             }
             curr.setDate(curr.getDate() + 1);
         }
     }
 
+    // 4. Calculate Attendance Counts & Performance Scores
     Object.keys(dateAttendanceMap).forEach(dStr => {
         const item = dateAttendanceMap[dStr];
         const statusVal = item.status.toLowerCase();
@@ -524,14 +493,17 @@ function _calculateAndDisplaySiswaPortalStats(me) {
 
         if (statusVal.includes('sakit')) {
             countSakit++;
+            // Sakit is excluded from divider
         } else if (statusVal.includes('ijin') || statusVal.includes('izin')) {
             countIjin++;
+            // Ijin is excluded from divider
         } else if (statusVal.includes('alpha') || statusVal.includes('alpa') || statusVal === 'absen' || statusVal.includes('tanpa keterangan')) {
             if (!isBeforeCutoff || item.fromAbsensiTab) {
                 countAlpha++;
-                daysCount++;
+                daysCount++; // Penalize performance divider
             }
         } else {
+            // Hadir or Performance log
             if (item.plan > 0) {
                 const pct = Math.min(100, (item.actual / item.plan) * 100);
                 totalScore += pct;
@@ -547,6 +519,7 @@ function _calculateAndDisplaySiswaPortalStats(me) {
     const scoreValEl = document.getElementById('siswa-portal-nilai');
     if (scoreValEl) scoreValEl.innerText = avgScore + '%';
 
+    // Populate Catatan Absensi Siswa (Sakit, Ijin, Alpha)
     const sakitEl = document.getElementById('input-siswa-rekap-sakit');
     const ijinEl = document.getElementById('input-siswa-rekap-ijin');
     const alphaEl = document.getElementById('input-siswa-rekap-alpha');
@@ -554,11 +527,6 @@ function _calculateAndDisplaySiswaPortalStats(me) {
     if (sakitEl) sakitEl.innerText = countSakit + ' Hari';
     if (ijinEl) ijinEl.innerText = countIjin + ' Hari';
     if (alphaEl) alphaEl.innerText = countAlpha + ' Hari';
-
-    if (typeof renderStudentPersonalLogs === 'function') {
-        renderStudentPersonalLogs(me);
-    }
-}
     
     // Render personal logs table
     if (typeof renderStudentPersonalLogs === 'function') {

@@ -914,36 +914,17 @@ if (typeof Chart !== 'undefined') {
                         setLoginButtonState(true, 'Menyiapkan Portal...');
                         loginSuccess(res.user);
                     } else {
-                        // Strict Local Fallback (DYNAMIC STUDENT LOOKUP)
+                        // Strict Local Fallback (STRICT CASE-SENSITIVE PASSWORD CHECK)
                         let targetUser = null;
                         const lowerEmail = loginVal.toLowerCase();
-                        const lowerPass = passVal.toLowerCase();
 
+                        const lowerPass = passVal.toLowerCase();
                         if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && lowerPass === "admin123") {
                             targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
                         } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && lowerPass === "visitor123") {
                             targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
-                        } else {
-                            const matchedSiswa = findStudentByLoginInput(loginVal);
-                            if (matchedSiswa) {
-                                targetUser = {
-                                    namaLengkap: matchedSiswa.namaLengkap,
-                                    role: "Siswa",
-                                    studentId: String(matchedSiswa.id),
-                                    nomorRegistrasi: String(matchedSiswa.id),
-                                    kelas: matchedSiswa.kelas || 'Kelas 1',
-                                    masuk: matchedSiswa.masuk || '',
-                                    keluar: matchedSiswa.tanggalKeluar || matchedSiswa.keluar || ''
-                                };
-                            } else if (lowerPass === "siswa123" || lowerEmail.endsWith("@indoprima.com") || /^\d+$/.test(loginVal.trim())) {
-                                const cleanId = loginVal.trim().replace('@indoprima.com', '');
-                                targetUser = {
-                                    namaLengkap: "BERLIANO ABISYAH ENANTA",
-                                    role: "Siswa",
-                                    studentId: cleanId || "2603130",
-                                    nomorRegistrasi: cleanId || "2603130"
-                                };
-                            }
+                        } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176" || lowerEmail.endsWith("@indoprima.com")) && lowerPass === "siswa123") {
+                            targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
                         }
 
                         if (targetUser) {
@@ -970,33 +951,14 @@ if (typeof Chart !== 'undefined') {
                     console.warn("API Login fetch error, executing local fallback:", err);
                     let targetUser = null;
                     const lowerEmail = loginVal.toLowerCase();
-                    const lowerPass = passVal.toLowerCase();
 
+                    // Strict Case-Sensitive Password Match
                     if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && passVal === "admin123") {
                         targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
                     } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && passVal === "visitor123") {
                         targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
-                    } else {
-                        const matchedSiswa = findStudentByLoginInput(loginVal);
-                        if (matchedSiswa) {
-                            targetUser = {
-                                namaLengkap: matchedSiswa.namaLengkap,
-                                role: "Siswa",
-                                studentId: String(matchedSiswa.id),
-                                nomorRegistrasi: String(matchedSiswa.id),
-                                kelas: matchedSiswa.kelas || 'Kelas 1',
-                                masuk: matchedSiswa.masuk || '',
-                                keluar: matchedSiswa.tanggalKeluar || matchedSiswa.keluar || ''
-                            };
-                        } else if (lowerPass === "siswa123" || passVal === "siswa123" || lowerEmail.endsWith("@indoprima.com") || /^\d+$/.test(loginVal.trim())) {
-                            const cleanId = loginVal.trim().replace('@indoprima.com', '');
-                            targetUser = {
-                                namaLengkap: "BERLIANO ABISYAH ENANTA",
-                                role: "Siswa",
-                                studentId: cleanId || "2603130",
-                                nomorRegistrasi: cleanId || "2603130"
-                            };
-                        }
+                    } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176") && passVal === "siswa123") {
+                        targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
                     }
 
                     if (targetUser) {
@@ -1028,25 +990,6 @@ if (typeof Chart !== 'undefined') {
             }
             console.error("Login client error:", e);
         }
-    }
-
-    function findStudentByLoginInput(inputVal) {
-        if (!inputVal) return null;
-        const cleanInput = String(inputVal).trim().toLowerCase();
-        const cleanId = cleanInput.replace('@indoprima.com', '').trim();
-
-        const dataset = (typeof activeData !== 'undefined' && activeData && activeData.length > 0)
-            ? activeData
-            : ((typeof fallbackStats !== 'undefined' && fallbackStats && fallbackStats.siswaData) ? fallbackStats.siswaData : []);
-        
-        let found = dataset.find(s => String(s.id).trim() === cleanId || String(s.noreg || '').trim() === cleanId);
-        if (!found) {
-            found = dataset.find(s => 
-                (s.email && s.email.toLowerCase() === cleanInput) ||
-                (s.namaLengkap && s.namaLengkap.toLowerCase().includes(cleanId))
-            );
-        }
-        return found;
     }
 
     // ====================================================
@@ -1251,7 +1194,7 @@ if (typeof Chart !== 'undefined') {
         if (spinner) spinner.classList.add('animate-spin');
         _updateSyncIndicator('syncing');
 
-        if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
+        if (typeof google !== 'undefined') {
             google.script.run
                 .withSuccessHandler(data => {
                     if (spinner) spinner.classList.remove('animate-spin');
@@ -1260,26 +1203,23 @@ if (typeof Chart !== 'undefined') {
                         renderData(data);
                         _updateSyncIndicator('done');
                     } else {
-                        monthYearMetadata = (fallbackStats && fallbackStats.monthYear) ? fallbackStats.monthYear : { year: 2026, month: 3 };
-                        renderData(fallbackStats);
-                        _updateSyncIndicator('done');
+                        _updateSyncIndicator('error');
+                        showToast('Gagal memuat data dasbor.', 'error');
                     }
                 })
                 .withFailureHandler(err => {
-                    console.warn("getDashboardStats RPC failed, using local dataset fallback:", err);
                     if (spinner) spinner.classList.remove('animate-spin');
-                    monthYearMetadata = (fallbackStats && fallbackStats.monthYear) ? fallbackStats.monthYear : { year: 2026, month: 3 };
-                    renderData(fallbackStats);
-                    _updateSyncIndicator('done');
+                    _updateSyncIndicator('error');
+                    showToast('Gagal memuat data dari server.', 'error');
                 })
                 .getDashboardStats();
         } else {
             setTimeout(() => {
                 if (spinner) spinner.classList.remove('animate-spin');
-                monthYearMetadata = (fallbackStats && fallbackStats.monthYear) ? fallbackStats.monthYear : { year: 2026, month: 3 };
+                monthYearMetadata = fallbackStats.monthYear;
                 renderData(fallbackStats);
                 _updateSyncIndicator('done');
-            }, 500);
+            }, 800);
         }
     }
 
@@ -1288,7 +1228,7 @@ if (typeof Chart !== 'undefined') {
         if (spinner) spinner.classList.add('animate-spin');
         _updateSyncIndicator('syncing');
 
-        if (typeof google !== 'undefined' && typeof google.script !== 'undefined' && typeof google.script.run !== 'undefined') {
+        if (typeof google !== 'undefined') {
             google.script.run
                 .withSuccessHandler(syncResult => {
                     if (syncResult && syncResult.success) {
@@ -1864,7 +1804,6 @@ if (typeof Chart !== 'undefined') {
         }
         if (viewName === 'turnover') renderTurnoverView();
         if (viewName === 'admin') renderAdminView();
-        if (viewName === 'sisi-siswa' && typeof populateSiswaPortalFields === 'function') populateSiswaPortalFields();
         if (viewName === 'absensi' && typeof renderAbsensiView === 'function') renderAbsensiView();
         if (viewName === 'safety' && typeof renderSafetyView === 'function') renderSafetyView();
         
