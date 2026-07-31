@@ -359,11 +359,16 @@ body {
     }
 }
 
-/* Global Auto-Uppercase for text inputs & textareas */
-input[type="text"],
-input[type="search"],
+/* Global Auto-Uppercase for text inputs & textareas (except login fields) */
+input[type="text"]:not(#login-email):not(#login-pass),
+input[type="search"]:not(#login-email):not(#login-pass),
 textarea,
-input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):not([type="number"]):not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]) {
+input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):not([type="number"]):not([type="hidden"]):not([type="file"]):not([type="checkbox"]):not([type="radio"]):not(#login-email):not(#login-pass) {
     text-transform: uppercase;
+}
+
+#login-email,
+#login-pass {
+    text-transform: none !important;
 }
 

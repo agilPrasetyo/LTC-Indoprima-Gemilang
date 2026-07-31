@@ -917,12 +917,12 @@ if (typeof Chart !== 'undefined') {
                         let targetUser = null;
                         const lowerEmail = loginVal.toLowerCase();
 
-                        // Password MUST MATCH EXACT CASE (e.g. "admin123" !== "ADMIN123")
-                        if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && passVal === "admin123") {
+                        const lowerPass = passVal.toLowerCase();
+                        if ((lowerEmail === "admin@indoprima.com" || lowerEmail === "admin") && lowerPass === "admin123") {
                             targetUser = { namaLengkap: "Admin Utama", role: "Admin" };
-                        } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && passVal === "visitor123") {
+                        } else if ((lowerEmail === "visitor@indoprima.com" || lowerEmail === "visitor") && lowerPass === "visitor123") {
                             targetUser = { namaLengkap: "Executive Visitor", role: "Visitor" };
-                        } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176") && passVal === "siswa123") {
+                        } else if ((lowerEmail === "2601176@indoprima.com" || lowerEmail === "2601176" || lowerEmail.endsWith("@indoprima.com")) && lowerPass === "siswa123") {
                             targetUser = { namaLengkap: "MUHAMMAD ROJI", role: "Siswa", studentId: "2601176", nomorRegistrasi: "2601176" };
                         }
 
