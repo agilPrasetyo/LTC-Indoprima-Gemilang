@@ -904,17 +904,23 @@
                 <div class="grid grid-cols-3 gap-3">
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target (Plan)</label>
-                        <input type="number" id="mp-modal-plan" placeholder="0" min="0" value="0"
+                        <input type="number" id="mp-modal-plan" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                             class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hasil (Aktual)</label>
-                        <input type="number" id="mp-modal-actual" placeholder="0" min="0" value="0"
+                        <input type="number" id="mp-modal-actual" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                             class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Reject</label>
-                        <input type="number" id="mp-modal-reject" placeholder="0" min="0" value="0"
+                        <input type="number" id="mp-modal-reject" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
                             class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                     </div>
                 </div>

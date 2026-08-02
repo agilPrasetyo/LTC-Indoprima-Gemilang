@@ -351,6 +351,10 @@ function submitSiswaDailyReport() {
     const spvVal = document.getElementById('input-siswa-spv').value;
     const keteranganVal = document.getElementById('input-siswa-keterangan').value.trim();
 
+    const targetParsed = Math.max(0, parseInt((targetVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+    const hasilParsed = Math.max(0, parseInt((hasilVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+    const rejectParsed = Math.max(0, parseInt((rejectVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+
     // Convert YYYY-MM-DD to DD/MM/YYYY
     const parts = dateVal.split('-');
     const dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
@@ -363,15 +367,15 @@ function submitSiswaDailyReport() {
         Bagian: bagianVal,
         NomorMesin: mesinVal || '-',
         Model: modelVal || '-',
-        Plan: parseFloat(targetVal),
-        Aktual: parseFloat(hasilVal),
-        Reject: parseFloat(rejectVal),
+        Plan: targetParsed,
+        Aktual: hasilParsed,
+        Reject: rejectParsed,
         NamaSPV: spvVal,
         Keterangan: keteranganVal || '-'
     };
 
     if (payload.Plan < 0 || payload.Aktual < 0 || payload.Reject < 0) {
-        showToast('Nilai target, hasil, dan reject tidak boleh negatif.', 'error');
+        showToast('Nilai target, hasil, dan reject harus berupa bilangan cacah (0, 1, 2, ...).', 'error');
         return;
     }
 

@@ -755,10 +755,12 @@ async function handleLocalSupabaseWrite(action, args) {
       .single();
     const studentName = studentData ? studentData.nama_lengkap : null;
 
-    const planNum = parseFloat(l.Plan);
-    const aktualNum = parseFloat(l.Aktual);
+    const planNum = Math.max(0, parseInt(String(l.Plan || 0).replace(/[^0-9]/g, ''), 10) || 0);
+    const aktualNum = Math.max(0, parseInt(String(l.Aktual || 0).replace(/[^0-9]/g, ''), 10) || 0);
+    const rejectNum = Math.max(0, parseInt(String(l.Reject || 0).replace(/[^0-9]/g, ''), 10) || 0);
+
     let persentase = null;
-    if (!isNaN(planNum) && planNum > 0 && !isNaN(aktualNum)) {
+    if (planNum > 0) {
       persentase = (aktualNum / planNum) * 100;
     }
 
@@ -774,9 +776,9 @@ async function handleLocalSupabaseWrite(action, args) {
       noreg: l.NoReg,
       nama_lengkap: studentName,
       tanggal_record: dbDate,
-      plan: l.Plan,
-      aktual: l.Aktual,
-      reject: l.Reject,
+      plan: planNum,
+      aktual: aktualNum,
+      reject: rejectNum,
       persentase: persentase,
       hadir: l.Hadir ? l.Hadir.toUpperCase() : '✔',
       keterangan: l.Keterangan ? l.Keterangan.toUpperCase() : '',

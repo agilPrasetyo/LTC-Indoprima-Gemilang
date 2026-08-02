@@ -1152,6 +1152,10 @@
         const parts = dateVal.split('-');
         const dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
 
+        const planNum = Math.max(0, parseInt(String(planVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+        const actualNum = Math.max(0, parseInt(String(actualVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+        const rejectNum = Math.max(0, parseInt(String(rejectVal || '0').replace(/[^0-9]/g, ''), 10) || 0);
+
         const payload = {
             NoReg: noreg,
             TanggalRecord: dateFormatted,
@@ -1160,36 +1164,30 @@
             Bagian: bagianVal,
             NomorMesin: mesinVal || '-',
             Model: modelVal || '-',
-            Plan: planVal !== "" ? parseFloat(planVal) : 0,
-            Aktual: actualVal !== "" ? parseFloat(actualVal) : 0,
-            Reject: rejectVal !== "" ? parseFloat(rejectVal) : 0,
+            Plan: planNum,
+            Aktual: actualNum,
+            Reject: rejectNum,
             NamaSPV: spvVal || '-',
             Keterangan: keteranganVal || '-'
         };
 
         showToast('Menyimpan log manpower...', 'info');
 
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success) {
+        executeGASCall('saveManpowerLog', [payload])
+            .then(res => {
+                if (res && res.success !== false) {
                     showToast('Log manpower harian berhasil disimpan!', 'success');
                     _updateLocalManpowerCache(noreg, dateVal, payload);
                     closeManpowerLogModal();
-                    renderAdminManpowerTable();
-                    setTimeout(() => loadDashboardData(), 1000);
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else renderAdminManpowerTable();
                 } else {
-                    showToast('Gagal menyimpan log: ' + (res.message || 'Unknown error'), 'error');
+                    showToast('Gagal menyimpan log: ' + (res?.message || 'Unknown error'), 'error');
                 }
-            }).withFailureHandler(err => {
+            })
+            .catch(err => {
                 showToast('Error server: ' + (err.message || err.toString()), 'error');
-            }).saveManpowerLog(payload);
-        } else {
-            // Mode preview lokal
-            showToast('Mode Preview: Log manpower disimpan ke data lokal.', 'success');
-            _updateLocalManpowerCache(noreg, dateVal, payload);
-            closeManpowerLogModal();
-            renderAdminManpowerTable();
-        }
+            });
     }
 
     function _updateLocalManpowerCache(noreg, dateVal, payload) {
