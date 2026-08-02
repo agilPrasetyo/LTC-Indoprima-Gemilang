@@ -43,15 +43,18 @@ function resetSiswaPortalForm() {
     const form = document.getElementById('form-siswa-daily');
     if (form) form.reset();
     
-    // Set default date to today for step 2 date input
+    // Set default date to today for step 2 date input & step 1 absence date input
+    const today = new Date();
+    const yyyy = today.getFullYear();
+    const mm = String(today.getMonth() + 1).padStart(2, '0');
+    const dd = String(today.getDate()).padStart(2, '0');
+    const todayFormatted = `${yyyy}-${mm}-${dd}`;
+
     const dateInput = document.getElementById('input-siswa-tanggal');
-    if (dateInput) {
-        const today = new Date();
-        const yyyy = today.getFullYear();
-        const mm = String(today.getMonth() + 1).padStart(2, '0');
-        const dd = String(today.getDate()).padStart(2, '0');
-        dateInput.value = `${yyyy}-${mm}-${dd}`;
-    }
+    if (dateInput) dateInput.value = todayFormatted;
+
+    const dateInputAbsen = document.getElementById('input-siswa-tanggal-absen');
+    if (dateInputAbsen) dateInputAbsen.value = todayFormatted;
 
     // Default presence is 'Hadir'
     const hadirRadio = document.querySelector('input[name="siswa-kehadiran"][value="Hadir"]');
@@ -290,11 +293,14 @@ function submitSiswaAbsenceReport(status) {
         return;
     }
 
-    // Ambil tanggal dari input jika ada, atau fallback ke tanggal hari ini
+    // Ambil tanggal dari input tanggal absen jika ada, atau tanggal operasional, atau fallback ke hari ini
+    const dateInputAbsen = document.getElementById('input-siswa-tanggal-absen');
     const dateInput = document.getElementById('input-siswa-tanggal');
+    const targetDateInput = (dateInputAbsen && dateInputAbsen.value) ? dateInputAbsen : dateInput;
+
     let dateFormatted = '';
-    if (dateInput && dateInput.value) {
-        const parts = dateInput.value.split('-');
+    if (targetDateInput && targetDateInput.value) {
+        const parts = targetDateInput.value.split('-');
         if (parts.length === 3) {
             dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
         }
