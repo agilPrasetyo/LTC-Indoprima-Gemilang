@@ -534,12 +534,18 @@ async function getUsersListFromSupabase() {
     return (users || []).map(u => {
       const rawRole = u.role || 'Siswa';
       const normalizedRole = rawRole.charAt(0).toUpperCase() + rawRole.slice(1).toLowerCase();
+      let passwordHint = '-';
+      if (normalizedRole === 'Siswa' && u.noreg) passwordHint = `${u.noreg}IPG`;
+      else if (normalizedRole === 'Admin') passwordHint = 'admin123';
+      else if (normalizedRole === 'Visitor') passwordHint = 'visitor123';
+
       return {
         id: u.id ? String(u.id) : '',
         namaLengkap: u.nama_lengkap || '',
         email: u.email || '',
         role: normalizedRole,
-        nomorRegistrasi: u.noreg || ''
+        nomorRegistrasi: u.noreg || '',
+        password: passwordHint
       };
     });
   } catch (error) {

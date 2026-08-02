@@ -1824,15 +1824,27 @@
 
     window.exportAdminAkunToExcel = function() {
         const doExport = (usersList) => {
-            const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'Role', 'NoReg', 'Status'];
-            let rows = (usersList || []).map(u => [
-                u.id || u.user_id || '-',
-                u.namaLengkap || u.nama_lengkap || u.nama || '-',
-                u.email || u.username || '-',
-                u.role || u.Role || '-',
-                u.nomorRegistrasi || u.noreg || '-',
-                u.status || 'AKTIF'
-            ]);
+            const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'Role', 'NoReg', 'Password', 'Status'];
+            let rows = (usersList || []).map(u => {
+                let passwordHint = u.password || '-';
+                if (!u.password || u.password === '-') {
+                    const roleUpper = String(u.role || '').toUpperCase();
+                    const noreg = u.nomorRegistrasi || u.noreg || '';
+                    if (roleUpper === 'SISWA' && noreg) passwordHint = `${noreg}IPG`;
+                    else if (roleUpper === 'ADMIN') passwordHint = 'admin123';
+                    else if (roleUpper === 'VISITOR') passwordHint = 'visitor123';
+                }
+
+                return [
+                    u.id || u.user_id || '-',
+                    u.namaLengkap || u.nama_lengkap || u.nama || '-',
+                    u.email || u.username || '-',
+                    u.role || u.Role || '-',
+                    u.nomorRegistrasi || u.noreg || '-',
+                    passwordHint,
+                    u.status || 'AKTIF'
+                ];
+            });
 
             if (rows.length === 0) {
                 const tbody = document.getElementById('admin-tbody');
@@ -1840,13 +1852,14 @@
                     const trs = tbody.querySelectorAll('tr');
                     trs.forEach(tr => {
                         const tds = tr.querySelectorAll('td');
-                        if (tds.length >= 5) {
+                        if (tds.length >= 6) {
                             rows.push([
                                 tds[0]?.innerText?.trim() || '-',
                                 tds[1]?.innerText?.trim() || '-',
                                 tds[2]?.innerText?.trim() || '-',
                                 tds[3]?.innerText?.trim() || '-',
                                 tds[4]?.innerText?.trim() || '-',
+                                tds[5]?.innerText?.trim() || '-',
                                 'AKTIF'
                             ]);
                         }
