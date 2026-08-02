@@ -914,10 +914,17 @@
         let logs = [];
         (activeData || []).forEach(siswa => {
             (siswa.dailyRecords || []).forEach(rec => {
+                let rawDate = rec.dateStr || rec.tanggal_record || '';
+                if (rawDate && rawDate.includes('/')) {
+                    const p = rawDate.split('/');
+                    if (p.length === 3) {
+                        rawDate = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+                    }
+                }
                 logs.push({
                     noreg: siswa.id,
                     namaLengkap: siswa.namaLengkap,
-                    tanggal: rec.dateStr || rec.tanggal_record || '',
+                    tanggal: rawDate,
                     hadir: rec.hadir || '✔',
                     plan: rec.plan !== null && rec.plan !== undefined ? rec.plan : null,
                     actual: rec.actual !== null && rec.actual !== undefined ? rec.actual : null,

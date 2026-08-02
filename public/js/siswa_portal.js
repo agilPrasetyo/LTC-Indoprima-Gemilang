@@ -290,18 +290,32 @@ function submitSiswaAbsenceReport(status) {
         return;
     }
 
-    // Default to today
-    const today = new Date();
-    const dd = String(today.getDate()).padStart(2, '0');
-    const mm = String(today.getMonth() + 1).padStart(2, '0');
-    const yyyy = today.getFullYear();
-    const dateFormatted = `${dd}/${mm}/${yyyy}`;
+    // Ambil tanggal dari input jika ada, atau fallback ke tanggal hari ini
+    const dateInput = document.getElementById('input-siswa-tanggal');
+    let dateFormatted = '';
+    if (dateInput && dateInput.value) {
+        const parts = dateInput.value.split('-');
+        if (parts.length === 3) {
+            dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
+        }
+    }
+    
+    if (!dateFormatted) {
+        const today = new Date();
+        const dd = String(today.getDate()).padStart(2, '0');
+        const mm = String(today.getMonth() + 1).padStart(2, '0');
+        const yyyy = today.getFullYear();
+        dateFormatted = `${dd}/${mm}/${yyyy}`;
+    }
 
     const payload = {
         NoReg: noreg,
         TanggalRecord: dateFormatted,
         Hadir: status,
         NamaSPV: spvAbsen,
+        Plan: 0,
+        Aktual: 0,
+        Reject: 0,
         Keterangan: `[SPV: ${spvAbsen}] ${ketAbsen}`
     };
 

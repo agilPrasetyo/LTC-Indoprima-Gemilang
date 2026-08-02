@@ -192,8 +192,17 @@ async function getStatsFromSupabase() {
   const logsByStudent = {};
   mLogs?.forEach(log => {
     if (!logsByStudent[log.noreg]) logsByStudent[log.noreg] = [];
+    
+    let rawDate = log.tanggal_record || '';
+    if (rawDate && rawDate.includes('/')) {
+      const parts = rawDate.split('/');
+      if (parts.length === 3) {
+        rawDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+
     logsByStudent[log.noreg].push({
-      dateStr: log.tanggal_record,
+      dateStr: rawDate,
       plan: log.plan,
       actual: log.aktual,
       reject: log.reject,
