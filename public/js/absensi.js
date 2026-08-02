@@ -497,34 +497,22 @@
         const rec = absensiData.find(r => r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg);
 
         if (!newStatus) {
-            // Delete record
-            if (rec && rec.rowIndex) {
-                // Delete from sheet
-                if (typeof google !== 'undefined') {
-                    showToast('Menghapus absensi...', 'info');
-                    google.script.run
-                        .withSuccessHandler(res => {
-                            if (res && res.success) {
-                                showToast(res.message, 'success');
-                                loadDashboardData();
-                            } else {
-                                showToast(res.message || 'Gagal menghapus.', 'error');
-                            }
-                        })
-                        .withFailureHandler(err => {
-                            showToast('Error: ' + (err.message || err), 'error');
-                        })
-                        .deleteAbsensi(rec.rowIndex);
-                } else {
-                    absensiData = absensiData.filter(r => !(r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg));
-                    showToast('Mode Preview: Data absensi dihapus.', 'success');
-                    renderAbsensiView();
-                }
-            } else {
-                // Was not saved in sheet or auto-generated, just refresh
-                absensiData = absensiData.filter(r => !(r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg));
-                renderAbsensiView();
-            }
+            // Delete record from Supabase (both absensi & manpower_log)
+            showToast('Menghapus data absensi...', 'info');
+            executeGASCall('deleteAbsensi', [currentEditNoreg, currentEditTanggal])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Data absensi berhasil dihapus!', 'success');
+                        absensiData = (absensiData || []).filter(r => !(r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg));
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAbsensiView();
+                    } else {
+                        showToast((res && res.message) || 'Gagal menghapus absensi.', 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error: ' + (err.message || err), 'error');
+                });
             closeAbsensiEditModal();
             return;
         }

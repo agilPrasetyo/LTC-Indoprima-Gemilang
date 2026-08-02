@@ -1235,29 +1235,21 @@
     }
 
     function executeManpowerLogDeletion(noreg, tanggal) {
-        let dateFormatted = tanggal;
-        if (tanggal && tanggal.includes('-')) {
-            const parts = tanggal.split('-');
-            dateFormatted = `${parts[2]}/${parts[1]}/${parts[0]}`;
-        }
-
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success !== false) {
+        showToast('Menghapus log manpower...', 'info');
+        executeGASCall('deleteManpowerLog', [noreg, tanggal])
+            .then(res => {
+                if (res && res.success !== false) {
                     showToast('Log manpower berhasil dihapus!', 'success');
                     _removeLocalManpowerCache(noreg, tanggal);
-                    renderAdminManpowerTable();
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else renderAdminManpowerTable();
                 } else {
-                    showToast('Gagal menghapus: ' + (res.message || 'Unknown error'), 'error');
+                    showToast('Gagal menghapus: ' + (res?.message || 'Unknown error'), 'error');
                 }
-            }).withFailureHandler(err => {
-                showToast('Error: ' + err.message, 'error');
-            }).deleteManpowerLog(noreg, dateFormatted);
-        } else {
-            showToast('Mode Preview: Log manpower dihapus dari memori lokal.', 'info');
-            _removeLocalManpowerCache(noreg, tanggal);
-            renderAdminManpowerTable();
-        }
+            })
+            .catch(err => {
+                showToast('Error: ' + (err.message || err), 'error');
+            });
     }
 
     function _removeLocalManpowerCache(noreg, tanggal) {

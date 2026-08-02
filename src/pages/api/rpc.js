@@ -793,10 +793,39 @@ async function handleLocalSupabaseWrite(action, args) {
       keterangan: l.Keterangan ? l.Keterangan.toUpperCase() : ''
     }, { onConflict: 'noreg,tanggal' });
 
+  } else if (action === 'deleteAbsensi') {
+    const noreg = args[0];
+    const tanggal = args[1]; // "2026-07-31" or "31/07/2026"
+
+    let dbDateYMD = tanggal;
+    let dbDateDMY = tanggal;
+    if (tanggal && tanggal.includes('/')) {
+      const p = tanggal.split('/');
+      dbDateYMD = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+    } else if (tanggal && tanggal.includes('-')) {
+      const p = tanggal.split('-');
+      dbDateDMY = `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    await supabase.from('absensi').delete().eq('noreg', noreg).eq('tanggal', dbDateYMD);
+    await supabase.from('manpower_log').delete().eq('noreg', noreg).or(`tanggal_record.eq.${dbDateDMY},tanggal_record.eq.${dbDateYMD}`);
+
   } else if (action === 'deleteManpowerLog') {
     const noreg = args[0];
-    const tanggalRecord = args[1];
-    await supabase.from('manpower_log').delete().eq('noreg', noreg).eq('tanggal_record', tanggalRecord);
+    const tanggal = args[1]; // "31/07/2026" or "2026-07-31"
+
+    let dbDateYMD = tanggal;
+    let dbDateDMY = tanggal;
+    if (tanggal && tanggal.includes('/')) {
+      const p = tanggal.split('/');
+      dbDateYMD = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+    } else if (tanggal && tanggal.includes('-')) {
+      const p = tanggal.split('-');
+      dbDateDMY = `${p[2]}/${p[1]}/${p[0]}`;
+    }
+
+    await supabase.from('manpower_log').delete().eq('noreg', noreg).or(`tanggal_record.eq.${dbDateDMY},tanggal_record.eq.${dbDateYMD}`);
+    await supabase.from('absensi').delete().eq('noreg', noreg).eq('tanggal', dbDateYMD);
 
   } else if (action === 'saveTransaksiKeuangan') {
     const t = args[0];
