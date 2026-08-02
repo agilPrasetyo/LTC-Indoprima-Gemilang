@@ -208,7 +208,12 @@ async function getStatsFromSupabase() {
       reject: log.reject,
       percent: log.persentase !== null ? parseFloat(log.persentase) : null,
       hadir: log.hadir,
-      keterangan: log.keterangan
+      keterangan: log.keterangan,
+      shift: log.shift,
+      bagian: log.bagian,
+      nomor_mesin: log.nomor_mesin,
+      model: log.model,
+      nama_spv: log.nama_spv
     });
   });
 
