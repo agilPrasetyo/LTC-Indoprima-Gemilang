@@ -1823,17 +1823,54 @@
     };
 
     window.exportAdminAkunToExcel = function() {
-        const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'NoReg', 'Role', 'Status'];
-        const dataToExport = (rawUsersData && rawUsersData.length > 0) ? rawUsersData : (typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
-        const rows = dataToExport.map(u => [
-            u.id || u.user_id || '-',
-            u.namaLengkap || u.nama_lengkap || u.nama || '-',
-            u.email || u.username || '-',
-            u.nomorRegistrasi || u.noreg || '-',
-            u.role || '-',
-            u.status || 'AKTIF'
-        ]);
-        exportDataArrayToExcel(headers, rows, 'Data_Manajemen_Akun_LTC.xlsx', 'Manajemen Akun');
+        const doExport = (usersList) => {
+            const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'Role', 'NoReg', 'Status'];
+            let rows = (usersList || []).map(u => [
+                u.id || u.user_id || '-',
+                u.namaLengkap || u.nama_lengkap || u.nama || '-',
+                u.email || u.username || '-',
+                u.role || u.Role || '-',
+                u.nomorRegistrasi || u.noreg || '-',
+                u.status || 'AKTIF'
+            ]);
+
+            if (rows.length === 0) {
+                const tbody = document.getElementById('admin-tbody');
+                if (tbody) {
+                    const trs = tbody.querySelectorAll('tr');
+                    trs.forEach(tr => {
+                        const tds = tr.querySelectorAll('td');
+                        if (tds.length >= 5) {
+                            rows.push([
+                                tds[0]?.innerText?.trim() || '-',
+                                tds[1]?.innerText?.trim() || '-',
+                                tds[2]?.innerText?.trim() || '-',
+                                tds[3]?.innerText?.trim() || '-',
+                                tds[4]?.innerText?.trim() || '-',
+                                'AKTIF'
+                            ]);
+                        }
+                    });
+                }
+            }
+
+            exportDataArrayToExcel(headers, rows, 'Data_Manajemen_Akun_LTC.xlsx', 'Manajemen Akun');
+        };
+
+        if (rawUsersData && rawUsersData.length > 0) {
+            doExport(rawUsersData);
+        } else {
+            showToast('Menyiapkan data ekspor akun...', 'info');
+            executeGASCall('getUsersList', [])
+                .then(data => {
+                    rawUsersData = data || [];
+                    doExport(rawUsersData);
+                })
+                .catch(err => {
+                    console.error('Error fetching users for export:', err);
+                    doExport(typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
+                });
+        }
     };
 
     window.exportAdminSiswaToExcel = function() {
