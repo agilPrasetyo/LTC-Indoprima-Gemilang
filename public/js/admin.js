@@ -51,15 +51,16 @@
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data pengguna...</td></tr>';
 
-            if (typeof google !== 'undefined') {
-                google.script.run.withSuccessHandler(data => {
+            executeGASCall('getUsersList', [])
+                .then(data => {
                     rawUsersData = data || [];
                     filterAdminUsersTable();
-                }).getUsersList();
-            } else {
-                rawUsersData = fallbackUsers;
-                filterAdminUsersTable();
-            }
+                })
+                .catch(err => {
+                    console.error('Gagal memuat data pengguna:', err);
+                    rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                    filterAdminUsersTable();
+                });
         } else if (currentAdminTab === 'kelola-siswa') {
             renderAdminSiswaTable();
         } else if (currentAdminTab === 'log-manpower') {
@@ -1823,11 +1824,12 @@
 
     window.exportAdminAkunToExcel = function() {
         const headers = ['User ID', 'Nama Lengkap', 'Email / Username', 'NoReg', 'Role', 'Status'];
-        const rows = (usersData || []).map(u => [
-            u.id || '-',
-            u.namaLengkap || '-',
+        const dataToExport = (rawUsersData && rawUsersData.length > 0) ? rawUsersData : (typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
+        const rows = dataToExport.map(u => [
+            u.id || u.user_id || '-',
+            u.namaLengkap || u.nama_lengkap || u.nama || '-',
             u.email || u.username || '-',
-            u.nomorRegistrasi || '-',
+            u.nomorRegistrasi || u.noreg || '-',
             u.role || '-',
             u.status || 'AKTIF'
         ]);
