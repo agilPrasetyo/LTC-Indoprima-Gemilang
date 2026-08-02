@@ -70,6 +70,7 @@ function resetSiswaPortalForm() {
 function toggleKehadiranSiswa(status) {
     const ketAbsenContainer = document.getElementById('siswa-ket-absen-container');
     const inputKetAbsen = document.getElementById('input-siswa-keterangan-absen');
+    const dateInputAbsen = document.getElementById('input-siswa-tanggal-absen');
     
     if (status === 'Hadir') {
         if (ketAbsenContainer) ketAbsenContainer.classList.add('hidden');
@@ -77,6 +78,13 @@ function toggleKehadiranSiswa(status) {
     } else {
         if (ketAbsenContainer) ketAbsenContainer.classList.remove('hidden');
         if (inputKetAbsen) inputKetAbsen.setAttribute('required', 'true');
+        if (dateInputAbsen && !dateInputAbsen.value) {
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            dateInputAbsen.value = `${yyyy}-${mm}-${dd}`;
+        }
         // Reset hubungi SPV radio to 'Tidak'
         const tidakRadio = document.querySelector('input[name="siswa-hubungi-spv"][value="Tidak"]');
         if (tidakRadio) {
