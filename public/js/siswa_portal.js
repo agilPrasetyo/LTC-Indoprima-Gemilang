@@ -367,53 +367,21 @@ function submitSiswaDailyReport() {
 function _sendSiswaReport(payload) {
     _updateSyncIndicator('syncing');
     
-    if (typeof google !== 'undefined') {
-        google.script.run.withSuccessHandler(res => {
-            if (res.success) {
+    executeGASCall('saveManpowerLog', [payload])
+        .then(res => {
+            if (res && res.success !== false) {
                 showToast('Laporan harian berhasil dikirim!', 'success');
                 _updateSyncIndicator('done');
                 showSuccessSiswaPortal();
             } else {
-                showToast('Gagal mengirim laporan: ' + res.message, 'error');
+                showToast('Gagal mengirim laporan: ' + ((res && res.message) || 'Unknown error'), 'error');
                 _updateSyncIndicator('error');
             }
-        }).withFailureHandler(err => {
+        })
+        .catch(err => {
             showToast('Error server: ' + (err.message || err.toString()), 'error');
             _updateSyncIndicator('error');
-        }).saveManpowerLog(payload);
-    } else {
-        // Fallback for preview mode
-        showToast('Mode Preview: Laporan disimpan ke database simulasi.', 'info');
-        _updateSyncIndicator('done');
-        
-        // Mock update in local memory
-        const noreg = payload.NoReg;
-        const studentIdx = fallbackSiswa.findIndex(std => std.id === noreg);
-        if (studentIdx !== -1) {
-            const recs = fallbackSiswa[studentIdx].dailyRecords || [];
-            const dateStr = payload.TanggalRecord.split('/').reverse().join('-');
-            const existIdx = recs.findIndex(r => r.dateStr === dateStr);
-            
-            const newRec = {
-                dateStr: dateStr,
-                hadir: payload.Hadir,
-                plan: payload.Plan || null,
-                actual: payload.Aktual || null,
-                reject: payload.Reject || null,
-                percent: payload.Plan ? Math.round((payload.Aktual / payload.Plan) * 100) : 100,
-                keterangan: payload.Keterangan || 'On duty'
-            };
-
-            if (existIdx !== -1) {
-                recs[existIdx] = newRec;
-            } else {
-                recs.push(newRec);
-            }
-            fallbackSiswa[studentIdx].dailyRecords = recs;
-        }
-
-        showSuccessSiswaPortal();
-    }
+        });
 }
 
 function showSuccessSiswaPortal() {

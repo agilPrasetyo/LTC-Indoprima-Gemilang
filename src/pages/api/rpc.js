@@ -762,10 +762,18 @@ async function handleLocalSupabaseWrite(action, args) {
       persentase = (aktualNum / planNum) * 100;
     }
 
+    let dbDate = l.TanggalRecord || '';
+    if (dbDate && dbDate.includes('/')) {
+      const parts = dbDate.split('/');
+      if (parts.length === 3) {
+        dbDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+
     await supabase.from('manpower_log').upsert({
       noreg: l.NoReg,
       nama_lengkap: studentName,
-      tanggal_record: l.TanggalRecord,
+      tanggal_record: dbDate,
       plan: l.Plan,
       aktual: l.Aktual,
       reject: l.Reject,
@@ -780,11 +788,6 @@ async function handleLocalSupabaseWrite(action, args) {
     }, { onConflict: 'noreg,tanggal_record' });
 
     // Sync directly to the absensi table for dashboard alignment
-    let dbDate = l.TanggalRecord;
-    if (dbDate && dbDate.includes('/')) {
-      const parts = dbDate.split('/');
-      dbDate = `${parts[2]}-${parts[1]}-${parts[0]}`;
-    }
     const hadirVal = l.Hadir ? l.Hadir.toUpperCase() : '✔';
     let statusAbsen = 'Hadir';
     if (hadirVal === 'IJIN') statusAbsen = 'Ijin';
