@@ -315,7 +315,7 @@
                 const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
                 const isFuture = dObj > todayEnd;
 
-                if (!isFuture && !isSunday && rec) {
+                if (!isFuture && rec) {
                     if (rec.status === 'Hadir') countH++;
                     else if (rec.status === 'Ijin') countI++;
                     else if (rec.status === 'Sakit') countS++;
@@ -356,10 +356,7 @@
                 if (isFuture) {
                     cellChar = '-';
                     cellClass = 'bg-slate-100 text-slate-300';
-                } else if (isSunday) {
-                    cellChar = 'X';
-                    cellClass = 'bg-slate-700 text-white font-bold';
-                } else if (rec) {
+                } else if (rec && rec.status) {
                     if (rec.status === 'Hadir') {
                         cellChar = 'H';
                         cellClass = 'bg-emerald-500 text-white font-bold hover:bg-emerald-600';
@@ -373,6 +370,9 @@
                         cellChar = 'S';
                         cellClass = 'bg-blue-500 text-white font-bold hover:bg-blue-600';
                     }
+                } else if (isSunday) {
+                    cellChar = 'X';
+                    cellClass = 'bg-slate-700 text-white font-bold';
                 }
 
                 const isClickable = !isFuture;
