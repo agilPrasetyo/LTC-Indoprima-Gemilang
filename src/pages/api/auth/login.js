@@ -12,44 +12,100 @@ export const POST = async ({ request, cookies }) => {
       });
     }
 
-    let targetEmail = (loginInput || '').trim().toLowerCase();
+    const cleanInput = (loginInput || '').trim();
+    const isEmail = cleanInput.includes('@');
+    let targetEmail = cleanInput.toLowerCase();
+    let foundProfile = null;
 
-    // Deteksi jika input adalah NoReg (hanya angka)
-    const isNoreg = /^\d+$/.test(loginInput.trim());
-    let noregVal = isNoreg ? loginInput : null;
-
-    if (isNoreg) {
-      // Cari email berdasarkan NoReg di tabel public.users
-      const { data: profile, error: profileErr } = await supabase
+    if (!isEmail) {
+      // Input adalah NoReg (bisa angka 2605044 atau gabungan huruf-angka PRA0782)
+      const { data: profile } = await supabase
         .from('users')
-        .select('email, noreg')
-        .eq('noreg', loginInput)
-        .single();
+        .select('*')
+        .ilike('noreg', cleanInput)
+        .maybeSingle();
 
-      if (profileErr || !profile) {
-        return new Response(JSON.stringify({ success: false, message: 'Nomor Registrasi tidak terdaftar.' }), {
-          status: 400,
-          headers: { 'Content-Type': 'application/json' }
-        });
+      if (profile) {
+        foundProfile = profile;
+        targetEmail = profile.email ? profile.email.toLowerCase() : `${cleanInput.toLowerCase()}@indoprima.com`;
+      } else {
+        const { data: siswaProf } = await supabase
+          .from('siswa')
+          .select('*')
+          .ilike('noreg', cleanInput)
+          .maybeSingle();
+
+        if (siswaProf) {
+          targetEmail = `${cleanInput.toLowerCase()}@indoprima.com`;
+        } else {
+          return new Response(JSON.stringify({ success: false, message: `Nomor Registrasi ${cleanInput} tidak terdaftar.` }), {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
       }
-      targetEmail = profile.email;
     }
 
-    // 1. Coba login langsung terlebih dahulu (99% kasus akan langsung sukses)
+    // 1. Coba login langsung ke Supabase Auth
     let { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
       email: targetEmail,
       password: password
     });
 
-    // 2. Jika gagal dan merupakan user default, jalankan auto-seeded (Self-Healing)
-    if (authErr && (
+    // 2. Self-Healing Auto-Creation: Jika auth error tetapi merupakan siswa terdaftar (misal PRA0782)
+    if (authErr && !isEmail) {
+      const noregUpper = cleanInput.toUpperCase();
+      const studentEmail = targetEmail.includes('@') ? targetEmail : `${cleanInput.toLowerCase()}@indoprima.com`;
+
+      const { data: siswaInfo } = await supabase
+        .from('siswa')
+        .select('*')
+        .ilike('noreg', cleanInput)
+        .maybeSingle();
+
+      const studentName = foundProfile?.nama_lengkap || siswaInfo?.nama_lengkap || 'SISWA LTC';
+
+      console.log(`[Self-Healing] Memicu registrasi auth otomatis untuk Siswa NoReg: ${noregUpper}`);
+
+      const { data: usersList } = await supabase.auth.admin.listUsers();
+      const existingAuth = usersList?.users?.find(u => u.email?.toLowerCase() === studentEmail.toLowerCase());
+
+      let authId;
+      if (existingAuth) {
+        authId = existingAuth.id;
+        await supabase.auth.admin.updateUserById(authId, { password: password });
+      } else {
+        const { data: newAuth } = await supabase.auth.admin.createUser({
+          email: studentEmail,
+          password: password,
+          email_confirm: true,
+          user_metadata: { role: 'SISWA', name: studentName }
+        });
+        if (newAuth?.user) authId = newAuth.user.id;
+      }
+
+      if (authId) {
+        await supabase.from('users').upsert({
+          id: authId,
+          noreg: noregUpper,
+          email: studentEmail,
+          nama_lengkap: studentName,
+          role: 'SISWA'
+        }, { onConflict: 'id' });
+      }
+
+      // Coba login ulang
+      const retryResult = await supabase.auth.signInWithPassword({
+        email: studentEmail,
+        password: password
+      });
+      authData = retryResult.data;
+      authErr = retryResult.error;
+    } else if (authErr && isEmail && (
       (targetEmail === 'admin@indoprima.com' && password === 'admin123') ||
-      (targetEmail === 'visitor@indoprima.com' && password === 'visitor123') ||
-      ((targetEmail === 'student@indoprima.com' || targetEmail === 'student@indoprima.com') && password === 'student123') ||
-      (targetEmail === '2601176' && password === 'siswa123')
+      (targetEmail === 'visitor@indoprima.com' && password === 'visitor123')
     )) {
-      console.log(`[Self-Healing] Memicu auto-seed untuk user default: ${targetEmail}`);
-      
+      console.log(`[Self-Healing] Memicu auto-seed untuk default admin/visitor: ${targetEmail}`);
       if (targetEmail === 'admin@indoprima.com' && password === 'admin123') {
         const { data: usersList } = await supabase.auth.admin.listUsers();
         const existing = usersList?.users?.find(u => u.email === 'admin@indoprima.com');
@@ -64,15 +120,12 @@ export const POST = async ({ request, cookies }) => {
           if (newAuth?.user) authId = newAuth.user.id;
         }
         if (authId) {
-          const { data: dbProfile } = await supabase.from('users').select('id').eq('id', authId).single();
-          if (!dbProfile) {
-            await supabase.from('users').insert({
-              id: authId,
-              email: 'admin@indoprima.com',
-              nama_lengkap: 'Admin Utama',
-              role: 'ADMIN'
-            });
-          }
+          await supabase.from('users').upsert({
+            id: authId,
+            email: 'admin@indoprima.com',
+            nama_lengkap: 'Admin Utama',
+            role: 'ADMIN'
+          }, { onConflict: 'id' });
         }
       } else if (targetEmail === 'visitor@indoprima.com' && password === 'visitor123') {
         const { data: usersList } = await supabase.auth.admin.listUsers();
@@ -88,45 +141,15 @@ export const POST = async ({ request, cookies }) => {
           if (newAuth?.user) authId = newAuth.user.id;
         }
         if (authId) {
-          const { data: dbProfile } = await supabase.from('users').select('id').eq('id', authId).single();
-          if (!dbProfile) {
-            await supabase.from('users').insert({
-              id: authId,
-              email: 'visitor@indoprima.com',
-              nama_lengkap: 'Visitor Dashboard',
-              role: 'VISITOR'
-            });
-          }
-        }
-      } else if ((targetEmail === 'student@indoprima.com' || targetEmail === '2601176') && (password === 'student123' || password === 'siswa123')) {
-        targetEmail = 'student@indoprima.com';
-        const { data: usersList } = await supabase.auth.admin.listUsers();
-        const existing = usersList?.users?.find(u => u.email === 'student@indoprima.com');
-        let authId = existing?.id;
-        if (!existing) {
-          const { data: newAuth } = await supabase.auth.admin.createUser({
-            email: 'student@indoprima.com',
-            password: 'student123',
-            email_confirm: true,
-            user_metadata: { role: 'SISWA', name: 'Ahmad Subarjo' }
-          });
-          if (newAuth?.user) authId = newAuth.user.id;
-        }
-        if (authId) {
-          const { data: dbProfile } = await supabase.from('users').select('id').eq('id', authId).single();
-          if (!dbProfile) {
-            await supabase.from('users').insert({
-              id: authId,
-              noreg: '2601176',
-              email: 'student@indoprima.com',
-              nama_lengkap: 'Ahmad Subarjo',
-              role: 'SISWA'
-            });
-          }
+          await supabase.from('users').upsert({
+            id: authId,
+            email: 'visitor@indoprima.com',
+            nama_lengkap: 'Visitor Dashboard',
+            role: 'VISITOR'
+          }, { onConflict: 'id' });
         }
       }
 
-      // Coba masuk kembali setelah seeding selesai
       const retryResult = await supabase.auth.signInWithPassword({
         email: targetEmail,
         password: password
