@@ -174,7 +174,10 @@
                 const masukDateObj = siswa.masuk ? (typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(siswa.masuk) : new Date(siswa.masuk)) : null;
                 let curr = new Date(cutoffDateObj.getTime());
                 while (curr <= todayObj) {
-                    const dStr = curr.toISOString().split('T')[0];
+                    const y = curr.getFullYear();
+                    const m = String(curr.getMonth() + 1).padStart(2, '0');
+                    const d = String(curr.getDate()).padStart(2, '0');
+                    const dStr = `${y}-${m}-${d}`;
                     const isSun = curr.getDay() === 0;
                     const isSat = curr.getDay() === 6;
                     const isWorkDay = !isSun && (!isSat || !String(siswa.hk || '').includes('5'));
@@ -319,7 +322,7 @@
                     if (rec.status === 'Hadir') countH++;
                     else if (rec.status === 'Ijin') countI++;
                     else if (rec.status === 'Sakit') countS++;
-                    else if (rec.status === 'Alpha') countA++;
+                    else if (rec.status === 'Alpha' && !isSunday) countA++;
                 }
             }
 
@@ -363,16 +366,23 @@
                     } else if (rec.status === 'Ijin') {
                         cellChar = 'I';
                         cellClass = 'bg-amber-400 text-white font-bold hover:bg-amber-500';
-                    } else if (rec.status === 'Alpha') {
-                        cellChar = 'A';
-                        cellClass = 'bg-rose-500 text-white font-bold hover:bg-rose-600';
                     } else if (rec.status === 'Sakit') {
                         cellChar = 'S';
                         cellClass = 'bg-blue-500 text-white font-bold hover:bg-blue-600';
+                    } else if (rec.status === 'Alpha') {
+                        if (isSunday) {
+                            // Hari Minggu jika tidak ada absensi manual eksplisit -> dikosongi (-)
+                            cellChar = '-';
+                            cellClass = 'bg-rose-50/60 text-slate-400 font-bold';
+                        } else {
+                            cellChar = 'A';
+                            cellClass = 'bg-rose-500 text-white font-bold hover:bg-rose-600';
+                        }
                     }
                 } else if (isSunday) {
-                    cellChar = 'X';
-                    cellClass = 'bg-slate-700 text-white font-bold';
+                    // Hari Minggu tanpa absensi -> dikosongi (-)
+                    cellChar = '-';
+                    cellClass = 'bg-rose-50/60 text-slate-400 font-bold hover:bg-rose-100/60';
                 }
 
                 const isClickable = !isFuture;
@@ -380,7 +390,7 @@
                     <td class="p-0 border-r border-b border-slate-100 text-center ${cellClass}" style="min-width:36px; width:36px; height:36px;">
                         <button ${isClickable ? `onclick="openAbsensiEditModal('${s.id}', '${s.namaLengkap.replace(/'/g, "\\'")}', '${dateStr}')"` : 'disabled'}
                                 class="w-full h-full min-h-[36px] text-[11px] font-bold flex items-center justify-center transition-all ${!isClickable ? 'cursor-default' : 'cursor-pointer'}"
-                                title="${isFuture ? 'Belum terjadi' : (rec ? (rec.status + (rec.keterangan ? ': ' + rec.keterangan : '')) : (isSunday ? 'Hari Minggu' : 'Belum absen'))}">
+                                title="${isFuture ? 'Belum terjadi' : (rec ? (rec.status + (rec.keterangan ? ': ' + rec.keterangan : '')) : (isSunday ? 'Hari Minggu (Libur)' : 'Belum absen'))}">
                             ${cellChar}
                         </button>
                     </td>
@@ -425,10 +435,14 @@
 
         absensiData.forEach(r => {
             if (r.tanggal.startsWith(prefix) && r.tanggal <= todayStr && targetNoregs[r.noreg]) {
+                const parts = r.tanggal.split('-');
+                const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+                const isSunday = dObj.getDay() === 0;
+
                 if (r.status === 'Hadir') totalHadir++;
                 else if (r.status === 'Ijin') totalIjin++;
-                else if (r.status === 'Alpha') totalAlpha++;
                 else if (r.status === 'Sakit') totalSakit++;
+                else if (r.status === 'Alpha' && !isSunday) totalAlpha++;
             }
         });
 
