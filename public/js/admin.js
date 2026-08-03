@@ -803,29 +803,14 @@
                     else {
                         renderAdminSiswaTable();
                         renderAdminTurnoverTable();
-            const idx = (activeData || []).findIndex(s => s.id === noreg);
-            if (idx !== -1) activeData.splice(idx, 1);
-
-            // Tambahkan ke activeTurnoverData lokal
-            if (siswaData) {
-                const today = new Date();
-                const fmt = d => `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-                activeTurnoverData.unshift({
-                    id: noreg,
-                    namaLengkap: siswaData.namaLengkap,
-                    bagian: siswaData.bagian,
-                    masuk: siswaData.masuk,
-                    tanggalKeluar: fmt(today),
-                    alasan: alasan || 'Dikeluarkan',
-                    keterangan: keterangan || ''
-                });
-            }
-
-            showToast('Mode Preview: Siswa dihapus & dicatat ke Turnover lokal.', 'info');
-            renderAdminSiswaTable();
-            renderAdminTurnoverTable();
-            setTimeout(() => loadDashboardData(), 300);
-        }
+                    }
+                } else {
+                    showToast('Gagal menghapus siswa: ' + (res?.message || 'Unknown error'), 'error');
+                }
+            })
+            .catch(err => {
+                showToast('Error server: ' + (err.message || err.toString()), 'error');
+            });
     }
 
     // ============================================================
