@@ -603,22 +603,39 @@ async function createUserInSupabase(u) {
 
 async function updateUserInSupabase(u) {
   try {
+    const newNoReg = u.nomorRegistrasi ? u.nomorRegistrasi.trim() : null;
+    const newName = u.namaLengkap ? u.namaLengkap.toUpperCase().trim() : '';
+
+    // Ambil data profil lama sebelum update
+    const { data: oldUser } = await supabase.from('users').select('*').eq('id', u.id).single();
+    const oldNoReg = oldUser?.noreg;
+
     const updateData = {
-      nama_lengkap: u.namaLengkap ? u.namaLengkap.toUpperCase() : '',
+      nama_lengkap: newName,
       email: u.email,
       role: u.role ? u.role.toUpperCase() : 'SISWA',
-      noreg: u.nomorRegistrasi || null
+      noreg: newNoReg
     };
 
     const { error } = await supabase.from('users').update(updateData).eq('id', u.id);
     if (error) throw error;
 
-    // Update password di Supabase Auth jika diinput
-    if (u.password) {
-      const { error: passErr } = await supabase.auth.admin.updateUserById(u.id, {
-        password: u.password
-      });
-      if (passErr) console.warn('Gagal memperbarui password Auth:', passErr.message);
+    // Update Auth Supabase (Email & Password)
+    const authUpdate = {};
+    if (u.email) authUpdate.email = u.email;
+    if (u.password) authUpdate.password = u.password;
+
+    if (Object.keys(authUpdate).length > 0) {
+      const { error: passErr } = await supabase.auth.admin.updateUserById(u.id, authUpdate);
+      if (passErr) console.warn('Gagal memperbarui Auth user:', passErr.message);
+    }
+
+    // PENTING: Jika NoReg diubah di Manajemen Akun, sinkronkan otomatis ke tabel siswa, absensi, dan manpower_log
+    if (oldNoReg && newNoReg && oldNoReg !== newNoReg) {
+      await supabase.from('siswa').update({ noreg: newNoReg, nama_lengkap: newName }).eq('noreg', oldNoReg);
+      await supabase.from('absensi').update({ noreg: newNoReg, nama_lengkap: newName }).eq('noreg', oldNoReg);
+      await supabase.from('manpower_log').update({ noreg: newNoReg, nama_lengkap: newName }).eq('noreg', oldNoReg);
+      await supabase.from('safety_log').update({ noreg: newNoReg, nama: newName }).eq('noreg', oldNoReg);
     }
 
     return { success: true };
@@ -646,74 +663,139 @@ async function deleteUserFromSupabase(userId) {
 async function handleLocalSupabaseWrite(action, args) {
   if (action === 'saveSiswa') {
     const s = args[0];
+    const newNoReg = s.NoReg ? s.NoReg.trim() : '';
+    const oldNoReg = s.OldNoReg ? s.OldNoReg.trim() : newNoReg;
     const nameUpper = s.NamaLengkap ? s.NamaLengkap.toUpperCase().trim() : '';
 
-    // Cek duplikasi nama untuk mencegah siswa aktif yang sama didaftarkan dengan noreg berbeda
-    const { data: dupCheck } = await supabase
-      .from('siswa')
-      .select('noreg')
-      .eq('nama_lengkap', nameUpper)
-      .eq('status', 'AKTIF')
-      .neq('noreg', s.NoReg)
-      .limit(1);
+    // PENTING: Jika NoReg diubah saat Edit Informasi Siswa
+    if (oldNoReg && newNoReg && oldNoReg !== newNoReg) {
+      // 1. Update NoReg di tabel siswa
+      const { error: siswaErr } = await supabase
+        .from('siswa')
+        .update({
+          noreg: newNoReg,
+          nama_lengkap: nameUpper,
+          kelas: s.Kelas,
+          departemen: s.Departemen ? s.Departemen.toUpperCase() : (s.Bagian ? s.Bagian.toUpperCase() : null),
+          section: s.Section ? s.Section.toUpperCase() : '',
+          hk: s.HK ? s.HK.toUpperCase() : (s.HariKerja ? s.HariKerja.toUpperCase() : '6 HARI'),
+          nama_spv: s.NamaSPV ? s.NamaSPV.toUpperCase() : null,
+          tanggal_masuk: s.TanggalMasuk,
+          tanggal_keluar: s.TanggalKeluar || null,
+          asal_daerah: s.AsalDaerah ? s.AsalDaerah.toUpperCase() : null,
+          asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
+          distribusi: s.Distribusi
+        })
+        .eq('noreg', oldNoReg);
 
-    if (dupCheck && dupCheck.length > 0) {
-      throw new Error(`Siswa dengan nama "${nameUpper}" sudah terdaftar sebagai siswa AKTIF dengan NoReg ${dupCheck[0].noreg}!`);
-    }
-    
-    // 1. Simpan/update data siswa
-    await supabase.from('siswa').upsert({
-      noreg: s.NoReg,
-      nama_lengkap: s.NamaLengkap ? s.NamaLengkap.toUpperCase() : '',
-      kelas: s.Kelas,
-      departemen: s.Departemen ? s.Departemen.toUpperCase() : (s.Bagian ? s.Bagian.toUpperCase() : null),
-      section: s.Section ? s.Section.toUpperCase() : '',
-      hk: s.HK ? s.HK.toUpperCase() : (s.HariKerja ? s.HariKerja.toUpperCase() : '6 HARI'),
-      nama_spv: s.NamaSPV ? s.NamaSPV.toUpperCase() : null,
-      tanggal_masuk: s.TanggalMasuk,
-      tanggal_keluar: s.TanggalKeluar || null,
-      asal_daerah: s.AsalDaerah ? s.AsalDaerah.toUpperCase() : null,
-      asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
-      distribusi: s.Distribusi,
-      status: 'AKTIF'
-    });
+      if (siswaErr) throw siswaErr;
 
-    // 2. Buat akun kredensial login otomatis jika belum terdaftar
-    const { data: existingUser } = await supabase.from('users').select('id').eq('noreg', s.NoReg).single();
-    if (!existingUser) {
-      const email = `${s.NoReg}@indoprima.com`;
-      const password = `${s.NoReg}IPG`;
-      let authId;
-      const { data: authUser, error: authErr } = await supabase.auth.admin.createUser({
-        email: email,
-        password: password,
-        email_confirm: true,
-        user_metadata: { role: 'SISWA', name: s.NamaLengkap ? s.NamaLengkap.toUpperCase() : '' }
+      // 2. Cascade Update ke Manajemen Akun (public.users & Auth)
+      const newEmail = `${newNoReg.toLowerCase()}@indoprima.com`;
+      const newPassword = `${newNoReg}IPG`;
+
+      const { data: existingUser } = await supabase
+        .from('users')
+        .select('*')
+        .eq('noreg', oldNoReg)
+        .maybeSingle();
+
+      if (existingUser) {
+        await supabase
+          .from('users')
+          .update({
+            noreg: newNoReg,
+            email: newEmail,
+            nama_lengkap: nameUpper
+          })
+          .eq('id', existingUser.id);
+
+        await supabase.auth.admin.updateUserById(existingUser.id, {
+          email: newEmail,
+          password: newPassword
+        }).catch(err => console.warn('Auth update error:', err));
+      } else {
+        let authId;
+        const { data: newAuth } = await supabase.auth.admin.createUser({
+          email: newEmail,
+          password: newPassword,
+          email_confirm: true,
+          user_metadata: { role: 'SISWA', name: nameUpper }
+        }).catch(err => ({ error: err }));
+
+        if (newAuth?.user) {
+          authId = newAuth.user.id;
+          await supabase.from('users').upsert({
+            id: authId,
+            noreg: newNoReg,
+            email: newEmail,
+            nama_lengkap: nameUpper,
+            role: 'SISWA'
+          }, { onConflict: 'id' });
+        }
+      }
+
+      // 3. Cascade Update ke tabel terkait (absensi, manpower_log, safety_log)
+      await supabase.from('absensi').update({ noreg: newNoReg, nama_lengkap: nameUpper }).eq('noreg', oldNoReg);
+      await supabase.from('manpower_log').update({ noreg: newNoReg, nama_lengkap: nameUpper }).eq('noreg', oldNoReg);
+      await supabase.from('safety_log').update({ noreg: newNoReg, nama: nameUpper }).eq('noreg', oldNoReg);
+
+    } else {
+      // Upsert biasa jika NoReg tidak berubah atau siswa baru
+      const { data: dupCheck } = await supabase
+        .from('siswa')
+        .select('noreg')
+        .eq('nama_lengkap', nameUpper)
+        .eq('status', 'AKTIF')
+        .neq('noreg', newNoReg)
+        .limit(1);
+
+      if (dupCheck && dupCheck.length > 0) {
+        throw new Error(`Siswa dengan nama "${nameUpper}" sudah terdaftar sebagai siswa AKTIF dengan NoReg ${dupCheck[0].noreg}!`);
+      }
+      
+      await supabase.from('siswa').upsert({
+        noreg: newNoReg,
+        nama_lengkap: nameUpper,
+        kelas: s.Kelas,
+        departemen: s.Departemen ? s.Departemen.toUpperCase() : (s.Bagian ? s.Bagian.toUpperCase() : null),
+        section: s.Section ? s.Section.toUpperCase() : '',
+        hk: s.HK ? s.HK.toUpperCase() : (s.HariKerja ? s.HariKerja.toUpperCase() : '6 HARI'),
+        nama_spv: s.NamaSPV ? s.NamaSPV.toUpperCase() : null,
+        tanggal_masuk: s.TanggalMasuk,
+        tanggal_keluar: s.TanggalKeluar || null,
+        asal_daerah: s.AsalDaerah ? s.AsalDaerah.toUpperCase() : null,
+        asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
+        distribusi: s.Distribusi,
+        status: 'AKTIF'
       });
-      if (authErr) {
-        if (authErr.message.includes('already been registered')) {
-          const { data: usersList } = await supabase.auth.admin.listUsers();
-          const existing = usersList?.users?.find(usr => usr.email === email);
-          if (existing) {
-            authId = existing.id;
-          }
+
+      const { data: existingUser } = await supabase.from('users').select('id').eq('noreg', newNoReg).maybeSingle();
+      if (!existingUser) {
+        const email = `${newNoReg.toLowerCase()}@indoprima.com`;
+        const password = `${newNoReg}IPG`;
+        let authId;
+        const { data: authUser } = await supabase.auth.admin.createUser({
+          email: email,
+          password: password,
+          email_confirm: true,
+          user_metadata: { role: 'SISWA', name: nameUpper }
+        }).catch(err => ({ error: err }));
+        if (authUser?.user) {
+          authId = authUser.user.id;
+          await supabase.from('users').upsert({
+            id: authId,
+            noreg: newNoReg,
+            email: email,
+            nama_lengkap: nameUpper,
+            role: 'SISWA'
+          }, { onConflict: 'id' });
         }
       } else {
-        authId = authUser?.user?.id;
+        await supabase.from('users').update({
+          nama_lengkap: nameUpper
+        }).eq('noreg', newNoReg);
       }
-      if (authId) {
-        await supabase.from('users').upsert({
-          id: authId,
-          noreg: s.NoReg,
-          email: email,
-          nama_lengkap: s.NamaLengkap ? s.NamaLengkap.toUpperCase() : '',
-          role: 'SISWA'
-        });
-      }
-    } else {
-      await supabase.from('users').update({
-        nama_lengkap: s.NamaLengkap ? s.NamaLengkap.toUpperCase() : ''
-      }).eq('noreg', s.NoReg);
     }
 
   } else if (action === 'deleteSiswa') {

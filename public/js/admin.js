@@ -233,25 +233,22 @@
         const payload = { id: userId, namaLengkap: nama, email, role, nomorRegistrasi: noreg };
         if (pass) payload.password = pass;
 
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success) {
-                    showToast('Akun berhasil diperbarui!');
+        showToast('Memperbarui data akun...', 'info');
+
+        executeGASCall('updateUser', [payload])
+            .then(res => {
+                if (res && res.success !== false) {
+                    showToast('Akun berhasil diperbarui!', 'success');
                     closeUserEditModal();
-                    renderAdminView();
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else renderAdminView();
                 } else {
-                    showToast('Gagal memperbarui akun: ' + res.message, 'error');
+                    showToast('Gagal memperbarui akun: ' + (res?.message || 'Unknown error'), 'error');
                 }
-            }).updateUser(payload);
-        } else {
-            const idx = fallbackUsers.findIndex(u => u.id === userId);
-            if (idx !== -1) {
-                fallbackUsers[idx] = { ...fallbackUsers[idx], ...payload };
-                showToast('Mode Preview: Akun berhasil diperbarui.');
-                closeUserEditModal();
-                renderAdminView();
-            }
-        }
+            })
+            .catch(err => {
+                showToast('Error server: ' + (err.message || err.toString()), 'error');
+            });
     }
 
     function deleteUserAdmin(userId) {
@@ -267,21 +264,21 @@
     }
 
     function executeUserDeletion(userId) {
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success) {
-                    showToast('Pengguna berhasil dihapus.');
-                    renderAdminView();
+        showToast('Menghapus akun pengguna...', 'info');
+
+        executeGASCall('deleteUserById', [userId])
+            .then(res => {
+                if (res && res.success !== false) {
+                    showToast('Pengguna berhasil dihapus.', 'success');
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else renderAdminView();
                 } else {
-                    showToast('Gagal menghapus pengguna: ' + res.message, 'error');
+                    showToast('Gagal menghapus pengguna: ' + (res?.message || 'Unknown error'), 'error');
                 }
-            }).deleteUserById(userId);
-        } else {
-            showToast('Mode Preview: Pengguna dihapus dari memori lokal.', 'info');
-            const idx = fallbackUsers.findIndex(u => u.id === userId);
-            if (idx !== -1) fallbackUsers.splice(idx, 1);
-            renderAdminView();
-        }
+            })
+            .catch(err => {
+                showToast('Error server: ' + (err.message || err.toString()), 'error');
+            });
     }
 
     function syncExternalToLocalAdmin() {
@@ -601,10 +598,11 @@
         modal.classList.remove('hidden');
         // Reset Modal Form
         document.getElementById('student-edit-mode').value = isEdit ? "true" : "false";
-        document.getElementById('student-noreg').disabled = isEdit;
+        document.getElementById('student-noreg').disabled = false; // Membolehkan pengeditan NoReg
         document.getElementById('student-modal-title').textContent = isEdit ? "Edit Informasi Siswa" : "Tambah Siswa Baru";
         
         if (!isEdit) {
+            document.getElementById('student-old-noreg').value = '';
             document.getElementById('student-noreg').value = '';
             document.getElementById('student-nama').value = '';
             document.getElementById('student-hk').value = '6 Hari';
@@ -653,6 +651,7 @@
         
         openStudentModal(true);
         
+        document.getElementById('student-old-noreg').value = s.id;
         document.getElementById('student-noreg').value = s.id;
         document.getElementById('student-nama').value = s.namaLengkap;
         // Auto-hitung kelas dari tanggal masuk (mengikuti rumus DATEDIF)
@@ -700,6 +699,7 @@
     }
 
     function saveStudent() {
+        const oldNoReg = document.getElementById('student-old-noreg').value.trim();
         const noreg = document.getElementById('student-noreg').value.trim();
         const nama = document.getElementById('student-nama').value.trim();
         const kelas = document.getElementById('student-kelas').value.trim();
@@ -720,6 +720,7 @@
         }
 
         const payload = {
+            OldNoReg: oldNoReg || noreg,
             NoReg: noreg,
             NamaLengkap: nama,
             Kelas: kelas,
@@ -735,68 +736,22 @@
             isEdit: isEdit
         };
 
-        google.script.run.withSuccessHandler(res => {
-            if (res.success) {
-                showToast('Data siswa berhasil disimpan!');
-                closeStudentModal();
+        showToast('Menyimpan data siswa...', 'info');
 
-                // ====================================================
-                // OPTIMISTIC UPDATE: langsung update activeData lokal
-                // agar tabel segera berubah tanpa menunggu server reload
-                // ====================================================
-                const perfLabel = (section.includes('ADM') || section.includes('ADMINISTRASI')) ? 'Hadir' : 'Plan';
-
-                if (isEdit) {
-                    // Update record yang sudah ada di activeData
-                    const idx = (activeData || []).findIndex(s => s.id === noreg);
-                    if (idx !== -1) {
-                        activeData[idx].namaLengkap = nama;
-                        activeData[idx].kelas = kelas;
-                        activeData[idx].departemen = departemen;
-                        activeData[idx].section = section;
-                        activeData[idx].spv = spv;
-                        activeData[idx].masuk = tglMasuk;
-                        activeData[idx].tanggalKeluar = tglKeluar;
-                        activeData[idx].distribusi = distribusi;
-                        activeData[idx].daerahAsal = asal;
-                        activeData[idx].asalSekolah = sekolah;
-                        activeData[idx].hk = hk;
-                    }
+        executeGASCall('saveSiswa', [payload])
+            .then(res => {
+                if (res && res.success !== false) {
+                    showToast('Data siswa berhasil disimpan!', 'success');
+                    closeStudentModal();
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else renderAdminSiswaTable();
                 } else {
-                    // Tambahkan siswa baru ke activeData
-                    if (!(activeData || []).some(s => s.id === noreg)) {
-                        activeData.push({
-                            id: noreg,
-                            namaLengkap: nama,
-                            kelas: kelas,
-                            departemen: departemen,
-                            section: section,
-                            spv: spv,
-                            masuk: tglMasuk,
-                            tanggalKeluar: tglKeluar,
-                            distribusi: distribusi,
-                            daerahAsal: asal,
-                            asalSekolah: sekolah,
-                            hk: hk,
-                            perfLabel: perfLabel,
-                            nilai: 0,
-                            status: 'Aktif',
-                            dailyRecords: []
-                        });
-                    }
+                    showToast('Gagal menyimpan data siswa: ' + (res?.message || 'Unknown error'), 'error');
                 }
-
-                // Re-render tabel SEGERA dengan data lokal yang sudah diperbarui
-                renderAdminSiswaTable();
-
-                // Refresh dari server di background (tidak menghambat UI)
-                setTimeout(() => loadDashboardData(), 1500);
-            } else {
-                showToast('Gagal menyimpan data siswa: ' + res.message, 'error');
-            }
-        }).withFailureHandler(err => {
-            showToast('Gagal menyimpan: ' + (err.message || err), 'error');
-        }).saveSiswa(payload);
+            })
+            .catch(err => {
+                showToast('Gagal menyimpan: ' + (err.message || err.toString()), 'error');
+            });
     }
 
 
@@ -838,42 +793,16 @@
     }
 
     function executeStudentDeletion(noreg, alasan, keterangan) {
-        if (typeof google !== 'undefined') {
-            showToast('Menghapus siswa dan mencatat turnover...', 'info');
+        showToast('Menghapus siswa dan mencatat turnover...', 'info');
 
-            google.script.run
-                .withSuccessHandler(res => {
-                    if (res.success) {
-                        // Optimistic update: hapus dari activeData lokal LANGSUNG
-                        const idx = (activeData || []).findIndex(s => s.id === noreg);
-                        if (idx !== -1) {
-                            activeData.splice(idx, 1);
-                        }
-                        // Re-render tabel SEGERA dengan data yang sudah diperbarui
+        executeGASCall('deleteSiswa', [noreg, alasan, keterangan])
+            .then(res => {
+                if (res && res.success !== false) {
+                    showToast('Siswa dihapus & tercatat di Turnover!', 'success');
+                    if (typeof loadDashboardData === 'function') loadDashboardData();
+                    else {
                         renderAdminSiswaTable();
                         renderAdminTurnoverTable();
-
-                        showToast('Siswa dihapus & tercatat di Turnover!', 'success');
-
-                        // Refresh data dari server di background (tidak perlu tunggu)
-                        setTimeout(() => {
-                            loadDashboardData();
-                        }, 1500);
-                    } else {
-                        showToast('Gagal menghapus siswa: ' + res.message, 'error');
-                    }
-                })
-                .withFailureHandler(err => {
-                    showToast('Error: ' + err.message, 'error');
-                })
-                .deleteSiswa(noreg, alasan, keterangan);
-        } else {
-            // Mode Preview: simulasi lokal
-            const siswaIdx = fallbackSiswa.findIndex(s => s.id === noreg);
-            const siswaData = siswaIdx !== -1 ? fallbackSiswa[siswaIdx] : null;
-            if (siswaIdx !== -1) fallbackSiswa.splice(siswaIdx, 1);
-
-            // Hapus juga dari activeData lokal
             const idx = (activeData || []).findIndex(s => s.id === noreg);
             if (idx !== -1) activeData.splice(idx, 1);
 
