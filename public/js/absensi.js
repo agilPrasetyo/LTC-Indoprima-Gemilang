@@ -164,16 +164,17 @@
             });
         });
 
-        // Auto-detect Auto-Alpha for working days starting on CUTOFF_DATE (2026-08-02) up to today
+        // Auto-detect Auto-Alpha for PAST working days starting on CUTOFF_DATE (2026-08-02) strictly before today
         const cutoffStr = window.ABSENSI_CUTOFF_DATE || '2026-08-02';
         const cutoffDateObj = typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(cutoffStr) : new Date(cutoffStr);
         const todayObj = new Date();
+        const todayStart = new Date(todayObj.getFullYear(), todayObj.getMonth(), todayObj.getDate()); // Midnight today local
 
         if (cutoffDateObj && !isNaN(cutoffDateObj.getTime())) {
             (activeData || []).forEach(siswa => {
                 const masukDateObj = siswa.masuk ? (typeof parseDateYYYYMMDD === 'function' ? parseDateYYYYMMDD(siswa.masuk) : new Date(siswa.masuk)) : null;
                 let curr = new Date(cutoffDateObj.getTime());
-                while (curr <= todayObj) {
+                while (curr < todayStart) { // Hanya untuk HARI YANG SUDAH LALU (sebelum hari ini)
                     const y = curr.getFullYear();
                     const m = String(curr.getMonth() + 1).padStart(2, '0');
                     const d = String(curr.getDate()).padStart(2, '0');
