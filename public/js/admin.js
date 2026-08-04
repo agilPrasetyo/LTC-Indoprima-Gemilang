@@ -7,6 +7,16 @@
     // Sama persis dengan rumus Excel yang digunakan
     // ============================================================
     function hitungKelas(sOrMasuk) {
+        if (typeof sOrMasuk === 'object' && sOrMasuk !== null) {
+            if (sOrMasuk.kelas && sOrMasuk.kelas !== '-' && sOrMasuk.kelas !== 'null' && sOrMasuk.kelas !== 'undefined') {
+                const strK = String(sOrMasuk.kelas).trim();
+                if (strK.length > 0) {
+                    const num = parseInt(strK.replace(/Kelas\s+/i, ''));
+                    if (!isNaN(num)) return 'Kelas ' + num;
+                    return strK;
+                }
+            }
+        }
         let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
         if (!tgl) return (typeof sOrMasuk === 'object' && sOrMasuk ? sOrMasuk.kelas : 'Kelas 1') || 'Kelas 1';
         if (typeof hitungKelasSiswa === 'function') {
@@ -654,8 +664,7 @@
         document.getElementById('student-old-noreg').value = s.id;
         document.getElementById('student-noreg').value = s.id;
         document.getElementById('student-nama').value = s.namaLengkap;
-        // Auto-hitung kelas dari tanggal masuk (mengikuti rumus DATEDIF)
-        document.getElementById('student-kelas').value = hitungKelas(s.masuk);
+        document.getElementById('student-kelas').value = s.kelas || hitungKelas(s.masuk);
         document.getElementById('student-hk').value = s.hk || s.hariKerja || '6 Hari';
         document.getElementById('student-departemen').value = s.departemen || 'PRODUKSI';
         document.getElementById('student-section').value = s.section || 'PAINTING';

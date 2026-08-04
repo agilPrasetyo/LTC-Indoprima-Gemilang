@@ -298,8 +298,9 @@
 
         let tbodyHTML = '';
         students.forEach((s, idx) => {
-            // Tentukan warna badge kelas
-            const kelasNum = parseInt((s.kelas || '').replace(/\D/g, '')) || 1;
+            // Tentukan warna badge kelas berdasarkan kelas terdaftar dari Manajemen Siswa
+            const studentKelas = s.kelas || _getStudentKelas(s.id);
+            const kelasNum = parseInt((studentKelas || '').replace(/\D/g, '')) || 1;
             let kelasBadge = '';
             if (kelasNum === 1) kelasBadge = 'bg-red-100 text-red-800 border-red-300';
             else if (kelasNum === 2) kelasBadge = 'bg-amber-100 text-amber-800 border-amber-300';
@@ -335,7 +336,7 @@
                     <td class="px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px;">${s.id}</td>
                     <td class="px-3 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 bg-white z-10 sticky whitespace-normal break-words" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px;">${s.namaLengkap}</td>
                     <td class="px-2 py-2.5 text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px;">
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${kelasBadge}">${s.kelas || 'Kelas 1'}</span>
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${kelasBadge}">${studentKelas}</span>
                     </td>
                     <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-emerald-50 text-emerald-800 z-10 sticky" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px;">${countH}</td>
                     <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-amber-50 text-amber-800 z-10 sticky" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px;">${countI}</td>
