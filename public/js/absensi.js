@@ -280,8 +280,18 @@
             students = students.filter(s => s.namaLengkap.toLowerCase().includes(nameQuery));
         }
 
-        // Sort students alphabetically
-        students.sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
+        // Sort students: Utama berdasarkan Kelas (Kelas 5 paling atas sampai Kelas 1 paling bawah), kedua berdasarkan Nama (A-Z)
+        students.sort((a, b) => {
+            const kA = a.kelas || _getStudentKelas(a.id);
+            const kB = b.kelas || _getStudentKelas(b.id);
+            const numA = parseInt((kA || '').replace(/\D/g, '')) || 1;
+            const numB = parseInt((kB || '').replace(/\D/g, '')) || 1;
+
+            if (numA !== numB) {
+                return numB - numA; // Urutkan menurun: Kelas 5 -> 4 -> 3 -> 2 -> 1
+            }
+            return a.namaLengkap.localeCompare(b.namaLengkap); // Urutkan A-Z untuk kelas yang sama
+        });
 
         // 3. Render Table Body
         if (students.length === 0) {
