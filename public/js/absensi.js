@@ -21,10 +21,19 @@
         return count;
     }
 
+    let hasInitializedAbsensiMonthYear = false;
+
     function renderAbsensiView() {
         const monthSelect = document.getElementById('abs-filter-month');
         const yearInput = document.getElementById('abs-filter-year');
         if (!monthSelect || !yearInput) return;
+
+        if (!hasInitializedAbsensiMonthYear) {
+            const now = new Date();
+            monthSelect.value = now.getMonth().toString();
+            yearInput.value = now.getFullYear().toString();
+            hasInitializedAbsensiMonthYear = true;
+        }
 
         const month = parseInt(monthSelect.value);
         const year = parseInt(yearInput.value);
