@@ -973,15 +973,21 @@ function updateAbsensiChart() {
         'Kelas 5': { hadir: 0, tidakHadir: 0 }
     };
 
-    // 1. Buat peta kelas siswa dari activeData & activeTurnoverData
-    const studentClassMap = {};
+    // 1. Buat peta kelas dan rentang tanggal aktif siswa dari activeData & activeTurnoverData
+    const studentMap = {};
     const allStudents = [...(typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []), ...(typeof activeTurnoverData !== 'undefined' && Array.isArray(activeTurnoverData) ? activeTurnoverData : [])];
     allStudents.forEach(s => {
         const idKey = s.id || s.noreg || s.no_reg;
-        if (idKey) studentClassMap[idKey] = s.kelas || 'Kelas 1';
+        if (idKey) {
+            studentMap[idKey] = {
+                kelas: s.kelas || 'Kelas 1',
+                masuk: s.masuk || s.tglMasuk || s.tanggalMasuk || '',
+                keluar: s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || ''
+            };
+        }
     });
 
-    // 2. Agregasi 100% murni dan eksklusif dari data resmi absensi (absensiData)
+    // 2. Agregasi 100% murni dan eksklusif dari data resmi absensi (absensiData) sesuai periode aktif siswa
     const records = (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) ? absensiData : (window.absensiData || []);
 
     records.forEach(a => {
@@ -993,6 +999,13 @@ function updateAbsensiChart() {
         // Abaikan entri Minggu
         if (st === 'X' || stLower === 'hari minggu' || stLower === 'x') return;
 
+        // Periksa apakah siswa aktif pada tanggal rekaman ini
+        const studentInfo = studentMap[a.noreg || a.id || a.siswa_id];
+        if (studentInfo) {
+            if (studentInfo.masuk && a.tanggal < studentInfo.masuk) return;
+            if (studentInfo.keluar && a.tanggal > studentInfo.keluar) return;
+        }
+
         let key = a.tanggal.substring(0, 7); // YYYY-MM
         if (filterType === 'date-range') {
             key = a.tanggal; // YYYY-MM-DD
@@ -1003,7 +1016,7 @@ function updateAbsensiChart() {
         }
 
         // Tentukan kelas siswa
-        const rawK = a.kelas || studentClassMap[a.noreg || a.id || a.siswa_id] || 'Kelas 1';
+        const rawK = a.kelas || (studentInfo ? studentInfo.kelas : 'Kelas 1');
         const num = parseInt(String(rawK).replace(/\D/g, '')) || 1;
         const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
 

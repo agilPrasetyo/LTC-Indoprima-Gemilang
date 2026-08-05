@@ -275,8 +275,31 @@
             theadRow.appendChild(th);
         }
 
-        // 2. Filter Students
-        let students = [...(activeData || [])];
+        // 2. Filter Students (Hanya siswa yang aktif pada periode/bulan terpilih)
+        const allStudents = [...(activeData || []), ...(activeTurnoverData || [])];
+        const uniqueMap = {};
+        allStudents.forEach(s => {
+            if (s.id && !uniqueMap[s.id]) {
+                uniqueMap[s.id] = s;
+            }
+        });
+
+        const firstDayStr = `${year}-${String(month + 1).padStart(2, '0')}-01`;
+        const lastDayNum = new Date(year, month + 1, 0).getDate();
+        const lastDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDayNum).padStart(2, '0')}`;
+
+        let students = Object.values(uniqueMap).filter(s => {
+            const masuk = s.masuk || s.tglMasuk || s.tanggalMasuk || '';
+            const keluar = s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || '';
+
+            // Syarat 1: Tanggal Masuk <= Hari Terakhir Bulan ini
+            if (masuk && masuk > lastDayStr) return false;
+            // Syarat 2: Tanggal Keluar >= Hari Pertama Bulan ini
+            if (keluar && keluar < firstDayStr) return false;
+
+            return true;
+        });
+
         if (classVal !== 'all') {
             if (classVal === 'Kelas 5') {
                 students = students.filter(s => {
@@ -308,7 +331,7 @@
 
         // 3. Render Table Body
         if (students.length === 0) {
-            tbody.innerHTML = `<tr><td colspan="${8 + daysInMonth}" class="px-3 py-8 text-center text-slate-400 text-xs bg-white">Tidak ada siswa aktif ditemukan. Silakan sesuaikan filter pencarian Anda.</td></tr>`;
+            tbody.innerHTML = `<tr><td colspan="${8 + daysInMonth}" class="px-3 py-8 text-center text-slate-400 text-xs bg-white">Tidak ada siswa aktif ditemukan pada periode ini. Silakan sesuaikan filter pencarian Anda.</td></tr>`;
             document.getElementById('abs-calendar-count').innerText = '0 siswa';
             return;
         }
@@ -331,6 +354,9 @@
             else if (kelasNum === 4) kelasBadge = 'bg-sky-100 text-sky-800 border-sky-300';
             else kelasBadge = 'bg-slate-200 text-slate-800 border-slate-300';
 
+            const sMasuk = s.masuk || s.tglMasuk || s.tanggalMasuk || '';
+            const sKeluar = s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || '';
+
             // Hitung akumulasi statistik absensi individual untuk bulan ini
             let countH = 0, countI = 0, countS = 0, countA = 0;
             for (let day = 1; day <= daysInMonth; day++) {
@@ -343,7 +369,11 @@
                 const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
                 const isFuture = dObj > todayEnd;
 
-                if (!isFuture && rec) {
+                const isBeforeMasuk = sMasuk && dateStr < sMasuk;
+                const isAfterKeluar = sKeluar && dateStr > sKeluar;
+                const isInactiveDate = isBeforeMasuk || isAfterKeluar;
+
+                if (!isFuture && !isInactiveDate && rec) {
                     if (rec.status === 'Hadir') countH++;
                     else if (rec.status === 'Ijin') countI++;
                     else if (rec.status === 'Sakit') countS++;
@@ -381,10 +411,18 @@
                 const todayEnd = new Date(); todayEnd.setHours(23, 59, 59, 999);
                 const isFuture = dObj > todayEnd;
 
+                const isBeforeMasuk = sMasuk && dateStr < sMasuk;
+                const isAfterKeluar = sKeluar && dateStr > sKeluar;
+                const isInactiveDate = isBeforeMasuk || isAfterKeluar;
+
                 let cellChar = '-';
                 let cellClass = 'bg-slate-100 text-slate-300 hover:bg-slate-200/80';
+                let isClickable = !isFuture && !isInactiveDate;
 
-                if (isFuture) {
+                if (isInactiveDate) {
+                    cellChar = '-';
+                    cellClass = 'bg-slate-100/60 text-slate-300 font-normal cursor-default';
+                } else if (isFuture) {
                     cellChar = '-';
                     cellClass = 'bg-slate-100 text-slate-300';
                 } else if (rec && rec.status) {
@@ -399,7 +437,6 @@
                         cellClass = 'bg-blue-500 text-white font-bold hover:bg-blue-600';
                     } else if (rec.status === 'Alpha') {
                         if (isSunday) {
-                            // Hari Minggu jika tidak ada absensi manual eksplisit -> dikosongi (-)
                             cellChar = '-';
                             cellClass = 'bg-rose-50/60 text-slate-400 font-bold';
                         } else {
@@ -408,17 +445,15 @@
                         }
                     }
                 } else if (isSunday) {
-                    // Hari Minggu tanpa absensi -> dikosongi (-)
                     cellChar = '-';
                     cellClass = 'bg-rose-50/60 text-slate-400 font-bold hover:bg-rose-100/60';
                 }
 
-                const isClickable = !isFuture;
                 rowHTML += `
                     <td class="p-0 border-r border-b border-slate-100 text-center ${cellClass}" style="min-width:36px; width:36px; height:36px;">
                         <button ${isClickable ? `onclick="openAbsensiEditModal('${s.id}', '${s.namaLengkap.replace(/'/g, "\\'")}', '${dateStr}')"` : 'disabled'}
                                 class="w-full h-full min-h-[36px] text-[11px] font-bold flex items-center justify-center transition-all ${!isClickable ? 'cursor-default' : 'cursor-pointer'}"
-                                title="${isFuture ? 'Belum terjadi' : (rec ? (rec.status + (rec.keterangan ? ': ' + rec.keterangan : '')) : (isSunday ? 'Hari Minggu (Libur)' : 'Belum absen'))}">
+                                title="${isInactiveDate ? (isBeforeMasuk ? 'Belum bergabung LTC' : 'Sudah keluar/lulus LTC') : (isFuture ? 'Belum terjadi' : (rec ? (rec.status + (rec.keterangan ? ': ' + rec.keterangan : '')) : (isSunday ? 'Hari Minggu (Libur)' : 'Belum absen')))}">
                             ${cellChar}
                         </button>
                     </td>
