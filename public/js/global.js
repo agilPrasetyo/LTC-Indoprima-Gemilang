@@ -187,6 +187,11 @@ if (typeof Chart !== 'undefined') {
 
     function getStudentCurrentKelas(s) {
         if (!s) return 'Kelas 1';
+        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk || s.tgl_masuk;
+        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tgl_keluar;
+        if (tglMasuk) {
+            return hitungKelasSiswa(tglMasuk, tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
+        }
         if (s.kelas && s.kelas !== '-' && s.kelas !== 'null' && s.kelas !== 'undefined') {
             const strK = String(s.kelas).trim();
             if (strK.length > 0) {
@@ -194,11 +199,6 @@ if (typeof Chart !== 'undefined') {
                 if (!isNaN(num)) return 'Kelas ' + num;
                 return strK;
             }
-        }
-        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk || s.tgl_masuk;
-        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tgl_keluar;
-        if (tglMasuk) {
-            return hitungKelasSiswa(tglMasuk, tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
         }
         return 'Kelas 1';
     }
