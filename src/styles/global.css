@@ -372,3 +372,28 @@ input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):
     text-transform: none !important;
 }
 
+/* Responsive Sticky Columns for Absensi Calendar Table */
+@media (min-width: 768px) {
+    .abs-col-no { position: sticky !important; left: 0px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
+    .abs-col-noreg { position: sticky !important; left: 40px !important; width: 80px !important; min-width: 80px !important; max-width: 80px !important; z-index: 30; display: table-cell !important; }
+    .abs-col-nama { position: sticky !important; left: 120px !important; width: 200px !important; min-width: 200px !important; max-width: 200px !important; z-index: 30; }
+    .abs-col-kelas { position: sticky !important; left: 320px !important; width: 90px !important; min-width: 90px !important; max-width: 90px !important; z-index: 30; }
+    .abs-col-h { position: sticky !important; left: 410px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
+    .abs-col-i { position: sticky !important; left: 450px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
+    .abs-col-s { position: sticky !important; left: 490px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
+    .abs-col-a { position: sticky !important; left: 530px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
+    .abs-col-pct { position: sticky !important; left: 570px !important; width: 50px !important; min-width: 50px !important; max-width: 50px !important; z-index: 30; }
+}
+
+@media (max-width: 767px) {
+    .abs-col-no { position: sticky !important; left: 0px !important; width: 32px !important; min-width: 32px !important; max-width: 32px !important; z-index: 30; font-size: 10px !important; padding-left: 2px !important; padding-right: 2px !important; }
+    .abs-col-noreg { display: none !important; }
+    .abs-col-nama { position: sticky !important; left: 32px !important; width: 130px !important; min-width: 130px !important; max-width: 130px !important; z-index: 30; font-size: 11px !important; padding-left: 6px !important; padding-right: 6px !important; }
+    .abs-col-kelas { position: static !important; width: 75px !important; min-width: 75px !important; max-width: 75px !important; z-index: 20; }
+    .abs-col-h { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }
+    .abs-col-i { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }
+    .abs-col-s { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }
+    .abs-col-a { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }
+    .abs-col-pct { position: static !important; width: 44px !important; min-width: 44px !important; max-width: 44px !important; z-index: 20; }
+}
+
