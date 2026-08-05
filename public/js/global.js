@@ -1407,9 +1407,15 @@ if (typeof Chart !== 'undefined') {
 
         // Store absensi data & safety data from server
         absensiData = data.absensi || [];
+        window.absensiData = absensiData;
         safetyData = data.safety || [];
         window.safetyData = safetyData;
         currentVersion = data.version || "";
+
+        // Trigger real-time sync for Rekap Absensi Siswa chart on dashboard
+        if (typeof updateAbsensiChart === 'function') {
+            updateAbsensiChart();
+        }
 
         const cardStats = data.cards || {};
         const turnDetails = cardStats.turnoverDetails || { resign: 0, lulus: 0, indisipliner: 0 };

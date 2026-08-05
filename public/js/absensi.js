@@ -224,6 +224,10 @@
         });
 
         absensiData = Object.values(mergedMap);
+        window.absensiData = absensiData;
+        if (typeof updateAbsensiChart === 'function') {
+            updateAbsensiChart();
+        }
     }
     function _getStudentKelas(noreg) {
         const student = (activeData || []).find(s => s.id === noreg);

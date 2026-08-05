@@ -965,59 +965,58 @@ function updateAbsensiChart() {
     const endDate = document.getElementById('absensi-chart-end-date')?.value;
 
     const grouped = {};
+    const classBreakdown = {
+        'Kelas 1': { hadir: 0, tidakHadir: 0 },
+        'Kelas 2': { hadir: 0, tidakHadir: 0 },
+        'Kelas 3': { hadir: 0, tidakHadir: 0 },
+        'Kelas 4': { hadir: 0, tidakHadir: 0 },
+        'Kelas 5': { hadir: 0, tidakHadir: 0 }
+    };
 
-    // 1. Agregasi dari rawSiswaData (log harian siswa)
-    if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
-        rawSiswaData.forEach(s => {
-            const logs = s.dailyLogs || s.dailyRecords || [];
-            if (Array.isArray(logs)) {
-                logs.forEach(dl => {
-                    const dateStr = dl.dateStr || dl.tanggal || dl.tanggal_record;
-                    if (!dateStr) return;
+    // 1. Buat peta kelas siswa dari activeData & activeTurnoverData
+    const studentClassMap = {};
+    const allStudents = [...(typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []), ...(typeof activeTurnoverData !== 'undefined' && Array.isArray(activeTurnoverData) ? activeTurnoverData : [])];
+    allStudents.forEach(s => {
+        const idKey = s.id || s.noreg || s.no_reg;
+        if (idKey) studentClassMap[idKey] = s.kelas || 'Kelas 1';
+    });
 
-                    let key = dateStr.substring(0, 7); // YYYY-MM
-                    if (filterType === 'date-range') {
-                        key = dateStr; // YYYY-MM-DD
-                    }
+    // 2. Agregasi 100% murni dan eksklusif dari data resmi absensi (absensiData)
+    const records = (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) ? absensiData : (window.absensiData || []);
 
-                    if (!grouped[key]) {
-                        grouped[key] = { hadir: 0, tidakHadir: 0 };
-                    }
+    records.forEach(a => {
+        if (!a.tanggal) return;
 
-                    const hVal = (dl.hadir || '').toString().trim().toLowerCase();
-                    const ketVal = (dl.keterangan || '').toString().trim().toLowerCase();
+        const st = (a.status || '').toString().trim();
+        const stLower = st.toLowerCase();
+        
+        // Abaikan entri Minggu
+        if (st === 'X' || stLower === 'hari minggu' || stLower === 'x') return;
 
-                    if (ketVal.includes('sakit') || hVal === 'sakit' || hVal === 's' ||
-                        ketVal.includes('izin') || hVal === 'izin' || hVal === 'i' ||
-                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'alpa' || hVal === 'a') {
-                        grouped[key].tidakHadir += 1;
-                    } else {
-                        grouped[key].hadir += 1;
-                    }
-                });
-            }
-        });
-    }
+        let key = a.tanggal.substring(0, 7); // YYYY-MM
+        if (filterType === 'date-range') {
+            key = a.tanggal; // YYYY-MM-DD
+        }
 
-    // 2. Agregasi dari absensiData (catatan absensi manual)
-    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
-        absensiData.forEach(a => {
-            if (!a.tanggal) return;
-            let key = a.tanggal.substring(0, 7);
-            if (filterType === 'date-range') {
-                key = a.tanggal;
-            }
+        if (!grouped[key]) {
+            grouped[key] = { hadir: 0, tidakHadir: 0 };
+        }
 
-            if (!grouped[key]) {
-                grouped[key] = { hadir: 0, tidakHadir: 0 };
-            }
+        // Tentukan kelas siswa
+        const rawK = a.kelas || studentClassMap[a.noreg || a.id || a.siswa_id] || 'Kelas 1';
+        const num = parseInt(String(rawK).replace(/\D/g, '')) || 1;
+        const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
 
-            const st = (a.status || '').toString().trim().toLowerCase();
-            if (st === 'alpha' || st === 'alpa' || st === 'a' || st === 'sakit' || st === 's' || st === 'izin' || st === 'i') {
-                grouped[key].tidakHadir += 1;
-            }
-        });
-    }
+        if (st === 'Hadir' || stLower === 'hadir' || st === 'H' || stLower === 'h') {
+            grouped[key].hadir += 1;
+            classBreakdown[kKey].hadir += 1;
+        } else if (st === 'Ijin' || stLower === 'ijin' || stLower === 'izin' || st === 'I' ||
+                   st === 'Sakit' || stLower === 'sakit' || st === 'S' ||
+                   st === 'Alpha' || stLower === 'alpha' || stLower === 'alpa' || st === 'A') {
+            grouped[key].tidakHadir += 1;
+            classBreakdown[kKey].tidakHadir += 1;
+        }
+    });
 
     let sortedKeys = Object.keys(grouped).sort();
 
@@ -1066,7 +1065,8 @@ function updateAbsensiChart() {
     const percentageData = sortedKeys.map(k => {
         const h = grouped[k].hadir;
         const th = grouped[k].tidakHadir;
-        return h > 0 ? Math.round((th / h) * 100) : 0;
+        const total = h + th;
+        return total > 0 ? Math.round((th / total) * 100) : 0;
     });
 
     const gradient = chartCtx.createLinearGradient(0, 0, 0, 300);
@@ -1198,67 +1198,7 @@ function updateAbsensiChart() {
         }
     });
 
-    // Populate Breakdown Kehadiran per Kelas (Synchronized with absensiData & rawSiswaData)
-    const classBreakdown = {
-        'Kelas 1': { hadir: 0, tidakHadir: 0 },
-        'Kelas 2': { hadir: 0, tidakHadir: 0 },
-        'Kelas 3': { hadir: 0, tidakHadir: 0 },
-        'Kelas 4': { hadir: 0, tidakHadir: 0 },
-        'Kelas 5': { hadir: 0, tidakHadir: 0 }
-    };
-
-    // 1. Process daily logs from activeData
-    if (typeof activeData !== 'undefined' && Array.isArray(activeData)) {
-        activeData.forEach(s => {
-            let k = s.kelas || 'Kelas 1';
-            const num = parseInt(String(k).replace(/Kelas\s+/i, ''));
-            const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
-
-            const logs = s.dailyLogs || s.dailyRecords || [];
-            if (Array.isArray(logs) && logs.length > 0) {
-                logs.forEach(dl => {
-                    const hVal = (dl.hadir || '').toString().trim().toLowerCase();
-                    const ketVal = (dl.keterangan || '').toString().trim().toLowerCase();
-                    if (ketVal.includes('sakit') || hVal === 'sakit' || hVal === 's' ||
-                        ketVal.includes('izin') || ketVal.includes('ijin') || hVal === 'izin' || hVal === 'ijin' || hVal === 'i' ||
-                        ketVal.includes('alpha') || ketVal.includes('alpa') || hVal === 'alpha' || hVal === 'alpa' || hVal === 'a') {
-                        classBreakdown[kKey].tidakHadir += 1;
-                    } else {
-                        classBreakdown[kKey].hadir += 1;
-                    }
-                });
-            } else {
-                classBreakdown[kKey].hadir += 20;
-            }
-        });
-    }
-
-    // 2. Process real absensi records from absensiData (Sakit, Izin, Alpha)
-    if (typeof absensiData !== 'undefined' && Array.isArray(absensiData)) {
-        const studentClassMap = {};
-        if (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData)) {
-            rawSiswaData.forEach(s => {
-                const idKey = s.noreg || s.id || s.no_reg;
-                if (idKey) studentClassMap[idKey] = s.kelas;
-            });
-        }
-
-        absensiData.forEach(a => {
-            let k = a.kelas || studentClassMap[a.noreg || a.id || a.siswa_id] || 'Kelas 1';
-            const num = parseInt(String(k).replace(/Kelas\s+/i, ''));
-            const kKey = (num >= 1 && num <= 5) ? `Kelas ${num}` : (num >= 5 ? 'Kelas 5' : 'Kelas 1');
-
-            const st = (a.status || a.keterangan || '').toString().trim().toLowerCase();
-            if (st.includes('alpha') || st.includes('alpa') || st === 'a' ||
-                st.includes('sakit') || st === 's' ||
-                st.includes('izin') || st.includes('ijin') || st === 'i') {
-                classBreakdown[kKey].tidakHadir += 1;
-            } else if (st.includes('hadir') || st === 'h') {
-                classBreakdown[kKey].hadir += 1;
-            }
-        });
-    }
-
+    // Populate Breakdown Kehadiran per Kelas (Synchronized 100% with absensiData)
     const bdContainer = document.getElementById('absensi-class-breakdown-container');
     if (bdContainer) {
         bdContainer.innerHTML = '';
