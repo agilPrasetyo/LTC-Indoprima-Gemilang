@@ -244,17 +244,17 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         // 1. Render Table Header
-        // Reset header to first 9 static/sticky columns
+        // Reset header: sticky ONLY for first 3 columns (No, Noreg, Nama Siswa)
         theadRow.innerHTML = `
-            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-0" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px;">No</th>
-            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[40px]" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px;">Noreg</th>
-            <th class="px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[120px]" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px;">Nama Siswa</th>
-            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[320px]" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px;">Kelas</th>
-            <th class="px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-slate-200 bg-emerald-100 z-30 sticky top-0 left-[410px]" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Hadir">H</th>
-            <th class="px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-slate-200 bg-amber-100 z-30 sticky top-0 left-[450px]" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Ijin">I</th>
-            <th class="px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-slate-200 bg-blue-100 z-30 sticky top-0 left-[490px]" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Sakit">S</th>
-            <th class="px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-slate-200 bg-rose-100 z-30 sticky top-0 left-[530px]" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px;" title="Total Alpha">A</th>
-            <th class="px-1 py-3 text-center text-indigo-800 font-bold border-r border-b border-slate-200 bg-indigo-100 z-30 sticky top-0 left-[570px]" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px;" title="Persentase Kehadiran">%</th>
+            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-0" style="position: sticky; left: 0px; width: 38px; min-width: 38px; max-width: 38px;">No</th>
+            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[38px]" style="position: sticky; left: 38px; width: 72px; min-width: 72px; max-width: 72px;">Noreg</th>
+            <th class="px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 z-30 sticky top-0 left-[110px]" style="position: sticky; left: 110px; width: 150px; min-width: 150px; max-width: 150px;">Nama Siswa</th>
+            <th class="px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0 z-20" style="width: 75px; min-width: 75px; max-width: 75px;">Kelas</th>
+            <th class="px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-slate-200 bg-emerald-100 sticky top-0 z-20" style="width: 36px; min-width: 36px; max-width: 36px;" title="Total Hadir">H</th>
+            <th class="px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-slate-200 bg-amber-100 sticky top-0 z-20" style="width: 36px; min-width: 36px; max-width: 36px;" title="Total Ijin">I</th>
+            <th class="px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-slate-200 bg-blue-100 sticky top-0 z-20" style="width: 36px; min-width: 36px; max-width: 36px;" title="Total Sakit">S</th>
+            <th class="px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-slate-200 bg-rose-100 sticky top-0 z-20" style="width: 36px; min-width: 36px; max-width: 36px;" title="Total Alpha">A</th>
+            <th class="px-1 py-3 text-center text-indigo-800 font-bold border-r border-b border-slate-200 bg-indigo-100 sticky top-0 z-20" style="width: 44px; min-width: 44px; max-width: 44px;" title="Persentase Kehadiran">%</th>
         `;
 
         const daysOfWeek = ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'];
@@ -351,17 +351,17 @@
 
             let rowHTML = `
                 <tr class="hover:bg-slate-50/50 transition-colors">
-                    <td class="px-2 py-2.5 text-slate-400 font-mono text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky left-0" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px;">${idx + 1}</td>
-                    <td class="px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px;">${s.id}</td>
-                    <td class="px-3 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 bg-white z-10 sticky whitespace-normal break-words" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px;">${s.namaLengkap}</td>
-                    <td class="px-2 py-2.5 text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px;">
+                    <td class="px-2 py-2.5 text-slate-400 font-mono text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky left-0" style="position: sticky; left: 0px; width: 38px; min-width: 38px; max-width: 38px;">${idx + 1}</td>
+                    <td class="px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100 bg-white z-10 sticky" style="position: sticky; left: 38px; width: 72px; min-width: 72px; max-width: 72px;">${s.id}</td>
+                    <td class="px-2.5 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 bg-white z-10 sticky whitespace-normal break-words" style="position: sticky; left: 110px; width: 150px; min-width: 150px; max-width: 150px;">${s.namaLengkap}</td>
+                    <td class="px-2 py-2.5 text-center text-xs border-r border-b border-slate-100 bg-white" style="width: 75px; min-width: 75px; max-width: 75px;">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${kelasBadge}">${studentKelas}</span>
                     </td>
-                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-emerald-50 text-emerald-800 z-10 sticky" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px;">${countH}</td>
-                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-amber-50 text-amber-800 z-10 sticky" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px;">${countI}</td>
-                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-blue-50 text-blue-800 z-10 sticky" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px;">${countS}</td>
-                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-rose-50 text-rose-800 z-10 sticky" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px;">${countA}</td>
-                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-indigo-50 text-indigo-800 z-10 sticky" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px;">${pct}%</td>
+                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-emerald-50 text-emerald-800" style="width: 36px; min-width: 36px; max-width: 36px;">${countH}</td>
+                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-amber-50 text-amber-800" style="width: 36px; min-width: 36px; max-width: 36px;">${countI}</td>
+                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-blue-50 text-blue-800" style="width: 36px; min-width: 36px; max-width: 36px;">${countS}</td>
+                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-rose-50 text-rose-800" style="width: 36px; min-width: 36px; max-width: 36px;">${countA}</td>
+                    <td class="px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-indigo-50 text-indigo-800" style="width: 44px; min-width: 44px; max-width: 44px;">${pct}%</td>
             `;
 
             for (let day = 1; day <= daysInMonth; day++) {
