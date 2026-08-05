@@ -446,12 +446,25 @@
         // Jalankan populasi filter secara dinamis
         populateAdminSiswaFilters();
 
+        const queryFilter = (document.getElementById('filter-siswa-query')?.value || '').toLowerCase().trim();
         const sectionFilter = document.getElementById('filter-siswa-section')?.value || '';
         const kelasFilter = document.getElementById('filter-siswa-kelas')?.value || '';
         const asalFilter = document.getElementById('filter-siswa-asal')?.value || '';
         const sekolahFilter = document.getElementById('filter-siswa-sekolah')?.value || '';
 
         let filtered = students.filter(s => String(s.status || '').toUpperCase() === "AKTIF");
+
+        if (queryFilter) {
+            filtered = filtered.filter(s => 
+                (s.namaLengkap || '').toLowerCase().includes(queryFilter) ||
+                (s.id || '').toLowerCase().includes(queryFilter) ||
+                (s.section || '').toLowerCase().includes(queryFilter) ||
+                (s.departemen || '').toLowerCase().includes(queryFilter) ||
+                (s.spv || '').toLowerCase().includes(queryFilter) ||
+                (s.asalSekolah || '').toLowerCase().includes(queryFilter) ||
+                (s.daerahAsal || s.asalDaerah || '').toLowerCase().includes(queryFilter)
+            );
+        }
 
         if (sectionFilter) {
             filtered = filtered.filter(s => s.section === sectionFilter);
