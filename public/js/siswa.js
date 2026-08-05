@@ -294,7 +294,9 @@ function renderSiswaView() {
 
     // Synchronize kelas dynamically for activeData matching Admin Management
     (activeData || []).forEach(s => {
-        s.kelas = typeof hitungKelas === 'function' ? hitungKelas(s) : (typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(s) : (s.kelas || 'Kelas 1'));
+        if (!s.kelas || s.kelas === '-' || s.kelas === 'null') {
+            s.kelas = typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(s) : 'Kelas 1';
+        }
     });
 
     let filtered = [...activeData];

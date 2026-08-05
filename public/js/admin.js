@@ -7,10 +7,6 @@
     // Sama persis dengan rumus Excel yang digunakan
     // ============================================================
     function hitungKelas(sOrMasuk) {
-        let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
-        if (tgl && typeof hitungKelasSiswa === 'function') {
-            return hitungKelasSiswa(tgl, new Date());
-        }
         if (typeof sOrMasuk === 'object' && sOrMasuk !== null) {
             if (sOrMasuk.kelas && sOrMasuk.kelas !== '-' && sOrMasuk.kelas !== 'null' && sOrMasuk.kelas !== 'undefined') {
                 const strK = String(sOrMasuk.kelas).trim();
@@ -20,6 +16,10 @@
                     return strK;
                 }
             }
+        }
+        let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
+        if (tgl && typeof hitungKelasSiswa === 'function') {
+            return hitungKelasSiswa(tgl, new Date());
         }
         return 'Kelas 1';
     }
