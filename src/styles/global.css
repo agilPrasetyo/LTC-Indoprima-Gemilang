@@ -372,23 +372,34 @@ input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):
     text-transform: none !important;
 }
 
-/* Responsive Sticky Columns for Absensi Calendar Table */
+/* Responsive Sticky Columns for Absensi Calendar Table (Solid Opaque, No See-Through) */
 @media (min-width: 768px) {
-    .abs-col-no { position: sticky !important; left: 0px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
-    .abs-col-noreg { position: sticky !important; left: 40px !important; width: 80px !important; min-width: 80px !important; max-width: 80px !important; z-index: 30; display: table-cell !important; }
-    .abs-col-nama { position: sticky !important; left: 120px !important; width: 200px !important; min-width: 200px !important; max-width: 200px !important; z-index: 30; }
-    .abs-col-kelas { position: sticky !important; left: 320px !important; width: 90px !important; min-width: 90px !important; max-width: 90px !important; z-index: 30; }
-    .abs-col-h { position: sticky !important; left: 410px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
-    .abs-col-i { position: sticky !important; left: 450px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
-    .abs-col-s { position: sticky !important; left: 490px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
-    .abs-col-a { position: sticky !important; left: 530px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; }
-    .abs-col-pct { position: sticky !important; left: 570px !important; width: 50px !important; min-width: 50px !important; max-width: 50px !important; z-index: 30; }
+    .abs-col-no { position: sticky !important; left: 0px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; background-color: #ffffff !important; opacity: 1 !important; border-right: 1px solid #e2e8f0 !important; }
+    .abs-col-noreg { position: sticky !important; left: 40px !important; width: 80px !important; min-width: 80px !important; max-width: 80px !important; z-index: 30; display: table-cell !important; background-color: #ffffff !important; opacity: 1 !important; border-right: 1px solid #e2e8f0 !important; }
+    .abs-col-nama { position: sticky !important; left: 120px !important; width: 200px !important; min-width: 200px !important; max-width: 200px !important; z-index: 30; background-color: #ffffff !important; opacity: 1 !important; border-right: 1px solid #e2e8f0 !important; }
+    .abs-col-kelas { position: sticky !important; left: 320px !important; width: 90px !important; min-width: 90px !important; max-width: 90px !important; z-index: 30; background-color: #ffffff !important; opacity: 1 !important; border-right: 1px solid #e2e8f0 !important; }
+    .abs-col-h { position: sticky !important; left: 410px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; background-color: #ecfdf5 !important; opacity: 1 !important; border-right: 1px solid #d1fae5 !important; }
+    .abs-col-i { position: sticky !important; left: 450px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; background-color: #fffbeb !important; opacity: 1 !important; border-right: 1px solid #fef3c7 !important; }
+    .abs-col-s { position: sticky !important; left: 490px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; background-color: #eff6ff !important; opacity: 1 !important; border-right: 1px solid #dbeafe !important; }
+    .abs-col-a { position: sticky !important; left: 530px !important; width: 40px !important; min-width: 40px !important; max-width: 40px !important; z-index: 30; background-color: #fff1f2 !important; opacity: 1 !important; border-right: 1px solid #ffe4e6 !important; }
+    .abs-col-pct { position: sticky !important; left: 570px !important; width: 50px !important; min-width: 50px !important; max-width: 50px !important; z-index: 30; background-color: #eef2ff !important; opacity: 1 !important; border-right: 2px solid #94a3b8 !important; box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.15) !important; }
+
+    /* Solid Opaque Headers (th) */
+    thead .abs-col-no, thead .abs-col-noreg, thead .abs-col-nama, thead .abs-col-kelas { background-color: #f1f5f9 !important; opacity: 1 !important; }
+    thead .abs-col-h { background-color: #d1fae5 !important; opacity: 1 !important; }
+    thead .abs-col-i { background-color: #fef3c7 !important; opacity: 1 !important; }
+    thead .abs-col-s { background-color: #dbeafe !important; opacity: 1 !important; }
+    thead .abs-col-a { background-color: #ffe4e6 !important; opacity: 1 !important; }
+    thead .abs-col-pct { background-color: #e0e7ff !important; opacity: 1 !important; }
 }
 
 @media (max-width: 767px) {
-    .abs-col-no { position: sticky !important; left: 0px !important; width: 32px !important; min-width: 32px !important; max-width: 32px !important; z-index: 30; font-size: 10px !important; padding-left: 2px !important; padding-right: 2px !important; }
+    .abs-col-no { position: sticky !important; left: 0px !important; width: 32px !important; min-width: 32px !important; max-width: 32px !important; z-index: 30; font-size: 10px !important; padding-left: 2px !important; padding-right: 2px !important; background-color: #ffffff !important; opacity: 1 !important; border-right: 1px solid #e2e8f0 !important; }
     .abs-col-noreg { display: none !important; }
-    .abs-col-nama { position: sticky !important; left: 32px !important; width: 130px !important; min-width: 130px !important; max-width: 130px !important; z-index: 30; font-size: 11px !important; padding-left: 6px !important; padding-right: 6px !important; }
+    .abs-col-nama { position: sticky !important; left: 32px !important; width: 130px !important; min-width: 130px !important; max-width: 130px !important; z-index: 30; font-size: 11px !important; padding-left: 6px !important; padding-right: 6px !important; background-color: #ffffff !important; opacity: 1 !important; border-right: 2px solid #94a3b8 !important; box-shadow: 4px 0 8px -2px rgba(0, 0, 0, 0.15) !important; }
+    
+    thead .abs-col-no, thead .abs-col-nama { background-color: #f1f5f9 !important; opacity: 1 !important; }
+
     .abs-col-kelas { position: static !important; width: 75px !important; min-width: 75px !important; max-width: 75px !important; z-index: 20; }
     .abs-col-h { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }
     .abs-col-i { position: static !important; width: 36px !important; min-width: 36px !important; max-width: 36px !important; z-index: 20; }

@@ -384,7 +384,7 @@
             const pct = currentMonthHK > 0 ? Math.min(100, Math.round((countH / currentMonthHK) * 100)) : 0;
 
             let rowHTML = `
-                <tr class="hover:bg-slate-50/50 transition-colors">
+                <tr class="hover:bg-slate-50 transition-colors">
                     <td class="abs-col-no px-2 py-2.5 text-slate-400 font-mono text-center text-xs border-r border-b border-slate-100 bg-white">${idx + 1}</td>
                     <td class="abs-col-noreg px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100 bg-white">${s.id}</td>
                     <td class="abs-col-nama px-2.5 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 bg-white whitespace-normal break-words">
