@@ -124,18 +124,18 @@
 <!-- Tabel Kalender Absensi Bulanan -->
 <div class="bg-white rounded-[20px] border border-slate-100 shadow-sm p-4">
     <div class="overflow-x-auto overflow-y-auto max-h-[600px] rounded-xl border border-slate-100" id="abs-calendar-wrapper">
-        <table class="text-left border-separate border-spacing-0 w-full" id="abs-calendar-table">
+        <table class="text-left border-separate border-spacing-0 min-w-full" id="abs-calendar-table" style="table-layout: fixed; width: max-content;">
             <thead id="abs-calendar-thead">
                 <tr class="text-[10px] font-bold uppercase text-slate-400 tracking-wider" id="abs-calendar-thead-tr">
-                    <th class="abs-col-no px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">No</th>
-                    <th class="abs-col-noreg px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Noreg</th>
-                    <th class="abs-col-nama px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Nama Siswa</th>
-                    <th class="abs-col-kelas px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Kelas</th>
-                    <th class="abs-col-h px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-slate-200 bg-emerald-100 sticky top-0" title="Total Hadir">H</th>
-                    <th class="abs-col-i px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-slate-200 bg-amber-100 sticky top-0" title="Total Ijin">I</th>
-                    <th class="abs-col-s px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-slate-200 bg-blue-100 sticky top-0" title="Total Sakit">S</th>
-                    <th class="abs-col-a px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-slate-200 bg-rose-100 sticky top-0" title="Total Alpha">A</th>
-                    <th class="abs-col-pct px-1 py-3 text-center text-indigo-800 font-bold border-r border-b border-slate-200 bg-indigo-100 sticky top-0" title="Persentase Kehadiran">%</th>
+                    <th class="abs-col-no px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px; background-color: #f1f5f9; z-index: 30;">No</th>
+                    <th class="abs-col-noreg px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px; background-color: #f1f5f9; z-index: 30;">Noreg</th>
+                    <th class="abs-col-nama px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px; background-color: #f1f5f9; z-index: 30;">Nama Siswa</th>
+                    <th class="abs-col-kelas px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px; background-color: #f1f5f9; z-index: 30;">Kelas</th>
+                    <th class="abs-col-h px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-emerald-200 sticky top-0" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px; background-color: #d1fae5; z-index: 30;" title="Total Hadir">H</th>
+                    <th class="abs-col-i px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-amber-200 sticky top-0" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px; background-color: #fef3c7; z-index: 30;" title="Total Ijin">I</th>
+                    <th class="abs-col-s px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-blue-200 sticky top-0" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px; background-color: #dbeafe; z-index: 30;" title="Total Sakit">S</th>
+                    <th class="abs-col-a px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-rose-200 sticky top-0" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px; background-color: #ffe4e6; z-index: 30;" title="Total Alpha">A</th>
+                    <th class="abs-col-pct px-1 py-3 text-center text-indigo-800 font-bold border-r-2 border-b border-slate-400 sticky top-0" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px; background-color: #e0e7ff; z-index: 30; box-shadow: 6px 0 12px -2px rgba(0, 0, 0, 0.25);" title="Persentase Kehadiran">%</th>
                 </tr>
             </thead>
             <tbody id="abs-calendar-tbody" class="text-sm">

@@ -248,17 +248,17 @@
         const daysInMonth = new Date(year, month + 1, 0).getDate();
 
         // 1. Render Table Header
-        // Reset header: responsive classes (desktop vs mobile)
+        // Reset header: responsive classes & solid opaque inline styles
         theadRow.innerHTML = `
-            <th class="abs-col-no px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">No</th>
-            <th class="abs-col-noreg px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Noreg</th>
-            <th class="abs-col-nama px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Nama Siswa</th>
-            <th class="abs-col-kelas px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 bg-slate-100 sticky top-0">Kelas</th>
-            <th class="abs-col-h px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-slate-200 bg-emerald-100 sticky top-0" title="Total Hadir">H</th>
-            <th class="abs-col-i px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-slate-200 bg-amber-100 sticky top-0" title="Total Ijin">I</th>
-            <th class="abs-col-s px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-slate-200 bg-blue-100 sticky top-0" title="Total Sakit">S</th>
-            <th class="abs-col-a px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-slate-200 bg-rose-100 sticky top-0" title="Total Alpha">A</th>
-            <th class="abs-col-pct px-1 py-3 text-center text-indigo-800 font-bold border-r border-b border-slate-200 bg-indigo-100 sticky top-0" title="Persentase Kehadiran">%</th>
+            <th class="abs-col-no px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px; background-color: #f1f5f9; z-index: 30;">No</th>
+            <th class="abs-col-noreg px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px; background-color: #f1f5f9; z-index: 30;">Noreg</th>
+            <th class="abs-col-nama px-3 py-3 text-left text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px; background-color: #f1f5f9; z-index: 30;">Nama Siswa</th>
+            <th class="abs-col-kelas px-2 py-3 text-center text-slate-700 font-bold border-r border-b border-slate-200 sticky top-0" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px; background-color: #f1f5f9; z-index: 30;">Kelas</th>
+            <th class="abs-col-h px-1 py-3 text-center text-emerald-800 font-bold border-r border-b border-emerald-200 sticky top-0" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px; background-color: #d1fae5; z-index: 30;" title="Total Hadir">H</th>
+            <th class="abs-col-i px-1 py-3 text-center text-amber-800 font-bold border-r border-b border-amber-200 sticky top-0" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px; background-color: #fef3c7; z-index: 30;" title="Total Ijin">I</th>
+            <th class="abs-col-s px-1 py-3 text-center text-blue-800 font-bold border-r border-b border-blue-200 sticky top-0" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px; background-color: #dbeafe; z-index: 30;" title="Total Sakit">S</th>
+            <th class="abs-col-a px-1 py-3 text-center text-rose-800 font-bold border-r border-b border-rose-200 sticky top-0" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px; background-color: #ffe4e6; z-index: 30;" title="Total Alpha">A</th>
+            <th class="abs-col-pct px-1 py-3 text-center text-indigo-800 font-bold border-r-2 border-b border-slate-400 sticky top-0" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px; background-color: #e0e7ff; z-index: 30; box-shadow: 6px 0 12px -2px rgba(0, 0, 0, 0.25);" title="Persentase Kehadiran">%</th>
         `;
 
         const daysOfWeek = ['Mg', 'Sn', 'Sl', 'Rb', 'Km', 'Jm', 'Sb'];
@@ -385,20 +385,20 @@
 
             let rowHTML = `
                 <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="abs-col-no px-2 py-2.5 text-slate-400 font-mono text-center text-xs border-r border-b border-slate-100 bg-white">${idx + 1}</td>
-                    <td class="abs-col-noreg px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100 bg-white">${s.id}</td>
-                    <td class="abs-col-nama px-2.5 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 bg-white whitespace-normal break-words">
+                    <td class="abs-col-no px-2 py-2.5 text-slate-400 font-mono text-center text-xs border-r border-b border-slate-100" style="position: sticky; left: 0px; width: 40px; min-width: 40px; max-width: 40px; background-color: #ffffff; z-index: 25;">${idx + 1}</td>
+                    <td class="abs-col-noreg px-2 py-2.5 text-slate-500 font-mono text-center text-xs border-r border-b border-slate-100" style="position: sticky; left: 40px; width: 80px; min-width: 80px; max-width: 80px; background-color: #ffffff; z-index: 25;">${s.id}</td>
+                    <td class="abs-col-nama px-2.5 py-2.5 font-semibold text-brand-textMain text-xs border-r border-b border-slate-100 whitespace-normal break-words" style="position: sticky; left: 120px; width: 200px; min-width: 200px; max-width: 200px; background-color: #ffffff; z-index: 25;">
                         <div>${s.namaLengkap}</div>
                         <div class="text-[9px] text-slate-400 font-mono font-normal md:hidden leading-tight">${s.id}</div>
                     </td>
-                    <td class="abs-col-kelas px-2 py-2.5 text-center text-xs border-r border-b border-slate-100 bg-white">
+                    <td class="abs-col-kelas px-2 py-2.5 text-center text-xs border-r border-b border-slate-100" style="position: sticky; left: 320px; width: 90px; min-width: 90px; max-width: 90px; background-color: #ffffff; z-index: 25;">
                         <span class="inline-flex items-center px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap ${kelasBadge}">${studentKelas}</span>
                     </td>
-                    <td class="abs-col-h px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-emerald-50 text-emerald-800">${countH}</td>
-                    <td class="abs-col-i px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-amber-50 text-amber-800">${countI}</td>
-                    <td class="abs-col-s px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-blue-50 text-blue-800">${countS}</td>
-                    <td class="abs-col-a px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-rose-50 text-rose-800">${countA}</td>
-                    <td class="abs-col-pct px-1 py-2.5 text-center text-xs font-bold border-r border-b border-slate-100 bg-indigo-50 text-indigo-800">${pct}%</td>
+                    <td class="abs-col-h px-1 py-2.5 text-center text-xs font-bold border-r border-b border-emerald-100 text-emerald-800" style="position: sticky; left: 410px; width: 40px; min-width: 40px; max-width: 40px; background-color: #ecfdf5; z-index: 25;">${countH}</td>
+                    <td class="abs-col-i px-1 py-2.5 text-center text-xs font-bold border-r border-b border-amber-100 text-amber-800" style="position: sticky; left: 450px; width: 40px; min-width: 40px; max-width: 40px; background-color: #fffbeb; z-index: 25;">${countI}</td>
+                    <td class="abs-col-s px-1 py-2.5 text-center text-xs font-bold border-r border-b border-blue-100 text-blue-800" style="position: sticky; left: 490px; width: 40px; min-width: 40px; max-width: 40px; background-color: #eff6ff; z-index: 25;">${countS}</td>
+                    <td class="abs-col-a px-1 py-2.5 text-center text-xs font-bold border-r border-b border-rose-100 text-rose-800" style="position: sticky; left: 530px; width: 40px; min-width: 40px; max-width: 40px; background-color: #fff1f2; z-index: 25;">${countA}</td>
+                    <td class="abs-col-pct px-1 py-2.5 text-center text-xs font-bold border-r-2 border-b border-slate-400 text-indigo-800" style="position: sticky; left: 570px; width: 50px; min-width: 50px; max-width: 50px; background-color: #eef2ff; z-index: 25; box-shadow: 6px 0 12px -2px rgba(0, 0, 0, 0.25);">${pct}%</td>
             `;
 
             for (let day = 1; day <= daysInMonth; day++) {
