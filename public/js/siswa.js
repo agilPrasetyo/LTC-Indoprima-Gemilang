@@ -47,8 +47,239 @@ function populateBagianFilter() {
 
 let populasiLtcKelasChartInstance = null;
 let performaLtcKelasChartInstance = null;
+let performanceProductionTrendChartInstance = null;
+let performanceTrendMode = 'bulanan'; // 'bulanan' | 'mingguan'
+
+function switchPerformanceTrendMode(mode) {
+    performanceTrendMode = mode;
+    const btnBulanan = document.getElementById('btn-perf-mode-bulanan');
+    const btnMingguan = document.getElementById('btn-perf-mode-mingguan');
+    
+    if (btnBulanan && btnMingguan) {
+        if (mode === 'bulanan') {
+            btnBulanan.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-white text-orange-600 shadow-sm";
+            btnMingguan.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-slate-500 hover:text-slate-700";
+        } else {
+            btnMingguan.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-white text-orange-600 shadow-sm";
+            btnBulanan.className = "px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-slate-500 hover:text-slate-700";
+        }
+    }
+    renderPerformanceProductionTrendChart();
+}
+window.switchPerformanceTrendMode = switchPerformanceTrendMode;
+
+function renderPerformanceProductionTrendChart() {
+    const trendCanvas = document.getElementById('chart-performance-production-trend');
+    if (!trendCanvas || typeof Chart === 'undefined') return;
+
+    const allStudents = [...(activeData || []), ...(activeTurnoverData || [])];
+    
+    const monthNamesMap = {
+        '01': 'Jan', '02': 'Feb', '03': 'Mar', '04': 'Apr',
+        '05': 'Mei', '06': 'Juni', '07': 'Juli', '08': 'Ags',
+        '09': 'Sep', '10': 'Okt', '11': 'Nov', '12': 'Des'
+    };
+
+    let labels = [];
+    let planValues = [];
+    let actualValues = [];
+
+    if (performanceTrendMode === 'bulanan') {
+        const monthGroup = {};
+        allStudents.forEach(s => {
+            (s.dailyRecords || []).forEach(r => {
+                if (!r.dateStr) return;
+                const ym = r.dateStr.substring(0, 7);
+                if (!monthGroup[ym]) {
+                    monthGroup[ym] = { plan: 0, actual: 0 };
+                }
+                monthGroup[ym].plan += Number(r.plan) || 0;
+                monthGroup[ym].actual += Number(r.actual) || 0;
+            });
+        });
+
+        const sortedYM = Object.keys(monthGroup).sort();
+        const targetKeys = sortedYM.length > 0 ? sortedYM : ['2026-05', '2026-06', '2026-07'];
+        
+        targetKeys.forEach(ym => {
+            const parts = ym.split('-');
+            const mName = monthNamesMap[parts[1]] || parts[1];
+            labels.push(mName);
+            const gData = monthGroup[ym] || { plan: 0, actual: 0 };
+            planValues.push(gData.plan);
+            actualValues.push(gData.actual);
+        });
+    } else {
+        const weekGroup = {};
+        allStudents.forEach(s => {
+            (s.dailyRecords || []).forEach(r => {
+                if (!r.dateStr) return;
+                const ym = r.dateStr.substring(0, 7);
+                const day = parseInt(r.dateStr.substring(8, 10), 10);
+                if (isNaN(day)) return;
+
+                let wLabel = 'W1';
+                if (day >= 1 && day <= 7) wLabel = 'W1';
+                else if (day >= 8 && day <= 14) wLabel = 'W2';
+                else if (day >= 15 && day <= 21) wLabel = 'W3';
+                else wLabel = 'W4';
+
+                const key = `${ym}_${wLabel}`;
+                if (!weekGroup[key]) {
+                    weekGroup[key] = { plan: 0, actual: 0 };
+                }
+                weekGroup[key].plan += Number(r.plan) || 0;
+                weekGroup[key].actual += Number(r.actual) || 0;
+            });
+        });
+
+        const sortedKeys = Object.keys(weekGroup).sort();
+        const targetKeys = sortedKeys.length > 0 ? sortedKeys : [
+            '2026-05_W1', '2026-05_W2', '2026-05_W3', '2026-05_W4',
+            '2026-06_W1', '2026-06_W2', '2026-06_W3', '2026-06_W4',
+            '2026-07_W1', '2026-07_W2', '2026-07_W3', '2026-07_W4'
+        ];
+
+        targetKeys.forEach(k => {
+            const parts = k.split('_');
+            const ymParts = parts[0].split('-');
+            const mName = monthNamesMap[ymParts[1]] || ymParts[1];
+            labels.push(`${mName} ${parts[1]}`);
+            const gData = weekGroup[k] || { plan: 0, actual: 0 };
+            planValues.push(gData.plan);
+            actualValues.push(gData.actual);
+        });
+    }
+
+    const efficiencyValues = planValues.map((p, idx) => {
+        const a = actualValues[idx];
+        return p > 0 ? Math.round((a / p) * 100) : 0;
+    });
+
+    if (performanceProductionTrendChartInstance) {
+        performanceProductionTrendChartInstance.destroy();
+    }
+
+    performanceProductionTrendChartInstance = new Chart(trendCanvas.getContext('2d'), {
+        data: {
+            labels: labels,
+            datasets: [
+                {
+                    type: 'bar',
+                    label: 'T.Plan',
+                    data: planValues,
+                    backgroundColor: '#FB923C',
+                    borderRadius: 4,
+                    barPercentage: 0.65,
+                    categoryPercentage: 0.7,
+                    yAxisID: 'y',
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#C2410C',
+                        font: { size: 9, weight: 'bold' },
+                        formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                    }
+                },
+                {
+                    type: 'bar',
+                    label: 'T.Aktual',
+                    data: actualValues,
+                    backgroundColor: '#4ADE80',
+                    borderRadius: 4,
+                    barPercentage: 0.65,
+                    categoryPercentage: 0.7,
+                    yAxisID: 'y',
+                    datalabels: {
+                        anchor: 'end',
+                        align: 'top',
+                        color: '#15803D',
+                        font: { size: 9, weight: 'bold' },
+                        formatter: (val) => val > 0 ? val.toLocaleString('id-ID') : ''
+                    }
+                },
+                {
+                    type: 'line',
+                    label: '(%)',
+                    data: efficiencyValues,
+                    borderColor: '#15803D',
+                    backgroundColor: '#15803D',
+                    borderWidth: 3,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    pointBackgroundColor: '#15803D',
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 2,
+                    tension: 0.2,
+                    yAxisID: 'y1',
+                    datalabels: {
+                        anchor: 'top',
+                        align: 'top',
+                        offset: 4,
+                        color: '#15803D',
+                        backgroundColor: '#DCFCE7',
+                        borderRadius: 4,
+                        padding: 3,
+                        font: { size: 10, weight: 'bold' },
+                        formatter: (val) => `${val}%`
+                    }
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            interaction: { mode: 'index', intersect: false },
+            plugins: {
+                legend: {
+                    position: 'bottom',
+                    labels: { boxWidth: 12, font: { size: 11, weight: 'bold' }, usePointStyle: true }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: (ctx) => {
+                            if (ctx.dataset.type === 'line') {
+                                return `Efisiensi: ${ctx.parsed.y}%`;
+                            }
+                            return `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('id-ID')} Pcs`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { display: false },
+                    ticks: { font: { size: 10, weight: 'bold' } }
+                },
+                y: {
+                    type: 'linear',
+                    display: true,
+                    position: 'left',
+                    beginAtZero: true,
+                    title: { display: true, text: 'Jumlah Output (Pcs)', font: { size: 10, weight: 'bold' } },
+                    grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
+                    ticks: { font: { size: 10 } }
+                },
+                y1: {
+                    type: 'linear',
+                    display: true,
+                    position: 'right',
+                    beginAtZero: true,
+                    suggestedMax: 140,
+                    title: { display: true, text: 'Efisiensi (%)', font: { size: 10, weight: 'bold' } },
+                    grid: { drawOnChartArea: false },
+                    ticks: {
+                        font: { size: 10, weight: 'bold' },
+                        callback: (val) => `${val}%`
+                    }
+                }
+            }
+        }
+    });
+}
 
 function renderPerformaTopCharts() {
+    renderPerformanceProductionTrendChart();
     const populasiCanvas = document.getElementById('chart-populasi-ltc-kelas');
     const performaCanvas = document.getElementById('chart-performa-ltc-kelas');
     if (!populasiCanvas || !performaCanvas) return;

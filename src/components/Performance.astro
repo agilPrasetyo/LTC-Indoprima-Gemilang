@@ -1,6 +1,34 @@
 <!-- HALAMAN PERFORMA SISWA (Redesain Menyeluruh) -->
 <div class="animate-fadeIn space-y-6">
 
+    <!-- Card 0: Full-Width Performance Production Trend (Bulanan / Mingguan Dual-Axis Combo Chart) -->
+    <div class="bg-white p-6 rounded-[28px] border border-slate-100 shadow-sm flex flex-col justify-between">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-4 border-b border-slate-100 pb-3">
+            <div>
+                <h3 class="font-display font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-line text-orange-500"></i> Performance Production Trend
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Tren agregat pencapaian total produksi Target Plan vs Target Aktual dan Efisiensi (%)</p>
+            </div>
+            
+            <!-- Mode Toggle Switch: Bulanan vs Mingguan -->
+            <div class="inline-flex p-1 bg-slate-100 rounded-xl border border-slate-200/60 self-start sm:self-auto">
+                <button id="btn-perf-mode-bulanan" onclick="switchPerformanceTrendMode('bulanan')"
+                    class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 bg-white text-orange-600 shadow-sm">
+                    <i class="fa-solid fa-calendar-days mr-1.5"></i> Bulanan
+                </button>
+                <button id="btn-perf-mode-mingguan" onclick="switchPerformanceTrendMode('mingguan')"
+                    class="px-4 py-1.5 rounded-lg text-xs font-bold transition-all duration-200 text-slate-500 hover:text-slate-700">
+                    <i class="fa-solid fa-calendar-week mr-1.5"></i> Mingguan
+                </button>
+            </div>
+        </div>
+
+        <div class="relative w-full h-[320px]">
+            <canvas id="chart-performance-production-trend"></canvas>
+        </div>
+    </div>
+
     <!-- 2 Top Charts: Populasi LTC by Kelas & Performa LTC per Kelas -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Chart 1: Populasi LTC by Kelas (Stacked Bar Chart) -->
