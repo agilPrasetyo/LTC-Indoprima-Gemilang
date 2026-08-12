@@ -427,10 +427,16 @@ function showStudentDetail(s) {
     document.getElementById('sdm-daerah-asal').innerText = s.daerahAsal || '-';
     document.getElementById('sdm-spv').innerText = spvLabel;
     document.getElementById('sdm-masuk').innerText = masukFormatted;
-    document.getElementById('sdm-nilai').innerText = (s.nilai || 0) + '%';
-    document.getElementById('sdm-nilai').className = `text-4xl font-extrabold ${perfColor.text}`;
-    document.getElementById('sdm-label').innerText = perfColor.label;
-    document.getElementById('sdm-label').className = `text-[10px] font-bold px-2.5 py-0.5 rounded-full ${perfColor.badge}`;
+    const nilaiEl = document.getElementById('sdm-nilai');
+    if (nilaiEl) {
+        nilaiEl.innerText = (s.nilai || 0) + '%';
+        nilaiEl.className = `text-3xl font-extrabold ${perfColor.text}`;
+    }
+    const labelEl = document.getElementById('sdm-label');
+    if (labelEl) {
+        labelEl.innerText = perfColor.label;
+        labelEl.className = `text-[10px] font-bold px-2.5 py-0.5 rounded-full ${perfColor.badge}`;
+    }
 
     const chartDaysCount = 14;
     const chartLabels = [];
@@ -470,7 +476,7 @@ function showStudentDetail(s) {
         if (ds > todayStr) {
             chartDataPoints.push(null);
         } else if (!rec) {
-            chartDataPoints.push(0);
+            chartDataPoints.push(null);
         } else {
             const isHadirDay = (rec.plan === null || rec.plan === 0 || isNaN(rec.plan)) && (rec.hadir !== "" && rec.hadir !== undefined && rec.hadir !== null);
             if (isHadirDay) {
@@ -487,8 +493,8 @@ function showStudentDetail(s) {
         if (sdmChartInstance) {
             sdmChartInstance.destroy();
         }
-        const gradient = ctx.createLinearGradient(0, 0, 0, 110);
-        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.22)');
+        const gradient = ctx.createLinearGradient(0, 0, 0, 220);
+        gradient.addColorStop(0, 'rgba(37, 99, 235, 0.28)');
         gradient.addColorStop(1, 'rgba(37, 99, 235, 0.00)');
 
         sdmChartInstance = new Chart(ctx, {
@@ -499,25 +505,35 @@ function showStudentDetail(s) {
                     label: 'Performa',
                     data: chartDataPoints,
                     borderColor: '#2563EB',
-                    borderWidth: 2,
+                    borderWidth: 2.5,
                     backgroundColor: gradient,
                     fill: true,
-                    tension: 0.3,
+                    tension: 0.35,
                     pointBackgroundColor: '#2563EB',
-                    pointRadius: 2,
-                    pointHoverRadius: 4,
+                    pointBorderColor: '#FFFFFF',
+                    pointBorderWidth: 2,
+                    pointRadius: 4,
+                    pointHoverRadius: 6,
                     spanGaps: true
                 }]
             },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                layout: {
+                    padding: {
+                        top: 25,
+                        bottom: 10,
+                        left: 5,
+                        right: 15
+                    }
+                },
                 plugins: {
                     legend: { display: false },
                     tooltip: {
                         callbacks: {
                             label: function (context) {
-                                return context.parsed.y !== null ? context.parsed.y + '%' : '-';
+                                return context.parsed.y !== null ? 'Performa: ' + context.parsed.y + '%' : 'Tidak Ada Data / Off';
                             }
                         }
                     }
@@ -525,13 +541,18 @@ function showStudentDetail(s) {
                 scales: {
                     x: {
                         grid: { display: false },
-                        ticks: { font: { size: 8, weight: 'bold' }, color: '#94A3B8' }
+                        ticks: { font: { size: 9, weight: 'bold' }, color: '#64748B' }
                     },
                     y: {
                         min: 0,
-                        max: 100,
-                        ticks: { stepSize: 50, font: { size: 8, weight: 'bold' }, color: '#94A3B8', callback: value => value + '%' },
-                        grid: { color: '#F1F5F9', borderDash: [2, 2] }
+                        suggestedMax: 115,
+                        ticks: {
+                            stepSize: 25,
+                            font: { size: 9, weight: 'bold' },
+                            color: '#94A3B8',
+                            callback: value => value <= 100 ? value + '%' : ''
+                        },
+                        grid: { color: '#F1F5F9', borderDash: [3, 3] }
                     }
                 }
             }

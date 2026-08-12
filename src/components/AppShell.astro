@@ -365,20 +365,20 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
     </div>
     <!-- Modal Body -->
     <div class="p-6 space-y-5">
-      <!-- Nilai Performa & Grafik Tren -->
+      <!-- Nilai Performa & Grafik Tren (Full Width Layout) -->
       <div class="bg-slate-50 rounded-2xl p-5">
-        <p class="text-xs font-bold uppercase tracking-widest text-slate-400 mb-3 text-center sm:text-left">Performa & Tren 2 Minggu Terakhir</p>
-        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 items-center">
-          <!-- Score Display -->
-          <div class="text-center sm:text-left sm:border-r border-slate-200/80 pr-2">
-            <p class="text-[10px] font-bold uppercase text-slate-400">Total Akumulasi</p>
-            <p class="text-4xl font-extrabold text-brand-textMain mt-1" id="sdm-nilai">0%</p>
-            <span class="inline-block mt-2 px-2.5 py-0.5 rounded-full text-[10px] font-bold" id="sdm-label">-</span>
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-3 mb-4 border-b border-slate-200/80 gap-2">
+          <div>
+            <p class="text-[10px] font-bold uppercase tracking-wider text-slate-400">RATA-RATA PERFORMA 2 MINGGU TERAKHIR</p>
+            <div class="flex items-baseline gap-2 mt-0.5">
+              <span class="text-3xl font-extrabold text-brand-textMain" id="sdm-nilai">0%</span>
+              <span class="text-xs text-slate-400 font-medium">(Rata-Rata Kehadiran & Target Produksi)</span>
+            </div>
           </div>
-          <!-- Line Chart Canvas -->
-          <div class="sm:col-span-2 h-28 relative">
-            <canvas id="sdm-chart-canvas"></canvas>
-          </div>
+        </div>
+        <!-- Line Chart Canvas Full Width (Tinggi h-56 / 224px, 100% Width) -->
+        <div class="w-full h-56 relative">
+          <canvas id="sdm-chart-canvas"></canvas>
         </div>
       </div>
 
@@ -519,13 +519,13 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
   window.PUBLIC_GAS_WEB_APP_URL = gasUrl;
 </script>
 
-<script is:inline src="/js/api.js?v=16.2"></script>
-<script is:inline src="/js/global.js?v=16.2"></script>
-<script is:inline src="/js/dashboard.js?v=16.2"></script>
-<script is:inline src="/js/siswa.js?v=16.2"></script>
-<script is:inline src="/js/turnover.js?v=16.2"></script>
-<script is:inline src="/js/siswa_portal.js?v=16.2"></script>
-<script is:inline src="/js/keuangan.js?v=16.2"></script>
-<script is:inline src="/js/admin.js?v=16.2"></script>
-<script is:inline src="/js/absensi.js?v=16.2"></script>
-<script is:inline src="/js/safety.js?v=16.2"></script>
+<script is:inline src="/js/api.js?v=16.3"></script>
+<script is:inline src="/js/global.js?v=16.3"></script>
+<script is:inline src="/js/dashboard.js?v=16.3"></script>
+<script is:inline src="/js/siswa.js?v=16.3"></script>
+<script is:inline src="/js/turnover.js?v=16.3"></script>
+<script is:inline src="/js/siswa_portal.js?v=16.3"></script>
+<script is:inline src="/js/keuangan.js?v=16.3"></script>
+<script is:inline src="/js/admin.js?v=16.3"></script>
+<script is:inline src="/js/absensi.js?v=16.3"></script>
+<script is:inline src="/js/safety.js?v=16.3"></script>
