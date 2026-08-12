@@ -290,12 +290,15 @@
         const lastDayStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(lastDayNum).padStart(2, '0')}`;
 
         let students = Object.values(uniqueMap).filter(s => {
+            const isAktif = (s.status || '').toUpperCase() === 'AKTIF';
             const masuk = s.masuk || s.tglMasuk || s.tanggalMasuk || '';
-            const keluar = s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || '';
+            const rawKeluar = s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || '';
+            // Jika siswa berstatus AKTIF atau tanggal_keluar < tanggal_masuk (salah input), abaikan tanggal_keluar
+            const keluar = (isAktif || (rawKeluar && masuk && rawKeluar < masuk)) ? '' : rawKeluar;
 
             // Syarat 1: Tanggal Masuk <= Hari Terakhir Bulan ini
             if (masuk && masuk > lastDayStr) return false;
-            // Syarat 2: Tanggal Keluar >= Hari Pertama Bulan ini
+            // Syarat 2: Tanggal Keluar >= Hari Pertama Bulan ini (hanya berlaku jika siswa memang sudah Non-Aktif / Turnover)
             if (keluar && keluar < firstDayStr) return false;
 
             return true;
