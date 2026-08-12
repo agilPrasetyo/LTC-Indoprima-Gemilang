@@ -983,7 +983,7 @@
                     <div class="text-[10px] text-slate-400 font-normal">Mesin: ${r.mesin || '-'} | Model: ${r.model || '-'}</div>
                 </td>
                 <td class="py-3 px-4 whitespace-nowrap">${hasilDisplay}</td>
-                <td class="py-3 px-4 text-slate-600 max-w-xs truncate" title="${r.keterangan || ''}">${r.keterangan || '-'}</td>
+                <td class="py-3 px-4 text-slate-600" title="${r.keterangan || ''}">${r.keterangan || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
