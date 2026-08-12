@@ -1412,6 +1412,11 @@ if (typeof Chart !== 'undefined') {
         window.safetyData = safetyData;
         currentVersion = data.version || "";
 
+        // Trigger auto-merge of absensi with manpower data if function available
+        if (typeof window._mergeAbsensiWithManpower === 'function') {
+            window._mergeAbsensiWithManpower();
+        }
+
         // Trigger real-time sync for Rekap Absensi Siswa chart on dashboard
         if (typeof updateAbsensiChart === 'function') {
             updateAbsensiChart();

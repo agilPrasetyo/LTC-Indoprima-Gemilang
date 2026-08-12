@@ -131,6 +131,7 @@
 
     window.renderAbsensiView = renderAbsensiView;
     window.saveHariKerja = saveHariKerja;
+    window._mergeAbsensiWithManpower = _mergeAbsensiWithManpower;
 
     // Merge manual absensi records with auto-detected manpower data
     function _mergeAbsensiWithManpower() {
