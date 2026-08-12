@@ -820,14 +820,14 @@
 
 <!-- MODAL: Input / Edit Log Manpower Harian -->
 <div id="manpower-log-modal" class="hidden fixed inset-0 z-50 flex items-center justify-center glass-modal-bg p-4 overflow-y-auto" onclick="if(event.target===this)closeManpowerLogModal()">
-    <div class="glass-modal-card p-6 md:p-8 rounded-[28px] w-full max-w-lg max-h-[90vh] overflow-y-auto space-y-5 transform scale-95 transition-all duration-250">
+    <div class="glass-modal-card p-6 md:p-8 rounded-[28px] w-full max-w-3xl max-h-[92vh] overflow-y-auto space-y-5 transform scale-95 transition-all duration-250">
         <div class="flex items-center justify-between pb-3 border-b border-slate-200/40">
             <div>
                 <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
                     <i class="fa-solid fa-clock-rotate-left text-brand-blue"></i>
                     <span id="mp-modal-title">Input Log Manpower Harian</span>
                 </h3>
-                <p class="text-xs text-brand-textSub mt-0.5">Isi data laporan kinerja harian siswa LTC</p>
+                <p class="text-xs text-brand-textSub mt-0.5">Kelola laporan kinerja & kehadiran harian siswa LTC</p>
             </div>
             <button onclick="closeManpowerLogModal()" class="p-2 hover:bg-slate-200/50 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
                 <i class="fa-solid fa-xmark text-sm"></i>
@@ -837,158 +837,191 @@
         <form id="form-manpower-modal" onsubmit="event.preventDefault(); saveManpowerLogModal();" class="space-y-4">
             <input type="hidden" id="mp-modal-is-edit" value="false">
 
-            <div>
+            <!-- Banner Profile Siswa (Hanya tampil saat MODE EDIT) -->
+            <div id="mp-modal-student-banner" class="hidden p-4 bg-gradient-to-r from-blue-50/90 to-indigo-50/70 rounded-2xl border border-blue-100/80 flex items-center justify-between shadow-sm">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-brand-blue text-white flex items-center justify-center font-bold text-sm shadow-md" id="mp-modal-banner-avatar">
+                        S
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-bold text-slate-800" id="mp-modal-banner-nama">NAMA SISWA</h4>
+                        <p class="text-[11px] text-slate-500 font-medium mt-0.5">
+                            NoReg: <span class="font-mono font-bold text-brand-blue" id="mp-modal-banner-noreg">-</span> • 
+                            Bagian: <span class="font-semibold text-slate-700" id="mp-modal-banner-bagian">-</span> • 
+                            SPV: <span class="font-semibold text-slate-700" id="mp-modal-banner-spv">-</span>
+                        </p>
+                    </div>
+                </div>
+                <span class="text-[10px] font-bold uppercase tracking-wider px-3 py-1 bg-blue-600 text-white rounded-full shadow-sm">MODE EDIT</span>
+            </div>
+
+            <!-- Select Siswa Dropdown Container (Hanya tampil saat TAMBAH BARU) -->
+            <div id="mp-modal-student-container">
                 <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Pilih Siswa <span class="text-rose-500">*</span></label>
                 <select id="mp-modal-student" required onchange="onMpModalStudentChange()"
-                    class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                    class="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                     <!-- Options filled dynamically -->
                 </select>
                 <p class="text-[10px] text-brand-textSub mt-1 font-semibold" id="mp-modal-info-label"></p>
             </div>
 
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Tanggal Record <span class="text-rose-500">*</span></label>
-                    <input type="date" id="mp-modal-date" required
-                        class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Status Kehadiran <span class="text-rose-500">*</span></label>
-                    <select id="mp-modal-hadir" required
-                        class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
-                        <option value="✔">Hadir (✔)</option>
-                        <option value="Ijin">Ijin</option>
-                        <option value="Sakit">Sakit</option>
-                        <option value="Alpha">Alpha</option>
-                    </select>
-                </div>
-            </div>
+            <!-- Form Grid 2 Kolom (Wide & Balanced Layout) -->
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <!-- Kolom Kiri: Waktu, Shift & Kehadiran -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Tanggal Record <span class="text-rose-500">*</span></label>
+                            <input type="date" id="mp-modal-date" required
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Status Kehadiran <span class="text-rose-500">*</span></label>
+                            <select id="mp-modal-hadir" required onchange="onMpModalHadirChange()"
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all font-semibold">
+                                <option value="✔">Hadir (✔)</option>
+                                <option value="Ijin">Ijin</option>
+                                <option value="Sakit">Sakit</option>
+                                <option value="Alpha">Alpha</option>
+                            </select>
+                        </div>
+                    </div>
 
-            <!-- Group Operasional -->
-            <div class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-3">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Detail Operasional</h4>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Shift Kerja</label>
+                            <select id="mp-modal-shift"
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                                <option value="Shift 1">Shift 1</option>
+                                <option value="Shift 2">Shift 2</option>
+                                <option value="Shift 3">Shift 3</option>
+                            </select>
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Bagian Operasional</label>
+                            <select id="mp-modal-bagian"
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                                <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                                <option value="GRINDING">GRINDING</option>
+                                <option value="PAINTING">PAINTING</option>
+                                <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                                <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                                <option value="LADLE">LADLE</option>
+                                <option value="GALAH IBK">GALAH IBK</option>
+                                <option value="QC LAB PASIR">QC LAB PASIR</option>
+                                <option value="PATTERN">PATTERN</option>
+                                <option value="ADM PPIC">ADM PPIC</option>
+                                <option value="MAINTENANCE">MAINTENANCE</option>
+                                <option value="FETTLING">FETTLING</option>
+                                <option value="PPIC">PPIC</option>
+                                <option value="CNC / MACHINING">CNC / MACHINING</option>
+                                <option value="CORE">CORE</option>
+                                <option value="SHOTBLAST">SHOTBLAST</option>
+                                <option value="QC POURING">QC POURING</option>
+                                <option value="MELTING">MELTING</option>
+                                <option value="FURAN">FURAN</option>
+                                <option value="IRGA">IRGA</option>
+                                <option value="SHE">SHE</option>
+                            </select>
+                        </div>
+                    </div>
+
                     <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Shift</label>
-                        <select id="mp-modal-shift"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                            <option value="Shift 1">Shift 1</option>
-                            <option value="Shift 2">Shift 2</option>
-                            <option value="Shift 3">Shift 3</option>
+                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Supervisor (SPV)</label>
+                        <select id="mp-modal-spv"
+                            class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                            <option value="">-- Pilih SPV --</option>
+                            <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
+                            <option value="AHMAD RIZAL">AHMAD RIZAL</option>
+                            <option value="AINUN UMAMI">AINUN UMAMI</option>
+                            <option value="ALDEVA DESNANDRI">ALDEVA DESNANDRI</option>
+                            <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
+                            <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
+                            <option value="BIMA AGUNG SETYAWAN">BIMA AGUNG SETYAWAN</option>
+                            <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
+                            <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
+                            <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
+                            <option value="MOHAMMAT YASIR MA&apos;ARIF">MOHAMMAT YASIR MA&apos;ARIF</option>
+                            <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
+                            <option value="MUHTADIN">MUHTADIN</option>
+                            <option value="NANDA TITO PRASETYO, S.T">NANDA TITO PRASETYO, S.T</option>
+                            <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
+                            <option value="RUSDI">RUSDI</option>
+                            <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
+                            <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
+                            <option value="TRIARTHA MANGIHUT SIMANUNGKALIT">TRIARTHA MANGIHUT SIMANUNGKALIT</option>
+                            <option value="WAWAN NOPIAWAN">WAWAN NOPIAWAN</option>
+                            <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
+                            <option value="YULINDARIKA NUR ANGGRAINI">YULINDARIKA NUR ANGGRAINI</option>
+                            <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
                         </select>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bagian</label>
-                        <select id="mp-modal-bagian"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                            <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
-                            <option value="GRINDING">GRINDING</option>
-                            <option value="PAINTING">PAINTING</option>
-                            <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
-                            <option value="ADM PRODUKSI">ADM PRODUKSI</option>
-                            <option value="LADLE">LADLE</option>
-                            <option value="GALAH IBK">GALAH IBK</option>
-                            <option value="QC LAB PASIR">QC LAB PASIR</option>
-                            <option value="PATTERN">PATTERN</option>
-                            <option value="ADM PPIC">ADM PPIC</option>
-                            <option value="MAINTENANCE">MAINTENANCE</option>
-                            <option value="FETTLING">FETTLING</option>
-                            <option value="PPIC">PPIC</option>
-                            <option value="CNC / MACHINING">CNC / MACHINING</option>
-                            <option value="CORE">CORE</option>
-                            <option value="SHOTBLAST">SHOTBLAST</option>
-                            <option value="QC POURING">QC POURING</option>
-                            <option value="MELTING">MELTING</option>
-                            <option value="FURAN">FURAN</option>
-                            <option value="IRGA">IRGA</option>
-                            <option value="SHE">SHE</option>
-                        </select>
+                </div>
+
+                <!-- Kolom Kanan: Detail Mesin & Kinerja Produksi -->
+                <div class="space-y-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Nomor Mesin</label>
+                            <input type="text" id="mp-modal-mesin" placeholder="Contoh: CNC-01"
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Model / Item</label>
+                            <input type="text" id="mp-modal-model" placeholder="Contoh: ORING 170"
+                                class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                        </div>
                     </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nomor Mesin</label>
-                        <input type="text" id="mp-modal-mesin" placeholder="Contoh: CNC-01"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Model</label>
-                        <input type="text" id="mp-modal-model" placeholder="Contoh: M-230"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+
+                    <!-- Card Hasil & Validasi dengan Live Efficiency Badge -->
+                    <div id="mp-modal-prod-group" class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-3">
+                        <div class="flex items-center justify-between">
+                            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700 flex items-center gap-1.5">
+                                <i class="fa-solid fa-chart-simple text-brand-blue"></i> Hasil & Validasi Produksi
+                            </h4>
+                            <span id="mp-modal-efficiency-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-200 text-slate-700">0%</span>
+                        </div>
+                        <div class="grid grid-cols-3 gap-2.5">
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target (Plan)</label>
+                                <input type="number" id="mp-modal-plan" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*" oninput="updateMpModalEfficiency()"
+                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-700 outline-none focus:border-brand-blue transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hasil (Aktual)</label>
+                                <input type="number" id="mp-modal-actual" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*" oninput="updateMpModalEfficiency()"
+                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-emerald-600 outline-none focus:border-brand-blue transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Reject</label>
+                                <input type="number" id="mp-modal-reject" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
+                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-rose-600 outline-none focus:border-brand-blue transition-all">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
 
-            <!-- Group Hasil & Validasi -->
-            <div id="mp-modal-prod-group" class="p-4 bg-slate-50/80 rounded-2xl border border-slate-100 space-y-3">
-                <h4 class="text-xs font-bold uppercase tracking-wider text-slate-700">Hasil & Validasi</h4>
-                <div class="grid grid-cols-3 gap-3">
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target (Plan)</label>
-                        <input type="number" id="mp-modal-plan" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
-                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hasil (Aktual)</label>
-                        <input type="number" id="mp-modal-actual" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
-                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                    </div>
-                    <div>
-                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Reject</label>
-                        <input type="number" id="mp-modal-reject" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
-                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                            oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                    </div>
-                </div>
-                <div>
-                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Supervisor (SPV)</label>
-                    <select id="mp-modal-spv"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                        <option value="">-- Pilih SPV --</option>
-                        <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
-                        <option value="AHMAD RIZAL">AHMAD RIZAL</option>
-                        <option value="AINUN UMAMI">AINUN UMAMI</option>
-                        <option value="ALDEVA DESNANDRI">ALDEVA DESNANDRI</option>
-                        <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
-                        <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
-                        <option value="BIMA AGUNG SETYAWAN">BIMA AGUNG SETYAWAN</option>
-                        <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
-                        <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
-                        <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
-                        <option value="MOHAMMAT YASIR MA&apos;ARIF">MOHAMMAT YASIR MA&apos;ARIF</option>
-                        <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
-                        <option value="MUHTADIN">MUHTADIN</option>
-                        <option value="NANDA TITO PRASETYO, S.T">NANDA TITO PRASETYO, S.T</option>
-                        <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
-                        <option value="RUSDI">RUSDI</option>
-                        <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
-                        <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
-                        <option value="TRIARTHA MANGIHUT SIMANUNGKALIT">TRIARTHA MANGIHUT SIMANUNGKALIT</option>
-                        <option value="WAWAN NOPIAWAN">WAWAN NOPIAWAN</option>
-                        <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
-                        <option value="YULINDARIKA NUR ANGGRAINI">YULINDARIKA NUR ANGGRAINI</option>
-                        <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
-                    </select>
-                </div>
-            </div>
-
+            <!-- Full Width Textarea Keterangan -->
             <div>
-                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Keterangan / Kendala</label>
-                <textarea id="mp-modal-keterangan" rows="2" placeholder="Tuliskan kendala / rincian tugas..."
-                    class="w-full px-4 py-3 bg-white/60 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all resize-none"></textarea>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-1.5">Keterangan / Kendala Operasional</label>
+                <textarea id="mp-modal-keterangan" rows="2" placeholder="Tuliskan rincian tugas atau kendala operasional lapangan (jika ada)..."
+                    class="w-full px-4 py-2.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all resize-none"></textarea>
             </div>
 
+            <!-- Sticky Action Footer -->
             <div class="flex gap-3 justify-end pt-4 border-t border-slate-200/40">
                 <button type="button" onclick="closeManpowerLogModal()"
                     class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all-300">
                     Batal
                 </button>
                 <button type="submit"
-                    class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all-300 shadow-md">
-                    Simpan Data
+                    class="px-6 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all-300 shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Simpan Perubahan Log</span>
                 </button>
             </div>
         </form>

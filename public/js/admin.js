@@ -969,6 +969,40 @@
         });
     }
 
+    function updateMpModalEfficiency() {
+        const plan = parseInt(document.getElementById('mp-modal-plan')?.value, 10) || 0;
+        const actual = parseInt(document.getElementById('mp-modal-actual')?.value, 10) || 0;
+        const badge = document.getElementById('mp-modal-efficiency-badge');
+        if (!badge) return;
+        if (plan > 0) {
+            const pct = Math.round((actual / plan) * 100);
+            badge.textContent = pct + '% Target';
+            if (pct >= 100) {
+                badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800';
+            } else if (pct >= 75) {
+                badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-sky-100 text-sky-800';
+            } else if (pct >= 50) {
+                badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-100 text-amber-800';
+            } else {
+                badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-rose-100 text-rose-800';
+            }
+        } else {
+            badge.textContent = '0%';
+            badge.className = 'text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700';
+        }
+    }
+
+    function onMpModalHadirChange() {
+        const hadir = document.getElementById('mp-modal-hadir')?.value;
+        const prodGroup = document.getElementById('mp-modal-prod-group');
+        if (!prodGroup) return;
+        if (hadir === 'Ijin' || hadir === 'Sakit' || hadir === 'Alpha') {
+            prodGroup.classList.add('opacity-40', 'pointer-events-none');
+        } else {
+            prodGroup.classList.remove('opacity-40', 'pointer-events-none');
+        }
+    }
+
     function openManpowerLogModal(noreg = null, tanggal = null) {
         const modal = document.getElementById('manpower-log-modal');
         if (!modal) return;
@@ -977,7 +1011,10 @@
         document.getElementById('mp-modal-is-edit').value = isEdit ? "true" : "false";
         document.getElementById('mp-modal-title').textContent = isEdit ? "Edit Log Manpower Harian" : "Input Log Manpower Harian";
 
-        // Populate dropdown siswa aktif
+        const studentContainer = document.getElementById('mp-modal-student-container');
+        const studentBanner = document.getElementById('mp-modal-student-banner');
+
+        // Populate dropdown siswa aktif (hanya digunakan saat Tambah Log Baru)
         const studentSelect = document.getElementById('mp-modal-student');
         if (studentSelect) {
             studentSelect.innerHTML = '';
@@ -992,28 +1029,48 @@
         }
 
         if (isEdit) {
+            if (studentContainer) studentContainer.classList.add('hidden');
+            if (studentBanner) studentBanner.classList.remove('hidden');
+
             if (studentSelect) studentSelect.value = noreg;
             document.getElementById('mp-modal-date').value = tanggal;
             document.getElementById('mp-modal-date').disabled = true;
 
-            // Cari rincian data dari activeData
+            // Cari rincian data siswa & record dari activeData
             const s = (activeData || []).find(std => std.id === noreg);
             const rec = s ? (s.dailyRecords || []).find(r => r.dateStr === tanggal) : null;
+
+            if (s) {
+                const avatarEl = document.getElementById('mp-modal-banner-avatar');
+                const namaEl = document.getElementById('mp-modal-banner-nama');
+                const noregEl = document.getElementById('mp-modal-banner-noreg');
+                const bagianEl = document.getElementById('mp-modal-banner-bagian');
+                const spvEl = document.getElementById('mp-modal-banner-spv');
+
+                if (avatarEl) avatarEl.textContent = (s.namaLengkap || 'S').charAt(0).toUpperCase();
+                if (namaEl) namaEl.textContent = s.namaLengkap || '-';
+                if (noregEl) noregEl.textContent = s.id || '-';
+                if (bagianEl) bagianEl.textContent = rec?.bagian || s.section || s.bagian || '-';
+                if (spvEl) spvEl.textContent = rec?.nama_spv || s.spv || '-';
+            }
 
             if (rec) {
                 const hadirVal = rec.hadir === "✔" || rec.hadir === "Hadir" ? "✔" : (rec.hadir || "✔");
                 document.getElementById('mp-modal-hadir').value = hadirVal;
                 document.getElementById('mp-modal-shift').value = rec.shift || "Shift 1";
-                document.getElementById('mp-modal-bagian').value = rec.bagian || s.section || "PAINTING";
+                document.getElementById('mp-modal-bagian').value = rec.bagian || s?.section || "PAINTING";
                 document.getElementById('mp-modal-mesin').value = rec.nomor_mesin || "";
                 document.getElementById('mp-modal-model').value = rec.model || "";
                 document.getElementById('mp-modal-plan').value = rec.plan !== null && rec.plan !== undefined ? rec.plan : 0;
                 document.getElementById('mp-modal-actual').value = rec.actual !== null && rec.actual !== undefined ? rec.actual : 0;
                 document.getElementById('mp-modal-reject').value = rec.reject !== null && rec.reject !== undefined ? rec.reject : 0;
-                document.getElementById('mp-modal-spv').value = rec.nama_spv || s.spv || "";
+                document.getElementById('mp-modal-spv').value = rec.nama_spv || s?.spv || "";
                 document.getElementById('mp-modal-keterangan').value = rec.keterangan || "";
             }
         } else {
+            if (studentContainer) studentContainer.classList.remove('hidden');
+            if (studentBanner) studentBanner.classList.add('hidden');
+
             if (studentSelect && studentSelect.options.length > 0) {
                 studentSelect.selectedIndex = 0;
             }
@@ -1037,6 +1094,8 @@
         }
 
         onMpModalStudentChange();
+        updateMpModalEfficiency();
+        onMpModalHadirChange();
         modal.classList.remove('hidden');
     }
 
