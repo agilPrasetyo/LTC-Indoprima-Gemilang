@@ -935,33 +935,33 @@
                 const pct = Math.round((r.actual / r.plan) * 100);
                 const badgeBg = pct >= 90 ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (pct >= 75 ? 'bg-amber-50 text-amber-700 border-amber-200' : 'bg-rose-50 text-rose-700 border-rose-200');
                 hasilDisplay = `
-                    <div class="flex flex-col gap-1 min-w-[210px]">
+                    <div class="flex flex-col gap-0.5">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 flex-wrap">
-                            <span class="text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100" title="Target Plan">Plan: ${r.plan}</span>
-                            <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100" title="Aktual">Aktual: ${r.actual}</span>
-                            <span class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100" title="Reject">Reject: ${r.reject || 0}</span>
+                            <span class="text-orange-600 bg-orange-50 px-1.5 py-0.5 rounded border border-orange-100 whitespace-nowrap" title="Target Plan">Plan: ${r.plan}</span>
+                            <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 whitespace-nowrap" title="Aktual">Aktual: ${r.actual}</span>
+                            <span class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 whitespace-nowrap" title="Reject">Reject: ${r.reject || 0}</span>
                         </div>
-                        <div class="flex items-center justify-between gap-2 mt-0.5">
-                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg}">${pct}% Target</span>
-                            <span class="text-[10px] text-slate-400 font-medium">SPV: ${r.spv || '-'}</span>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full border ${badgeBg} whitespace-nowrap">${pct}% Target</span>
+                            <span class="text-[10px] text-slate-400 font-medium whitespace-nowrap">SPV: ${r.spv || '-'}</span>
                         </div>
                     </div>
                 `;
             } else if (r.actual !== null && r.actual > 0) {
                 hasilDisplay = `
-                    <div class="flex flex-col gap-1 min-w-[210px]">
+                    <div class="flex flex-col gap-0.5">
                         <div class="flex items-center gap-1.5 text-xs font-bold text-slate-800 flex-wrap">
-                            <span class="text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100" title="Target Plan">Plan: 0</span>
-                            <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100" title="Aktual">Aktual: ${r.actual}</span>
-                            <span class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100" title="Reject">Reject: ${r.reject || 0}</span>
+                            <span class="text-slate-500 bg-slate-50 px-1.5 py-0.5 rounded border border-slate-100 whitespace-nowrap" title="Target Plan">Plan: 0</span>
+                            <span class="text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded border border-emerald-100 whitespace-nowrap" title="Aktual">Aktual: ${r.actual}</span>
+                            <span class="text-rose-600 bg-rose-50 px-1.5 py-0.5 rounded border border-rose-100 whitespace-nowrap" title="Reject">Reject: ${r.reject || 0}</span>
                         </div>
-                        <div class="text-[10px] text-slate-400 font-medium mt-0.5">SPV: ${r.spv || '-'}</div>
+                        <div class="text-[10px] text-slate-400 font-medium mt-0.5 whitespace-nowrap">SPV: ${r.spv || '-'}</div>
                     </div>
                 `;
             } else {
                 hasilDisplay = `
                     <div class="text-slate-400 text-xs font-medium">-</div>
-                    <div class="text-[10px] text-slate-400 font-normal">SPV: ${r.spv || '-'}</div>
+                    <div class="text-[10px] text-slate-400 font-normal whitespace-nowrap">SPV: ${r.spv || '-'}</div>
                 `;
             }
 
