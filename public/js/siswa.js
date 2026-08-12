@@ -444,9 +444,13 @@ function showStudentDetail(s) {
     const isBagianHadirGlobal = (s.section || '').toUpperCase().includes('ADM') ||
         (s.section || '').toUpperCase().includes('ADMINISTRASI') ||
         (s.section || '').toUpperCase().includes('PPIC') ||
+        (s.section || '').toUpperCase().includes('IRGA') ||
+        (s.section || '').toUpperCase().includes('SHE') ||
         (s.bagian || '').toUpperCase().includes('ADM') ||
         (s.bagian || '').toUpperCase().includes('ADMINISTRASI') ||
-        (s.bagian || '').toUpperCase().includes('PPIC');
+        (s.bagian || '').toUpperCase().includes('PPIC') ||
+        (s.bagian || '').toUpperCase().includes('IRGA') ||
+        (s.bagian || '').toUpperCase().includes('SHE');
 
     for (let i = chartDaysCount - 1; i >= 0; i--) {
         const d = new Date(today);
@@ -547,9 +551,13 @@ function showStudentDetail(s) {
                 const isBagianHadir = (s.section || '').toUpperCase().includes('ADM') ||
                     (s.section || '').toUpperCase().includes('ADMINISTRASI') ||
                     (s.section || '').toUpperCase().includes('PPIC') ||
+                    (s.section || '').toUpperCase().includes('IRGA') ||
+                    (s.section || '').toUpperCase().includes('SHE') ||
                     (s.bagian || '').toUpperCase().includes('ADM') ||
                     (s.bagian || '').toUpperCase().includes('ADMINISTRASI') ||
-                    (s.bagian || '').toUpperCase().includes('PPIC');
+                    (s.bagian || '').toUpperCase().includes('PPIC') ||
+                    (s.bagian || '').toUpperCase().includes('IRGA') ||
+                    (s.bagian || '').toUpperCase().includes('SHE');
 
                 const isHadirDay = (rec.plan === null || rec.plan === 0 || isNaN(rec.plan)) && (rec.hadir !== "" && rec.hadir !== undefined && rec.hadir !== null);
 
