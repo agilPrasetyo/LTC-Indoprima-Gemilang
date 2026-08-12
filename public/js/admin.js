@@ -976,14 +976,14 @@
                 </td>
                 <td class="py-3 px-4 font-mono font-bold text-slate-700 whitespace-nowrap">${dateDisplay}</td>
                 <td class="py-3 px-4 font-mono text-slate-500 whitespace-nowrap">${r.noreg}</td>
-                <td class="py-3 px-4 font-bold text-brand-textMain whitespace-nowrap">${r.namaLengkap}</td>
+                <td class="py-3 px-4 font-bold text-brand-textMain truncate max-w-[200px]" title="${r.namaLengkap}">${r.namaLengkap}</td>
                 <td class="py-3 px-4 text-center whitespace-nowrap">${hadirBadge}</td>
-                <td class="py-3 px-4 whitespace-nowrap">
-                    <div class="font-bold text-slate-700">${r.shift || 'Shift 1'} • ${r.bagian || '-'}</div>
-                    <div class="text-[10px] text-slate-400 font-normal">Mesin: ${r.mesin || '-'} | Model: ${r.model || '-'}</div>
+                <td class="py-3 px-4">
+                    <div class="font-bold text-slate-700 truncate max-w-[190px]" title="${r.shift || 'Shift 1'} • ${r.bagian || '-'}">${r.shift || 'Shift 1'} • ${r.bagian || '-'}</div>
+                    <div class="text-[10px] text-slate-400 font-normal truncate max-w-[190px]" title="Mesin: ${r.mesin || '-'} | Model: ${r.model || '-'}">Mesin: ${r.mesin || '-'} | Model: ${r.model || '-'}</div>
                 </td>
                 <td class="py-3 px-4 whitespace-nowrap">${hasilDisplay}</td>
-                <td class="py-3 px-4 text-slate-600" title="${r.keterangan || ''}">${r.keterangan || '-'}</td>
+                <td class="py-3 px-4 text-slate-600 truncate max-w-xs" title="${r.keterangan || ''}">${r.keterangan || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
