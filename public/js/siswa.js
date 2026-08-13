@@ -230,6 +230,14 @@ function renderPerformanceProductionTrendChart() {
             responsive: true,
             maintainAspectRatio: false,
             interaction: { mode: 'index', intersect: false },
+            layout: {
+                padding: {
+                    top: 35,
+                    left: 10,
+                    right: 15,
+                    bottom: 5
+                }
+            },
             plugins: {
                 legend: {
                     position: 'bottom',
@@ -238,7 +246,7 @@ function renderPerformanceProductionTrendChart() {
                 tooltip: {
                     callbacks: {
                         label: (ctx) => {
-                            if (ctx.dataset.type === 'line') {
+                            if (ctx.dataset.type === 'line' || ctx.dataset.yAxisID === 'y1') {
                                 return `Efisiensi: ${ctx.parsed.y}%`;
                             }
                             return `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('id-ID')} Pcs`;
@@ -256,6 +264,7 @@ function renderPerformanceProductionTrendChart() {
                     display: true,
                     position: 'left',
                     beginAtZero: true,
+                    grace: '20%',
                     title: { display: true, text: 'Jumlah Output (Pcs)', font: { size: 10, weight: 'bold' } },
                     grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
                     ticks: { font: { size: 10 } }
@@ -265,7 +274,7 @@ function renderPerformanceProductionTrendChart() {
                     display: true,
                     position: 'right',
                     beginAtZero: true,
-                    suggestedMax: 140,
+                    grace: '25%',
                     title: { display: true, text: 'Efisiensi (%)', font: { size: 10, weight: 'bold' } },
                     grid: { drawOnChartArea: false },
                     ticks: {
@@ -458,6 +467,13 @@ function renderPerformaTopCharts() {
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 30,
+                    left: 10,
+                    right: 15
+                }
+            },
             plugins: {
                 legend: {
                     position: 'top',
@@ -484,6 +500,7 @@ function renderPerformaTopCharts() {
                     display: true,
                     position: 'left',
                     beginAtZero: true,
+                    grace: '15%',
                     grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
                     ticks: { font: { size: 10 } }
                 },
@@ -492,7 +509,7 @@ function renderPerformaTopCharts() {
                     display: true,
                     position: 'right',
                     beginAtZero: true,
-                    max: 100,
+                    grace: '15%',
                     grid: { drawOnChartArea: false },
                     ticks: {
                         font: { size: 10 },

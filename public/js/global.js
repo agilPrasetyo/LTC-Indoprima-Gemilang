@@ -59,7 +59,7 @@ const globalChartDataLabelsPlugin = {
                             ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
                             ctx.shadowBlur = 3;
 
-                            const isPercentLine = (dataset.label && dataset.label.toLowerCase().includes('persentase')) || dataset.yAxisID === 'yPercent';
+                            const isPercentLine = (dataset.label && (dataset.label.toLowerCase().includes('persentase') || dataset.label.includes('%') || dataset.label.toLowerCase().includes('efisiensi'))) || dataset.yAxisID === 'yPercent' || dataset.yAxisID === 'y1';
                             const formattedVal = typeof val === 'number' 
                                 ? (isPercentLine || !Number.isInteger(val) ? (Number.isInteger(val) ? val + '%' : val.toFixed(1) + '%') : String(val))
                                 : String(val);
