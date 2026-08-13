@@ -153,12 +153,14 @@ function renderPerformanceProductionTrendChart() {
 
     const efficiencyValues = planValues.map((p, idx) => {
         const a = actualValues[idx];
-        return p > 0 ? Math.round((a / p) * 100) : 0;
+        return (p > 0 || a > 0) ? Math.round((a / (p || 1)) * 100) : null;
     });
 
     if (performanceProductionTrendChartInstance) {
         performanceProductionTrendChartInstance.destroy();
     }
+
+    const isWeekly = performanceTrendMode === 'mingguan';
 
     performanceProductionTrendChartInstance = new Chart(trendCanvas.getContext('2d'), {
         data: {
@@ -170,8 +172,8 @@ function renderPerformanceProductionTrendChart() {
                     data: planValues,
                     backgroundColor: '#FB923C',
                     borderRadius: 4,
-                    barPercentage: 0.65,
-                    categoryPercentage: 0.7,
+                    barPercentage: isWeekly ? 0.6 : 0.65,
+                    categoryPercentage: isWeekly ? 0.65 : 0.7,
                     yAxisID: 'y',
                     datalabels: {
                         anchor: 'end',
@@ -187,8 +189,8 @@ function renderPerformanceProductionTrendChart() {
                     data: actualValues,
                     backgroundColor: '#4ADE80',
                     borderRadius: 4,
-                    barPercentage: 0.65,
-                    categoryPercentage: 0.7,
+                    barPercentage: isWeekly ? 0.6 : 0.65,
+                    categoryPercentage: isWeekly ? 0.65 : 0.7,
                     yAxisID: 'y',
                     datalabels: {
                         anchor: 'end',
@@ -200,28 +202,26 @@ function renderPerformanceProductionTrendChart() {
                 },
                 {
                     type: 'line',
-                    label: '(%)',
+                    label: 'Efisiensi (%)',
                     data: efficiencyValues,
-                    borderColor: '#15803D',
-                    backgroundColor: '#15803D',
-                    borderWidth: 3,
-                    pointRadius: 5,
-                    pointHoverRadius: 7,
-                    pointBackgroundColor: '#15803D',
+                    borderColor: '#059669',
+                    backgroundColor: '#059669',
+                    borderWidth: 2.5,
+                    pointRadius: 4.5,
+                    pointHoverRadius: 6.5,
+                    pointBackgroundColor: '#059669',
                     pointBorderColor: '#FFFFFF',
                     pointBorderWidth: 2,
-                    tension: 0.2,
+                    tension: 0.25,
+                    spanGaps: false,
                     yAxisID: 'y1',
                     datalabels: {
-                        anchor: 'top',
-                        align: 'top',
-                        offset: 4,
-                        color: '#15803D',
-                        backgroundColor: '#DCFCE7',
+                        color: '#FFFFFF',
+                        backgroundColor: '#059669',
                         borderRadius: 4,
                         padding: 3,
                         font: { size: 10, weight: 'bold' },
-                        formatter: (val) => `${val}%`
+                        formatter: (val) => val !== null && val !== undefined ? `${val}%` : ''
                     }
                 }
             ]
@@ -247,7 +247,7 @@ function renderPerformanceProductionTrendChart() {
                     callbacks: {
                         label: (ctx) => {
                             if (ctx.dataset.type === 'line' || ctx.dataset.yAxisID === 'y1') {
-                                return `Efisiensi: ${ctx.parsed.y}%`;
+                                return `Efisiensi: ${ctx.parsed.y !== null ? ctx.parsed.y + '%' : '-'}`;
                             }
                             return `${ctx.dataset.label}: ${ctx.parsed.y.toLocaleString('id-ID')} Pcs`;
                         }
@@ -264,17 +264,20 @@ function renderPerformanceProductionTrendChart() {
                     display: true,
                     position: 'left',
                     beginAtZero: true,
-                    grace: '20%',
+                    grace: '70%',
                     title: { display: true, text: 'Jumlah Output (Pcs)', font: { size: 10, weight: 'bold' } },
                     grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
-                    ticks: { font: { size: 10 } }
+                    ticks: { 
+                        font: { size: 10 },
+                        callback: (val) => val.toLocaleString('id-ID')
+                    }
                 },
                 y1: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     beginAtZero: true,
-                    grace: '25%',
+                    grace: '15%',
                     title: { display: true, text: 'Efisiensi (%)', font: { size: 10, weight: 'bold' } },
                     grid: { drawOnChartArea: false },
                     ticks: {

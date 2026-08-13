@@ -51,19 +51,48 @@ const globalChartDataLabelsPlugin = {
                             const labelText = total > 1 && pct > 0 ? `${val} (${pct}%)` : `${val}`;
                             ctx.fillText(labelText, position.x, position.y);
                         } else if (isLineDataset) {
-                            ctx.font = 'bold 11px Inter, sans-serif';
-                            ctx.fillStyle = dataset.borderColor || '#0F3A8C';
-                            ctx.textAlign = 'center';
-                            ctx.textBaseline = 'bottom';
-                            
-                            ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
-                            ctx.shadowBlur = 3;
-
                             const isPercentLine = (dataset.label && (dataset.label.toLowerCase().includes('persentase') || dataset.label.includes('%') || dataset.label.toLowerCase().includes('efisiensi'))) || dataset.yAxisID === 'yPercent' || dataset.yAxisID === 'y1';
                             const formattedVal = typeof val === 'number' 
-                                ? (isPercentLine || !Number.isInteger(val) ? (Number.isInteger(val) ? val + '%' : val.toFixed(1) + '%') : String(val))
+                                ? (isPercentLine || !Number.isInteger(val) ? (Number.isInteger(val) ? val + '%' : val.toFixed(1) + '%') : val.toLocaleString('id-ID'))
                                 : String(val);
-                            ctx.fillText(formattedVal, position.x, position.y - 12);
+
+                            const bgBadge = dataset.datalabels && dataset.datalabels.backgroundColor ? dataset.datalabels.backgroundColor : null;
+                            const textBadgeColor = dataset.datalabels && dataset.datalabels.color ? dataset.datalabels.color : '#FFFFFF';
+
+                            if (bgBadge) {
+                                ctx.font = 'bold 10px Inter, sans-serif';
+                                const textWidth = ctx.measureText(formattedVal).width;
+                                const padX = 5;
+                                const rectWidth = textWidth + padX * 2;
+                                const rectHeight = 16;
+                                const rx = position.x - rectWidth / 2;
+                                const ry = position.y - 20;
+
+                                ctx.shadowColor = 'rgba(0, 0, 0, 0.12)';
+                                ctx.shadowBlur = 3;
+                                ctx.fillStyle = bgBadge;
+                                ctx.beginPath();
+                                if (typeof ctx.roundRect === 'function') {
+                                    ctx.roundRect(rx, ry, rectWidth, rectHeight, 4);
+                                } else {
+                                    ctx.rect(rx, ry, rectWidth, rectHeight);
+                                }
+                                ctx.fill();
+
+                                ctx.shadowColor = 'transparent';
+                                ctx.fillStyle = textBadgeColor;
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'middle';
+                                ctx.fillText(formattedVal, position.x, ry + rectHeight / 2 + 0.5);
+                            } else {
+                                ctx.font = 'bold 11px Inter, sans-serif';
+                                ctx.fillStyle = dataset.borderColor || '#0F3A8C';
+                                ctx.textAlign = 'center';
+                                ctx.textBaseline = 'bottom';
+                                ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+                                ctx.shadowBlur = 3;
+                                ctx.fillText(formattedVal, position.x, position.y - 10);
+                            }
                         } else if (isStackedBar) {
                             const base = element.base !== undefined ? element.base : element.y;
                             const sliceHeight = Math.abs(base - element.y);
@@ -77,7 +106,7 @@ const globalChartDataLabelsPlugin = {
                                 ctx.textBaseline = 'middle';
                                 ctx.shadowColor = 'rgba(0, 0, 0, 0.5)';
                                 ctx.shadowBlur = 2;
-                                ctx.fillText(String(val), element.x, yCenter);
+                                ctx.fillText(typeof val === 'number' ? val.toLocaleString('id-ID') : String(val), element.x, yCenter);
                             }
 
                             // Render TOTAL STACK SUM on top of the highest stacked segment
@@ -104,18 +133,19 @@ const globalChartDataLabelsPlugin = {
                                 ctx.textBaseline = 'bottom';
                                 ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
                                 ctx.shadowBlur = 3;
-                                ctx.fillText(String(stackSum), element.x, topY - 5);
+                                ctx.fillText(stackSum.toLocaleString('id-ID'), element.x, topY - 5);
                             }
                         } else if (isBarDataset) {
-                            ctx.font = 'bold 11px Inter, sans-serif';
+                            ctx.font = 'bold 10px Inter, sans-serif';
                             ctx.fillStyle = '#334155';
                             ctx.textAlign = 'center';
                             ctx.textBaseline = 'bottom';
                             
-                            ctx.shadowColor = 'rgba(255, 255, 255, 0.9)';
-                            ctx.shadowBlur = 2;
+                            ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+                            ctx.shadowBlur = 3;
                             
-                            ctx.fillText(String(val), position.x, position.y - 4);
+                            const formattedBarVal = typeof val === 'number' ? val.toLocaleString('id-ID') : String(val);
+                            ctx.fillText(formattedBarVal, position.x, position.y - 3);
                         }
 
                         ctx.restore();
