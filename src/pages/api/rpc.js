@@ -990,6 +990,7 @@ async function handleLocalSupabaseWrite(action, args) {
       if (sLower === 'alpha') return 'Alpha';
       if (sLower === 'ijin') return 'Ijin';
       if (sLower === 'sakit') return 'Sakit';
+      if (sLower === 'off' || sLower === 'libur') return 'Off';
       return 'Hadir';
     };
 
