@@ -358,20 +358,27 @@ function renderPerformaTopCharts() {
         data: {
             labels: months,
             datasets: [
-                { label: 'Kls 1', data: dataKls1, backgroundColor: '#C00000', borderRadius: 0 },
-                { label: 'Kls 2', data: dataKls2, backgroundColor: '#FFC000', borderRadius: 0 },
-                { label: 'Kls 3', data: dataKls3, backgroundColor: '#00B050', borderRadius: 0 },
-                { label: 'Kls 4', data: dataKls4, backgroundColor: '#0070C0', borderRadius: 0 },
-                { label: 'Kls 5', data: dataKls5, backgroundColor: '#7F7F7F', borderRadius: 0 }
+                { label: 'Kls 1', data: dataKls1, backgroundColor: '#EF4444', borderRadius: 2 },
+                { label: 'Kls 2', data: dataKls2, backgroundColor: '#F59E0B', borderRadius: 2 },
+                { label: 'Kls 3', data: dataKls3, backgroundColor: '#10B981', borderRadius: 2 },
+                { label: 'Kls 4', data: dataKls4, backgroundColor: '#06B6D4', borderRadius: 2 },
+                { label: 'Kls 5', data: dataKls5, backgroundColor: '#8B5CF6', borderRadius: 4 }
             ]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
+            layout: {
+                padding: {
+                    top: 25,
+                    left: 5,
+                    right: 10
+                }
+            },
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } }
+                    labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, usePointStyle: true }
                 },
                 tooltip: { mode: 'index', intersect: false }
             },
@@ -384,6 +391,7 @@ function renderPerformaTopCharts() {
                 y: {
                     stacked: true,
                     beginAtZero: true,
+                    grace: '15%',
                     grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
                     ticks: { font: { size: 10 } }
                 }
@@ -393,9 +401,9 @@ function renderPerformaTopCharts() {
 
     // ----------------------------------------------------
     // CHART 2: Performa LTC per Kelas (Combo Bar & Line)
-    // Bar 1 = Total Plan (HIJAU)
-    // Bar 2 = Total Aktual (BIRU)
-    // Line = Persentase Capaian (MERAH)
+    // Bar 1 = Total Plan (EMERALD)
+    // Bar 2 = Total Aktual (ROYAL BLUE)
+    // Line = Persentase Capaian (ROSE RED BADGE)
     // ----------------------------------------------------
     const classes = ['Kelas 1', 'Kelas 2', 'Kelas 3', 'Kelas 4', 'Kelas 5'];
 
@@ -426,7 +434,7 @@ function renderPerformaTopCharts() {
 
     const pctPerKelas = finalPlan.map((plan, i) => {
         const act = finalActual[i];
-        return plan > 0 ? Math.round((act / plan) * 100) : 0;
+        return plan > 0 ? Math.round((act / plan) * 100) : null;
     });
 
     if (performaLtcKelasChartInstance) performaLtcKelasChartInstance.destroy();
@@ -439,31 +447,44 @@ function renderPerformaTopCharts() {
                     type: 'bar',
                     label: 'Total Plan',
                     data: finalPlan,
-                    backgroundColor: '#10B981', // HIJAU
-                    borderRadius: 6,
+                    backgroundColor: '#10B981',
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.65,
                     yAxisID: 'y'
                 },
                 {
                     type: 'bar',
                     label: 'Total Aktual',
                     data: finalActual,
-                    backgroundColor: '#2563EB', // BIRU
-                    borderRadius: 6,
+                    backgroundColor: '#2563EB',
+                    borderRadius: 4,
+                    barPercentage: 0.6,
+                    categoryPercentage: 0.65,
                     yAxisID: 'y'
                 },
                 {
                     type: 'line',
                     label: 'Persentase Capaian (%)',
                     data: pctPerKelas,
-                    borderColor: '#EF4444', // MERAH
-                    backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                    borderWidth: 3,
-                    pointBackgroundColor: '#EF4444',
+                    borderColor: '#E11D48',
+                    backgroundColor: '#E11D48',
+                    borderWidth: 2.5,
+                    pointBackgroundColor: '#E11D48',
                     pointBorderColor: '#FFFFFF',
                     pointBorderWidth: 2,
-                    pointRadius: 5,
-                    tension: 0.3,
-                    yAxisID: 'yPercent'
+                    pointRadius: 4.5,
+                    pointHoverRadius: 6.5,
+                    tension: 0.25,
+                    spanGaps: false,
+                    yAxisID: 'yPercent',
+                    datalabels: {
+                        color: '#FFFFFF',
+                        backgroundColor: '#E11D48',
+                        borderRadius: 4,
+                        padding: 3,
+                        font: { size: 10, weight: 'bold' }
+                    }
                 }
             ]
         },
@@ -472,23 +493,24 @@ function renderPerformaTopCharts() {
             maintainAspectRatio: false,
             layout: {
                 padding: {
-                    top: 30,
+                    top: 35,
                     left: 10,
-                    right: 15
+                    right: 15,
+                    bottom: 5
                 }
             },
             plugins: {
                 legend: {
                     position: 'top',
-                    labels: { boxWidth: 10, font: { size: 10, weight: 'bold' } }
+                    labels: { boxWidth: 10, font: { size: 10, weight: 'bold' }, usePointStyle: true }
                 },
                 tooltip: {
                     callbacks: {
                         label: function(context) {
                             if (context.dataset.yAxisID === 'yPercent') {
-                                return context.dataset.label + ': ' + context.raw + '%';
+                                return context.dataset.label + ': ' + (context.raw !== null ? context.raw + '%' : '-');
                             }
-                            return context.dataset.label + ': ' + context.raw;
+                            return context.dataset.label + ': ' + (context.raw ? context.raw.toLocaleString('id-ID') : 0) + ' Pcs';
                         }
                     }
                 }
@@ -503,19 +525,23 @@ function renderPerformaTopCharts() {
                     display: true,
                     position: 'left',
                     beginAtZero: true,
-                    grace: '15%',
+                    grace: '45%',
                     grid: { color: 'rgba(226, 232, 240, 0.6)', borderDash: [4, 4] },
-                    ticks: { font: { size: 10 } }
+                    ticks: { 
+                        font: { size: 10 },
+                        callback: val => val.toLocaleString('id-ID')
+                    }
                 },
                 yPercent: {
                     type: 'linear',
                     display: true,
                     position: 'right',
                     beginAtZero: true,
-                    grace: '15%',
+                    grace: '20%',
+                    suggestedMax: 120,
                     grid: { drawOnChartArea: false },
                     ticks: {
-                        font: { size: 10 },
+                        font: { size: 10, weight: 'bold' },
                         callback: value => value + '%'
                     }
                 }
