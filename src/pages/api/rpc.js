@@ -305,15 +305,19 @@ async function getStatsFromSupabase() {
     return { id: f.trans_id, tipe: f.tipe, kat: f.kategori, jumlah: amt, tanggal: f.tanggal, ket: f.keterangan };
   });
 
-  const absensiRecords = (absensi || []).map((a, index) => ({
-    rowIndex: index + 2,
-    id: a.id,
-    tanggal: a.tanggal,
-    noreg: a.noreg,
-    nama: siswaList.find(s => s.id === a.noreg)?.nama || '',
-    status: a.status,
-    keterangan: a.keterangan
-  }));
+  const absensiRecords = (absensi || []).map((a, index) => {
+    const isOff = a.status === 'Off' || a.status === 'Libur' || 
+                  (a.keterangan && (a.keterangan.toUpperCase().includes('OFF') || a.keterangan.toUpperCase().includes('LIBUR')));
+    return {
+      rowIndex: index + 2,
+      id: a.id,
+      tanggal: a.tanggal,
+      noreg: a.noreg,
+      nama: siswaList.find(s => s.id === a.noreg)?.nama || '',
+      status: isOff ? 'Off' : a.status,
+      keterangan: a.keterangan
+    };
+  });
 
   return {
     success: true,
@@ -365,11 +369,15 @@ async function getStudentLogsFromSupabase(noreg) {
       model: log.model || '',
       namaSpv: log.nama_spv || ''
     })),
-    absensi: (absensi || []).map(a => ({
-      tanggal: a.tanggal,
-      status: a.status,
-      keterangan: a.keterangan || ''
-    })),
+    absensi: (absensi || []).map(a => {
+      const isOff = a.status === 'Off' || a.status === 'Libur' || 
+                    (a.keterangan && (a.keterangan.toUpperCase().includes('OFF') || a.keterangan.toUpperCase().includes('LIBUR')));
+      return {
+        tanggal: a.tanggal,
+        status: isOff ? 'Off' : a.status,
+        keterangan: a.keterangan || ''
+      };
+    }),
     perfLabel: "Plan"
   };
 }
@@ -990,16 +998,29 @@ async function handleLocalSupabaseWrite(action, args) {
       if (sLower === 'alpha') return 'Alpha';
       if (sLower === 'ijin') return 'Ijin';
       if (sLower === 'sakit') return 'Sakit';
-      if (sLower === 'off' || sLower === 'libur') return 'Off';
+      if (sLower === 'off' || sLower === 'libur') return 'Ijin'; // Map 'Off' to 'Ijin' for DB check constraint compatibility
       return 'Hadir';
     };
 
-    await supabase.from('absensi').upsert({
+    const statusVal = toProperStatus(a.status);
+    let ketVal = a.keterangan ? a.keterangan.toUpperCase() : '';
+    if ((a.status === 'Off' || a.status === 'Libur') && !ketVal.includes('OFF') && !ketVal.includes('LIBUR')) {
+      ketVal = ketVal ? `OFF - ${ketVal}` : 'OFF';
+    }
+
+    const { error: upsertErr } = await supabase.from('absensi').upsert({
       noreg: a.noreg,
       tanggal: a.tanggal,
-      status: toProperStatus(a.status),
-      keterangan: a.keterangan ? a.keterangan.toUpperCase() : ''
+      status: statusVal,
+      keterangan: ketVal
     }, { onConflict: 'noreg,tanggal' });
+
+    if (upsertErr) {
+      console.error('Error saving absensi:', upsertErr);
+      return new Response(JSON.stringify({ success: false, message: upsertErr.message }), { status: 400 });
+    }
+
+    return new Response(JSON.stringify({ success: true }), { status: 200 });
 
   } else if (action === 'deleteAbsensi') {
     await supabase.from('absensi').delete().eq('id', args[0]);

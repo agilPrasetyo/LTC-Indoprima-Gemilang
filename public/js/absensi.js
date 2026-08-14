@@ -430,7 +430,12 @@
                     cellChar = '-';
                     cellClass = 'bg-slate-100 text-slate-300';
                 } else if (rec && rec.status) {
-                    if (rec.status === 'Hadir') {
+                    const isOffRec = rec.status === 'Off' || rec.status === 'Libur' ||
+                                     (rec.keterangan && (rec.keterangan.toUpperCase().includes('OFF') || rec.keterangan.toUpperCase().includes('LIBUR')));
+                    if (isOffRec) {
+                        cellChar = 'O';
+                        cellClass = 'bg-slate-200 text-slate-500 font-bold hover:bg-slate-300';
+                    } else if (rec.status === 'Hadir') {
                         cellChar = 'H';
                         cellClass = 'bg-emerald-500 text-white font-bold hover:bg-emerald-600';
                     } else if (rec.status === 'Ijin') {
@@ -447,9 +452,6 @@
                             cellChar = 'A';
                             cellClass = 'bg-rose-500 text-white font-bold hover:bg-rose-600';
                         }
-                    } else if (rec.status === 'Off' || rec.status === 'Libur') {
-                        cellChar = 'O';
-                        cellClass = 'bg-slate-200 text-slate-500 font-bold hover:bg-slate-300';
                     }
                 } else if (isSunday) {
                     cellChar = '-';
