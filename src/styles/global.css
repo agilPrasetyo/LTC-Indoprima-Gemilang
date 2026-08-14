@@ -439,14 +439,15 @@ input:not([type]):not([type="email"]):not([type="password"]):not([type="date"]):
 }
 
 /* Universal Solid Opaque Sticky Table Headers (Prevents any see-through transparency during scrolling) */
-table thead tr.sticky,
-table thead.sticky,
-table tr.sticky th,
-table thead tr.sticky th,
-table thead.sticky tr th,
-table thead th.sticky {
+table thead th {
+    position: sticky !important;
+    top: 0 !important;
     background-color: #f8fafc !important;
     background-clip: padding-box !important;
     opacity: 1 !important;
+    z-index: 20;
+}
+table thead tr {
+    background-color: #f8fafc !important;
 }
 
