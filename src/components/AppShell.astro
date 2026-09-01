@@ -122,7 +122,7 @@ const { role } = Astro.props;
 </div>
 
 <!-- Struktur Navigasi Aplikasi Utama -->
-<div id="app" class="hidden min-h-screen flex flex-col lg:flex-row">
+<div id="app" class="hidden min-h-screen flex flex-col lg:flex-row w-full max-w-full overflow-x-hidden">
 
   <!-- Backdrop Overlay untuk Mobile/Split-Screen Drawer -->
   <div id="sidebar-drawer-overlay" class="hidden fixed inset-0 z-40 bg-slate-900/40 backdrop-blur-sm transition-opacity duration-300 lg:hidden" onclick="toggleMobileSidebar(false)"></div>
@@ -130,7 +130,7 @@ const { role } = Astro.props;
   <!-- =============================================
        DESKTOP & SPLIT-SCREEN SIDEBAR DRAWER
        ============================================= -->
-  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-brand-border/60 p-4 lg:p-5 flex flex-col justify-between transition-transform duration-300 ease-in-out text-brand-textMain -translate-x-full lg:translate-x-0 lg:static lg:sticky lg:top-0 lg:h-screen lg:max-h-screen shadow-2xl lg:shadow-none">
+  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 shrink-0 bg-white/95 backdrop-blur-xl border-r border-brand-border/60 p-4 lg:p-5 flex flex-col justify-between transition-transform duration-300 ease-in-out text-brand-textMain -translate-x-full lg:translate-x-0 lg:sticky lg:top-0 lg:h-screen lg:max-h-screen shadow-2xl lg:shadow-none">
     
     <!-- Button to toggle sidebar collapse -->
     <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" class="hidden lg:flex absolute top-8 -right-3 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow items-center justify-center text-slate-500 hover:text-brand-blue hover:scale-110 active:scale-95 transition-all duration-300 z-50 cursor-pointer" title="Sembunyikan/Pin Sidebar">
@@ -303,7 +303,7 @@ const { role } = Astro.props;
   <!-- =============================================
        KONTEN UTAMA APLIKASI
        ============================================= -->
-  <div class="flex-1 min-h-screen bg-brand-bg flex flex-col justify-between overflow-x-clip pb-16 md:pb-0">
+  <div class="flex-1 min-w-0 w-full min-h-screen bg-brand-bg flex flex-col justify-between overflow-x-hidden pb-16 md:pb-0">
     
     <!-- HEADER UTAMA (Frozen/Sticky Dashboard Header) -->
     <header class="h-20 bg-white/95 backdrop-blur-xl border-b border-brand-border/80 sticky top-0 z-30 flex items-center justify-between px-6 md:px-8 shadow-xs">
@@ -1412,13 +1412,13 @@ const { role } = Astro.props;
 </div>
 
 <!-- Memuat Script Real-Time Engine secara teratur -->
-<script is:inline src="/js/api.js?v=52.0"></script>
-<script is:inline src="/js/global.js?v=52.0"></script>
-<script is:inline src="/js/dashboard.js?v=52.0"></script>
-<script is:inline src="/js/siswa.js?v=52.0"></script>
-<script is:inline src="/js/turnover.js?v=52.0"></script>
-<script is:inline src="/js/siswa_portal.js?v=52.0"></script>
-<script is:inline src="/js/keuangan.js?v=52.0"></script>
-<script is:inline src="/js/admin.js?v=52.0"></script>
-<script is:inline src="/js/absensi.js?v=52.0"></script>
-<script is:inline src="/js/safety.js?v=52.0"></script>
+<script is:inline src="/js/api.js?v=53.0"></script>
+<script is:inline src="/js/global.js?v=53.0"></script>
+<script is:inline src="/js/dashboard.js?v=53.0"></script>
+<script is:inline src="/js/siswa.js?v=53.0"></script>
+<script is:inline src="/js/turnover.js?v=53.0"></script>
+<script is:inline src="/js/siswa_portal.js?v=53.0"></script>
+<script is:inline src="/js/keuangan.js?v=53.0"></script>
+<script is:inline src="/js/admin.js?v=53.0"></script>
+<script is:inline src="/js/absensi.js?v=53.0"></script>
+<script is:inline src="/js/safety.js?v=53.0"></script>
