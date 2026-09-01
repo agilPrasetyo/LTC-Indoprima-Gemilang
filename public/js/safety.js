@@ -1033,51 +1033,57 @@ function saveSafetyData() {
         submitBtn.innerHTML = '<i class="fa-solid fa-spinner animate-spin"></i> Menyimpan...';
     }
 
-    executeGASCall('saveSafetyRecord', [payload])
-        .then(res => {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Simpan Data Safety';
-            }
-
-            if (res && res.success) {
-                showToast('Data Kecelakaan Kerja berhasil disimpan!');
-                closeSafetyModal();
-                if (typeof loadDashboardData === 'function') {
-                    loadDashboardData();
+    const rpcRunner = (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : (typeof executeGASCall === 'function' ? executeGASCall : (typeof window !== 'undefined' && window.executeGASCall ? window.executeGASCall : null))));
+    if (rpcRunner) {
+        rpcRunner('saveSafetyRecord', [payload])
+            .then(res => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Simpan Data Safety';
                 }
-            } else {
-                showToast('Gagal menyimpan data safety: ' + (res ? res.message : 'Unknown error'), 'error');
-            }
-        })
-        .catch(err => {
-            if (submitBtn) {
-                submitBtn.disabled = false;
-                submitBtn.innerHTML = 'Simpan Data Safety';
-            }
-            console.error('Error saving safety data:', err);
-            showToast('Gagal menyimpan data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
-        });
+
+                if (res && res.success) {
+                    showToast('Data Kecelakaan Kerja berhasil disimpan!');
+                    closeSafetyModal();
+                    if (typeof loadDashboardData === 'function') {
+                        loadDashboardData();
+                    }
+                } else {
+                    showToast('Gagal menyimpan data safety: ' + (res ? res.message : 'Unknown error'), 'error');
+                }
+            })
+            .catch(err => {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.innerHTML = 'Simpan Data Safety';
+                }
+                console.error('Error saving safety data:', err);
+                showToast('Gagal menyimpan data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
+            });
+    }
 }
 
 function deleteSafetyRecord(id) {
     if (!confirm('Apakah Anda yakin ingin menghapus catatan kecelakaan kerja ini?')) return;
 
-    executeGASCall('deleteSafetyRecord', [id])
-        .then(res => {
-            if (res && res.success) {
-                showToast('Data Safety berhasil dihapus!');
-                if (typeof loadDashboardData === 'function') {
-                    loadDashboardData();
+    const rpcRunner = (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : (typeof executeGASCall === 'function' ? executeGASCall : (typeof window !== 'undefined' && window.executeGASCall ? window.executeGASCall : null))));
+    if (rpcRunner) {
+        rpcRunner('deleteSafetyRecord', [id])
+            .then(res => {
+                if (res && res.success) {
+                    showToast('Data Safety berhasil dihapus!');
+                    if (typeof loadDashboardData === 'function') {
+                        loadDashboardData();
+                    }
+                } else {
+                    showToast('Gagal menghapus data safety: ' + (res ? res.message : 'Unknown error'), 'error');
                 }
-            } else {
-                showToast('Gagal menghapus data safety: ' + (res ? res.message : 'Unknown error'), 'error');
-            }
-        })
-        .catch(err => {
-            console.error('Error deleting safety record:', err);
-            showToast('Gagal menghapus data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
-        });
+            })
+            .catch(err => {
+                console.error('Error deleting safety record:', err);
+                showToast('Gagal menghapus data safety: ' + (err ? err.message : 'Gangguan koneksi'), 'error');
+            });
+    }
 }
 
 // Attach globals for inline HTML event handlers

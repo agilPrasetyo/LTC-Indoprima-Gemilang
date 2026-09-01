@@ -1,4 +1,8 @@
 
+    function getRpcRunner() {
+        return (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : (typeof executeGASCall === 'function' ? executeGASCall : (typeof window !== 'undefined' && window.executeGASCall ? window.executeGASCall : null))));
+    }
+
     var currentAdminTab = 'sync-akun';
 
     // ============================================================
@@ -89,16 +93,22 @@
             if (!tbody) return;
             tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data pengguna...</td></tr>';
 
-            executeGASCall('getUsersList', [])
-                .then(data => {
-                    rawUsersData = data || [];
-                    filterAdminUsersTable();
-                })
-                .catch(err => {
-                    console.error('Gagal memuat data pengguna:', err);
-                    rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
-                    filterAdminUsersTable();
-                });
+            const rpc = getRpcRunner();
+            if (rpc) {
+                rpc('getUsersList', [])
+                    .then(data => {
+                        rawUsersData = data || [];
+                        filterAdminUsersTable();
+                    })
+                    .catch(err => {
+                        console.error('Gagal memuat data pengguna:', err);
+                        rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                        filterAdminUsersTable();
+                    });
+            } else {
+                rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                filterAdminUsersTable();
+            }
         } else if (currentAdminTab === 'kelola-siswa') {
             renderAdminSiswaTable();
         } else if (currentAdminTab === 'log-manpower') {
@@ -273,20 +283,23 @@
 
         showToast('Memperbarui data akun...', 'info');
 
-        executeGASCall('updateUser', [payload])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Akun berhasil diperbarui!', 'success');
-                    closeUserEditModal();
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else renderAdminView();
-                } else {
-                    showToast('Gagal memperbarui akun: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error server: ' + (err.message || err.toString()), 'error');
-            });
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('updateUser', [payload])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Akun berhasil diperbarui!', 'success');
+                        closeUserEditModal();
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminView();
+                    } else {
+                        showToast('Gagal memperbarui akun: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error server: ' + (err.message || err.toString()), 'error');
+                });
+        }
     }
 
     function deleteUserAdmin(userId) {
@@ -304,19 +317,22 @@
     function executeUserDeletion(userId) {
         showToast('Menghapus akun pengguna...', 'info');
 
-        executeGASCall('deleteUserById', [userId])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Pengguna berhasil dihapus.', 'success');
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else renderAdminView();
-                } else {
-                    showToast('Gagal menghapus pengguna: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error server: ' + (err.message || err.toString()), 'error');
-            });
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('deleteUserById', [userId])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Pengguna berhasil dihapus.', 'success');
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminView();
+                    } else {
+                        showToast('Gagal menghapus pengguna: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error server: ' + (err.message || err.toString()), 'error');
+                });
+        }
     }
 
     function syncExternalToLocalAdmin() {
@@ -788,20 +804,23 @@
 
         showToast('Menyimpan data siswa...', 'info');
 
-        executeGASCall('saveSiswa', [payload])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Data siswa berhasil disimpan!', 'success');
-                    closeStudentModal();
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else renderAdminSiswaTable();
-                } else {
-                    showToast('Gagal menyimpan data siswa: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Gagal menyimpan: ' + (err.message || err.toString()), 'error');
-            });
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('saveSiswa', [payload])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Data siswa berhasil disimpan!', 'success');
+                        closeStudentModal();
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminSiswaTable();
+                    } else {
+                        showToast('Gagal menyimpan data siswa: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Gagal menyimpan: ' + (err.message || err.toString()), 'error');
+                });
+        }
     }
 
 
@@ -845,22 +864,25 @@
     function executeStudentDeletion(noreg, alasan, keterangan) {
         showToast('Menghapus siswa dan mencatat turnover...', 'info');
 
-        executeGASCall('deleteSiswa', [noreg, alasan, keterangan])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Siswa dihapus & tercatat di Turnover!', 'success');
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else {
-                        renderAdminSiswaTable();
-                        renderAdminTurnoverTable();
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('deleteSiswa', [noreg, alasan, keterangan])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Siswa dihapus & tercatat di Turnover!', 'success');
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else {
+                            renderAdminSiswaTable();
+                            renderAdminTurnoverTable();
+                        }
+                    } else {
+                        showToast('Gagal menghapus siswa: ' + (res?.message || 'Unknown error'), 'error');
                     }
-                } else {
-                    showToast('Gagal menghapus siswa: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error server: ' + (err.message || err.toString()), 'error');
-            });
+                })
+                .catch(err => {
+                    showToast('Gagal menghapus: ' + (err.message || err.toString()), 'error');
+                });
+        }
     }
 
     // ============================================================
@@ -1245,21 +1267,24 @@
 
         showToast('Menyimpan log manpower...', 'info');
 
-        executeGASCall('saveManpowerLog', [payload])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Log manpower harian berhasil disimpan!', 'success');
-                    _updateLocalManpowerCache(noreg, dateVal, payload, origDate);
-                    closeManpowerLogModal();
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else renderAdminManpowerTable();
-                } else {
-                    showToast('Gagal menyimpan log: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error server: ' + (err.message || err.toString()), 'error');
-            });
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('saveManpowerLog', [payload])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Log manpower harian berhasil disimpan!', 'success');
+                        _updateLocalManpowerCache(noreg, dateVal, payload, origDate);
+                        closeManpowerLogModal();
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminManpowerTable();
+                    } else {
+                        showToast('Gagal menyimpan log: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error server: ' + (err.message || err.toString()), 'error');
+                });
+        }
     }
 
     function _updateLocalManpowerCache(noreg, dateVal, payload, origDateVal) {
@@ -1309,20 +1334,23 @@
 
     function executeManpowerLogDeletion(noreg, tanggal) {
         showToast('Menghapus log manpower...', 'info');
-        executeGASCall('deleteManpowerLog', [noreg, tanggal])
-            .then(res => {
-                if (res && res.success !== false) {
-                    showToast('Log manpower berhasil dihapus!', 'success');
-                    _removeLocalManpowerCache(noreg, tanggal);
-                    if (typeof loadDashboardData === 'function') loadDashboardData();
-                    else renderAdminManpowerTable();
-                } else {
-                    showToast('Gagal menghapus: ' + (res?.message || 'Unknown error'), 'error');
-                }
-            })
-            .catch(err => {
-                showToast('Error: ' + (err.message || err), 'error');
-            });
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('deleteManpowerLog', [noreg, tanggal])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Log manpower berhasil dihapus!', 'success');
+                        _removeLocalManpowerCache(noreg, tanggal);
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminManpowerTable();
+                    } else {
+                        showToast('Gagal menghapus: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error: ' + (err.message || err), 'error');
+                });
+        }
     }
 
     function _removeLocalManpowerCache(noreg, tanggal) {
@@ -1948,15 +1976,20 @@
             doExport(rawUsersData);
         } else {
             showToast('Menyiapkan data ekspor akun...', 'info');
-            executeGASCall('getUsersList', [])
-                .then(data => {
-                    rawUsersData = data || [];
-                    doExport(rawUsersData);
-                })
-                .catch(err => {
-                    console.error('Error fetching users for export:', err);
-                    doExport(typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
-                });
+            const rpc = getRpcRunner();
+            if (rpc) {
+                rpc('getUsersList', [])
+                    .then(data => {
+                        rawUsersData = data || [];
+                        doExport(rawUsersData);
+                    })
+                    .catch(err => {
+                        console.error('Error fetching users for export:', err);
+                        doExport(typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
+                    });
+            } else {
+                doExport(typeof fallbackUsers !== 'undefined' ? fallbackUsers : []);
+            }
         }
     };
 

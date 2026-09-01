@@ -679,21 +679,23 @@
 
         if (!newStatus) {
             // Delete record from Supabase (both absensi & manpower_log)
-            showToast('Menghapus data absensi...', 'info');
-            executeGASCall('deleteAbsensi', [currentEditNoreg, currentEditTanggal])
-                .then(res => {
-                    if (res && res.success !== false) {
-                        showToast('Data absensi berhasil dihapus!', 'success');
-                        absensiData = (absensiData || []).filter(r => !(r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg));
-                        if (typeof loadDashboardData === 'function') loadDashboardData();
-                        else renderAbsensiView();
-                    } else {
-                        showToast((res && res.message) || 'Gagal menghapus absensi.', 'error');
-                    }
-                })
-                .catch(err => {
-                    showToast('Error: ' + (err.message || err), 'error');
-                });
+            const rpcRunner = (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : (typeof executeGASCall === 'function' ? executeGASCall : (typeof window !== 'undefined' && window.executeGASCall ? window.executeGASCall : null))));
+            if (rpcRunner) {
+                rpcRunner('deleteAbsensi', [currentEditNoreg, currentEditTanggal])
+                    .then(res => {
+                        if (res && res.success !== false) {
+                            showToast('Data absensi berhasil dihapus!', 'success');
+                            absensiData = (absensiData || []).filter(r => !(r.tanggal === currentEditTanggal && r.noreg === currentEditNoreg));
+                            if (typeof loadDashboardData === 'function') loadDashboardData();
+                            else renderAbsensiView();
+                        } else {
+                            showToast((res && res.message) || 'Gagal menghapus absensi.', 'error');
+                        }
+                    })
+                    .catch(err => {
+                        showToast('Error: ' + (err.message || err), 'error');
+                    });
+            }
             closeAbsensiEditModal();
             return;
         }

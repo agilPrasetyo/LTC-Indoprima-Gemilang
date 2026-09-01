@@ -20,6 +20,30 @@ class RpcRunner {
   }
 }
 
+// Fungsi utama pengeksekusi request HTTP ke Endpoint Backend Astro (/api/rpc)
+async function executeRpcCall(functionName, args) {
+  try {
+    const payload = { action: functionName, args: args || [] };
+    
+    const response = await fetch('/api/rpc', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify(payload)
+    });
+    
+    if (!response.ok) {
+      const errBody = await response.json().catch(() => null);
+      throw new Error(errBody?.message || `HTTP Server Error: status ${response.status}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error(`[Astro Server RPC Error] pada method ${functionName}:`, error);
+    throw error;
+  }
+}
+
 // Proxy dinamis untuk method RPC (misal: rpc.getDashboardStats(), rpc.login(), dll)
 const runnerPrototypeProxy = new Proxy({}, {
   get(target, propKey, receiver) {
@@ -54,34 +78,10 @@ const rpcProxy = new Proxy({}, {
   }
 });
 
-// Fungsi utama pengeksekusi request HTTP ke Endpoint Backend Astro (/api/rpc)
-async function executeRpcCall(functionName, args) {
-  try {
-    const payload = { action: functionName, args: args };
-    
-    const response = await fetch('/api/rpc', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(payload)
-    });
-    
-    if (!response.ok) {
-      const errBody = await response.json().catch(() => null);
-      throw new Error(errBody?.message || `HTTP Server Error: status ${response.status}`);
-    }
-    return await response.json();
-  } catch (error) {
-    console.error(`[Astro Server RPC Error] pada method ${functionName}:`, error);
-    throw error;
-  }
-}
-
-// Ekspor ke window.rpc, window.executeRpcCall, window.executeGASCall, dan window.google.script.run
-window.rpc = rpcProxy;
+// Ekspor ke window global untuk seluruh script frontend
 window.executeRpcCall = executeRpcCall;
 window.executeGASCall = executeRpcCall;
+window.rpc = rpcProxy;
 window.google = window.google || {};
 window.google.script = window.google.script || {};
 window.google.script.run = rpcProxy;
