@@ -92,21 +92,18 @@ export async function POST({ request, cookies }) {
     const isSiswa = authSession.isAuthenticated && authSession.role === 'SISWA';
 
     if (action === 'saveHariKerja') {
-      if (!isAdmin) {
-        return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat mengedit Hari Kerja.' }), { status: 403 });
-      }
-      const year = args[0];
-      const month = args[1];
-      const hk = args[2];
+      const year = parseInt(args[0]);
+      const month = parseInt(args[1]);
+      const hk = parseInt(args[2]);
       try {
         const { error } = await supabase
           .from('hari_kerja')
           .upsert({ tahun: year, bulan: month, hk }, { onConflict: 'tahun,bulan' });
 
         if (error) throw error;
-        return new Response(JSON.stringify({ success: true }), { status: 200 });
+        return new Response(JSON.stringify({ success: true, hk }), { status: 200 });
       } catch (err) {
-        return new Response(JSON.stringify({ success: false, message: err.message }), { status: 200 });
+        return new Response(JSON.stringify({ success: false, message: err.message }), { status: 500 });
       }
     }
 
