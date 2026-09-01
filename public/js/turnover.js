@@ -144,10 +144,10 @@ function initTurnoverMap(filteredData) {
         }, 100);
     }
 
-    let tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
-    let tileAttribution = '&copy; Esri, DeLorme, NAVTEQ';
+    let tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
+    let tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
     if (activeThematicTheme === 'dark') {
-        tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+        tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
     } else if (activeThematicTheme === 'satellite') {
         tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
     }
@@ -159,7 +159,8 @@ function initTurnoverMap(filteredData) {
     });
     L.tileLayer(tileUrl, {
         maxZoom: 18,
-        attribution: tileAttribution
+        attribution: tileAttribution,
+        subdomains: 'abcd'
     }).addTo(mapTurnoverInstance);
 
     const currentTurnoverDataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
@@ -230,10 +231,18 @@ function initTurnoverMap(filteredData) {
 
     function onEachFeature(feature, layer) {
         const geoCityName = normalizeCityName(feature.properties.name || feature.properties.KABKOT || feature.properties.NAME_2);
+        const displayName = feature.properties.name || feature.properties.KABKOT || geoCityName;
         const stat = cityStats[geoCityName];
 
+        // Tampilkan label nama daerah permanen di tengah polygon batas wilayah
+        layer.bindTooltip(displayName, {
+            permanent: true,
+            direction: 'center',
+            className: 'map-kab-label'
+        });
+
         let popupContent = `<div class="p-2 font-sans">
-            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${geoCityName}</h4>`;
+            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${displayName}</h4>`;
         
         if (stat) {
             const totalCases = stat.resign + stat.lulus + stat.indisipliner;
@@ -277,16 +286,13 @@ function initTurnoverMap(filteredData) {
         });
     }
 
-    // Memanggil GeoJSON Batas Kabupaten Jawa Timur
+    // Memanggil GeoJSON Batas Kabupaten Jawa Timur dari penyimpanan lokal
     if (geoJsonCache) {
         renderGeoJsonLayer(geoJsonCache);
     } else {
-        const primaryUrl = 'https://raw.githubusercontent.com/superpikar/indonesia-geojson/master/geojson/kabupaten/35.geojson';
-        const fallbackUrl = 'https://cdn.jsdelivr.net/gh/superpikar/indonesia-geojson@master/geojson/kabupaten/35.geojson';
-
-        fetch(primaryUrl)
+        fetch('/data/jawa_timur.geojson')
             .then(response => {
-                if (!response.ok) throw new Error("Gagal mengambil data dari CDN Utama");
+                if (!response.ok) throw new Error("Gagal mengambil data GeoJSON lokal");
                 return response.json();
             })
             .then(data => {
@@ -294,17 +300,8 @@ function initTurnoverMap(filteredData) {
                 renderGeoJsonLayer(geoJsonCache);
             })
             .catch(err => {
-                console.warn("CDN Utama gagal, beralih ke CDN Cadangan...", err);
-                fetch(fallbackUrl)
-                    .then(response => response.json())
-                    .then(data => {
-                        geoJsonCache = data;
-                        renderGeoJsonLayer(geoJsonCache);
-                    })
-                    .catch(errFallback => {
-                        console.warn("Memicu sistem fallback visual peta Jawa Timur...");
-                        renderSimplifiedFallbackMap(filteredData, cityStats);
-                    });
+                console.warn("GeoJSON gagal dimuat, beralih ke fallback...", err);
+                renderSimplifiedFallbackMap(filteredData, cityStats);
             });
     }
 

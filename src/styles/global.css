@@ -107,6 +107,21 @@ body {
     cursor: pointer;
 }
 
+/* Styling Label Nama Daerah / Kabupaten pada Peta Turnover */
+.map-kab-label {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    font-size: 10px !important;
+    font-weight: 800 !important;
+    color: #1e293b !important;
+    text-shadow: 1px 1px 2px #ffffff, -1px -1px 2px #ffffff, 1px -1px 2px #ffffff, -1px 1px 2px #ffffff, 0px 0px 4px #ffffff !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.03em !important;
+}
+
 /* Glassmorphism Styles & Modal Overrides */
 .glass-modal-bg,
 #app [id$="-modal"],
