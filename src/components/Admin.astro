@@ -30,88 +30,50 @@
 
     <!-- TAB 1: Manajemen Akun -->
     <div id="admin-tab-sync-akun" class="admin-tab-content space-y-6">
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Form Registrasi User Baru -->
-            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm h-fit space-y-4">
-                <h3 class="font-display font-bold text-lg text-brand-textMain border-b border-slate-100 pb-2">Registrasi Pengguna Baru</h3>
-                <div class="space-y-4" id="form-user-admin">
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nama Lengkap</label>
-                        <input type="text" id="admin-user-nama" placeholder="Contoh: Akhmad Setyo"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
+        <!-- Tabel Manajemen Akun Terdaftar (Full Width) -->
+        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm w-full">
+            <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-display font-bold text-lg text-brand-textMain">Manajemen Akun Terdaftar</h3>
+                    <p class="text-xs text-brand-textSub">Daftar kredensial akses dashboard internal</p>
+                </div>
+                <div class="flex flex-wrap items-center gap-2.5">
+                    <div class="relative w-full sm:w-64">
+                        <input type="text" id="filter-user-query" oninput="filterAdminUsersTable()" placeholder="Cari nama, email, noreg, role..."
+                            class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm font-semibold">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                     </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Email Log In</label>
-                        <input type="email" id="admin-user-email" placeholder="akhmad@indoprima.com"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Password Sandi</label>
-                        <input type="password" id="admin-user-pass" placeholder="Minimal 6 karakter"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Otoritas Peran (Role)</label>
-                        <select id="admin-user-role"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
-                            <option value="Admin">Admin (Akses Penuh)</option>
-                            <option value="Visitor">Visitor (Executive View Only)</option>
-                            <option value="Siswa">Siswa (Portal Personal)</option>
-                        </select>
-                    </div>
-                    <div>
-                        <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nomor Registrasi (Opsional untuk Siswa)</label>
-                        <input type="text" id="admin-user-noreg" placeholder="Contoh: 2601190"
-                            class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all-300">
-                    </div>
-                    <button onclick="saveUserAdmin()"
-                        class="w-full py-3 bg-brand-blue text-white font-semibold rounded-xl hover:bg-blue-700 transition-all-300 shadow-md">
-                        Daftarkan Akun
+                    <button onclick="openUserRegisterModal()"
+                        class="px-4 py-2 bg-brand-blue hover:bg-blue-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300 shadow-sm cursor-pointer">
+                        <i class="fa-solid fa-user-plus"></i> Tambah Pengguna
+                    </button>
+                    <button onclick="exportAdminAkunToExcel()"
+                        class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300 shadow-sm cursor-pointer">
+                        <i class="fa-solid fa-file-excel"></i> Export Excel
+                    </button>
+                    <button onclick="syncExternalToLocalAdmin()"
+                        class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-brand-blue font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300 cursor-pointer">
+                        <i class="fa-solid fa-arrows-spin"></i> Sinkronisasi Siswa Eksternal
                     </button>
                 </div>
             </div>
-
-            <!-- Tabel Manajemen Akun Terdaftar -->
-            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm lg:col-span-2">
-                <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
-                    <div>
-                        <h3 class="font-display font-bold text-lg text-brand-textMain">Manajemen Akun Terdaftar</h3>
-                        <p class="text-xs text-brand-textSub">Daftar kredensial akses dashboard internal</p>
-                    </div>
-                    <div class="flex flex-wrap items-center gap-3">
-                        <div class="relative w-full sm:w-64">
-                            <input type="text" id="filter-user-query" oninput="filterAdminUsersTable()" placeholder="Cari nama, email, noreg, role..."
-                                class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm">
-                            <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
-                        </div>
-                        <button onclick="exportAdminAkunToExcel()"
-                            class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300 shadow-sm cursor-pointer">
-                            <i class="fa-solid fa-file-excel"></i> Export Excel
-                        </button>
-                        <button onclick="syncExternalToLocalAdmin()"
-                            class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-brand-blue font-bold rounded-xl text-xs flex items-center gap-2 transition-all-300">
-                            <i class="fa-solid fa-arrows-spin"></i> Sinkronisasi Siswa Eksternal
-                        </button>
-                    </div>
-                </div>
-                <div class="overflow-x-auto max-h-[480px]" style="overflow-y: auto;">
-                    <table class="w-full text-left text-sm border-collapse">
-                        <thead class="sticky top-0 z-20 bg-slate-50">
-                            <tr class="text-brand-textSub text-xs uppercase border-b border-slate-200 bg-slate-50 font-bold">
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">User ID</th>
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Nama Lengkap</th>
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Email</th>
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Role</th>
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">NoReg</th>
-                                <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Password</th>
-                                <th class="py-3 px-4 font-semibold text-right w-[160px] sticky top-0 bg-slate-50 z-20">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody id="admin-tbody" class="divide-y divide-slate-50">
-                            <!-- Diisi Dinamis lewat JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
+            <div class="overflow-x-auto max-h-[550px]" style="overflow-y: auto;">
+                <table class="w-full text-left text-sm border-collapse">
+                    <thead class="sticky top-0 z-20 bg-slate-50">
+                        <tr class="text-brand-textSub text-xs uppercase border-b border-slate-200 bg-slate-50 font-bold">
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">User ID</th>
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Nama Lengkap</th>
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Email</th>
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Role</th>
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">NoReg</th>
+                            <th class="py-3 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Password</th>
+                            <th class="py-3 px-4 font-semibold text-right w-[160px] sticky top-0 bg-slate-50 z-20">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-tbody" class="divide-y divide-slate-50">
+                        <!-- Diisi Dinamis lewat JavaScript -->
+                    </tbody>
+                </table>
             </div>
         </div>
     </div>

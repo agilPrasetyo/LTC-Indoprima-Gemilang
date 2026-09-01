@@ -200,6 +200,21 @@
         });
     }
 
+    function openUserRegisterModal() {
+        clearFormUserAdmin();
+        const modal = document.getElementById('user-register-modal');
+        if (modal) {
+            modal.classList.remove('hidden');
+        }
+    }
+
+    function closeUserRegisterModal() {
+        const modal = document.getElementById('user-register-modal');
+        if (modal) {
+            modal.classList.add('hidden');
+        }
+    }
+
     function saveUserAdmin() {
         const namaLengkap = document.getElementById('admin-user-nama').value.trim();
         const email = document.getElementById('admin-user-email').value.trim();
@@ -213,31 +228,41 @@
         }
 
         const payload = { namaLengkap, email, password, role, nomorRegistrasi };
+        showToast('Mendaftarkan akun pengguna baru...', 'info');
 
-        if (typeof google !== 'undefined') {
-            google.script.run.withSuccessHandler(res => {
-                if (res.success) {
-                    showToast('Akun pengguna baru berhasil didaftarkan!');
-                    clearFormUserAdmin();
-                    renderAdminView();
-                } else {
-                    showToast('Gagal mendaftarkan user: ' + res.message, 'error');
-                }
-            }).createUser(payload);
-        } else {
-            showToast('Mode Preview: Akun ditambahkan ke basis data memori lokal.', 'info');
-            const generatedId = "USER-" + Date.now();
-            fallbackUsers.push({ id: generatedId, ...payload });
-            clearFormUserAdmin();
-            renderAdminView();
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('createUser', [payload])
+                .then(res => {
+                    if (res && res.success !== false) {
+                        showToast('Akun pengguna baru berhasil didaftarkan!', 'success');
+                        clearFormUserAdmin();
+                        closeUserRegisterModal();
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminView();
+                    } else {
+                        showToast('Gagal mendaftarkan user: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Error server: ' + (err.message || err.toString()), 'error');
+                });
         }
     }
 
+    window.openUserRegisterModal = openUserRegisterModal;
+    window.closeUserRegisterModal = closeUserRegisterModal;
+    window.saveUserAdmin = saveUserAdmin;
+
     function clearFormUserAdmin() {
-        document.getElementById('admin-user-nama').value = '';
-        document.getElementById('admin-user-email').value = '';
-        document.getElementById('admin-user-pass').value = '';
-        document.getElementById('admin-user-noreg').value = '';
+        const n = document.getElementById('admin-user-nama');
+        const e = document.getElementById('admin-user-email');
+        const p = document.getElementById('admin-user-pass');
+        const nr = document.getElementById('admin-user-noreg');
+        if (n) n.value = '';
+        if (e) e.value = '';
+        if (p) p.value = '';
+        if (nr) nr.value = '';
     }
 
     // ============================================================

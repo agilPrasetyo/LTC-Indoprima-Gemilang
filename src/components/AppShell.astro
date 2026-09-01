@@ -619,6 +619,53 @@ const { role } = Astro.props;
     </div>
 </div>
 
+<!-- MODAL: Registrasi Pengguna Baru (ROOT LEVEL) -->
+<div id="user-register-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeUserRegisterModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-5 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-user-plus text-brand-blue"></i> Registrasi Pengguna Baru
+            </h3>
+            <button onclick="closeUserRegisterModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-600 cursor-pointer"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="space-y-4" id="form-user-admin">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nama Lengkap</label>
+                <input type="text" id="admin-user-nama" placeholder="Contoh: Akhmad Setyo"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all font-semibold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Email Log In</label>
+                <input type="email" id="admin-user-email" placeholder="akhmad@indoprima.com"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all font-semibold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Password Sandi</label>
+                <input type="password" id="admin-user-pass" placeholder="Minimal 6 karakter"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all font-semibold">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Otoritas Peran (Role)</label>
+                <select id="admin-user-role"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all font-semibold cursor-pointer">
+                    <option value="Admin">Admin (Akses Penuh)</option>
+                    <option value="Visitor">Visitor (Executive View Only)</option>
+                    <option value="Siswa">Siswa (Portal Personal)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nomor Registrasi (Opsional untuk Siswa)</label>
+                <input type="text" id="admin-user-noreg" placeholder="Contoh: 2601190"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all font-semibold">
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+            <button onclick="closeUserRegisterModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all cursor-pointer">Batal</button>
+            <button onclick="saveUserAdmin()" class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md cursor-pointer">Daftarkan Akun</button>
+        </div>
+    </div>
+</div>
+
 <!-- MODAL: Edit User Akun (ROOT LEVEL) -->
 <div id="user-edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeUserEditModal()">
     <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-5 animate-fadeIn">
@@ -1365,13 +1412,13 @@ const { role } = Astro.props;
 </div>
 
 <!-- Memuat Script Real-Time Engine secara teratur -->
-<script is:inline src="/js/api.js?v=48.0"></script>
-<script is:inline src="/js/global.js?v=48.0"></script>
-<script is:inline src="/js/dashboard.js?v=48.0"></script>
-<script is:inline src="/js/siswa.js?v=48.0"></script>
-<script is:inline src="/js/turnover.js?v=48.0"></script>
-<script is:inline src="/js/siswa_portal.js?v=48.0"></script>
-<script is:inline src="/js/keuangan.js?v=48.0"></script>
-<script is:inline src="/js/admin.js?v=48.0"></script>
-<script is:inline src="/js/absensi.js?v=48.0"></script>
-<script is:inline src="/js/safety.js?v=48.0"></script>
+<script is:inline src="/js/api.js?v=49.0"></script>
+<script is:inline src="/js/global.js?v=49.0"></script>
+<script is:inline src="/js/dashboard.js?v=49.0"></script>
+<script is:inline src="/js/siswa.js?v=49.0"></script>
+<script is:inline src="/js/turnover.js?v=49.0"></script>
+<script is:inline src="/js/siswa_portal.js?v=49.0"></script>
+<script is:inline src="/js/keuangan.js?v=49.0"></script>
+<script is:inline src="/js/admin.js?v=49.0"></script>
+<script is:inline src="/js/absensi.js?v=49.0"></script>
+<script is:inline src="/js/safety.js?v=49.0"></script>
