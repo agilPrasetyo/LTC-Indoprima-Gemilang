@@ -3,7 +3,7 @@
         return (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : (typeof executeGASCall === 'function' ? executeGASCall : (typeof window !== 'undefined' && window.executeGASCall ? window.executeGASCall : null))));
     }
 
-    var currentAdminTab = 'sync-akun';
+    var currentAdminTab = 'kelola-siswa';
 
     // ============================================================
     // UTILITY: Hitung Kelas otomatis dari Tanggal Masuk
@@ -31,27 +31,17 @@
     }
 
     function switchAdminTab(tabId) {
-        currentAdminTab = tabId;
-        
-        // Update tab buttons style
-        document.querySelectorAll('.admin-tab-btn').forEach(btn => {
-            btn.className = "admin-tab-btn px-5 py-3 text-xs font-semibold border-b-2 border-transparent text-brand-textSub hover:text-brand-textMain transition-all duration-200 flex items-center gap-2";
-        });
-        
-        const activeBtn = document.getElementById('tab-btn-' + tabId);
-        if (activeBtn) {
-            activeBtn.className = "admin-tab-btn px-5 py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue transition-all duration-200 flex items-center gap-2";
-        }
+        currentAdminTab = tabId || 'kelola-siswa';
         
         // Update sidebar sub-menu buttons style
-        updateAdminSubmenuHighlight(tabId);
+        updateAdminSubmenuHighlight(currentAdminTab);
 
         // Toggle tab content panels
         document.querySelectorAll('.admin-tab-content').forEach(content => {
             content.classList.add('hidden');
         });
         
-        const activeContent = document.getElementById('admin-tab-' + tabId);
+        const activeContent = document.getElementById('admin-tab-' + currentAdminTab);
         if (activeContent) {
             activeContent.classList.remove('hidden');
         }
