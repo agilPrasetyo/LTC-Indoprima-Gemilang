@@ -91,7 +91,11 @@
         if (currentAdminTab === 'sync-akun') {
             const tbody = document.getElementById('admin-tbody');
             if (!tbody) return;
-            tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data pengguna...</td></tr>';
+
+            // Hanya tampilkan spinner saat data benar-benar masih kosong (first initial load)
+            if (!rawUsersData || rawUsersData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data pengguna...</td></tr>';
+            }
 
             const rpc = getRpcRunner();
             if (rpc) {
@@ -102,11 +106,15 @@
                     })
                     .catch(err => {
                         console.error('Gagal memuat data pengguna:', err);
-                        rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                        if (!rawUsersData || rawUsersData.length === 0) {
+                            rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                        }
                         filterAdminUsersTable();
                     });
             } else {
-                rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                if (!rawUsersData || rawUsersData.length === 0) {
+                    rawUsersData = typeof fallbackUsers !== 'undefined' ? fallbackUsers : [];
+                }
                 filterAdminUsersTable();
             }
         } else if (currentAdminTab === 'kelola-siswa') {
