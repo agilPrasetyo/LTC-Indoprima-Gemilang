@@ -440,18 +440,72 @@ function updateClassPopulationChart() {
     }
 }
 
-function updateTurnoverPieChart() {
+function populateDashTurnoverMonthFilter(records) {
+    const filterEl = document.getElementById('dash-turnover-month-filter');
+    if (!filterEl) return;
+
+    const currentVal = filterEl.value || 'ALL';
+    const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+
+    const monthsSet = new Set();
+    (records || []).forEach(item => {
+        const rawDate = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').trim();
+        if (rawDate.length >= 7) {
+            const ym = rawDate.substring(0, 7);
+            if (/^\d{4}-\d{2}$/.test(ym)) {
+                monthsSet.add(ym);
+            }
+        }
+    });
+
+    const sortedMonths = Array.from(monthsSet).sort().reverse();
+
+    let html = '<option value="ALL">Semua Bulan</option>';
+    sortedMonths.forEach(ym => {
+        const [y, m] = ym.split('-');
+        const mIdx = parseInt(m, 10) - 1;
+        const label = (monthNamesIndo[mIdx] || m) + ' ' + y;
+        html += `<option value="${ym}">${label}</option>`;
+    });
+
+    filterEl.innerHTML = html;
+    if (monthsSet.has(currentVal) || currentVal === 'ALL') {
+        filterEl.value = currentVal;
+    }
+}
+
+function onDashTurnoverMonthChanged() {
+    updateTurnoverPieChart(false);
+}
+window.onDashTurnoverMonthChanged = onDashTurnoverMonthChanged;
+
+function updateTurnoverPieChart(rebuildFilter = true) {
     const chartCanvas = document.getElementById('dashboardTurnoverPieChart');
     if (!chartCanvas) return;
     const chartCtx = chartCanvas.getContext('2d');
 
     if (turnoverPieChartInstance) turnoverPieChartInstance.destroy();
 
+    const allRecords = activeTurnoverData || [];
+    if (rebuildFilter) {
+        populateDashTurnoverMonthFilter(allRecords);
+    }
+
+    const filterEl = document.getElementById('dash-turnover-month-filter');
+    const selectedMonth = filterEl ? filterEl.value : 'ALL';
+
+    let records = allRecords;
+    if (selectedMonth && selectedMonth !== 'ALL') {
+        records = allRecords.filter(item => {
+            const ym = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
+            return ym === selectedMonth;
+        });
+    }
+
     let resignCount = 0;
     let lulusCount = 0;
     let indisiplinerCount = 0;
 
-    const records = activeTurnoverData || [];
     records.forEach(item => {
         const statusStr = String(item.alasan || item.alasanDetail || item.alasan_detail || item.keterangan || '').trim().toLowerCase();
         if (statusStr.includes('resign')) {
@@ -495,12 +549,19 @@ function updateTurnoverPieChart() {
     const evalRate = totalTurnover > 0 ? Math.round(((resignCount + indisiplinerCount) / totalTurnover) * 100) + '%' : '0%';
 
     const now = new Date();
-    const curYearMonth = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const curYearMonth = selectedMonth !== 'ALL' ? selectedMonth : (now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
     const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
-    const curMonthLabel = monthNamesIndo[now.getMonth()] + ' ' + now.getFullYear();
+    
+    let curMonthLabel;
+    if (selectedMonth !== 'ALL') {
+        const [y, m] = selectedMonth.split('-');
+        curMonthLabel = (monthNamesIndo[parseInt(m, 10) - 1] || m) + ' ' + y;
+    } else {
+        curMonthLabel = monthNamesIndo[now.getMonth()] + ' ' + now.getFullYear();
+    }
 
     let curMonthCount = 0;
-    records.forEach(item => {
+    allRecords.forEach(item => {
         const tgl = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
         if (tgl === curYearMonth) {
             curMonthCount++;
@@ -514,7 +575,7 @@ function updateTurnoverPieChart() {
     if (evalRateEl) evalRateEl.innerText = evalRate;
 
     const curMonthCountEl = document.getElementById('stat-turnover-month-count');
-    if (curMonthCountEl) curMonthCountEl.innerText = curMonthCount + ' Siswa';
+    if (curMonthCountEl) curMonthCountEl.innerText = (selectedMonth !== 'ALL' ? totalTurnover : curMonthCount) + ' Siswa';
 
     const curMonthLabelEl = document.getElementById('stat-turnover-month-label');
     if (curMonthLabelEl) curMonthLabelEl.innerText = curMonthLabel;

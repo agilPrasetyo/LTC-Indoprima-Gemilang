@@ -1641,14 +1641,14 @@ if (typeof Chart !== 'undefined') {
             if (latest) {
                 const totK = latest.totalKaryawan || 146;
                 const activeLtc = (typeof activeData !== 'undefined' && Array.isArray(activeData)) ? activeData.length : (activeStudentCount || 29);
-                const pct = totK > 0 ? ((activeLtc / totK) * 100).toFixed(2) + '%' : '0.00%';
+                const pct = totK > 0 ? Math.round((activeLtc / totK) * 100) + '%' : '0%';
                 statPctLtc.innerText = pct;
                 if (statPctLtcDate) {
                     statPctLtcDate.innerText = latest.tanggal;
                 }
             }
         } else if (statPctLtc) {
-            statPctLtc.innerText = '0.00%';
+            statPctLtc.innerText = '0%';
             if (statPctLtcDate) statPctLtcDate.innerText = 'Terbaru';
         }
 
