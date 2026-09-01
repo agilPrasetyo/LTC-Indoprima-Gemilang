@@ -239,6 +239,9 @@ if (typeof Chart !== 'undefined') {
         }
         return 'Kelas 1';
     }
+    window.getStudentCurrentKelas = getStudentCurrentKelas;
+    window.hitungKelas = getStudentCurrentKelas;
+    window.hitungKelasSiswa = hitungKelasSiswa;
 
     var currentUser = null;
     window.currentUser = null;

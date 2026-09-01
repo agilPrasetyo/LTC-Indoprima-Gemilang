@@ -310,7 +310,8 @@ function calculateLTCCosts() {
                     if (isHadir) {
                         hadirCount++;
 
-                        let kelasPadaHariIni = hitungKelasSiswa(siswa.masuk, cursor);
+                        const studentCurrentClass = typeof hitungKelas === 'function' ? hitungKelas(siswa) : (typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(siswa) : (siswa.kelas || 'Kelas 1'));
+                        let kelasPadaHariIni = studentCurrentClass;
 
                         if (kelasPadaHariIni === "Kelas 6" || parseInt(kelasPadaHariIni.replace('Kelas ', '')) > 5) {
                             kelasPadaHariIni = "Kelas 5";
@@ -328,7 +329,8 @@ function calculateLTCCosts() {
 
             const costTotal = costSaku + costTrans;
 
-            let kelasAkhir = hitungKelasSiswa(siswa.masuk, intersectEnd);
+            const studentCurrentClass = typeof hitungKelas === 'function' ? hitungKelas(siswa) : (typeof getStudentCurrentKelas === 'function' ? getStudentCurrentKelas(siswa) : (siswa.kelas || 'Kelas 1'));
+            let kelasAkhir = studentCurrentClass;
             if (kelasAkhir === "Kelas 6" || parseInt(kelasAkhir.replace('Kelas ', '')) > 5) {
                 kelasAkhir = "Kelas 5";
             }
@@ -384,16 +386,25 @@ function calculateLTCCosts() {
         
         const detailStr = item.detailMonths.map(d => `${d.month}: ${d.hadir}/${d.hariKerja} Hadir (Saku: Rp ${Math.round(d.saku).toLocaleString('id-ID')}, Trans: Rp ${Math.round(d.trans).toLocaleString('id-ID')})`).join('<br>');
 
+        const k = item.kelas || 'Kelas 1';
+        let badgeCls = 'bg-slate-200 text-slate-800 border-slate-300';
+        if (k.includes('Kelas 1')) badgeCls = 'bg-red-100 text-red-800 border-red-300';
+        else if (k.includes('Kelas 2')) badgeCls = 'bg-amber-100 text-amber-800 border-amber-300';
+        else if (k.includes('Kelas 3')) badgeCls = 'bg-emerald-100 text-emerald-800 border-emerald-300';
+        else if (k.includes('Kelas 4')) badgeCls = 'bg-sky-100 text-sky-800 border-sky-300';
+
         tr.innerHTML = `
-            <td class="py-3 px-4 text-brand-textSub">${item.id}</td>
-            <td class="py-3 px-4 text-brand-textMain font-bold">${item.name}</td>
-            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-brand-blue">${item.kelas}</span></td>
-            <td class="py-3 px-4 text-brand-textMain">${item.detailMonths.reduce((acc, curr) => acc + curr.hadir, 0)} hari</td>
-            <td class="py-3 px-4 text-brand-textSub">${item.detailMonths.reduce((acc, curr) => acc + curr.hariKerja, 0)} hari</td>
-            <td class="py-3 px-4 text-[10px] text-brand-textSub leading-relaxed">${detailStr}</td>
-            <td class="py-3 px-4 text-right font-semibold text-brand-textMain">Rp ${Math.round(item.saku).toLocaleString('id-ID')}</td>
-            <td class="py-3 px-4 text-right font-semibold text-brand-textMain">Rp ${Math.round(item.trans).toLocaleString('id-ID')}</td>
-            <td class="py-3 px-4 text-right font-bold text-brand-blue">Rp ${Math.round(item.total).toLocaleString('id-ID')}</td>
+            <td class="py-3.5 px-4 text-brand-textSub font-mono font-bold">${item.id}</td>
+            <td class="py-3.5 px-4 text-brand-textMain font-bold whitespace-nowrap">${item.name}</td>
+            <td class="py-3.5 px-4 min-w-[120px] text-center whitespace-nowrap">
+                <span class="px-3.5 py-1 rounded-full text-[11px] font-bold border whitespace-nowrap inline-flex items-center justify-center shadow-2xs ${badgeCls}">${item.kelas}</span>
+            </td>
+            <td class="py-3.5 px-4 text-brand-textMain font-semibold whitespace-nowrap">${item.detailMonths.reduce((acc, curr) => acc + curr.hadir, 0)} hari</td>
+            <td class="py-3.5 px-4 text-brand-textSub whitespace-nowrap">${item.detailMonths.reduce((acc, curr) => acc + curr.hariKerja, 0)} hari</td>
+            <td class="py-3.5 px-4 text-[11px] text-brand-textSub leading-relaxed">${detailStr}</td>
+            <td class="py-3.5 px-4 text-right font-semibold text-brand-textMain whitespace-nowrap">Rp ${Math.round(item.saku).toLocaleString('id-ID')}</td>
+            <td class="py-3.5 px-4 text-right font-semibold text-brand-textMain whitespace-nowrap">Rp ${Math.round(item.trans).toLocaleString('id-ID')}</td>
+            <td class="py-3.5 px-4 text-right font-extrabold text-brand-blue whitespace-nowrap">Rp ${Math.round(item.total).toLocaleString('id-ID')}</td>
         `;
         tbody.appendChild(tr);
     });
@@ -568,11 +579,11 @@ function renderMonthlyHistoryTable() {
             <div class="overflow-x-auto">
                 <table class="w-full text-left text-sm border-collapse">
                     <thead>
-                        <tr class="text-brand-textSub text-xs uppercase border-b border-slate-100">
-                            <th class="py-3 px-4 font-semibold">Bulan</th>
-                            <th class="py-3 px-4 font-semibold text-right">Uang Saku</th>
-                            <th class="py-3 px-4 font-semibold text-right">Transport</th>
-                            <th class="py-3 px-4 font-semibold text-right">Total Pengeluaran</th>
+                        <tr class="text-slate-700 text-[11px] uppercase border-b border-slate-200 bg-slate-100 font-bold tracking-wider">
+                            <th class="py-3.5 px-4 font-bold text-slate-700">Bulan</th>
+                            <th class="py-3.5 px-4 font-bold text-right text-slate-700">Uang Saku</th>
+                            <th class="py-3.5 px-4 font-bold text-right text-slate-700">Transport</th>
+                            <th class="py-3.5 px-4 font-bold text-right text-brand-blue">Total Pengeluaran</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-50">${rowsHtml}</tbody>
