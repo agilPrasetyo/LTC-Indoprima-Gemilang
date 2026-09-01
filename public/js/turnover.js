@@ -144,9 +144,10 @@ function initTurnoverMap(filteredData) {
         }, 100);
     }
 
-    let tileUrl = 'https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png';
+    let tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+    let tileAttribution = '&copy; Esri, DeLorme, NAVTEQ';
     if (activeThematicTheme === 'dark') {
-        tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
     } else if (activeThematicTheme === 'satellite') {
         tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
     }
@@ -156,7 +157,10 @@ function initTurnoverMap(filteredData) {
             mapTurnoverInstance.removeLayer(layer);
         }
     });
-    L.tileLayer(tileUrl).addTo(mapTurnoverInstance);
+    L.tileLayer(tileUrl, {
+        maxZoom: 18,
+        attribution: tileAttribution
+    }).addTo(mapTurnoverInstance);
 
     const currentTurnoverDataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
     const cityStats = {};
