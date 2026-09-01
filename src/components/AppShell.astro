@@ -13,7 +13,6 @@ interface Props {
 }
 
 const { role } = Astro.props;
-const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
 ---
 
 <script is:inline define:vars={{ role }}>
@@ -131,7 +130,7 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
   <!-- =============================================
        DESKTOP & SPLIT-SCREEN SIDEBAR DRAWER
        ============================================= -->
-  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-brand-border/60 p-6 flex-col justify-between transition-transform duration-300 ease-in-out text-brand-textMain -translate-x-full lg:translate-x-0 lg:static lg:sticky lg:top-0 lg:h-screen lg:flex shadow-2xl lg:shadow-none flex">
+  <aside id="app-sidebar" class="fixed inset-y-0 left-0 z-50 w-64 bg-white/95 backdrop-blur-xl border-r border-brand-border/60 p-4 lg:p-5 flex flex-col justify-between transition-transform duration-300 ease-in-out text-brand-textMain -translate-x-full lg:translate-x-0 lg:static lg:sticky lg:top-0 lg:h-screen lg:max-h-screen shadow-2xl lg:shadow-none">
     
     <!-- Button to toggle sidebar collapse -->
     <button id="sidebar-toggle-btn" onclick="toggleSidebarCollapse()" class="hidden lg:flex absolute top-8 -right-3 w-6 h-6 rounded-full bg-white border border-slate-200 shadow-sm hover:shadow items-center justify-center text-slate-500 hover:text-brand-blue hover:scale-110 active:scale-95 transition-all duration-300 z-50 cursor-pointer" title="Sembunyikan/Pin Sidebar">
@@ -143,9 +142,9 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
       <i class="fa-solid fa-xmark text-lg"></i>
     </button>
 
-    <div>
+    <div class="flex-1 flex flex-col min-h-0">
       <!-- Brand Logo & Name -->
-      <div class="flex items-center gap-3 mb-8 sidebar-brand-area">
+      <div class="flex items-center gap-3 mb-5 shrink-0 sidebar-brand-area">
         <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-50 to-red-50 flex items-center justify-center p-1.5 border border-slate-100 shadow-sm brand-logo-container">
           <img src="/images/logo_indoprima.png" class="w-full h-full object-contain" alt="Indoprima Gemilang Logo" onerror="this.src='https://placehold.co/100x100?text=Indoprima'" />
         </div>
@@ -157,58 +156,98 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
         </div>
       </div>
 
-      <!-- Navigation Links -->
-      <nav id="sidebar-nav-links" class="space-y-1.5">
-        <button id="nav-dashboard" onclick="switchView('dashboard')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-white bg-blue-600 transition-all duration-300 text-left">
-          <i class="fa-solid fa-chart-pie text-base w-5 text-center"></i>
+      <!-- Navigation Links (Scrollable with thin scrollbar) -->
+      <nav id="sidebar-nav-links" class="flex-1 overflow-y-auto space-y-1 pr-1.5 -mr-1.5" style="scrollbar-width: thin;">
+        <button id="nav-dashboard" onclick="switchView('dashboard')" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-white bg-blue-600 transition-all duration-300 text-left">
+          <i class="fa-solid fa-chart-pie text-sm w-4 text-center"></i>
           <span class="nav-text">Dashboard</span>
         </button>
 
-        <button id="nav-siswa" onclick="switchView('siswa')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all duration-300 text-left">
-          <i class="fa-solid fa-user-graduate text-base w-5 text-center"></i>
+        <button id="nav-siswa" onclick="switchView('siswa')" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all duration-300 text-left">
+          <i class="fa-solid fa-user-graduate text-sm w-4 text-center"></i>
           <span class="nav-text">Performa LTC</span>
         </button>
 
-        <button id="nav-turnover" onclick="switchView('turnover')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
-          <i class="fa-solid fa-user-minus text-base w-5 text-center"></i>
+        <button id="nav-turnover" onclick="switchView('turnover')" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-user-minus text-sm w-4 text-center"></i>
           <span class="nav-text">Turnover</span>
         </button>
 
-        <button id="nav-keuangan" onclick="switchView('keuangan')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
-          <i class="fa-solid fa-wallet text-base w-5 text-center"></i>
+        <button id="nav-keuangan" onclick="switchView('keuangan')" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-wallet text-sm w-4 text-center"></i>
           <span class="nav-text">Cost / Keuangan</span>
         </button>
 
-        <button id="nav-absensi" onclick="switchView('absensi')" class="nav-btn w-full hidden flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
-          <i class="fa-solid fa-calendar-days text-base w-5 text-center"></i>
+        <button id="nav-absensi" onclick="switchView('absensi')" class="nav-btn w-full hidden flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-calendar-days text-sm w-4 text-center"></i>
           <span class="nav-text">Absensi Siswa</span>
         </button>
 
-        <button id="nav-safety" onclick="switchView('safety')" class="nav-btn w-full flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
-          <i class="fa-solid fa-shield-halved text-base w-5 text-center"></i>
+        <button id="nav-safety" onclick="switchView('safety')" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
+          <i class="fa-solid fa-shield-halved text-sm w-4 text-center"></i>
           <span class="nav-text">Safety / K3</span>
         </button>
 
-        <button id="nav-admin" onclick="switchView('admin')" class="nav-btn w-full hidden flex items-center gap-3.5 px-4 py-3.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all-300 text-left">
-          <i class="fa-solid fa-sliders text-base w-5 text-center"></i>
-          <span class="nav-text">Admin</span>
-        </button>
+        <!-- Menu Admin & Sub-Menu Dropdown (Khusus Sidebar Desktop) -->
+        <div id="nav-admin-wrapper" class="w-full pt-0.5">
+          <button id="nav-admin" onclick="toggleAdminMenu()" class="nav-btn w-full hidden flex items-center justify-between px-3.5 py-2.5 rounded-xl font-medium text-sm text-brand-textSub hover:bg-brand-blue/5 hover:text-brand-blue transition-all duration-300 text-left group">
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-sliders text-sm w-4 text-center"></i>
+              <span class="nav-text">Admin</span>
+            </div>
+            <i id="admin-chevron" class="fa-solid fa-chevron-down text-[9px] text-slate-400 group-hover:text-brand-blue transition-transform duration-200"></i>
+          </button>
+
+          <!-- Sub Menu Navigasi Admin (Card Nesting Style) -->
+          <div id="nav-admin-submenu" class="hidden bg-slate-50/90 rounded-xl p-1 border border-slate-200/70 mt-1 space-y-0.5 animate-fadeIn">
+            <button onclick="switchView('admin'); switchAdminTab('sync-akun');" id="subnav-admin-sync-akun"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-user-gear text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Manajemen Akun</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('kelola-siswa');" id="subnav-admin-kelola-siswa"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-graduation-cap text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Manajemen Siswa</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('log-manpower');" id="subnav-admin-log-manpower"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-clock text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Log Manpower</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('kelola-turnover');" id="subnav-admin-kelola-turnover"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-right-from-bracket text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Kelola Turnover</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('kelola-populasi');" id="subnav-admin-kelola-populasi"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-users-line text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Kelola Populasi</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('kelola-k3');" id="subnav-admin-kelola-k3"
+              class="admin-subnav-btn w-full flex items-center gap-2 px-2.5 py-1.5 rounded-lg text-xs font-semibold text-slate-600 hover:text-brand-blue hover:bg-white transition-all text-left">
+              <i class="fa-solid fa-shield-halved text-[10px] w-3.5 text-center text-slate-400"></i>
+              <span class="truncate">Manajemen K3</span>
+            </button>
+          </div>
+        </div>
       </nav>
     </div>
 
-    <!-- User Profile Area in Sidebar -->
-    <div class="border-t border-slate-100 pt-4 sidebar-user-area">
-      <div class="flex items-center gap-3 mb-4 user-info-container transition-opacity duration-300">
-        <div class="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200">
-          <i class="fa-solid fa-user text-sm"></i>
+    <!-- User Profile Area in Sidebar (Pinned firmly at bottom) -->
+    <div class="border-t border-slate-100 pt-3 mt-2 shrink-0 sidebar-user-area">
+      <div class="flex items-center gap-2.5 mb-2.5 user-info-container transition-opacity duration-300">
+        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shrink-0">
+          <i class="fa-solid fa-user text-xs"></i>
         </div>
         <div class="overflow-hidden">
           <p class="font-bold text-xs text-brand-textMain truncate leading-tight" id="user-display-name">-</p>
           <p class="text-[9px] font-semibold text-brand-textSub tracking-wider uppercase mt-0.5" id="user-display-role">-</p>
         </div>
       </div>
-      <button onclick="logout()" class="logout-btn w-full flex items-center justify-center gap-2 py-2.5 bg-slate-100/80 hover:bg-rose-500/10 hover:text-rose-600 rounded-xl text-xs font-semibold text-brand-textSub transition-all duration-300">
-        <i class="fa-solid fa-arrow-right-from-bracket"></i>
+      <button onclick="logout()" class="logout-btn w-full flex items-center justify-center gap-2 py-2 bg-slate-100/80 hover:bg-rose-500/10 hover:text-rose-600 rounded-xl text-xs font-semibold text-brand-textSub transition-all duration-300">
+        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
         <span class="logout-text">Keluar Sesi</span>
       </button>
     </div>
@@ -414,6 +453,7 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
             <thead>
               <tr class="bg-slate-50 text-[10px] font-bold uppercase text-slate-400">
                 <th class="px-3 py-2">Tanggal</th>
+                <th class="px-3 py-2">Shift</th>
                 <th class="px-3 py-2">Hadir</th>
                 <th class="px-3 py-2">Plan</th>
                 <th class="px-3 py-2">Aktual</th>
@@ -514,18 +554,824 @@ const gasUrl = import.meta.env.PUBLIC_GAS_WEB_APP_URL;
     </div>
 </div>
 
-<!-- Memuat Script Real-Time Engine secara teratur -->
-<script is:inline define:vars={{ gasUrl }}>
-  window.PUBLIC_GAS_WEB_APP_URL = gasUrl;
-</script>
+<!-- MODAL EDIT ABSENSI INDIVIDU (ROOT LEVEL: FULL VIEWPORT OVERLAY) -->
+<div id="absensi-edit-modal" class="hidden fixed inset-0 z-[100] items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeAbsensiEditModal()">
+    <div class="bg-white/95 backdrop-blur-xl border border-slate-100 shadow-2xl rounded-[28px] w-full max-w-md overflow-hidden animate-fadeIn">
+        <!-- Modal Header -->
+        <div class="p-6 border-b border-slate-100 flex items-start justify-between">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-xl bg-blue-50 flex items-center justify-center text-brand-blue">
+                    <i class="fa-solid fa-clipboard-user text-lg"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-base text-brand-textMain">Update Absensi Siswa</h3>
+                    <p class="text-xs text-slate-400 font-semibold" id="abs-modal-date-display">-</p>
+                </div>
+            </div>
+            <button onclick="closeAbsensiEditModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        <!-- Modal Body -->
+        <div class="p-6 space-y-4">
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nama Siswa</label>
+                <p class="text-sm font-semibold text-brand-textMain" id="abs-modal-nama-display">-</p>
+                <p class="text-xs text-slate-400 font-mono" id="abs-modal-noreg-display">-</p>
+            </div>
 
-<script is:inline src="/js/api.js?v=18.1"></script>
-<script is:inline src="/js/global.js?v=18.1"></script>
-<script is:inline src="/js/dashboard.js?v=18.1"></script>
-<script is:inline src="/js/siswa.js?v=18.1"></script>
-<script is:inline src="/js/turnover.js?v=18.1"></script>
-<script is:inline src="/js/siswa_portal.js?v=18.1"></script>
-<script is:inline src="/js/keuangan.js?v=18.1"></script>
-<script is:inline src="/js/admin.js?v=18.1"></script>
-<script is:inline src="/js/absensi.js?v=18.1"></script>
-<script is:inline src="/js/safety.js?v=18.1"></script>
+            <!-- Notice Status Asli vs Status Admin -->
+            <div id="abs-modal-override-info" class="hidden p-3 rounded-2xl text-xs space-y-1">
+                <!-- Populated dynamically via openAbsensiEditModal -->
+            </div>
+            
+            <div>
+                <label for="abs-modal-status-select" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Status Kehadiran</label>
+                <select id="abs-modal-status-select" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:border-brand-blue bg-white">
+                    <option value="">- (Hapus Data / Kosong)</option>
+                    <option value="Off">Off / Libur</option>
+                    <option value="Hadir">Hadir</option>
+                    <option value="Ijin">Ijin</option>
+                    <option value="Alpha">Alpha</option>
+                    <option value="Sakit">Sakit</option>
+                </select>
+            </div>
+            
+            <div>
+                <label for="abs-modal-ket-input" class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Keterangan / Alasan</label>
+                <input type="text" id="abs-modal-ket-input" class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue bg-white" placeholder="Alasan ijin/sakit/keterangan lain...">
+            </div>
+
+            <!-- Warning/Info auto-generated -->
+            <div id="abs-modal-auto-info" class="hidden p-3 bg-slate-50 border border-slate-100 rounded-xl text-[11px] text-slate-500 leading-relaxed">
+                <i class="fa-solid fa-circle-info text-blue-500 mr-1"></i> Kehadiran saat ini diisi otomatis berdasarkan daily report performa. Mengubah status di sini akan merekam data absensi manual yang memprioritaskan pilihan Anda.
+            </div>
+
+            <div class="flex items-center justify-end gap-3 pt-2">
+                <button onclick="closeAbsensiEditModal()" class="px-4 py-2 border border-slate-200 text-slate-600 rounded-xl text-xs font-bold hover:bg-slate-50 transition-all">
+                    Batal
+                </button>
+                <button onclick="saveAbsensiModalChanges()" class="px-5 py-2 bg-brand-blue text-white rounded-xl text-xs font-bold hover:bg-blue-700 transition-all shadow-md flex items-center gap-1.5">
+                    <i class="fa-solid fa-circle-check"></i> Simpan Status
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Edit User Akun (ROOT LEVEL) -->
+<div id="user-edit-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeUserEditModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-5 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-user-pen text-brand-blue"></i> Edit Akun Pengguna
+            </h3>
+            <button onclick="closeUserEditModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <input type="hidden" id="edit-user-id">
+        <div class="space-y-4">
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nama Lengkap</label>
+                <input type="text" id="edit-user-nama" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Email Login</label>
+                <input type="email" id="edit-user-email" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Password Baru (kosongkan jika tidak diubah)</label>
+                <input type="password" id="edit-user-pass" placeholder="Minimal 6 karakter" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Role</label>
+                <select id="edit-user-role" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                    <option value="Admin">Admin (Akses Penuh)</option>
+                    <option value="Visitor">Visitor (Executive View Only)</option>
+                    <option value="Siswa">Siswa (Portal Personal)</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nomor Registrasi (Opsional)</label>
+                <input type="text" id="edit-user-noreg" placeholder="Contoh: 2601190" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+            <button onclick="closeUserEditModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">Batal</button>
+            <button onclick="saveUserEdit()" class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md">Simpan Perubahan</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Tambah/Edit Turnover (ROOT LEVEL) -->
+<div id="turnover-form-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeTurnoverModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto space-y-5 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-right-from-bracket text-rose-500"></i>
+                <span id="turnover-modal-title">Tambah Data Turnover</span>
+            </h3>
+            <button onclick="closeTurnoverModal()" class="p-2 hover:bg-slate-100 rounded-xl text-slate-400 hover:text-slate-600"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <input type="hidden" id="turnover-edit-mode" value="false">
+        <input type="hidden" id="turnover-edit-id">
+        <div class="space-y-4">
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">NoReg</label>
+                    <input type="text" id="turnover-noreg" placeholder="2601190" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nama Lengkap</label>
+                    <input type="text" id="turnover-nama" placeholder="Nama siswa" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+            <div class="grid grid-cols-3 gap-3">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Bagian</label>
+                    <select id="turnover-bagian" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                        <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                        <option value="GRINDING">GRINDING</option>
+                        <option value="PAINTING">PAINTING</option>
+                        <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                        <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                        <option value="LADLE">LADLE</option>
+                        <option value="GALAH IBK">GALAH IBK</option>
+                        <option value="QC LAB PASIR">QC LAB PASIR</option>
+                        <option value="QC LAB LOGAM">QC LAB LOGAM</option>
+                        <option value="PATTERN">PATTERN</option>
+                        <option value="ADM PPIC">ADM PPIC</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
+                        <option value="FETTLING">FETTLING</option>
+                        <option value="PPIC">PPIC</option>
+                        <option value="CNC / MACHINING">CNC / MACHINING</option>
+                        <option value="CORE">CORE</option>
+                        <option value="SHOTBLAST">SHOTBLAST</option>
+                        <option value="QC POURING">QC POURING</option>
+                        <option value="MELTING">MELTING</option>
+                        <option value="FURAN">FURAN</option>
+                        <option value="IRGA">IRGA</option>
+                        <option value="SHE">SHE</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kelas</label>
+                    <input type="text" id="turnover-kelas" placeholder="Contoh: Kelas 1" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kota / Daerah</label>
+                    <input type="text" id="turnover-daerah" placeholder="Contoh: Gresik" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Sekolah Asal</label>
+                <input type="text" id="turnover-sekolah" placeholder="Contoh: SMK Negeri 1 Gresik" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Tanggal Masuk</label>
+                    <input type="date" id="turnover-tgl-masuk" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Tanggal Keluar</label>
+                    <input type="date" id="turnover-tgl-keluar" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Alasan Keluar</label>
+                <select id="turnover-alasan" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                    <option value="Resign">Resign</option>
+                    <option value="Lulus">Lulus Program</option>
+                    <option value="Indisipliner">Indisipliner</option>
+                    <option value="Sakit">Sakit / Kesehatan</option>
+                    <option value="Lainnya">Lainnya</option>
+                </select>
+            </div>
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Keterangan</label>
+                <textarea id="turnover-keterangan" rows="3" placeholder="Keterangan tambahan..." class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all resize-none"></textarea>
+            </div>
+        </div>
+        <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+            <button onclick="closeTurnoverModal()" class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">Batal</button>
+            <button onclick="saveTurnoverData()" class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md">Simpan Data</button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Tambah/Edit Siswa (ROOT LEVEL) -->
+<div id="student-form-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closeStudentModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto space-y-6 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-graduation-cap text-brand-blue"></i>
+                <span id="student-modal-title">Tambah Siswa Baru</span>
+            </h3>
+            <button onclick="closeStudentModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4" id="form-siswa">
+            <input type="hidden" id="student-edit-mode" value="false">
+            <input type="hidden" id="student-old-noreg" value="">
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">No. Registrasi (NoReg)</label>
+                    <input type="text" id="student-noreg" placeholder="Contoh: 2601190"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Nama Lengkap</label>
+                    <input type="text" id="student-nama" placeholder="Contoh: FARANDI SATRIA NUGRAHA"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Departemen</label>
+                    <select id="student-departemen"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                        <option value="PRODUKSI">PRODUKSI</option>
+                        <option value="ENGINEERING">ENGINEERING</option>
+                        <option value="HC">HC</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Section</label>
+                    <select id="student-section"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                        <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                        <option value="GRINDING">GRINDING</option>
+                        <option value="PAINTING">PAINTING</option>
+                        <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                        <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                        <option value="LADLE">LADLE</option>
+                        <option value="GALAH IBK">GALAH IBK</option>
+                        <option value="QC LAB PASIR">QC LAB PASIR</option>
+                        <option value="QC LAB LOGAM">QC LAB LOGAM</option>
+                        <option value="PATTERN">PATTERN</option>
+                        <option value="ADM PPIC">ADM PPIC</option>
+                        <option value="MAINTENANCE">MAINTENANCE</option>
+                        <option value="FETTLING">FETTLING</option>
+                        <option value="PPIC">PPIC</option>
+                        <option value="CNC / MACHINING">CNC / MACHINING</option>
+                        <option value="CORE">CORE</option>
+                        <option value="SHOTBLAST">SHOTBLAST</option>
+                        <option value="QC POURING">QC POURING</option>
+                        <option value="MELTING">MELTING</option>
+                        <option value="FURAN">FURAN</option>
+                        <option value="IRGA">IRGA</option>
+                        <option value="SHE">SHE</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">HK (Hari Kerja)</label>
+                    <input type="text" id="student-hk" placeholder="Contoh: 6 Hari"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Kelas</label>
+                    <input type="text" id="student-kelas" placeholder="Contoh: Kelas 1"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Masuk LTC</label>
+                    <input type="date" id="student-tgl-masuk"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Akhir LTC</label>
+                    <input type="date" id="student-tgl-keluar"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Distribusi (Tanggal)</label>
+                    <input type="date" id="student-distribusi"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">SPV (Supervisor)</label>
+                    <select id="student-spv"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                        <option value="">-- Pilih SPV --</option>
+                        <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
+                        <option value="AHMAD RIZAL">AHMAD RIZAL</option>
+                        <option value="AINUN UMAMI">AINUN UMAMI</option>
+                        <option value="ALDEVA DESNANDRI">ALDEVA DESNANDRI</option>
+                        <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
+                        <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
+                        <option value="BIMA AGUNG SETYAWAN">BIMA AGUNG SETYAWAN</option>
+                        <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
+                        <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
+                        <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
+                        <option value="MOHAMMAT YASIR MA'ARIF">MOHAMMAT YASIR MA'ARIF</option>
+                        <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
+                        <option value="MUHTADIN">MUHTADIN</option>
+                        <option value="NANDA TITO PRASETYO, S.T">NANDA TITO PRASETYO, S.T</option>
+                        <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
+                        <option value="RUSDI">RUSDI</option>
+                        <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
+                        <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
+                        <option value="TRIARTHA MANGIHUT SIMANUNGKALIT">TRIARTHA MANGIHUT SIMANUNGKALIT</option>
+                        <option value="WAWAN NOPIAWAN">WAWAN NOPIAWAN</option>
+                        <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
+                        <option value="YULINDARIKA NUR ANGGRAINI">YULINDARIKA NUR ANGGRAINI</option>
+                        <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Daerah Asal</label>
+                    <input type="text" id="student-asal-daerah" placeholder="Contoh: Gresik"
+                        class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+                </div>
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Sekolah / Instansi</label>
+                <input type="text" id="student-sekolah" placeholder="Contoh: SMK Negeri 1 Gresik"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+                <button onclick="closeStudentModal()"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">
+                    Batal
+                </button>
+                <button onclick="saveStudent()"
+                    class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md">
+                    Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Tambah/Edit Populasi (ROOT LEVEL) -->
+<div id="populasi-form-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4" onclick="if(event.target===this)closePopulasiModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-md max-h-[90vh] overflow-y-auto space-y-6 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-display font-bold text-lg text-brand-textMain flex items-center gap-2">
+                <i class="fa-solid fa-users-viewfinder text-brand-blue"></i>
+                <span id="populasi-modal-title">Tambah Data Populasi</span>
+            </h3>
+            <button onclick="closePopulasiModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+        
+        <div class="space-y-4" id="form-populasi">
+            <input type="hidden" id="populasi-edit-mode" value="false">
+            
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Tanggal Record</label>
+                <input type="date" id="populasi-tanggal"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+            
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Karyawan Kontrak</label>
+                <input type="number" id="populasi-kontrak" placeholder="Contoh: 100"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Outsourcing</label>
+                <input type="number" id="populasi-outsourcing" placeholder="Contoh: 10"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Satpam & Supir</label>
+                <input type="number" id="populasi-satpam-supir" placeholder="Contoh: 5"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <div>
+                <label class="block text-xs font-bold uppercase tracking-wider text-brand-textSub mb-2">Order</label>
+                <input type="number" id="populasi-order" placeholder="Contoh: 1"
+                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue focus:bg-white transition-all">
+            </div>
+
+            <p class="text-[10px] text-brand-textSub italic font-semibold">
+                * Keterangan: Kolom LTC, Total Karyawan, dan Total LTC akan dihitung otomatis oleh sistem menggunakan rumus spreadsheet berdasarkan jumlah siswa aktif.
+            </p>
+
+            <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+                <button onclick="closePopulasiModal()"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">
+                    Batal
+                </button>
+                <button onclick="savePopulasiData()"
+                    class="px-5 py-2.5 bg-brand-blue text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md">
+                    Simpan Data
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL: Input / Edit Log Manpower Harian (ROOT LEVEL) -->
+<div id="manpower-log-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto" onclick="if(event.target===this)closeManpowerLogModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-3xl max-h-[92vh] overflow-y-auto space-y-5 animate-fadeIn">
+        <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <div>
+                <h3 class="font-display font-bold text-lg text-slate-800 flex items-center gap-2">
+                    <i class="fa-solid fa-clock-rotate-left text-blue-600"></i>
+                    <span id="mp-modal-title">Input Log Manpower Harian</span>
+                </h3>
+                <p class="text-xs text-slate-400 mt-0.5">Kelola laporan kinerja & kehadiran harian siswa LTC</p>
+            </div>
+            <button onclick="closeManpowerLogModal()" class="p-2 hover:bg-slate-100 rounded-xl transition-colors text-slate-400 hover:text-slate-600">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <form id="form-manpower-log" onsubmit="event.preventDefault(); saveManpowerLogModal();" class="space-y-4">
+            <input type="hidden" id="mp-modal-is-edit" value="false">
+            <input type="hidden" id="mp-modal-orig-date" value="">
+
+            <!-- Banner Profile Siswa (Hanya tampil saat MODE EDIT - Seamless Strip) -->
+            <div id="mp-modal-student-banner" class="hidden p-3.5 bg-slate-50 rounded-2xl border border-slate-100 flex items-center justify-between">
+                <div class="flex items-center gap-3">
+                    <div class="w-9 h-9 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm" id="mp-modal-banner-avatar">
+                        R
+                    </div>
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <h4 class="text-sm font-bold text-slate-800" id="mp-modal-banner-nama">NAMA SISWA</h4>
+                            <span class="text-[10px] font-mono font-bold px-2 py-0.5 bg-blue-50 text-blue-700 rounded-md" id="mp-modal-banner-noreg">-</span>
+                        </div>
+                        <p class="text-[11px] text-slate-500 font-medium mt-0.5">
+                            Bagian: <span class="font-semibold text-slate-700" id="mp-modal-banner-bagian">-</span> • 
+                            SPV: <span class="font-semibold text-slate-700" id="mp-modal-banner-spv">-</span>
+                        </p>
+                    </div>
+                </div>
+                <span class="inline-flex items-center gap-1.5 text-[10px] font-bold px-2.5 py-1 bg-blue-50 text-blue-700 rounded-full">
+                    <span class="w-1.5 h-1.5 rounded-full bg-blue-600 animate-pulse"></span> Mode Edit
+                </span>
+            </div>
+
+            <!-- Select Siswa Dropdown Container (Hanya tampil saat TAMBAH BARU) -->
+            <div id="mp-modal-student-container">
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1.5">Pilih Siswa <span class="text-rose-500">*</span></label>
+                <select id="mp-modal-student" required onchange="onMpModalStudentChange()"
+                    class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold text-slate-700">
+                    <!-- Options filled dynamically -->
+                </select>
+                <p class="text-[10px] text-slate-400 mt-1 font-medium" id="mp-modal-info-label"></p>
+            </div>
+
+            <!-- SECTION 1: Waktu & Kehadiran (Grid 4 Kolom Sejajar) -->
+            <div>
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-calendar-days text-blue-600"></i> Waktu & Kehadiran
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Tanggal Record <span class="text-rose-500">*</span></label>
+                        <input type="date" id="mp-modal-date" required
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800 cursor-pointer">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Status Kehadiran <span class="text-rose-500">*</span></label>
+                        <select id="mp-modal-hadir" required onchange="onMpModalHadirChange()"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-semibold text-slate-800">
+                            <option value="✔">Hadir (✔)</option>
+                            <option value="Ijin">Ijin</option>
+                            <option value="Sakit">Sakit</option>
+                            <option value="Alpha">Alpha</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Shift Kerja</label>
+                        <select id="mp-modal-shift"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                            <option value="Shift 1">Shift 1</option>
+                            <option value="Shift 2">Shift 2</option>
+                            <option value="Shift 3">Shift 3</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Supervisor (SPV)</label>
+                        <select id="mp-modal-spv"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                            <option value="">-- Pilih SPV --</option>
+                            <option value="ABID ZAIDAHUL BAROK">ABID ZAIDAHUL BAROK</option>
+                            <option value="AHMAD RIZAL">AHMAD RIZAL</option>
+                            <option value="AINUN UMAMI">AINUN UMAMI</option>
+                            <option value="ALDEVA DESNANDRI">ALDEVA DESNANDRI</option>
+                            <option value="ALOYSIUS YUDISTIRA ADI N.">ALOYSIUS YUDISTIRA ADI N.</option>
+                            <option value="AMIR SUPRAPTO">AMIR SUPRAPTO</option>
+                            <option value="BIMA AGUNG SETYAWAN">BIMA AGUNG SETYAWAN</option>
+                            <option value="FATHONI AROS TANCEFFA">FATHONI AROS TANCEFFA</option>
+                            <option value="FEBE EGA SALINDA">FEBE EGA SALINDA</option>
+                            <option value="IRVAN TRISAPTA PERMANA">IRVAN TRISAPTA PERMANA</option>
+                            <option value="MOHAMMAT YASIR MA&apos;ARIF">MOHAMMAT YASIR MA&apos;ARIF</option>
+                            <option value="MUHAMMAD TEGUH WIRAWAN">MUHAMMAD TEGUH WIRAWAN</option>
+                            <option value="MUHTADIN">MUHTADIN</option>
+                            <option value="NANDA TITO PRASETYO, S.T">NANDA TITO PRASETYO, S.T</option>
+                            <option value="OKY WAHYU PRATAMA">OKY WAHYU PRATAMA</option>
+                            <option value="RUSDI">RUSDI</option>
+                            <option value="SOFYAN ABIDIN">SOFYAN ABIDIN</option>
+                            <option value="SYAIFUDDIN NIZAR">SYAIFUDDIN NIZAR</option>
+                            <option value="TRIARTHA MANGIHUT SIMANUNGKALIT">TRIARTHA MANGIHUT SIMANUNGKALIT</option>
+                            <option value="WAWAN NOPIAWAN">WAWAN NOPIAWAN</option>
+                            <option value="WIRA ATMOJO SASELAH">WIRA ATMOJO SASELAH</option>
+                            <option value="YULINDARIKA NUR ANGGRAINI">YULINDARIKA NUR ANGGRAINI</option>
+                            <option value="YURA BAGUS NANDHA TAMA">YURA BAGUS NANDHA TAMA</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 2: Detail Operasional & Mesin (Grid 3 Kolom Sejajar) -->
+            <div>
+                <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-2 flex items-center gap-1.5">
+                    <i class="fa-solid fa-gears text-blue-600"></i> Detail Operasional
+                </h4>
+                <div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Bagian Operasional</label>
+                        <select id="mp-modal-bagian"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                            <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                            <option value="GRINDING">GRINDING</option>
+                            <option value="PAINTING">PAINTING</option>
+                            <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                            <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                            <option value="LADLE">LADLE</option>
+                            <option value="GALAH IBK">GALAH IBK</option>
+                            <option value="QC LAB PASIR">QC LAB PASIR</option>
+                            <option value="QC LAB LOGAM">QC LAB LOGAM</option>
+                            <option value="PATTERN">PATTERN</option>
+                            <option value="ADM PPIC">ADM PPIC</option>
+                            <option value="MAINTENANCE">MAINTENANCE</option>
+                            <option value="FETTLING">FETTLING</option>
+                            <option value="PPIC">PPIC</option>
+                            <option value="CNC / MACHINING">CNC / MACHINING</option>
+                            <option value="CORE">CORE</option>
+                            <option value="SHOTBLAST">SHOTBLAST</option>
+                            <option value="QC POURING">QC POURING</option>
+                            <option value="MELTING">MELTING</option>
+                            <option value="FURAN">FURAN</option>
+                            <option value="IRGA">IRGA</option>
+                            <option value="SHE">SHE</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nomor Mesin</label>
+                        <input type="text" id="mp-modal-mesin" placeholder="Contoh: CNC-01"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Model / Item</label>
+                        <input type="text" id="mp-modal-model" placeholder="Contoh: ORING 170"
+                            class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 3: Capaian Produksi (Kartu Soft Slate/Blue) -->
+            <div id="mp-modal-prod-group" class="p-4 bg-slate-50 rounded-2xl border border-slate-100 space-y-2.5 transition-all">
+                <div class="flex items-center justify-between">
+                    <h4 class="text-[11px] font-bold uppercase tracking-wider text-slate-600 flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line text-blue-600"></i> Hasil & Validasi Produksi
+                    </h4>
+                    <span id="mp-modal-efficiency-badge" class="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-200 text-slate-700">0% Target</span>
+                </div>
+                <div class="grid grid-cols-3 gap-3">
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target (Plan)</label>
+                        <input type="number" id="mp-modal-plan" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*" oninput="updateMpModalEfficiency()"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hasil (Aktual)</label>
+                        <input type="number" id="mp-modal-actual" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*" oninput="updateMpModalEfficiency()"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-emerald-600 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Reject</label>
+                        <input type="number" id="mp-modal-reject" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
+                            onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
+                            class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-rose-600 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- SECTION 4: Keterangan Operasional -->
+            <div>
+                <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Keterangan / Kendala Operasional</label>
+                <textarea id="mp-modal-keterangan" rows="2" placeholder="Tuliskan kendala operasional atau rincian tugas harian (jika ada)..."
+                    class="w-full px-3.5 py-2.5 bg-slate-50 hover:bg-slate-100/70 border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-blue-600 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all resize-none"></textarea>
+            </div>
+
+            <!-- Sticky Action Footer -->
+            <div class="flex gap-3 justify-end pt-4 border-t border-slate-100">
+                <button type="button" onclick="closeManpowerLogModal()"
+                    class="px-5 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-all">
+                    Batal
+                </button>
+                <button type="submit"
+                    class="px-6 py-2.5 bg-blue-600 text-white font-bold rounded-xl text-xs hover:bg-blue-700 transition-all shadow-md flex items-center gap-2">
+                    <i class="fa-solid fa-floppy-disk"></i>
+                    <span>Simpan Perubahan Log</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- MODAL TUTORIAL PENGISIAN FORMULIR SISWA (ROOT LEVEL) -->
+<div id="modal-siswa-tutorial" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto" onclick="if(event.target===this)closeSiswaTutorialModal()">
+    <div class="bg-white p-6 sm:p-8 rounded-[28px] w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg shadow-sm">
+                    <i class="fa-solid fa-book-open-reader"></i>
+                </div>
+                <div>
+                    <h3 class="font-black text-slate-800 text-base sm:text-lg">Tutorial Pengisian Formulir</h3>
+                    <p class="text-xs text-slate-500 font-medium">Panduan langkah demi langkah laporan harian peserta LTC</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Body Content: 3 Step Cards -->
+        <div class="space-y-4 text-xs">
+            <!-- Step 1 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 1</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Identitas & Status Kehadiran Hari Ini</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Periksa Identitas:</strong> Nama Lengkap, NoReg, dan Kelas akan terisi secara otomatis.</li>
+                    <li><strong class="text-slate-800">Pilih Kehadiran:</strong>
+                        <ul class="list-circle list-inside pl-4 mt-1 space-y-1 text-slate-500">
+                            <li><span class="font-semibold text-blue-700">Hadir:</span> Untuk melanjutkan ke pengisian data operasional & produksi (Langkah 2).</li>
+                            <li><span class="font-semibold text-amber-700">Ijin / Sakit:</span> Wajib memilih nama <strong class="text-slate-700">Supervisor (SPV)</strong> yang telah Anda hubungi untuk konfirmasi, lalu tuliskan alasan ijin/sakit Anda.</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Step 2 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 2</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Data Operasional & Hasil Produksi (Khusus Hadir)</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja.</li>
+                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian pekerjaan Anda.</li>
+                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah target, aktual yang selesai dan barang reject (isi 0 jika tidak ada).</li>
+                    <li><strong class="text-slate-800">Supervisor Shift:</strong> Pilih nama Supervisor yang bertugas pada shift Anda.</li>
+                </ul>
+            </div>
+
+            <!-- Step 3 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
+                <div class="flex items-center gap-2">
+                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 3</span>
+                    <h4 class="font-bold text-slate-800 text-xs">Verifikasi Kinerja & Kirim Laporan</h4>
+                </div>
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol kirim laporan harian maka data akan terkirim ke database.</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
+            <button type="button" onclick="openAdminWhatsAppHelp()" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm shadow-emerald-500/20 cursor-pointer">
+                <i class="fa-brands fa-whatsapp text-sm"></i> Jika Butuh Bantuan Hubungi Admin
+            </button>
+            <button type="button" onclick="closeSiswaTutorialModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer">
+                Saya Mengerti
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- MODAL DETAIL INSIDEN K3 (SAFETY LOG) -->
+<div id="safety-detail-modal" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto" onclick="if(event.target===this)closeSafetyDetailModal()">
+    <div class="bg-white rounded-[28px] border border-slate-100 shadow-2xl p-6 md:p-8 w-full max-w-lg max-h-[90vh] overflow-y-auto space-y-5 animate-fadeIn">
+        <!-- Header -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 flex items-center justify-center text-blue-600 text-base">
+                    <i class="fa-solid fa-shield-halved"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-base text-slate-800">Detail Insiden Keselamatan (K3)</h3>
+                    <p class="text-xs text-slate-400">Rincian laporan dan kronologi kecelakaan kerja</p>
+                </div>
+            </div>
+            <button type="button" onclick="closeSafetyDetailModal()" class="w-8 h-8 rounded-full bg-slate-100 text-slate-400 hover:text-slate-600 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Content Cards -->
+        <div class="space-y-4">
+            <!-- 1. Card Identitas Siswa -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Identitas Siswa</span>
+                    <span id="safety-detail-kategori-badge" class="px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border bg-blue-50 text-blue-600 border-blue-200">
+                        Ringan
+                    </span>
+                </div>
+                <div class="flex items-center gap-3">
+                    <div class="w-11 h-11 rounded-2xl bg-blue-600 text-white font-black text-sm flex items-center justify-center shadow-sm shadow-blue-500/20" id="safety-detail-avatar">
+                        AA
+                    </div>
+                    <div>
+                        <h4 class="text-sm font-extrabold text-slate-800" id="safety-detail-nama">-</h4>
+                        <div class="text-xs text-slate-400 font-semibold flex items-center gap-2 mt-0.5">
+                            <span class="text-blue-600 font-bold" id="safety-detail-noreg">-</span>
+                            <span>•</span>
+                            <span id="safety-detail-kelas" class="font-medium text-slate-600">-</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="grid grid-cols-2 gap-2 pt-2.5 border-t border-slate-200/60 text-xs">
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-semibold block">Penempatan / Section</span>
+                        <span class="font-bold text-slate-700 mt-0.5 block" id="safety-detail-section">-</span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-semibold block">Supervisor (SPV)</span>
+                        <span class="font-bold text-slate-700 mt-0.5 block" id="safety-detail-spv">-</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 2. Card Kejadian Insiden -->
+            <div class="p-4 bg-white border border-slate-200/70 rounded-2xl space-y-2.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rincian Kejadian</span>
+                <div class="grid grid-cols-2 gap-3 text-xs">
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-semibold block">Tanggal Insiden</span>
+                        <span class="font-bold text-slate-800 flex items-center gap-1.5 mt-0.5" id="safety-detail-tanggal">
+                            <i class="fa-regular fa-calendar text-slate-400"></i> -
+                        </span>
+                    </div>
+                    <div>
+                        <span class="text-[10px] text-slate-400 font-semibold block">Tingkat Keparahan</span>
+                        <span class="font-bold text-slate-800 mt-0.5 block" id="safety-detail-kategori-text">-</span>
+                    </div>
+                </div>
+                <div class="pt-2 border-t border-slate-100">
+                    <span class="text-[10px] text-slate-400 font-semibold block">Jenis Kecelakaan</span>
+                    <span class="font-extrabold text-slate-800 text-xs block mt-0.5" id="safety-detail-jenis">-</span>
+                </div>
+            </div>
+
+            <!-- 3. Card Kronologi & Tindakan Penanganan -->
+            <div class="p-4 bg-blue-50/40 border border-blue-100 rounded-2xl space-y-1.5">
+                <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 flex items-center gap-1.5">
+                    <i class="fa-solid fa-notes-medical text-blue-500"></i> Kronologi & Tindakan Penanganan
+                </span>
+                <p class="text-xs text-slate-700 leading-relaxed whitespace-pre-line" id="safety-detail-keterangan">
+                    -
+                </p>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="flex justify-end pt-2 border-t border-slate-100">
+            <button type="button" onclick="closeSafetyDetailModal()" class="px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-xs cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Memuat Script Real-Time Engine secara teratur -->
+<script is:inline src="/js/api.js?v=46.0"></script>
+<script is:inline src="/js/global.js?v=46.0"></script>
+<script is:inline src="/js/dashboard.js?v=46.0"></script>
+<script is:inline src="/js/siswa.js?v=46.0"></script>
+<script is:inline src="/js/turnover.js?v=46.0"></script>
+<script is:inline src="/js/siswa_portal.js?v=46.0"></script>
+<script is:inline src="/js/keuangan.js?v=46.0"></script>
+<script is:inline src="/js/admin.js?v=46.0"></script>
+<script is:inline src="/js/absensi.js?v=46.0"></script>
+<script is:inline src="/js/safety.js?v=46.0"></script>

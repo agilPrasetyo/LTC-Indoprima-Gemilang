@@ -97,21 +97,88 @@
             </div>
         </div>
 
-        <!-- 2 Kolom Grafik -->
-        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-            <!-- Grafik Tren Kecelakaan Kerja (Bar + Line) -->
-            <div class="lg:col-span-2 space-y-2">
-                <h5 class="font-display font-bold text-xs text-brand-textMain">Tren Kecelakaan Kerja per Periode</h5>
-                <div class="relative h-72">
+        <!-- 2 Kolom Grafik Visualisasi Safety (Concept A - Executive EHS Dashboard) -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+            <!-- 1. Grafik Tren Insiden per Periode (Stacked Severity + Smooth Trend Curve) -->
+            <div class="lg:col-span-7 bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex flex-col justify-between space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h5 class="font-display font-bold text-xs text-brand-textMain flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-simple text-blue-600"></i> Tren Insiden per Periode (Stacked Severity)
+                        </h5>
+                        <p class="text-[11px] text-brand-textSub mt-0.5">Komposisi tingkat keparahan insiden per rentang waktu</p>
+                    </div>
+                    <span id="safety-trend-badge-total" class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200/60 shadow-xs">
+                        0 Kasus
+                    </span>
+                </div>
+
+                <div class="relative h-64 w-full">
                     <canvas id="safetyTrendChart"></canvas>
+                </div>
+
+                <!-- Custom Modern Mini Legend -->
+                <div class="flex flex-wrap items-center justify-center gap-3 pt-3 border-t border-slate-200/70 text-[10.5px]">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs"></span>
+                        <span class="font-semibold text-slate-600">Near Miss</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs"></span>
+                        <span class="font-semibold text-slate-600">Ringan</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-xs"></span>
+                        <span class="font-semibold text-slate-600">Sedang</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs"></span>
+                        <span class="font-semibold text-slate-600">Berat</span>
+                    </div>
+                    <div class="flex items-center gap-1.5 pl-2 border-l border-slate-200">
+                        <span class="w-3.5 h-0.5 bg-slate-800 rounded-full"></span>
+                        <span class="font-bold text-slate-800">Total Tren</span>
+                    </div>
                 </div>
             </div>
 
-            <!-- Grafik Distribusi Kategori / Bagian Insiden -->
-            <div class="space-y-2">
-                <h5 class="font-display font-bold text-xs text-brand-textMain">Distribusi Kategori Insiden</h5>
-                <div class="relative h-72 flex items-center justify-center">
+            <!-- 2. Grafik Distribusi Insiden (Donut + Center KPI + Tab Switcher & Progress Breakdown) -->
+            <div class="lg:col-span-5 bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex flex-col justify-between space-y-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h5 class="font-display font-bold text-xs text-brand-textMain flex items-center gap-1.5">
+                            <i class="fa-solid fa-chart-pie text-emerald-600"></i> Distribusi Insiden
+                        </h5>
+                        <p class="text-[11px] text-brand-textSub mt-0.5" id="safety-dist-subtitle">Proporsi per tingkat keparahan</p>
+                    </div>
+
+                    <!-- Tab Switcher: Kategori vs Bagian -->
+                    <div class="inline-flex p-0.5 bg-slate-200/80 rounded-xl text-[10px] font-bold">
+                        <button type="button" id="tab-dist-kategori" onclick="switchSafetyDistTab('kategori')"
+                            class="px-2.5 py-1 rounded-lg transition-all bg-white text-blue-700 shadow-xs">
+                            Kategori
+                        </button>
+                        <button type="button" id="tab-dist-bagian" onclick="switchSafetyDistTab('bagian')"
+                            class="px-2.5 py-1 rounded-lg transition-all text-slate-600 hover:text-slate-900">
+                            Bagian
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Donut Chart Wrapper with Center KPI -->
+                <div class="relative h-44 w-full flex items-center justify-center">
                     <canvas id="safetyDistributionChart"></canvas>
+                    
+                    <!-- Center Overlay Metric -->
+                    <div id="safety-donut-center" class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                        <span id="safety-donut-center-val" class="text-2xl font-black text-slate-800 leading-none">0</span>
+                        <span id="safety-donut-center-label" class="text-[8.5px] font-extrabold text-slate-400 uppercase tracking-wider mt-1">Total Insiden</span>
+                    </div>
+                </div>
+
+                <!-- Detailed Breakdown List Container -->
+                <div id="safety-dist-breakdown-list" class="space-y-1.5 pt-2.5 border-t border-slate-200/70 max-h-36 overflow-y-auto" style="scrollbar-width: thin;">
+                    <!-- Injected dynamically in safety.js -->
                 </div>
             </div>
         </div>
@@ -182,24 +249,22 @@
         </div>
 
         <!-- Tabel Data Safety -->
-        <div class="overflow-x-auto rounded-xl border border-slate-200/80">
+        <div class="overflow-x-auto rounded-2xl border border-slate-200/80 shadow-xs">
             <table class="w-full text-left text-xs border-collapse">
                 <thead>
-                    <tr class="bg-slate-100/80 text-brand-textMain font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
-                        <th class="py-3 px-4">TANGGAL</th>
-                        <th class="py-3 px-4">NO REG</th>
-                        <th class="py-3 px-4">NAMA SISWA</th>
-                        <th class="py-3 px-4 min-w-[90px] whitespace-nowrap">KELAS</th>
-                        <th class="py-3 px-4">SECTION</th>
-                        <th class="py-3 px-4">SPV</th>
-                        <th class="py-3 px-4">JENIS KECELAKAAN</th>
-                        <th class="py-3 px-4 min-w-[120px] whitespace-nowrap">KATEGORI</th>
-                        <th class="py-3 px-4">KETERANGAN</th>
+                    <tr class="bg-slate-50/90 text-brand-textMain font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                        <th class="py-3.5 px-3.5 whitespace-nowrap">Tanggal</th>
+                        <th class="py-3.5 px-3.5">Peserta LTC</th>
+                        <th class="py-3.5 px-3.5">Section & SPV</th>
+                        <th class="py-3.5 px-3.5">Jenis Kecelakaan</th>
+                        <th class="py-3.5 px-3 whitespace-nowrap">Tingkat Keparahan</th>
+                        <th class="py-3.5 px-3 max-w-[170px]">Keterangan</th>
+                        <th class="py-3.5 px-4 text-center whitespace-nowrap min-w-[85px]">Aksi</th>
                     </tr>
                 </thead>
                 <tbody id="safety-tbody" class="divide-y divide-slate-100 font-semibold text-brand-textMain">
                     <tr>
-                        <td colspan="9" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
+                        <td colspan="7" class="py-8 text-center text-slate-400 italic">Memuat data kecelakaan kerja...</td>
                     </tr>
                 </tbody>
             </table>

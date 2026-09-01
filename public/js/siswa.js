@@ -873,9 +873,16 @@ function showStudentDetail(s) {
                 const parsedDate = parseDateYYYYMMDD(rec.dateStr);
                 const dow = parsedDate ? (['Min', 'Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab'][parsedDate.getDay()]) : '';
 
+                let rawShift = rec.shift || rec.Shift || '-';
+                if (rawShift && rawShift.toUpperCase().startsWith('SHIFT')) {
+                    const sNum = rawShift.replace(/\D/g, '');
+                    rawShift = sNum ? `Shift ${sNum}` : rawShift;
+                }
+
                 logTbody.innerHTML += `
                     <tr class="border-b border-slate-50">
                         <td class="py-1.5 px-3 text-[10px] text-slate-500 font-mono">${dow} ${rec.dateStr || '-'}</td>
+                        <td class="py-1.5 px-3 text-[10px] text-slate-700 font-semibold">${rawShift}</td>
                         <td class="py-1.5 px-3 text-[10px] ${rowClass} font-semibold">${hadir}</td>
                         <td class="py-1.5 px-3 text-[10px] text-slate-600">${planVal}</td>
                         <td class="py-1.5 px-3 text-[10px] text-slate-600">${actualVal}</td>

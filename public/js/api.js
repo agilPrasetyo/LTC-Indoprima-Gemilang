@@ -1,79 +1,70 @@
-// Bersihkan objek `google` buatan ekstensi browser (seperti Google Translate) jika bukan dalam lingkungan Google Apps Script sesungguhnya
-if (typeof window.google !== 'undefined' && (!window.google.script || !window.google.script.run)) {
-  try {
-    delete window.google;
-  } catch (e) {
-    window.google = undefined;
+// ============================================================================
+// ASTRO RPC CLIENT BRIDGE (Independent Backend Communication)
+// Menghubungkan frontend Astro secara mandiri ke endpoint Backend Lokal (/api/rpc & Supabase)
+// ============================================================================
+
+class RpcRunner {
+  constructor() {
+    this.successHandler = () => {};
+    this.failureHandler = () => {};
   }
-}
-
-// API penengah (Bridge) untuk menghubungkan Astro frontend dengan Google Sheets backend via Web App URL
-const GAS_URL = window.PUBLIC_GAS_WEB_APP_URL || '';
-
-if (typeof google === 'undefined' || typeof google.script === 'undefined') {
-  class GASRunner {
-    constructor() {
-      this.successHandler = () => {};
-      this.failureHandler = () => {};
-    }
-    
-    withSuccessHandler(handler) {
-      this.successHandler = handler;
-      return this;
-    }
-    
-    withFailureHandler(handler) {
-      this.failureHandler = handler;
-      return this;
-    }
-  }
-
-  // Intercept pemanggilan method dinamis pada instance builder
-  const runnerPrototypeProxy = new Proxy({}, {
-    get(target, propKey, receiver) {
-      return (...args) => {
-        executeGASCall(propKey, args)
-          .then(res => {
-            if (receiver.successHandler) receiver.successHandler(res);
-          })
-          .catch(err => {
-            if (receiver.failureHandler) receiver.failureHandler(err);
-          });
-      };
-    }
-  });
   
-  Object.setPrototypeOf(GASRunner.prototype, runnerPrototypeProxy);
-
-  // Buat mock objek `google.script.run` menggunakan Proxy
-  const runProxy = new Proxy({}, {
-    get(target, propKey) {
-      if (propKey === 'withSuccessHandler') {
-        return (handler) => new GASRunner().withSuccessHandler(handler);
-      }
-      if (propKey === 'withFailureHandler') {
-        return (handler) => new GASRunner().withFailureHandler(handler);
-      }
-      
-      // Jika dipanggil langsung tanpa chaining handler
-      return (...args) => {
-        executeGASCall(propKey, args);
-      };
-    }
-  });
-
-  window.google = window.google || {};
-  window.google.script = window.google.script || {};
-  window.google.script.run = runProxy;
+  withSuccessHandler(handler) {
+    this.successHandler = handler;
+    return this;
+  }
+  
+  withFailureHandler(handler) {
+    this.failureHandler = handler;
+    return this;
+  }
 }
 
-// Fungsi utama pengeksekusi request HTTP ke Google Apps Script Web App
-// Fungsi utama pengeksekusi request HTTP ke Backend Astro API (Vercel)
-async function executeGASCall(functionName, args) {
+// Proxy dinamis untuk method RPC (misal: rpc.getDashboardStats(), rpc.login(), dll)
+const runnerPrototypeProxy = new Proxy({}, {
+  get(target, propKey, receiver) {
+    return (...args) => {
+      executeRpcCall(propKey, args)
+        .then(res => {
+          if (receiver.successHandler) receiver.successHandler(res);
+        })
+        .catch(err => {
+          if (receiver.failureHandler) receiver.failureHandler(err);
+        });
+    };
+  }
+});
+
+Object.setPrototypeOf(RpcRunner.prototype, runnerPrototypeProxy);
+
+// Objek Runner Proxy utama
+const rpcProxy = new Proxy({}, {
+  get(target, propKey) {
+    if (propKey === 'withSuccessHandler') {
+      return (handler) => new RpcRunner().withSuccessHandler(handler);
+    }
+    if (propKey === 'withFailureHandler') {
+      return (handler) => new RpcRunner().withFailureHandler(handler);
+    }
+    
+    // Jika method dipanggil langsung tanpa chaining handler
+    return (...args) => {
+      return executeRpcCall(propKey, args);
+    };
+  }
+});
+
+// Ekspor ke window.rpc dan alias window.google.script.run (kompatibilitas backward)
+window.rpc = rpcProxy;
+window.google = window.google || {};
+window.google.script = window.google.script || {};
+window.google.script.run = rpcProxy;
+
+// Fungsi utama pengeksekusi request HTTP ke Endpoint Backend Astro (/api/rpc)
+async function executeRpcCall(functionName, args) {
   try {
     const payload = { action: functionName, args: args };
     
-    // Arahkan semua request ke endpoint Astro API lokal
     const response = await fetch('/api/rpc', {
       method: 'POST',
       headers: {
@@ -82,10 +73,13 @@ async function executeGASCall(functionName, args) {
       body: JSON.stringify(payload)
     });
     
-    if (!response.ok) throw new Error(`HTTP error! status: ${response.status}`);
+    if (!response.ok) {
+      const errBody = await response.json().catch(() => null);
+      throw new Error(errBody?.message || `HTTP Server Error: status ${response.status}`);
+    }
     return await response.json();
   } catch (error) {
-    console.error(`[Astro Supabase Error] pada method ${functionName}:`, error);
+    console.error(`[Astro Server RPC Error] pada method ${functionName}:`, error);
     throw error;
   }
 }

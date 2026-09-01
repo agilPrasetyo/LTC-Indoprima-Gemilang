@@ -217,14 +217,29 @@ async function getStatsFromSupabase() {
     });
   });
 
+  function computeKelasFromMasuk(masukStr, targetDateStr) {
+    if (!masukStr) return 'Kelas 1';
+    const start = new Date(masukStr);
+    if (isNaN(start.getTime())) return 'Kelas 1';
+    let end = targetDateStr ? new Date(targetDateStr) : new Date();
+    if (isNaN(end.getTime())) end = new Date();
+    let bulan = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
+    if (end.getDate() < start.getDate()) bulan--;
+    if (bulan < 0) bulan = 0;
+    let num = bulan + 1;
+    if (num > 5) num = 5;
+    return `Kelas ${num}`;
+  }
+
   const siswaList = (siswa || []).map(s => {
     const daily = logsByStudent[s.noreg] || [];
     const hasHadir = daily.some(r => r.hadir !== "");
+    const computedKelas = computeKelasFromMasuk(s.tanggal_masuk, s.status === 'TURNOVER' ? s.tanggal_keluar : null);
     return {
       id: s.noreg,
       namaLengkap: s.nama_lengkap,
       nama: s.nama_lengkap,
-      kelas: s.kelas,
+      kelas: computedKelas,
       departemen: s.departemen,
       bagian: s.departemen || '', // compatibility fallback
       section: s.section || '',
@@ -246,18 +261,36 @@ async function getStatsFromSupabase() {
     };
   });
 
+  // Ensure TEST-001 test student is always present for testing simulation
+  if (!siswaList.some(s => s.id === 'TEST-001')) {
+    siswaList.push({
+      id: 'TEST-001',
+      namaLengkap: 'SISWA TESTING (SIMULASI)',
+      nama: 'SISWA TESTING (SIMULASI)',
+      kelas: 'Kelas 4',
+      departemen: 'PRODUKSI',
+      bagian: 'PRODUKSI',
+      section: 'GRINDING',
+      hk: '6 HARI',
+      hariKerja: '6 HARI',
+      spv: "MOHAMMAT YASIR MA'ARIF",
+      masuk: '2026-05-01',
+      keluar: null,
+      tanggalKeluar: null,
+      asalDaerah: 'SURABAYA',
+      daerahAsal: 'SURABAYA',
+      asal: 'SURABAYA',
+      asalSekolah: 'SMK TESTING',
+      sekolah: 'SMK TESTING',
+      distribusi: '2026-08-01',
+      status: 'Aktif',
+      dailyRecords: logsByStudent['TEST-001'] || [],
+      perfLabel: 'Hadir'
+    });
+  }
+
   function computeTurnoverKelas(masukStr, targetDateStr) {
-    if (!masukStr) return 'Kelas 1';
-    const start = new Date(masukStr);
-    if (isNaN(start.getTime())) return 'Kelas 1';
-    let end = targetDateStr ? new Date(targetDateStr) : new Date();
-    if (isNaN(end.getTime())) end = new Date();
-    let bulan = (end.getFullYear() - start.getFullYear()) * 12 + (end.getMonth() - start.getMonth());
-    if (end.getDate() < start.getDate()) bulan--;
-    if (bulan < 0) bulan = 0;
-    let num = bulan + 1;
-    if (num > 5) num = 5;
-    return `Kelas ${num}`;
+    return computeKelasFromMasuk(masukStr, targetDateStr);
   }
 
   const totalSiswa = siswaList.filter(s => s.status === "Aktif").length;
@@ -265,7 +298,7 @@ async function getStatsFromSupabase() {
     const student = siswaList.find(s => s.id === t.noreg);
     const masukDate = t.tanggal_masuk || (student ? student.masuk : null);
     const keluarDate = t.tanggal_keluar || (student ? student.keluar : null);
-    const kelasVal = t.kelas || (student ? student.kelas : null) || computeTurnoverKelas(masukDate, keluarDate);
+    const kelasVal = computeTurnoverKelas(masukDate, keluarDate);
 
     return {
       id: t.noreg,
@@ -410,7 +443,9 @@ async function handleLogin(username, password) {
     (targetEmail === 'admin@indoprima.com' && password === 'admin123') ||
     (targetEmail === 'visitor@indoprima.com' && password === 'visitor123') ||
     ((targetEmail === 'student@indoprima.com' || targetEmail === 'student@indoprima.com') && password === 'student123') ||
-    (targetEmail === '2601176' && password === 'siswa123')
+    (targetEmail === '2601176' && password === 'siswa123') ||
+    ((targetEmail === 'test@indoprima.com' || (typeof targetEmail === 'string' && targetEmail.toUpperCase() === 'TEST-001')) && 
+     (password === 'testing123' || password === 'test123' || (typeof password === 'string' && password.toUpperCase() === 'TEST-001IPG')))
   )) {
     console.log(`[Self-Healing RPC] Memicu auto-seed untuk user default: ${targetEmail}`);
 
@@ -488,6 +523,35 @@ async function handleLogin(username, password) {
           });
         }
       }
+    } else if ((targetEmail === 'test@indoprima.com' || (typeof targetEmail === 'string' && targetEmail.toUpperCase() === 'TEST-001')) && 
+               (password === 'testing123' || password === 'test123' || (typeof password === 'string' && password.toUpperCase() === 'TEST-001IPG'))) {
+      targetEmail = 'test@indoprima.com';
+      const { data: usersList } = await supabase.auth.admin.listUsers();
+      const existing = usersList?.users?.find(u => u.email === 'test@indoprima.com');
+      let authId = existing?.id;
+      if (!existing) {
+        const { data: newAuth } = await supabase.auth.admin.createUser({
+          email: 'test@indoprima.com',
+          password: password,
+          email_confirm: true,
+          user_metadata: { role: 'SISWA', name: 'SISWA TESTING (SIMULASI)' }
+        });
+        if (newAuth?.user) authId = newAuth.user.id;
+      } else {
+        await supabase.auth.admin.updateUserById(authId, { password: password });
+      }
+      if (authId) {
+        const { data: dbProfile } = await supabase.from('users').select('id').eq('id', authId).single();
+        if (!dbProfile) {
+          await supabase.from('users').insert({
+            id: authId,
+            noreg: 'TEST-001',
+            email: 'test@indoprima.com',
+            nama_lengkap: 'SISWA TESTING (SIMULASI)',
+            role: 'SISWA'
+          });
+        }
+      }
     }
 
     // Coba login ulang setelah seeding
@@ -510,12 +574,34 @@ async function handleLogin(username, password) {
     
     let studentDetails = {};
     if (normalizedRole === 'Siswa' && user.noreg) {
-      const { data: s } = await supabase.from('siswa').select('kelas,tanggal_masuk,tanggal_keluar').eq('noreg', user.noreg).single();
-      if (s) {
+      try {
+        const { data: s } = await supabase.from('siswa').select('kelas,tanggal_masuk,tanggal_keluar,section,departemen,nama_spv').eq('noreg', user.noreg).maybeSingle();
+        if (s) {
+          studentDetails = {
+            kelas: s.kelas || 'Kelas 1',
+            masuk: s.tanggal_masuk || '2026-05-01',
+            tanggalMasuk: s.tanggal_masuk || '2026-05-01',
+            keluar: s.tanggal_keluar || null,
+            tanggalKeluar: s.tanggal_keluar || null,
+            section: s.section || 'GRINDING',
+            departemen: s.departemen || 'PRODUKSI',
+            spv: s.nama_spv || "MOHAMMAT YASIR MA'ARIF"
+          };
+        }
+      } catch (err) {
+        console.warn('Error fetching student profile:', err.message);
+      }
+
+      if (user.noreg === 'TEST-001' && !studentDetails.masuk) {
         studentDetails = {
-          kelas: s.kelas || '-',
-          tanggalMasuk: s.tanggal_masuk || '-',
-          tanggalKeluar: s.tanggal_keluar || '-'
+          kelas: 'Kelas 1',
+          masuk: '2026-05-01',
+          tanggalMasuk: '2026-05-01',
+          keluar: null,
+          tanggalKeluar: null,
+          section: 'GRINDING',
+          departemen: 'PRODUKSI',
+          spv: "MOHAMMAT YASIR MA'ARIF"
         };
       }
     }
@@ -527,6 +613,7 @@ async function handleLogin(username, password) {
         namaLengkap: user.nama_lengkap, 
         role: normalizedRole, 
         nomorRegistrasi: user.noreg || '',
+        noreg: user.noreg || '',
         ...studentDetails
       } 
     };
@@ -858,6 +945,8 @@ async function handleLocalSupabaseWrite(action, args) {
     let persentase = null;
     if (planNum > 0) {
       persentase = (aktualNum / planNum) * 100;
+    } else if (l.Persentase !== undefined && l.Persentase !== null && l.Persentase !== '') {
+      persentase = parseFloat(l.Persentase);
     }
 
     let dbDate = l.TanggalRecord || '';
@@ -865,6 +954,25 @@ async function handleLocalSupabaseWrite(action, args) {
       const parts = dbDate.split('/');
       if (parts.length === 3) {
         dbDate = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+      }
+    }
+
+    // Jika tanggal diubah saat mode edit, bersihkan record lama pada tanggal sebelumnya
+    const origDate = l.OriginalTanggalRecord || l.OldTanggal || '';
+    if (origDate) {
+      let origDbDate = origDate;
+      if (origDate.includes('/')) {
+        const p = origDate.split('/');
+        if (p.length === 3) origDbDate = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
+      }
+      if (origDbDate && origDbDate !== dbDate) {
+        let origDbDMY = origDate;
+        if (origDate.includes('-')) {
+          const p = origDate.split('-');
+          if (p.length === 3) origDbDMY = `${p[2]}/${p[1]}/${p[0]}`;
+        }
+        await supabase.from('manpower_log').delete().eq('noreg', l.NoReg).or(`tanggal_record.eq.${origDbDMY},tanggal_record.eq.${origDbDate}`);
+        await supabase.from('absensi').delete().eq('noreg', l.NoReg).eq('tanggal', origDbDate);
       }
     }
 
@@ -1003,9 +1111,18 @@ async function handleLocalSupabaseWrite(action, args) {
     };
 
     const statusVal = toProperStatus(a.status);
-    let ketVal = a.keterangan ? a.keterangan.toUpperCase() : '';
-    if ((a.status === 'Off' || a.status === 'Libur') && !ketVal.includes('OFF') && !ketVal.includes('LIBUR')) {
-      ketVal = ketVal ? `OFF - ${ketVal}` : 'OFF';
+    let ketVal = a.keterangan ? a.keterangan.trim().toUpperCase() : '';
+    
+    if (a.status === 'Off' || a.status === 'Libur') {
+      if (!ketVal.includes('OFF') && !ketVal.includes('LIBUR')) {
+        ketVal = ketVal ? `OFF - ${ketVal}` : 'OFF';
+      }
+    } else {
+      if (ketVal === 'OFF' || ketVal === 'LIBUR') {
+        ketVal = '';
+      } else if (ketVal.startsWith('OFF - ')) {
+        ketVal = ketVal.substring(6).trim();
+      }
     }
 
     const { error: upsertErr } = await supabase.from('absensi').upsert({

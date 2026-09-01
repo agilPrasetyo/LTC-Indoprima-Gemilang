@@ -12,6 +12,7 @@ const globalChartDataLabelsPlugin = {
             const numDatasets = chart.data.datasets.length;
             
             chart.data.datasets.forEach((dataset, datasetIndex) => {
+                if (dataset.datalabels && dataset.datalabels.display === false) return;
                 const meta = chart.getDatasetMeta(datasetIndex);
                 if (!meta || meta.hidden) return;
 
@@ -117,7 +118,11 @@ const globalChartDataLabelsPlugin = {
                             for (let dIdx = 0; dIdx < numDatasets; dIdx++) {
                                 const dMeta = chart.getDatasetMeta(dIdx);
                                 if (!dMeta || dMeta.hidden) continue;
-                                const dVal = Number(chart.data.datasets[dIdx].data[index]) || 0;
+                                const dDataset = chart.data.datasets[dIdx];
+                                const isLine = dDataset.type === 'line' || dMeta.type === 'line';
+                                if (isLine) continue;
+
+                                const dVal = Number(dDataset.data[index]) || 0;
                                 stackSum += dVal;
 
                                 const dElem = dMeta.data[index];
@@ -215,50 +220,57 @@ if (typeof Chart !== 'undefined') {
         return "Kelas " + kelasNum;
     }
 
-    function getStudentCurrentKelas(s) {
+    function getStudentCurrentKelas(s, targetDate) {
         if (!s) return 'Kelas 1';
+        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk || s.tgl_masuk;
+        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tgl_keluar;
+        const isTerminasi = s.status === 'Terminasi' || s.status === 'TURNOVER';
+        const refDate = targetDate || (isTerminasi && tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
+        if (tglMasuk && typeof hitungKelasSiswa === 'function') {
+            return hitungKelasSiswa(tglMasuk, refDate);
+        }
         if (s.kelas && s.kelas !== '-' && s.kelas !== 'null' && s.kelas !== 'undefined') {
             const strK = String(s.kelas).trim();
             if (strK.length > 0) {
                 const num = parseInt(strK.replace(/Kelas\s+/i, ''));
-                if (!isNaN(num)) return 'Kelas ' + num;
+                if (!isNaN(num)) return 'Kelas ' + Math.min(5, num);
                 return strK;
             }
-        }
-        const tglMasuk = s.masuk || s.tanggalMasuk || s.tanggal_masuk || s.tgl_masuk;
-        const tglKeluar = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tgl_keluar;
-        if (tglMasuk && typeof hitungKelasSiswa === 'function') {
-            return hitungKelasSiswa(tglMasuk, tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
         }
         return 'Kelas 1';
     }
 
-    let currentUser = null;
-    let chartInstance = null;
-    let mapInstance = null;
+    var currentUser = null;
+    window.currentUser = null;
+    var chartInstance = null;
+    var mapInstance = null;
     
     // Peta & Grafik Baru Turnover
-    let mapTurnoverInstance = null; 
-    let geoJsonLayer = null; 
-    let turnoverMarkerGroup = null; 
-    let turnoverPieChartInstance = null; 
-    let activeThematicTheme = 'light'; 
+    var mapTurnoverInstance = null; 
+    var geoJsonLayer = null; 
+    var turnoverMarkerGroup = null; 
+    var turnoverPieChartInstance = null; 
+    var activeThematicTheme = 'light'; 
     
-    let activeData = [];
-    let rawSiswaData = []; 
-    let rawTurnoverData = []; 
-    let activeTurnoverData = []; 
-    let financeData = [];
-    let rawUsersData = []; 
-    let absensiData = [];
+    var activeData = [];
+    window.activeData = activeData;
+    var rawSiswaData = []; 
+    window.rawSiswaData = rawSiswaData;
+    var rawTurnoverData = []; 
+    var activeTurnoverData = []; 
+    var financeData = [];
+    var rawUsersData = []; 
+    var absensiData = [];
+    window.absensiData = absensiData;
     window.ABSENSI_CUTOFF_DATE = '2026-08-02'; // Tanggal resmi Go-Live Cut-Off System Absensi
-    let safetyData = [];
-    let rawPopulasiData = [];
-    let geoJsonCache = null;  
-    let monthYearMetadata = { year: 2026, month: 3 };
-    let costRatesConfig = [];
-    let _lastSyncTime = null;
-    let currentVersion = "";
+    var safetyData = [];
+    window.safetyData = safetyData;
+    var rawPopulasiData = [];
+    var geoJsonCache = null;  
+    var monthYearMetadata = { year: 2026, month: 3 };
+    var costRatesConfig = [];
+    var _lastSyncTime = null;
+    var currentVersion = "";
 
     // Update realtime sync indicator in header
     function _updateSyncIndicator(status) {
@@ -788,9 +800,10 @@ if (typeof Chart !== 'undefined') {
             { kelas: "Kelas 5", uangSaku: 3700000, transport: 500000 }
         ]
     };
+    window.fallbackStats = fallbackStats;
 
     function startRealtimeClock() {
-        setInterval(() => {
+        const updateClocks = () => {
             const clockEl = document.getElementById('realtime-clock');
             const studentClockEl = document.getElementById('siswa-realtime-clock-form');
             
@@ -820,7 +833,12 @@ if (typeof Chart !== 'undefined') {
                     <span>${dayName}, ${dayNum} ${monthName} ${year} — ${hh}:${mm}:${ss} WIB</span>
                 `;
             }
-        }, 1000);
+        };
+
+        updateClocks();
+        if (!window._clockIntervalId) {
+            window._clockIntervalId = setInterval(updateClocks, 1000);
+        }
     }
 
     function fillLogin(email, pass, role) {
@@ -921,7 +939,7 @@ if (typeof Chart !== 'undefined') {
                         setLoginButtonState(false);
                         if (errorBox) {
                             errorBox.classList.remove('hidden');
-                            errorBox.innerText = "Google Apps Script Error: " + (err.message || err.toString());
+                            errorBox.innerText = "Gagal terhubung ke server: " + (err.message || err.toString());
                         }
                         console.error("Login server error:", err);
                     })
@@ -1128,6 +1146,7 @@ if (typeof Chart !== 'undefined') {
 
     function loginSuccess(user, bypassSplash = false) {
         currentUser = user;
+        window.currentUser = user;
         try {
             localStorage.setItem('currentUser', JSON.stringify(user));
             if (user.role === 'Admin') {
@@ -1210,6 +1229,9 @@ if (typeof Chart !== 'undefined') {
                 switchView('dashboard');
             }
             startRealtimeClock();
+            if (currentUser && currentUser.role === 'Siswa' && typeof populateSiswaPortalFields === 'function') {
+                populateSiswaPortalFields();
+            }
             loadDashboardData();
         };
 
@@ -1237,13 +1259,23 @@ if (typeof Chart !== 'undefined') {
                         _updateSyncIndicator('done');
                     } else {
                         _updateSyncIndicator('error');
-                        showToast('Gagal memuat data dasbor.', 'error');
+                        showToast('Gagal memuat data dasbor, menggunakan data lokal.', 'warning');
+                        monthYearMetadata = fallbackStats.monthYear;
+                        renderData(fallbackStats);
+                        if (currentUser && currentUser.role === 'Siswa' && typeof populateSiswaPortalFields === 'function') {
+                            populateSiswaPortalFields();
+                        }
                     }
                 })
                 .withFailureHandler(err => {
                     if (spinner) spinner.classList.remove('animate-spin');
                     _updateSyncIndicator('error');
-                    showToast('Gagal memuat data dari server.', 'error');
+                    console.warn('Gagal memuat data dari server, beralih ke data lokal:', err);
+                    monthYearMetadata = fallbackStats.monthYear;
+                    renderData(fallbackStats);
+                    if (currentUser && currentUser.role === 'Siswa' && typeof populateSiswaPortalFields === 'function') {
+                        populateSiswaPortalFields();
+                    }
                 })
                 .getDashboardStats();
         } else {
@@ -1839,6 +1871,7 @@ if (typeof Chart !== 'undefined') {
         if (titleHeader) titleHeader.innerText = titleMap[viewName] || 'Dashboard';
 
         if (viewName === 'siswa') renderSiswaView();
+        if (viewName === 'sisi-siswa' && typeof populateSiswaPortalFields === 'function') populateSiswaPortalFields();
         if (viewName === 'keuangan') {
             renderKeuanganView();
             // Auto-set calc dates to current month and calculate on tab switch
@@ -1851,10 +1884,43 @@ if (typeof Chart !== 'undefined') {
         if (viewName === 'absensi' && typeof renderAbsensiView === 'function') renderAbsensiView();
         if (viewName === 'safety' && typeof renderSafetyView === 'function') renderSafetyView();
         
+        // Manage Admin Submenu State
+        const adminSubmenu = document.getElementById('nav-admin-submenu');
+        const adminChevron = document.getElementById('admin-chevron');
+        if (viewName === 'admin') {
+            if (adminSubmenu) adminSubmenu.classList.remove('hidden');
+            if (adminChevron) adminChevron.classList.add('rotate-180');
+            if (typeof updateAdminSubmenuHighlight === 'function' && typeof currentAdminTab !== 'undefined') {
+                updateAdminSubmenuHighlight(currentAdminTab);
+            }
+        } else {
+            if (adminSubmenu) adminSubmenu.classList.add('hidden');
+            if (adminChevron) adminChevron.classList.remove('rotate-180');
+        }
+
         if (viewName === 'turnover' && mapTurnoverInstance) {
             setTimeout(() => mapTurnoverInstance.invalidateSize(), 200);
         }
     }
+
+    function toggleAdminMenu() {
+        const adminSubmenu = document.getElementById('nav-admin-submenu');
+        const adminChevron = document.getElementById('admin-chevron');
+        const adminView = document.getElementById('view-admin');
+        
+        if (!adminView || adminView.classList.contains('hidden')) {
+            switchView('admin');
+        } else {
+            if (adminSubmenu) {
+                const isHidden = adminSubmenu.classList.toggle('hidden');
+                if (adminChevron) {
+                    if (isHidden) adminChevron.classList.remove('rotate-180');
+                    else adminChevron.classList.add('rotate-180');
+                }
+            }
+        }
+    }
+    window.toggleAdminMenu = toggleAdminMenu;
 
     function searchGlobalTable(query) {
         const cleanQuery = query.toLowerCase();
@@ -1997,6 +2063,8 @@ if (typeof Chart !== 'undefined') {
     // Restore Session on Page Refresh
     document.addEventListener('DOMContentLoaded', () => {
         try {
+            startRealtimeClock();
+
             // Apply forced role adjustments first
             if (window.FORCED_ROLE) {
                 const qfContainer = document.getElementById('quick-fill-container');
@@ -2018,6 +2086,9 @@ if (typeof Chart !== 'undefined') {
             if (savedUserStr) {
                 const savedUser = JSON.parse(savedUserStr);
                 if (savedUser) {
+                    currentUser = savedUser;
+                    window.currentUser = savedUser;
+
                     // Jika di halaman utama tanpa FORCED_ROLE (ltcindoprima.web.id/), 
                     // jangan auto-restore agar pengguna dapat bebas memilih akun/pindah user
                     if (!window.FORCED_ROLE) {

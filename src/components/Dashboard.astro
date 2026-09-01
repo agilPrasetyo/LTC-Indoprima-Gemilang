@@ -237,56 +237,80 @@
         </div>
     </div>
 
-    <!-- Grafik Turnover (Statistik Turnover) -->
+    <!-- Grafik Turnover (Statistik Turnover & Kelulusan) -->
     <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm flex flex-col justify-between group">
         <div>
             <div class="flex items-center justify-between border-b border-slate-100 pb-3">
                 <div class="flex items-center gap-2">
-                    <span class="p-2 rounded-lg bg-rose-50 text-rose-600 text-xs"><i class="fa-solid fa-user-minus"></i></span>
+                    <span class="p-2 rounded-lg bg-indigo-50 text-indigo-600 text-xs"><i class="fa-solid fa-users-rays"></i></span>
                     <h3 class="font-display font-bold text-lg text-brand-textMain">Statistik Turnover</h3>
                 </div>
-                <span class="px-2.5 py-0.5 bg-rose-50 text-rose-600 rounded-full text-[10px] font-bold" id="stat-siswa-lulus">0</span>
+                <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[11px] font-bold font-mono" id="stat-turnover-total-badge">0 Siswa</span>
             </div>
             
-            <!-- Horizontal Layout: Chart on Left, Table on Right -->
-            <div class="flex flex-col sm:flex-row items-center gap-6 mt-4">
-                <div class="relative w-full sm:w-[60%] h-52 flex items-center justify-center">
+            <!-- Modern Donut Chart + Clean Interactive Legend -->
+            <div class="flex flex-col sm:flex-row items-center gap-5 mt-4">
+                <!-- Donut Canvas Container -->
+                <div class="relative w-full sm:w-[50%] h-48 flex items-center justify-center">
                     <canvas id="dashboardTurnoverPieChart"></canvas>
-                    <div class="absolute w-[112px] h-[112px] rounded-full bg-white/95 backdrop-blur-sm shadow-md border border-slate-50 flex flex-col items-center justify-center text-center p-2 pointer-events-none z-10">
-                        <p class="text-[9px] font-extrabold uppercase tracking-widest text-[#0D9488] leading-none mb-0.5">Turnover</p>
-                        <p class="text-slate-300 text-[8px] tracking-widest leading-none my-1">•••••</p>
-                        <p id="dashboard-turnover-total-center" class="text-sm font-black text-slate-800 leading-none">0 Siswa</p>
+                    <!-- Clean Floating Center Typography -->
+                    <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
+                        <span id="dashboard-turnover-total-center" class="text-3xl font-display font-black text-slate-800 leading-none tracking-tight">0</span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Total Keluar</span>
                     </div>
                 </div>
 
-                <div class="w-full sm:w-[40%] flex flex-col justify-center">
-                    <table class="w-full text-xs border-collapse">
-                        <tbody>
-                            <tr class="border-b border-slate-100">
-                                <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#FBBF24]"></span> Resign
-                                </td>
-                                <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-resign-val">0 Siswa</td>
-                            </tr>
-                            <tr class="border-b border-slate-100">
-                                <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#10B981]"></span> Lulus
-                                </td>
-                                <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-lulus-val">0 Siswa</td>
-                            </tr>
-                            <tr>
-                                <td class="py-2.5 flex items-center gap-2 font-semibold text-slate-500">
-                                    <span class="w-2.5 h-2.5 rounded-full bg-[#F43F5E]"></span> Indisipliner
-                                </td>
-                                <td class="py-2.5 text-right font-bold text-brand-textMain" id="stat-turnover-indisipliner-val">0 Siswa</td>
-                            </tr>
-                        </tbody>
-                    </table>
+                <!-- Right Legend Cards -->
+                <div class="w-full sm:w-[50%] flex flex-col gap-2">
+                    <!-- Lulus -->
+                    <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/80 flex items-center justify-between transition-all hover:bg-emerald-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs"></span>
+                            <div>
+                                <p class="text-xs font-bold text-emerald-950 leading-tight">Lulus Magang</p>
+                                <p class="text-[9px] text-emerald-600/90 font-medium leading-none mt-0.5">Selesai Program</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-extrabold text-emerald-700 font-mono" id="stat-turnover-lulus-val">0 Siswa</span>
+                            <span class="text-[10px] text-emerald-600 font-bold block" id="stat-turnover-lulus-pct">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Resign -->
+                    <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-100/80 flex items-center justify-between transition-all hover:bg-amber-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs"></span>
+                            <div>
+                                <p class="text-xs font-bold text-amber-950 leading-tight">Resign Mandiri</p>
+                                <p class="text-[9px] text-amber-600/90 font-medium leading-none mt-0.5">Alasan Pribadi</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-extrabold text-amber-700 font-mono" id="stat-turnover-resign-val">0 Siswa</span>
+                            <span class="text-[10px] text-amber-600 font-bold block" id="stat-turnover-resign-pct">0%</span>
+                        </div>
+                    </div>
+
+                    <!-- Indisipliner -->
+                    <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100/80 flex items-center justify-between transition-all hover:bg-rose-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs"></span>
+                            <div>
+                                <p class="text-xs font-bold text-rose-950 leading-tight">Indisipliner</p>
+                                <p class="text-[9px] text-rose-600/90 font-medium leading-none mt-0.5">Evaluasi Ketertiban</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-extrabold text-rose-700 font-mono" id="stat-turnover-indisipliner-val">0 Siswa</span>
+                            <span class="text-[10px] text-rose-600 font-bold block" id="stat-turnover-indis-pct">0%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Mini Metrics Row (Pengisi Space Bawah) -->
-            <div class="pt-4 mt-4 border-t border-slate-100 grid grid-cols-3 gap-2">
+            <div class="pt-3.5 mt-3.5 border-t border-slate-100 grid grid-cols-3 gap-2">
                 <!-- Mini Metric 1: Rasio Kelulusan -->
                 <div class="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-emerald-50">
                     <div class="flex items-center gap-1.5 text-emerald-700">
@@ -314,7 +338,7 @@
                         <span class="text-[9px] font-extrabold uppercase tracking-wider text-sky-800 truncate">Bulan Ini</span>
                     </div>
                     <p id="stat-turnover-month-count" class="text-base sm:text-lg font-black text-sky-700 mt-2">0 Siswa</p>
-                    <span id="stat-turnover-month-label" class="text-[8px] font-bold text-sky-600/90 mt-0.5 truncate">Juli 2026</span>
+                    <span id="stat-turnover-month-label" class="text-[8px] font-bold text-sky-600/90 mt-0.5 truncate">Agustus 2026</span>
                 </div>
             </div>
         </div>

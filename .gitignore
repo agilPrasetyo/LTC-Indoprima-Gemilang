@@ -23,3 +23,11 @@ pnpm-debug.log*
 
 # jetbrains setting folder
 .idea/
+
+# scratch scripts & temp files
+scratch-*.cjs
+scratch-*.mjs
+scratch-*.js
+test-*.js
+/*.jpg
+/*.png

@@ -241,7 +241,10 @@
 
                 <!-- STEP 2 CONTAINER -->
                 <div id="step-container-2" class="step-container space-y-6 hidden">
-                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Detail Operasional</h4>
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
+                        <span>Detail Operasional</span>
+                        <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md">Langkah 2 dari 3</span>
+                    </h4>
                     <div class="space-y-4">
                         <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
@@ -254,87 +257,261 @@
                                 <select id="input-siswa-shift" required
                                     class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
                                     <option value="" disabled selected>Pilih Shift</option>
-                                    <option value="Shift 1">Shift 1</option>
-                                    <option value="Shift 2">Shift 2</option>
-                                    <option value="Shift 3">Shift 3</option>
+                                    <option value="Shift 1">Shift 1 (Pagi)</option>
+                                    <option value="Shift 2">Shift 2 (Siang)</option>
+                                    <option value="Shift 3">Shift 3 (Malam)</option>
                                 </select>
                             </div>
                         </div>
                         
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Bagian</label>
-                            <select id="input-siswa-bagian" required
-                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
-                                <option value="" disabled selected>Pilih Bagian</option>
-                                <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
-                                <option value="GRINDING">GRINDING</option>
-                                <option value="PAINTING">PAINTING</option>
-                                <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
-                                <option value="ADM PRODUKSI">ADM PRODUKSI</option>
-                                <option value="LADLE">LADLE</option>
-                                <option value="GALAH IBK">GALAH IBK</option>
-                                <option value="QC LAB PASIR">QC LAB PASIR</option>
-                                <option value="PATTERN">PATTERN</option>
-                                <option value="ADM PPIC">ADM PPIC</option>
-                                <option value="MAINTENANCE">MAINTENANCE</option>
-                                <option value="FETTLING">FETTLING</option>
-                                <option value="PPIC">PPIC</option>
-                                <option value="CNC / MACHINING">CNC / MACHINING</option>
-                                <option value="CORE">CORE</option>
-                                <option value="SHOTBLAST">SHOTBLAST</option>
-                                <option value="QC POURING">QC POURING</option>
-                                <option value="MELTING">MELTING</option>
-                                <option value="FURAN">FURAN</option>
-                                <option value="IRGA">IRGA</option>
-                                <option value="SHE">SHE</option>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Bagian / Section Kerja</label>
+                            <select id="input-siswa-bagian" required onchange="onSiswaBagianChanged()"
+                                class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <option value="" disabled selected>Pilih Bagian Penempatan</option>
+                                <optgroup label="── DEPARTEMEN PRODUKSI ──">
+                                    <option value="GRINDING">GRINDING</option>
+                                    <option value="PAINTING">PAINTING</option>
+                                    <option value="CORE">CORE</option>
+                                    <option value="SHOTBLAST">SHOTBLAST</option>
+                                    <option value="FURAN">FURAN</option>
+                                    <option value="FETTLING">FETTLING</option>
+                                    <option value="CNC / MACHINING">CNC / MACHINING</option>
+                                    <option value="MELTING">MELTING</option>
+                                    <option value="GALAH IBK">GALAH IBK</option>
+                                    <option value="PPIC">PPIC</option>
+                                    <option value="ADM PPIC">ADM PPIC</option>
+                                    <option value="ADM PRODUKSI">ADM PRODUKSI</option>
+                                </optgroup>
+                                <optgroup label="── DEPARTEMEN ENGINEERING ──">
+                                    <option value="PATTERN">PATTERN</option>
+                                    <option value="LADLE">LADLE</option>
+                                    <option value="MAINTENANCE">MAINTENANCE</option>
+                                    <option value="ADM MAINTENANCE">ADM MAINTENANCE</option>
+                                    <option value="ENGINEERING DRAFTER">ENGINEERING DRAFTER</option>
+                                </optgroup>
+                                <optgroup label="── DEPARTEMEN PERSONALIA & SHE ──">
+                                    <option value="IRGA">IRGA</option>
+                                    <option value="SHE (SAFETY K3)">SHE (SAFETY K3)</option>
+                                </optgroup>
+                                <optgroup label="── DEPARTEMEN QUALITY CONTROL (QC) ──">
+                                    <option value="QC POURING">QC POURING</option>
+                                    <option value="QC LAB PASIR">QC LAB PASIR</option>
+                                    <option value="QC LAB LOGAM">QC LAB LOGAM</option>
+                                </optgroup>
                             </select>
-                        </div>
-
-                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Mesin</label>
-                                <input type="text" id="input-siswa-mesin" placeholder="Contoh: CNC-01"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Model</label>
-                                <input type="text" id="input-siswa-model" placeholder="Contoh: M-230"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
                         </div>
                     </div>
                 </div>
 
                 <!-- STEP 3 CONTAINER -->
                 <div id="step-container-3" class="step-container space-y-6 hidden">
-                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2">Hasil & Validasi</h4>
-                    <div class="space-y-4">
-                        <div class="grid grid-cols-3 gap-3">
+                    <h4 class="text-sm font-bold text-slate-800 uppercase tracking-wider border-b border-slate-100 pb-2 flex items-center justify-between">
+                        <span id="step3-section-title">Hasil & Validasi Pekerjaan</span>
+                        <span id="step3-section-badge" class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-blue-50 text-blue-600">Lini Produksi</span>
+                    </h4>
+
+                    <!-- 1. DYNAMIC CONTAINER: LINI PRODUKSI (MULTI-PRODUK + AUTO TARGET) -->
+                    <div id="container-mode-produksi" class="space-y-4">
+                        <div>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Mesin / Line</label>
+                            <input type="text" id="input-siswa-mesin" placeholder="Contoh: GRINDA-02 / CNC-01 / LINE-A"
+                                class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                        </div>
+
+                        <!-- Multi Product Rows Wrapper -->
+                        <div class="space-y-3">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Model Produk & Target</label>
+                                <span class="text-[11px] text-slate-400 italic">Target terkunci otomatis dari master data</span>
+                            </div>
+
+                            <div id="produksi-products-list" class="space-y-3">
+                                <!-- Dynamic Product Rows will be injected here -->
+                            </div>
+
+                            <button type="button" id="btn-add-product-row" onclick="addProdukRow()"
+                                class="w-full py-2.5 border-2 border-dashed border-blue-200 hover:border-blue-400 bg-blue-50/50 hover:bg-blue-50 text-blue-600 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2">
+                                <i class="fa-solid fa-plus text-[10px]"></i> Tambah Model Produk Lain
+                            </button>
+                        </div>
+
+                        <!-- Live Summary Card -->
+                        <!-- Summary Stats Cards (Plan, Actual, Reject only) -->
+                        <div class="p-3.5 bg-gradient-to-br from-slate-50 to-blue-50/30 border border-slate-200/80 rounded-2xl">
+                            <div class="grid grid-cols-3 gap-2.5 text-center">
+                                <div class="bg-white/80 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                                    <div class="text-[10px] uppercase font-bold text-slate-400">Total Plan</div>
+                                    <div id="summary-total-plan" class="text-sm sm:text-base font-extrabold text-blue-600">0</div>
+                                </div>
+                                <div class="bg-white/80 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                                    <div class="text-[10px] uppercase font-bold text-slate-400">Total Aktual</div>
+                                    <div id="summary-total-aktual" class="text-sm sm:text-base font-extrabold text-emerald-600">0</div>
+                                </div>
+                                <div class="bg-white/80 p-2.5 rounded-xl border border-slate-100 shadow-sm">
+                                    <div class="text-[10px] uppercase font-bold text-slate-400">Total Reject</div>
+                                    <div id="summary-total-reject" class="text-sm sm:text-base font-extrabold text-rose-600">0</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 2. DYNAMIC CONTAINER: QUALITY CONTROL (QC POURING & QC LAB PASIR) -->
+                    <div id="container-mode-qc" class="space-y-4 hidden">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Target</label>
-                                <input type="number" id="input-siswa-target" placeholder="0" required min="0" step="1" pattern="[0-9]*"
-                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Model / Aktivitas Pengujian</label>
+                                <div class="relative" id="qc-model-dropdown-container">
+                                    <div class="relative flex items-center">
+                                        <input type="text" id="input-qc-model" placeholder="Pilih atau cari model / aktivitas..." autocomplete="off"
+                                            oninput="onModelInputTyping('qc', event, true)"
+                                            onfocus="openModelDropdown('qc', true)"
+                                            class="w-full pl-3.5 pr-9 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-blue-500 focus:bg-white focus:ring-2 focus:ring-blue-100 transition-all cursor-text">
+                                        <button type="button" onclick="toggleModelDropdown('qc', event, true)" class="absolute right-2 p-1.5 text-slate-400 hover:text-slate-600 transition-colors flex items-center justify-center">
+                                            <i class="fa-solid fa-chevron-down text-xs transition-transform duration-200" id="qc-model-chevron"></i>
+                                        </button>
+                                    </div>
+                                    <!-- Custom Dropdown Menu -->
+                                    <div id="qc-model-dropdown-list" class="hidden absolute top-full left-0 right-0 mt-1.5 bg-white border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-300/40 z-50 max-h-60 overflow-y-auto divide-y divide-slate-100 animate-fadeIn" style="scrollbar-width: thin;">
+                                    </div>
+                                </div>
                             </div>
                             <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Hasil</label>
-                                <input type="number" id="input-siswa-hasil" placeholder="0" required min="0" step="1" pattern="[0-9]*"
-                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
-                            </div>
-                            <div>
-                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Reject</label>
-                                <input type="number" id="input-siswa-reject" placeholder="0" min="0" step="1" value="0" pattern="[0-9]*"
-                                    onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}"
-                                    oninput="this.value=this.value.replace(/[^0-9]/g,'')"
-                                    class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Nomor Mesin / Tungku / FBO</label>
+                                <input type="text" id="input-qc-mesin" placeholder="Contoh: FBO-01 / LADLE-03"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
                             </div>
                         </div>
 
+                        <div class="grid grid-cols-3 gap-3">
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Target (Ladle/Tes)</label>
+                                <input type="number" id="input-qc-target" placeholder="0" min="0" step="1"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Hasil (Aktual)</label>
+                                <input type="number" id="input-qc-hasil" placeholder="0" min="0" step="1"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                            <div>
+                                <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Reject / Ng</label>
+                                <input type="number" id="input-qc-reject" placeholder="0" min="0" step="1" value="0"
+                                    class="w-full px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 3. DYNAMIC CONTAINER: ADMIN, PPIC & SUPPORT (CHECKLIST SYSTEM) -->
+                    <div id="container-mode-support" class="space-y-4 hidden">
+                        <!-- Maintenance Specific Machine Selector -->
+                        <div id="maintenance-machine-wrapper" class="space-y-2 hidden">
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1 flex items-center justify-between">
+                                <span>Mesin / Fasilitas yang Dikerjakan</span>
+                                <span class="text-[10px] text-slate-400 font-normal">Bisa pilih lebih dari 1</span>
+                            </label>
+                            <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="maintenance-machines-pills">
+                                <!-- Machine toggle buttons will be rendered here -->
+                            </div>
+                            <input type="text" id="input-maintenance-mesin-custom" placeholder="Nama mesin lainnya jika tidak ada di daftar..."
+                                class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all mt-1">
+                        </div>
+
+                        <!-- Checklist Items Container -->
+                        <div class="space-y-2.5">
+                            <div class="flex items-center justify-between">
+                                <label class="text-xs font-bold uppercase tracking-wider text-slate-600">Daftar Checklist Tugas Harian</label>
+                                <span class="text-[11px] text-emerald-600 font-semibold" id="checklist-progress-text">0 Tugas Selesai</span>
+                            </div>
+
+                            <div id="checklist-items-container" class="space-y-2 bg-slate-50/80 p-3 rounded-2xl border border-slate-200/80">
+                                <!-- Checkbox items dynamically populated based on section -->
+                            </div>
+
+                            <!-- Custom extra task checkbox -->
+                            <div class="p-3 bg-white border border-slate-200 rounded-xl space-y-2">
+                                <label class="flex items-start gap-2.5 cursor-pointer">
+                                    <input type="checkbox" id="chk-tugas-tambahan" onchange="onTaskCheckboxChanged()"
+                                        class="mt-0.5 w-4 h-4 rounded text-blue-600 border-slate-300 focus:ring-blue-500">
+                                    <span class="text-xs font-semibold text-slate-700">Tugas Tambahan / Khusus dari SPV</span>
+                                </label>
+                                <input type="text" id="input-tugas-tambahan-desc" placeholder="Tuliskan tugas khusus yang diberikan SPV hari ini..."
+                                    class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-lg text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 4. DYNAMIC CONTAINER: SECTION MELTING (UNIFIED PELEBURAN & PERAWATAN TUNGKU) -->
+                    <div id="container-mode-melting" class="space-y-4 hidden">
+                        <!-- Card 1: Output Peleburan Logam (Heat) -->
+                        <div class="p-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-3">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-fire-burner text-orange-500"></i> Output Peleburan Logam (Heat)
+                                </span>
+                                <span class="text-[10px] text-slate-400 font-semibold italic">Isi jika ada target leburan</span>
+                            </div>
+
+                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Jenis Material Logam</label>
+                                    <select id="input-melting-material" class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-semibold outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                        <option value="FCD 450 (Ductile Iron)">FCD 450 (Ductile Iron)</option>
+                                        <option value="FC 250 (Gray Iron)">FC 250 (Gray Iron)</option>
+                                        <option value="FCD 500 / 600">FCD 500 / 600</option>
+                                        <option value="FC 150 / 200">FC 150 / 200</option>
+                                        <option value="STEEL / BAJA">STEEL / BAJA</option>
+                                        <option value="LAINNYA / TRIAL">LAINNYA / TRIAL</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nomor Tungku Induksi</label>
+                                    <input type="text" id="input-melting-tungku" placeholder="Contoh: TUNGKU 01 / INDUCTION 2T"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
+                                </div>
+                            </div>
+
+                            <div class="grid grid-cols-3 gap-2.5">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Target (Plan Heat)</label>
+                                    <input type="number" id="input-melting-target" placeholder="0" min="0" step="1" oninput="calculateMeltingSmartScore()"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-blue-700 outline-none focus:border-blue-500 focus:bg-white transition-all text-center"
+                                        onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Hasil (Aktual Heat)</label>
+                                    <input type="number" id="input-melting-aktual" placeholder="0" min="0" step="1" oninput="calculateMeltingSmartScore()"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-emerald-700 outline-none focus:border-blue-500 focus:bg-white transition-all text-center"
+                                        onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Suhu Tuang (°C)</label>
+                                    <input type="number" id="input-melting-suhu" placeholder="1450" min="1000" step="5"
+                                        class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-orange-600 outline-none focus:border-blue-500 focus:bg-white transition-all text-center"
+                                        onkeydown="if(event.key==='.'||event.key===','||event.key==='-'||event.key==='+'||event.key==='e'||event.key==='E'){event.preventDefault();}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Card 2: Checklist SOP Perawatan & Standby Tungku -->
+                        <div class="p-3.5 bg-white border border-slate-200 rounded-2xl shadow-sm space-y-2.5">
+                            <div class="flex items-center justify-between border-b border-slate-100 pb-2">
+                                <span class="text-xs font-bold text-slate-700 flex items-center gap-1.5">
+                                    <i class="fa-solid fa-screwdriver-wrench text-emerald-600"></i> SOP Perawatan & Operasional Tungku
+                                </span>
+                                <span class="text-[11px] text-emerald-600 font-bold" id="melting-checklist-progress-text">0/6 Tugas Selesai</span>
+                            </div>
+
+                            <div id="melting-checklist-container" class="space-y-2">
+                                <!-- Dynamic Melting Checklist items populated via JS -->
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- COMMON SECTION: SUPERVISOR & KETERANGAN -->
+                    <div class="space-y-4 pt-2 border-t border-slate-100">
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Supervisor (SPV)</label>
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Supervisor (SPV) Penanggung Jawab</label>
                             <select id="input-siswa-spv" required
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all">
                                 <option value="" disabled selected>Pilih Supervisor</option>
@@ -363,8 +540,8 @@
                         </div>
 
                         <div>
-                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Keterangan / Kendala</label>
-                            <textarea id="input-siswa-keterangan" placeholder="Tuliskan kendala operasional lapangan jika target tidak tercapai..." rows="3"
+                            <label class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5" id="label-siswa-keterangan">Keterangan / Kendala Lapangan</label>
+                            <textarea id="input-siswa-keterangan" placeholder="Tuliskan kendala operasional lapangan atau rincian tugas jika ada..." rows="3"
                                 class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-500 focus:bg-white transition-all resize-none"></textarea>
                         </div>
                     </div>
@@ -570,78 +747,4 @@
     </div>
 </div>
 
-<!-- MODAL TUTORIAL PENGISIAN FORMULIR SISWA -->
-<div id="modal-siswa-tutorial" class="hidden fixed inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-sm p-4 overflow-y-auto" onclick="if(event.target===this)closeSiswaTutorialModal()">
-    <div class="bg-white p-6 sm:p-8 rounded-[28px] w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
-        <!-- Header -->
-        <div class="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-2xl bg-blue-50 border border-blue-100 text-blue-600 flex items-center justify-center text-lg shadow-sm">
-                    <i class="fa-solid fa-book-open-reader"></i>
-                </div>
-                <div>
-                    <h3 class="font-black text-slate-800 text-base sm:text-lg">Tutorial Pengisian Formulir</h3>
-                    <p class="text-xs text-slate-500 font-medium">Panduan langkah demi langkah laporan harian peserta LTC</p>
-                </div>
-            </div>
-            <button type="button" onclick="closeSiswaTutorialModal()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 flex items-center justify-center transition-all cursor-pointer">
-                <i class="fa-solid fa-xmark text-sm"></i>
-            </button>
-        </div>
 
-        <!-- Body Content: 3 Step Cards -->
-        <div class="space-y-4 text-xs">
-            <!-- Step 1 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 1</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Identitas & Status Kehadiran Hari Ini</h4>
-                </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Periksa Identitas:</strong> Nama Lengkap, NoReg, dan Kelas akan terisi secara otomatis.</li>
-                    <li><strong class="text-slate-800">Pilih Kehadiran:</strong>
-                        <ul class="list-circle list-inside pl-4 mt-1 space-y-1 text-slate-500">
-                            <li><span class="font-semibold text-blue-700">Hadir:</span> Untuk melanjutkan ke pengisian data operasional & produksi (Langkah 2).</li>
-                            <li><span class="font-semibold text-amber-700">Ijin / Sakit:</span> Wajib memilih nama <strong class="text-slate-700">Supervisor (SPV)</strong> yang telah Anda hubungi untuk konfirmasi, lalu tuliskan alasan ijin/sakit Anda.</li>
-                        </ul>
-                    </li>
-                </ul>
-            </div>
-
-            <!-- Step 2 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 2</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Data Operasional & Hasil Produksi (Khusus Hadir)</h4>
-                </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja.</li>
-                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian pekerjaan Anda.</li>
-                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah target, aktual yang selesai dan barang reject (isi 0 jika tidak ada).</li>
-                    <li><strong class="text-slate-800">Supervisor Shift:</strong> Pilih nama Supervisor yang bertugas pada shift Anda.</li>
-                </ul>
-            </div>
-
-            <!-- Step 3 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 3</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Verifikasi Kinerja & Kirim Laporan</h4>
-                </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol kirim laporan harian maka data akan terkirim ke database.</li>
-                </ul>
-            </div>
-        </div>
-
-        <!-- Footer -->
-        <div class="pt-3 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <button type="button" onclick="openAdminWhatsAppHelp()" class="w-full sm:w-auto px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl font-bold text-xs flex items-center justify-center gap-2 transition-all shadow-sm shadow-emerald-500/20 cursor-pointer">
-                <i class="fa-brands fa-whatsapp text-sm"></i> Jika Butuh Bantuan Hubungi Admin
-            </button>
-            <button type="button" onclick="closeSiswaTutorialModal()" class="w-full sm:w-auto px-6 py-2.5 bg-slate-800 hover:bg-slate-700 text-white rounded-xl font-bold text-xs transition-all shadow-sm cursor-pointer">
-                Saya Mengerti
-            </button>
-        </div>
-    </div>
-</div>

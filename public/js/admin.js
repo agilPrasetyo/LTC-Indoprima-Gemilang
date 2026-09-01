@@ -7,19 +7,21 @@
     // Sama persis dengan rumus Excel yang digunakan
     // ============================================================
     function hitungKelas(sOrMasuk) {
+        let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
+        let tglKeluar = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.tanggalKeluar || sOrMasuk.keluar) : null;
+        let isTerminasi = typeof sOrMasuk === 'object' && sOrMasuk !== null && (sOrMasuk.status === 'Terminasi' || sOrMasuk.status === 'TURNOVER');
+        if (tgl && typeof hitungKelasSiswa === 'function') {
+            return hitungKelasSiswa(tgl, isTerminasi && tglKeluar ? parseDateYYYYMMDD(tglKeluar) : new Date());
+        }
         if (typeof sOrMasuk === 'object' && sOrMasuk !== null) {
             if (sOrMasuk.kelas && sOrMasuk.kelas !== '-' && sOrMasuk.kelas !== 'null' && sOrMasuk.kelas !== 'undefined') {
                 const strK = String(sOrMasuk.kelas).trim();
                 if (strK.length > 0) {
                     const num = parseInt(strK.replace(/Kelas\s+/i, ''));
-                    if (!isNaN(num)) return 'Kelas ' + num;
+                    if (!isNaN(num)) return 'Kelas ' + Math.min(5, num);
                     return strK;
                 }
             }
-        }
-        let tgl = typeof sOrMasuk === 'object' && sOrMasuk !== null ? (sOrMasuk.masuk || sOrMasuk.tanggalMasuk || sOrMasuk.tanggal_masuk) : sOrMasuk;
-        if (tgl && typeof hitungKelasSiswa === 'function') {
-            return hitungKelasSiswa(tgl, new Date());
         }
         return 'Kelas 1';
     }
@@ -37,6 +39,9 @@
             activeBtn.className = "admin-tab-btn px-5 py-3 text-xs font-bold border-b-2 border-brand-blue text-brand-blue transition-all duration-200 flex items-center gap-2";
         }
         
+        // Update sidebar sub-menu buttons style
+        updateAdminSubmenuHighlight(tabId);
+
         // Toggle tab content panels
         document.querySelectorAll('.admin-tab-content').forEach(content => {
             content.classList.add('hidden');
@@ -50,6 +55,30 @@
         // Trigger specific render
         renderAdminView();
     }
+
+    function updateAdminSubmenuHighlight(tabId) {
+        document.querySelectorAll('.admin-subnav-btn').forEach(btn => {
+            btn.classList.remove('bg-white', 'text-brand-blue', 'font-bold', 'shadow-xs', 'border', 'border-slate-200/80');
+            btn.classList.add('text-slate-600', 'hover:text-brand-blue', 'hover:bg-white', 'font-semibold');
+            const icon = btn.querySelector('i');
+            if (icon) {
+                icon.classList.remove('text-brand-blue');
+                icon.classList.add('text-slate-400');
+            }
+        });
+        const activeSub = document.getElementById('subnav-admin-' + tabId);
+        if (activeSub) {
+            activeSub.classList.remove('text-slate-600', 'hover:text-brand-blue', 'hover:bg-white', 'font-semibold');
+            activeSub.classList.add('bg-white', 'text-brand-blue', 'font-bold', 'shadow-xs', 'border', 'border-slate-200/80');
+            const icon = activeSub.querySelector('i');
+            if (icon) {
+                icon.classList.remove('text-slate-400');
+                icon.classList.add('text-brand-blue');
+            }
+        }
+    }
+    window.updateAdminSubmenuHighlight = updateAdminSubmenuHighlight;
+    window.switchAdminTab = switchAdminTab;
 
     function renderAdminView() {
         // Muat status sinkronisasi
@@ -857,22 +886,28 @@
                         rawDate = `${p[2]}-${p[1].padStart(2, '0')}-${p[0].padStart(2, '0')}`;
                     }
                 }
-                logs.push({
-                    noreg: siswa.id,
-                    namaLengkap: siswa.namaLengkap,
-                    tanggal: rawDate,
-                    hadir: rec.hadir || '✔',
-                    plan: rec.plan !== null && rec.plan !== undefined ? rec.plan : null,
-                    actual: rec.actual !== null && rec.actual !== undefined ? rec.actual : null,
-                    reject: rec.reject !== null && rec.reject !== undefined ? rec.reject : 0,
-                    percent: rec.percent !== null && rec.percent !== undefined ? rec.percent : null,
-                    shift: rec.shift || rec.Shift || 'Shift 1',
-                    bagian: rec.bagian || rec.Bagian || siswa.section || '-',
-                    mesin: rec.nomor_mesin || rec.nomorMesin || rec.NomorMesin || '-',
-                    model: rec.model || rec.Model || '-',
-                    spv: rec.nama_spv || rec.namaSpv || rec.NamaSPV || siswa.spv || '-',
-                    keterangan: rec.keterangan || rec.Keterangan || '-'
-                });
+                    let shiftFormatted = rec.shift || rec.Shift || 'Shift 1';
+                    if (shiftFormatted && shiftFormatted.toUpperCase().startsWith('SHIFT')) {
+                        const sNum = shiftFormatted.replace(/\D/g, '');
+                        shiftFormatted = sNum ? `Shift ${sNum}` : shiftFormatted;
+                    }
+
+                    logs.push({
+                        noreg: siswa.id,
+                        namaLengkap: siswa.namaLengkap,
+                        tanggal: rawDate,
+                        hadir: rec.hadir || '✔',
+                        plan: rec.plan !== null && rec.plan !== undefined ? rec.plan : null,
+                        actual: rec.actual !== null && rec.actual !== undefined ? rec.actual : null,
+                        reject: rec.reject !== null && rec.reject !== undefined ? rec.reject : 0,
+                        percent: rec.percent !== null && rec.percent !== undefined ? rec.percent : null,
+                        shift: shiftFormatted,
+                        bagian: rec.bagian || rec.Bagian || siswa.section || '-',
+                        mesin: rec.nomor_mesin || rec.nomorMesin || rec.NomorMesin || '-',
+                        model: rec.model || rec.Model || '-',
+                        spv: rec.nama_spv || rec.namaSpv || rec.NamaSPV || siswa.spv || '-',
+                        keterangan: rec.keterangan || rec.Keterangan || '-'
+                    });
             });
         });
 
@@ -1053,8 +1088,10 @@
             if (studentBanner) studentBanner.classList.remove('hidden');
 
             if (studentSelect) studentSelect.value = noreg;
+            const origDateInput = document.getElementById('mp-modal-orig-date');
+            if (origDateInput) origDateInput.value = tanggal || '';
             document.getElementById('mp-modal-date').value = tanggal;
-            document.getElementById('mp-modal-date').disabled = true;
+            document.getElementById('mp-modal-date').disabled = false;
 
             // Cari rincian data siswa & record dari activeData
             const s = (activeData || []).find(std => std.id === noreg);
@@ -1077,7 +1114,21 @@
             if (rec) {
                 const hadirVal = rec.hadir === "✔" || rec.hadir === "Hadir" ? "✔" : (rec.hadir || "✔");
                 document.getElementById('mp-modal-hadir').value = hadirVal;
-                document.getElementById('mp-modal-shift').value = rec.shift || "Shift 1";
+                
+                const shiftSelect = document.getElementById('mp-modal-shift');
+                if (shiftSelect) {
+                    const targetShift = (rec.shift || 'Shift 1').toUpperCase().trim();
+                    let found = false;
+                    for (let opt of shiftSelect.options) {
+                        if (opt.value.toUpperCase().trim() === targetShift) {
+                            shiftSelect.value = opt.value;
+                            found = true;
+                            break;
+                        }
+                    }
+                    if (!found) shiftSelect.value = "Shift 1";
+                }
+
                 document.getElementById('mp-modal-bagian').value = rec.bagian || s?.section || "PAINTING";
                 document.getElementById('mp-modal-mesin').value = rec.nomor_mesin || "";
                 document.getElementById('mp-modal-model').value = rec.model || "";
@@ -1147,6 +1198,8 @@
         const studentSelect = document.getElementById('mp-modal-student');
         const noreg = studentSelect ? studentSelect.value : '';
         const dateVal = document.getElementById('mp-modal-date').value;
+        const origDate = document.getElementById('mp-modal-orig-date')?.value || '';
+        const isEdit = document.getElementById('mp-modal-is-edit')?.value === 'true';
         const hadirVal = document.getElementById('mp-modal-hadir').value;
         const shiftVal = document.getElementById('mp-modal-shift').value;
         const bagianVal = document.getElementById('mp-modal-bagian').value;
@@ -1186,13 +1239,17 @@
             Keterangan: keteranganVal || '-'
         };
 
+        if (isEdit && origDate && origDate !== dateVal) {
+            payload.OriginalTanggalRecord = origDate;
+        }
+
         showToast('Menyimpan log manpower...', 'info');
 
         executeGASCall('saveManpowerLog', [payload])
             .then(res => {
                 if (res && res.success !== false) {
                     showToast('Log manpower harian berhasil disimpan!', 'success');
-                    _updateLocalManpowerCache(noreg, dateVal, payload);
+                    _updateLocalManpowerCache(noreg, dateVal, payload, origDate);
                     closeManpowerLogModal();
                     if (typeof loadDashboardData === 'function') loadDashboardData();
                     else renderAdminManpowerTable();
@@ -1205,10 +1262,13 @@
             });
     }
 
-    function _updateLocalManpowerCache(noreg, dateVal, payload) {
+    function _updateLocalManpowerCache(noreg, dateVal, payload, origDateVal) {
         const studentIdx = (activeData || []).findIndex(s => s.id === noreg);
         if (studentIdx !== -1) {
-            const recs = activeData[studentIdx].dailyRecords || [];
+            let recs = activeData[studentIdx].dailyRecords || [];
+            if (origDateVal && origDateVal !== dateVal) {
+                recs = recs.filter(r => r.dateStr !== origDateVal);
+            }
             const existIdx = recs.findIndex(r => r.dateStr === dateVal);
 
             const newRec = {

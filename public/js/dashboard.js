@@ -463,19 +463,32 @@ function updateTurnoverPieChart() {
         }
     });
 
+    const totalTurnover = resignCount + lulusCount + indisiplinerCount;
+    const lulusPct = totalTurnover > 0 ? Math.round((lulusCount / totalTurnover) * 100) : 0;
+    const resignPct = totalTurnover > 0 ? Math.round((resignCount / totalTurnover) * 100) : 0;
+    const indisPct = totalTurnover > 0 ? Math.round((indisiplinerCount / totalTurnover) * 100) : 0;
+
+    const totalBadgeEl = document.getElementById('stat-turnover-total-badge');
+    if (totalBadgeEl) totalBadgeEl.innerText = totalTurnover + ' Siswa';
+
     const resignValEl = document.getElementById('stat-turnover-resign-val');
     if (resignValEl) resignValEl.innerText = resignCount + ' Siswa';
+    const resignPctEl = document.getElementById('stat-turnover-resign-pct');
+    if (resignPctEl) resignPctEl.innerText = resignPct + '%';
 
     const lulusValEl = document.getElementById('stat-turnover-lulus-val');
     if (lulusValEl) lulusValEl.innerText = lulusCount + ' Siswa';
+    const lulusPctEl = document.getElementById('stat-turnover-lulus-pct');
+    if (lulusPctEl) lulusPctEl.innerText = lulusPct + '%';
 
     const indisValEl = document.getElementById('stat-turnover-indisipliner-val');
     if (indisValEl) indisValEl.innerText = indisiplinerCount + ' Siswa';
+    const indisPctEl = document.getElementById('stat-turnover-indis-pct');
+    if (indisPctEl) indisPctEl.innerText = indisPct + '%';
 
     // Set total in the central circle overlay
-    const totalTurnover = resignCount + lulusCount + indisiplinerCount;
     const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
-    if (totalCenterEl) totalCenterEl.innerText = totalTurnover + ' Siswa';
+    if (totalCenterEl) totalCenterEl.innerText = totalTurnover;
 
     // Calculate 3 Mini Metrics for Turnover Card
     const lulusRate = totalTurnover > 0 ? Math.round((lulusCount / totalTurnover) * 100) + '%' : '0%';
@@ -488,7 +501,7 @@ function updateTurnoverPieChart() {
 
     let curMonthCount = 0;
     records.forEach(item => {
-        const tgl = String(item.tgl_keluar || item.tanggal || item.created_at || '').substring(0, 7);
+        const tgl = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
         if (tgl === curYearMonth) {
             curMonthCount++;
         }
@@ -509,47 +522,50 @@ function updateTurnoverPieChart() {
     turnoverPieChartInstance = new Chart(chartCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Resign', 'Lulus', 'Indisipliner'],
+            labels: ['Lulus Magang', 'Resign Mandiri', 'Indisipliner'],
             datasets: [{
-                data: [resignCount, lulusCount, indisiplinerCount],
-                backgroundColor: ['#FBBF24', '#10B981', '#F43F5E'],
-                borderWidth: 2,
-                borderColor: '#FFFFFF',
-                spacing: 6, // Elegant gap between slices
-                offset: [8, 0, 0], // Subtle explode on Resign
-                hoverOffset: 15
+                data: [lulusCount, resignCount, indisiplinerCount],
+                backgroundColor: ['#10B981', '#F59E0B', '#F43F5E'],
+                hoverBackgroundColor: ['#059669', '#D97706', '#E11D48'],
+                borderWidth: 0,
+                spacing: 5,
+                borderRadius: 6,
+                hoverOffset: 8
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            cutout: '60%',
+            cutout: '75%',
+            animation: {
+                animateScale: true,
+                animateRotate: true,
+                duration: 1000,
+                easing: 'easeOutQuart'
+            },
             plugins: {
                 legend: {
                     display: false
                 },
                 tooltip: {
-                    backgroundColor: '#0F172A',
-                    padding: 10,
-                    borderRadius: 8,
-                    titleFont: { size: 11, family: 'Inter', weight: 'bold' },
-                    bodyFont: { size: 11, family: 'Inter' }
+                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
+                    padding: 12,
+                    cornerRadius: 12,
+                    borderColor: 'rgba(255, 255, 255, 0.1)',
+                    borderWidth: 1,
+                    titleFont: { size: 12, family: 'Inter', weight: 'bold' },
+                    bodyFont: { size: 12, family: 'Inter', weight: '600' },
+                    callbacks: {
+                        label: function(context) {
+                            const val = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const pct = total > 0 ? Math.round((val / total) * 100) : 0;
+                            return ` ${val} Siswa (${pct}%)`;
+                        }
+                    }
                 },
                 datalabels: {
-                    display: true,
-                    color: '#FFFFFF',
-                    font: {
-                        family: "system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif",
-                        size: 13,
-                        weight: 'bold'
-                    },
-                    formatter: function(value, context) {
-                        const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                        const percentage = total > 0 ? Math.round((value / total) * 100) : 0;
-                        if (percentage === 0) return '';
-                        return `${percentage}%`;
-                    },
-                    textAlign: 'center'
+                    display: false
                 }
             }
         }
