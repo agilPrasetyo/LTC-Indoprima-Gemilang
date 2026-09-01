@@ -201,11 +201,11 @@ function calculateLTCCosts() {
     }
 
     const defaultRates = {
-        'kelas1': { saku: 3000000, trans: 500000 },
-        'kelas2': { saku: 3100000, trans: 500000 },
-        'kelas3': { saku: 3250000, trans: 500000 },
-        'kelas4': { saku: 3450000, trans: 500000 },
-        'kelas5': { saku: 3700000, trans: 500000 }
+        'kelas1': { saku: 2250000, trans: 750000 },
+        'kelas2': { saku: 2350000, trans: 750000 },
+        'kelas3': { saku: 2500000, trans: 750000 },
+        'kelas4': { saku: 2700000, trans: 750000 },
+        'kelas5': { saku: 2950000, trans: 750000 }
     };
 
     const getRatesForClass = (kelasStr) => {
@@ -461,11 +461,11 @@ function renderMonthlyHistoryTable() {
 
     const ratesMap = {};
     const defaultRates = {
-        'kelas1': { saku: 3000000, trans: 500000 },
-        'kelas2': { saku: 3100000, trans: 500000 },
-        'kelas3': { saku: 3250000, trans: 500000 },
-        'kelas4': { saku: 3450000, trans: 500000 },
-        'kelas5': { saku: 3700000, trans: 500000 }
+        'kelas1': { saku: 2250000, trans: 750000 },
+        'kelas2': { saku: 2350000, trans: 750000 },
+        'kelas3': { saku: 2500000, trans: 750000 },
+        'kelas4': { saku: 2700000, trans: 750000 },
+        'kelas5': { saku: 2950000, trans: 750000 }
     };
     if (window.costRatesConfig && Array.isArray(costRatesConfig)) {
         costRatesConfig.forEach(rate => {
