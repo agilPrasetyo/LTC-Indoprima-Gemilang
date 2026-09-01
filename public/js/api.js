@@ -54,12 +54,6 @@ const rpcProxy = new Proxy({}, {
   }
 });
 
-// Ekspor ke window.rpc dan alias window.google.script.run (kompatibilitas backward)
-window.rpc = rpcProxy;
-window.google = window.google || {};
-window.google.script = window.google.script || {};
-window.google.script.run = rpcProxy;
-
 // Fungsi utama pengeksekusi request HTTP ke Endpoint Backend Astro (/api/rpc)
 async function executeRpcCall(functionName, args) {
   try {
@@ -83,3 +77,11 @@ async function executeRpcCall(functionName, args) {
     throw error;
   }
 }
+
+// Ekspor ke window.rpc, window.executeRpcCall, window.executeGASCall, dan window.google.script.run
+window.rpc = rpcProxy;
+window.executeRpcCall = executeRpcCall;
+window.executeGASCall = executeRpcCall;
+window.google = window.google || {};
+window.google.script = window.google.script || {};
+window.google.script.run = rpcProxy;

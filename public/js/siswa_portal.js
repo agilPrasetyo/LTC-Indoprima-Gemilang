@@ -482,7 +482,8 @@ function _sendSiswaReport(payload) {
         _updateSyncIndicator('syncing');
     }
     
-    executeGASCall('saveManpowerLog', [payload])
+    const runner = (typeof executeRpcCall === 'function' ? executeRpcCall : (typeof window !== 'undefined' && window.executeRpcCall ? window.executeRpcCall : executeGASCall));
+    runner('saveManpowerLog', [payload])
         .then(res => {
             if (res && res.success !== false) {
                 showToast('Laporan harian berhasil dikirim!', 'success');
@@ -657,7 +658,23 @@ const SECTION_TASKS_MAP = {
         'Input hasil produksi ke sistem ERP (Dynamics AX)',
         'Pembuatan / rekap jadwal produksi mingguan'
     ],
+    'ADMIN PRODUKSI': [
+        'Penyebaran RPH (Rencana Produksi Harian) ke setiap line produksi sesuai jadwal',
+        'Cetak / sediakan form produksi yang habis di area lini',
+        'Pengambilan seluruh checksheet produksi dari masing-masing line',
+        'Input data laporan produksi harian secara berkala',
+        'Input hasil produksi ke sistem ERP (Dynamics AX)',
+        'Pembuatan / rekap jadwal produksi mingguan'
+    ],
     'ADM MAINTENANCE': [
+        'Melayani & mencatat bon permintaan barang / sparepart teknisi',
+        'Serah terima & pengecekan barang masuk dari supplier',
+        'Input data log / kartu stok pengambilan barang gudang maintenance',
+        'Penataan, penataan ulang, & sortir stok barang gudang maintenance',
+        'Pembuangan sampah jerigen, kardus, & limbah material ke belakang pabrik',
+        'Pengecekan akhir shift (kebersihan meja, mematikan perangkat elektronik, dan penguncian pintu gudang)'
+    ],
+    'ADMIN MAINTENANCE': [
         'Melayani & mencatat bon permintaan barang / sparepart teknisi',
         'Serah terima & pengecekan barang masuk dari supplier',
         'Input data log / kartu stok pengambilan barang gudang maintenance',
@@ -670,6 +687,20 @@ const SECTION_TASKS_MAP = {
         'Pembuatan & rekap Back Order (BO)',
         'Pencatatan & rekap administrasi penerimaan/pengeluaran barang',
         'Filing & pengarsipan dokumen pengiriman harian'
+    ],
+    'ADMIN PPIC': [
+        'Pembuatan Surat Jalan (SJ) pengiriman',
+        'Pembuatan & rekap Back Order (BO)',
+        'Pencatatan & rekap administrasi penerimaan/pengeluaran barang',
+        'Filing & pengarsipan dokumen pengiriman harian'
+    ],
+    'ADMIN': [
+        'Penyebaran RPH (Rencana Produksi Harian) ke setiap line produksi sesuai jadwal',
+        'Cetak / sediakan form produksi yang habis di area lini',
+        'Pengambilan seluruh checksheet produksi dari masing-masing line',
+        'Input data laporan produksi harian secara berkala',
+        'Input hasil produksi ke sistem ERP (Dynamics AX)',
+        'Pembuatan / rekap jadwal produksi mingguan'
     ],
     'SHE': [
         'Inspeksi rutin kelayakan APAR & Kotak P3K di seluruh area',
