@@ -464,6 +464,15 @@ function getMonthlyTurnoverStats(dataset) {
         }
     });
 
+    // Pastikan bulan berjalan saat ini (misal Sep 2026) selalu masuk ke dalam grafik
+    const now = new Date();
+    const nowY = now.getFullYear();
+    const nowM = now.getMonth();
+    const nowKey = `${nowY}-${String(nowM + 1).padStart(2, '0')}`;
+    if (!monthMap[nowKey]) {
+        monthMap[nowKey] = { label: `${monthNames[nowM]} ${nowY}`, key: nowKey, lulus: 0, resign: 0, indisipliner: 0, order: nowY * 12 + nowM };
+    }
+
     const sortedKeys = Object.keys(monthMap).sort((a, b) => monthMap[a].order - monthMap[b].order);
 
     if (sortedKeys.length === 0) {
@@ -521,7 +530,7 @@ function updateTurnoverBarChart(dataset) {
                 {
                     label: 'Indisipliner',
                     data: monthlyStats.indisiplinData,
-                    backgroundColor: '#F43F5E',
+                    backgroundColor: '#EF4444',
                     borderRadius: 6,
                     barPercentage: 0.6,
                     categoryPercentage: 0.6
@@ -533,40 +542,61 @@ function updateTurnoverBarChart(dataset) {
             maintainAspectRatio: false,
             plugins: {
                 legend: {
-                    display: true,
-                    position: 'top',
-                    labels: {
-                        font: { size: 11, family: 'Inter', weight: '600' },
-                        usePointStyle: true,
-                        boxWidth: 8
-                    }
+                    display: false
                 },
                 tooltip: {
-                    mode: 'index',
-                    intersect: false,
-                    backgroundColor: '#0F172A',
-                    titleFont: { size: 12, weight: '700', family: 'Inter' },
-                    bodyFont: { size: 11, family: 'Inter' },
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleFont: { family: 'Inter', size: 12, weight: 'bold' },
+                    bodyFont: { family: 'Inter', size: 11 },
                     padding: 10,
-                    borderRadius: 12
+                    cornerRadius: 8
                 }
             },
             scales: {
                 x: {
                     grid: { display: false },
-                    ticks: { font: { size: 11, family: 'Inter', weight: '600' } }
+                    ticks: { font: { family: 'Inter', size: 11, weight: '600' }, color: '#64748B' }
                 },
                 y: {
                     beginAtZero: true,
-                    ticks: { precision: 0, font: { size: 10, family: 'Inter' } }
+                    ticks: { stepSize: 1, font: { family: 'Inter', size: 11 }, color: '#94A3B8' },
+                    grid: { color: '#F1F5F9' }
                 }
-            },
-            animation: false
+            }
         }
     });
+
+    const datasetAll = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
+    const totalAll = datasetAll.length;
+    let totalLulus = 0, totalResign = 0, totalIndis = 0;
+
+    datasetAll.forEach(s => {
+        const status = String(s.alasan || s.alasanDetail || s.alasan_detail || s.keterangan || '').toLowerCase();
+        if (status.includes('resign')) totalResign++;
+        else if (status.includes('lulus')) totalLulus++;
+        else if (status.includes('indisipliner') || status.includes('indisiplin')) totalIndis++;
+    });
+
+    const totalEl = document.getElementById('donut-total-count');
+    if (totalEl) totalEl.innerText = `${totalAll} Siswa`;
+
+    const lulusCntEl = document.getElementById('donut-lulus-cnt');
+    if (lulusCntEl) lulusCntEl.innerText = `(${totalLulus})`;
+    const lulusPctEl = document.getElementById('donut-lulus-pct');
+    if (lulusPctEl) lulusPctEl.innerText = totalAll > 0 ? `${Math.round((totalLulus/totalAll)*100)}%` : '0%';
+
+    const resignCntEl = document.getElementById('donut-resign-cnt');
+    if (resignCntEl) resignCntEl.innerText = `(${totalResign})`;
+    const resignPctEl = document.getElementById('donut-resign-pct');
+    if (resignPctEl) resignPctEl.innerText = totalAll > 0 ? `${Math.round((totalResign/totalAll)*100)}%` : '0%';
+
+    const indisCntEl = document.getElementById('donut-indis-cnt');
+    if (indisCntEl) indisCntEl.innerText = `(${totalIndis})`;
+    const indisPctEl = document.getElementById('donut-indis-pct');
+    if (indisPctEl) indisPctEl.innerText = totalAll > 0 ? `${Math.round((totalIndis/totalAll)*100)}%` : '0%';
 }
 
-function updateTurnoverDonutChart(lCount, rCount, iCount, lPct, rPct, iPct) {
+function filterTurnoverMonthlyBar() {
     const dataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
     updateTurnoverBarChart(dataset);
 }
@@ -577,6 +607,11 @@ function populateTurnoverHistoryMonthFilter(dataset) {
 
     const currentVal = select.value;
     const monthSet = new Set();
+
+    // Pastikan bulan berjalan saat ini (September 2026 dll) selalu ada di daftar filter
+    const now = new Date();
+    const nowYm = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    monthSet.add(nowYm);
 
     (dataset || []).forEach(t => {
         const exitDate = String(t.tanggalKeluar || t.tgl_keluar || t.keluar || t.masuk || '').substring(0, 7);

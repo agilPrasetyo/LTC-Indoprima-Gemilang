@@ -448,6 +448,12 @@ function populateDashTurnoverMonthFilter(records) {
     const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
     const monthsSet = new Set();
+    
+    // Pastikan bulan berjalan saat ini (September 2026 dll) selalu ada di daftar filter
+    const now = new Date();
+    const curYm = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    monthsSet.add(curYm);
+
     (records || []).forEach(item => {
         const rawDate = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').trim();
         if (rawDate.length >= 7) {
