@@ -187,38 +187,62 @@ function initTurnoverMap(filteredData) {
     const filterWilInput = document.getElementById('filter-turnover-wilayah');
     const activeCityFilter = filterWilInput ? normalizeCityName(filterWilInput.value) : "";
 
-    // Fungsi pewarnaan dinamis: multi-color pastel jika tidak ada data (seperti gambar), dan thematic color jika ada data
+    // Fungsi pewarnaan dinamis berbasis data riil:
+    // - Wilayah belum pernah ada siswanya: tidak diberi warna (transparan, garis batas abu-abu halus)
+    // - Resign & Indisipliner tinggi: Blok MERAH (#EF4444)
+    // - Kelulusan tinggi / turnover rendah: Blok HIJAU (#10B981)
+    // - Seimbang: Blok KUNING/ORANGE (#F59E0B)
     function styleGeoJsonFeature(feature) {
         const geoCityName = normalizeCityName(feature.properties.name || feature.properties.KABKOT || feature.properties.NAME_2);
         const stat = cityStats[geoCityName];
         
-        // Ambil warna default warnawarni pastel dari peta referensi gambar Anda
-        let fillColor = jabarJatimPastelColors[geoCityName] || '#94a3b8'; 
-        let fillOpacity = 0.55; // Opacity sedang agar warna pastel terlihat hidup dan jelas
-        let weight = 1.5;
-        let color = "#FFFFFF"; // Garis batas putih bersih agar terlihat sangat elegan dan modern
+        let fillColor = 'transparent'; 
+        let fillOpacity = 0;
+        let weight = 1;
+        let color = '#94a3b8'; // Garis batas abu-abu netral
+        let dashArray = '3, 4'; // Garis putus-putus tipis untuk wilayah tanpa data
 
         if (stat) {
-            const totalNeg = stat.resign + stat.indisipliner;
-            const totalPos = stat.lulus;
+            const totalNeg = (stat.resign || 0) + (stat.indisipliner || 0);
+            const totalPos = (stat.lulus || 0);
+            const totalCases = totalNeg + totalPos;
 
-            // Ganti ke warna status tema jika ada data aktivitas/kasus magang
-            if (totalNeg > totalPos) {
-                fillColor = "#EF4444"; // Zona Merah (Butuh Evaluasi)
-                fillOpacity = 0.75;
-            } else if (totalPos > totalNeg) {
-                fillColor = "#10B981"; // Zona Hijau (Kelulusan Sukses)
-                fillOpacity = 0.75;
-            } else if (totalPos === totalNeg && totalPos > 0) {
-                fillColor = "#F59E0B"; // Zona Jingga (Seimbang)
-                fillOpacity = 0.75;
+            if (totalCases > 0) {
+                dashArray = null;
+                // Wilayah jika tingkat resign dan indisipliner tinggi -> BLOK MERAH
+                if (totalNeg > totalPos) {
+                    fillColor = '#EF4444'; // Zona Merah (Butuh Evaluasi)
+                    fillOpacity = 0.65;
+                    color = '#DC2626';
+                    weight = 2;
+                } 
+                // Wilayah jika tingkat kelulusan sukses lebih tinggi -> BLOK HIJAU
+                else if (totalPos > totalNeg) {
+                    fillColor = '#10B981'; // Zona Hijau (Kelulusan Sukses)
+                    fillOpacity = 0.65;
+                    color = '#059669';
+                    weight = 2;
+                } 
+                // Wilayah jika seimbang -> BLOK KUNING / ORANGE
+                else if (totalPos === totalNeg) {
+                    fillColor = '#F59E0B'; // Zona Jingga (Seimbang)
+                    fillOpacity = 0.65;
+                    color = '#D97706';
+                    weight = 2;
+                }
             }
         }
 
         if (activeCityFilter && geoCityName === activeCityFilter) {
             weight = 3.5;
-            color = "#2563EB"; // Sinar biru tebal jika difilter
-            fillOpacity = 0.85;
+            color = '#2563EB'; // Sinar border biru tebal jika dipilih di filter
+            if (fillOpacity === 0) {
+                fillColor = '#3B82F6';
+                fillOpacity = 0.2;
+            } else {
+                fillOpacity = 0.85;
+            }
+            dashArray = null;
         }
 
         return {
@@ -226,6 +250,7 @@ function initTurnoverMap(filteredData) {
             fillOpacity: fillOpacity,
             color: color,
             weight: weight,
+            dashArray: dashArray,
             opacity: 1
         };
     }
@@ -235,39 +260,66 @@ function initTurnoverMap(filteredData) {
         const displayName = feature.properties.name || feature.properties.KABKOT || geoCityName;
         const stat = cityStats[geoCityName];
 
-        // Tampilkan label nama daerah permanen di tengah polygon batas wilayah
-        layer.bindTooltip(displayName, {
-            permanent: true,
-            direction: 'center',
-            className: 'map-kab-label'
-        });
+        let hasData = false;
+        let tooltipClass = 'map-kab-label';
 
-        let popupContent = `<div class="p-2 font-sans">
-            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${displayName}</h4>`;
-        
         if (stat) {
+            const totalNeg = (stat.resign || 0) + (stat.indisipliner || 0);
+            const totalPos = (stat.lulus || 0);
+            const totalCases = totalNeg + totalPos;
+
+            if (totalCases > 0) {
+                hasData = true;
+                if (totalNeg > totalPos) tooltipClass = 'map-kab-label-red';
+                else if (totalPos > totalNeg) tooltipClass = 'map-kab-label-green';
+                else if (totalPos === totalNeg) tooltipClass = 'map-kab-label-yellow';
+            }
+        }
+
+        // Tampilkan label nama daerah permanen HANYA pada wilayah yang memiliki data siswa agar peta bersih & rapi
+        if (hasData) {
+            layer.bindTooltip(displayName, {
+                permanent: true,
+                direction: 'center',
+                className: tooltipClass
+            });
+        } else {
+            // Untuk wilayah tanpa data, label tooltip hanya muncul saat kursor diarahkan (hover)
+            layer.bindTooltip(displayName, {
+                permanent: false,
+                direction: 'center',
+                className: 'map-kab-label'
+            });
+        }
+
+        let popupContent = `<div class="p-2.5 font-sans">
+            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1.5 flex items-center gap-1.5">
+                <span>📍</span> <span>${displayName}</span>
+            </h4>`;
+        
+        if (hasData) {
             const totalCases = stat.resign + stat.lulus + stat.indisipliner;
             const totalNeg = stat.resign + stat.indisipliner;
             const totalPos = stat.lulus;
             
-            let zoneLabel = '<span class="px-2 py-0.5 text-[9px] font-bold text-white rounded bg-blue-500">ZONA STABIL</span>';
-            if (totalNeg > totalPos) zoneLabel = '<span class="px-2 py-0.5 text-[9px] font-bold text-white rounded bg-red-500">ZONA MERAH (EVALUASI)</span>';
-            else if (totalPos > totalNeg) zoneLabel = '<span class="px-2 py-0.5 text-[9px] font-bold text-white rounded bg-emerald-500">ZONA HIJAU (SUKSES)</span>';
-            else if (totalPos === totalNeg) zoneLabel = '<span class="px-2 py-0.5 text-[9px] font-bold text-white rounded bg-amber-500">ZONA SEIMBANG</span>';
+            let zoneBadge = '';
+            if (totalNeg > totalPos) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-rose-700 bg-rose-100 border border-rose-200 rounded-md">🔴 TURNOVER TINGGI (EVALUASI)</span>';
+            else if (totalPos > totalNeg) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded-md">🟢 KELULUSAN TINGGI (SUKSES)</span>';
+            else if (totalPos === totalNeg) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-amber-700 bg-amber-100 border border-amber-200 rounded-md">🟡 ZONA SEIMBANG</span>';
 
             popupContent += `
-                <div class="my-2">${zoneLabel}</div>
-                <p class="text-xs text-slate-600">Total Kasus: <b>${totalCases} Siswa</b></p>
+                <div class="my-2">${zoneBadge}</div>
+                <p class="text-xs text-slate-600 font-semibold">Total Siswa Terdata: <b>${totalCases} Orang</b></p>
                 <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-medium">
-                    <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
-                    <p class="text-amber-600 font-semibold">● Resign Kerja: ${stat.resign} orang</p>
-                    <p class="text-rose-600 font-semibold">● Indisipliner: ${stat.indisipliner} orang</p>
+                    <p class="text-emerald-600 font-bold flex justify-between"><span>● Lulus Sukses:</span> <span>${stat.lulus} orang</span></p>
+                    <p class="text-amber-600 font-bold flex justify-between"><span>● Resign Mandiri:</span> <span>${stat.resign} orang</span></p>
+                    <p class="text-rose-600 font-bold flex justify-between"><span>● Indisipliner:</span> <span>${stat.indisipliner} orang</span></p>
                 </div>
             `;
         } else {
             popupContent += `
-                <div class="my-2"><span class="px-2 py-0.5 text-[9px] font-bold text-white rounded bg-emerald-500/80">WILAYAH AKTIF</span></div>
-                <p class="text-xs text-slate-600">Wilayah operasional magang sangat stabil tanpa catatan terminasi.</p>
+                <div class="my-2"><span class="px-2 py-0.5 text-[9px] font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded">BELUM ADA DATA SISWA</span></div>
+                <p class="text-xs text-slate-500 mt-1">Belum ada siswa magang yang tercatat dari wilayah ini.</p>
             `;
         }
         popupContent += `</div>`;
@@ -276,13 +328,13 @@ function initTurnoverMap(filteredData) {
         layer.on({
             mouseover: function(e) {
                 const l = e.target;
-                l.setStyle({ weight: 3, color: '#2563EB', fillOpacity: 0.85 });
+                l.setStyle({ weight: 3, color: '#2563EB', fillOpacity: hasData ? 0.85 : 0.2 });
             },
             mouseout: function(e) {
                 if (geoJsonLayer) geoJsonLayer.resetStyle(e.target);
             },
             click: function(e) {
-                mapTurnoverInstance.fitBounds(e.target.getBounds());
+                mapTurnoverInstance.fitBounds(e.target.getBounds(), { padding: [30, 30] });
             }
         });
     }

@@ -109,17 +109,60 @@ body {
 
 /* Styling Label Nama Daerah / Kabupaten pada Peta Turnover */
 .map-kab-label {
-    background: transparent !important;
-    border: none !important;
-    box-shadow: none !important;
-    font-size: 10px !important;
+    background: rgba(255, 255, 255, 0.92) !important;
+    border: 1px solid #cbd5e1 !important;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1) !important;
+    border-radius: 6px !important;
+    padding: 2px 6px !important;
+    font-size: 9px !important;
     font-weight: 800 !important;
     color: #1e293b !important;
-    text-shadow: 1px 1px 2px #ffffff, -1px -1px 2px #ffffff, 1px -1px 2px #ffffff, -1px 1px 2px #ffffff, 0px 0px 4px #ffffff !important;
     pointer-events: none !important;
     white-space: nowrap !important;
     text-transform: uppercase !important;
     letter-spacing: 0.03em !important;
+}
+
+.map-kab-label-red {
+    background: rgba(254, 242, 242, 0.95) !important;
+    border: 1.5px solid #ef4444 !important;
+    color: #b91c1c !important;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
+}
+
+.map-kab-label-green {
+    background: rgba(236, 253, 245, 0.95) !important;
+    border: 1.5px solid #10b981 !important;
+    color: #047857 !important;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
+}
+
+.map-kab-label-yellow {
+    background: rgba(254, 252, 232, 0.95) !important;
+    border: 1.5px solid #f59e0b !important;
+    color: #b45309 !important;
+    box-shadow: 0 2px 8px rgba(245, 158, 11, 0.25) !important;
+    border-radius: 6px !important;
+    padding: 2px 7px !important;
+    font-size: 9px !important;
+    font-weight: 800 !important;
+    pointer-events: none !important;
+    white-space: nowrap !important;
+    text-transform: uppercase !important;
 }
 
 /* Glassmorphism Styles & Modal Overrides */
