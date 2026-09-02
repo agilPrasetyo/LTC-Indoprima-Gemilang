@@ -562,7 +562,6 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     if (totalCenterEl) totalCenterEl.innerText = evalRate;
 
     // Calculate 3 Mini Metrics for Turnover Card
-    const now = new Date();
     const curYearMonth = selectedMonth !== 'ALL' ? selectedMonth : (now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
     const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
     
