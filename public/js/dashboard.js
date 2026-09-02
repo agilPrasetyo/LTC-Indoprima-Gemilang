@@ -517,46 +517,46 @@ function updateTurnoverPieChart(rebuildFilter = true) {
         }
     });
 
-    const totalTurnover = resignCount + lulusCount + indisiplinerCount;
-    const lulusPct = totalTurnover > 0 ? Math.round((lulusCount / totalTurnover) * 100) : 0;
-    const resignPct = totalTurnover > 0 ? Math.round((resignCount / totalTurnover) * 100) : 0;
-    const indisPct = totalTurnover > 0 ? Math.round((indisiplinerCount / totalTurnover) * 100) : 0;
+    // Jumlah Siswa Terkini (Jumlah Siswa Aktif Terkini di Dashboard / Manajemen Siswa)
+    const totalSiswaTerkini = (typeof activeData !== 'undefined' && Array.isArray(activeData) && activeData.length > 0)
+        ? activeData.length
+        : ((window.rawSiswaData && window.rawSiswaData.length > 0)
+            ? window.rawSiswaData.filter(s => String(s.status || '').toUpperCase() === 'AKTIF').length
+            : 30);
+
+    // Total Kasus Turnover = Resign + Indisipliner
+    const totalTurnoverCases = resignCount + indisiplinerCount;
+    // Rasio Turnover = Total (Resign + Indisipliner) / Jumlah Siswa Terkini * 100%
+    const evalRatePct = totalSiswaTerkini > 0 ? Math.round((totalTurnoverCases / totalSiswaTerkini) * 100) : 0;
+    const evalRate = evalRatePct + '%';
+
+    const resignPct = totalSiswaTerkini > 0 ? Math.round((resignCount / totalSiswaTerkini) * 100) : 0;
+    const indisPct = totalSiswaTerkini > 0 ? Math.round((indisiplinerCount / totalSiswaTerkini) * 100) : 0;
+    const sisaBertahan = Math.max(0, totalSiswaTerkini - totalTurnoverCases);
 
     const totalBadgeEl = document.getElementById('stat-turnover-total-badge');
-    if (totalBadgeEl) totalBadgeEl.innerText = totalTurnover + ' Siswa';
+    if (totalBadgeEl) totalBadgeEl.innerText = totalTurnoverCases + ' Siswa';
 
     const resignValEl = document.getElementById('stat-turnover-resign-val');
     if (resignValEl) resignValEl.innerText = resignCount + ' Siswa';
     const resignPctEl = document.getElementById('stat-turnover-resign-pct');
     if (resignPctEl) resignPctEl.innerText = resignPct + '%';
 
-    const lulusValEl = document.getElementById('stat-turnover-lulus-val');
-    if (lulusValEl) lulusValEl.innerText = lulusCount + ' Siswa';
-    const lulusPctEl = document.getElementById('stat-turnover-lulus-pct');
-    if (lulusPctEl) lulusPctEl.innerText = lulusPct + '%';
-
     const indisValEl = document.getElementById('stat-turnover-indisipliner-val');
     if (indisValEl) indisValEl.innerText = indisiplinerCount + ' Siswa';
     const indisPctEl = document.getElementById('stat-turnover-indis-pct');
     if (indisPctEl) indisPctEl.innerText = indisPct + '%';
 
-    // Set total in the central circle overlay
-    const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
-    if (totalCenterEl) totalCenterEl.innerText = totalTurnover;
+    const lulusValEl = document.getElementById('stat-turnover-lulus-val');
+    if (lulusValEl) lulusValEl.innerText = totalSiswaTerkini + ' Siswa';
+    const lulusPctEl = document.getElementById('stat-turnover-lulus-pct');
+    if (lulusPctEl) lulusPctEl.innerText = 'Basis 100%';
 
-    // Jumlah Siswa Terkini (Jumlah Siswa Aktif Terkini di Dashboard / Manajemen Siswa)
-    const totalSiswaTerkini = (typeof activeData !== 'undefined' && Array.isArray(activeData) && activeData.length > 0)
-        ? activeData.length
-        : ((window.rawSiswaData && window.rawSiswaData.length > 0)
-            ? window.rawSiswaData.filter(s => String(s.status || '').toUpperCase() === 'AKTIF').length
-            : 29);
+    // Set Rasio Turnover di lingkaran tengah Donut Chart
+    const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
+    if (totalCenterEl) totalCenterEl.innerText = evalRate;
 
     // Calculate 3 Mini Metrics for Turnover Card
-    // Rasio Lulus = (Lulus / Jumlah Siswa Terkini) * 100%
-    const lulusRate = totalSiswaTerkini > 0 ? Math.round((lulusCount / totalSiswaTerkini) * 100) + '%' : '0%';
-    // Rasio Turnover = Total (Resign + Indisipliner) / Jumlah Siswa Terkini * 100%
-    const evalRate = totalSiswaTerkini > 0 ? Math.round(((resignCount + indisiplinerCount) / totalSiswaTerkini) * 100) + '%' : '0%';
-
     const now = new Date();
     const curYearMonth = selectedMonth !== 'ALL' ? selectedMonth : (now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
     const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
@@ -571,32 +571,41 @@ function updateTurnoverPieChart(rebuildFilter = true) {
 
     let curMonthCount = 0;
     allRecords.forEach(item => {
-        const tgl = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
-        if (tgl === curYearMonth) {
-            curMonthCount++;
+        const statusStr = String(item.alasan || item.alasanDetail || item.alasan_detail || item.keterangan || '').trim().toLowerCase();
+        if (statusStr.includes('resign') || statusStr.includes('indisipliner') || statusStr.includes('indisiplin')) {
+            const tgl = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
+            if (tgl === curYearMonth) {
+                curMonthCount++;
+            }
         }
     });
 
     const lulusRateEl = document.getElementById('stat-turnover-lulus-rate');
-    if (lulusRateEl) lulusRateEl.innerText = lulusRate;
+    if (lulusRateEl) lulusRateEl.innerText = totalTurnoverCases + ' Siswa';
 
     const evalRateEl = document.getElementById('stat-turnover-eval-rate');
     if (evalRateEl) evalRateEl.innerText = evalRate;
 
     const curMonthCountEl = document.getElementById('stat-turnover-month-count');
-    if (curMonthCountEl) curMonthCountEl.innerText = (selectedMonth !== 'ALL' ? totalTurnover : curMonthCount) + ' Siswa';
+    if (curMonthCountEl) curMonthCountEl.innerText = (selectedMonth !== 'ALL' ? totalTurnoverCases : curMonthCount) + ' Siswa';
 
     const curMonthLabelEl = document.getElementById('stat-turnover-month-label');
     if (curMonthLabelEl) curMonthLabelEl.innerText = curMonthLabel;
 
+    // Donut chart merepresentasikan komponen Turnover terhadap basis total siswa saat ini
+    const chartLabels = ['Resign Mandiri', 'Indisipliner', 'Siswa Bertahan / Aktif'];
+    const chartData = [resignCount, indisiplinerCount, sisaBertahan];
+    const chartColors = ['#F59E0B', '#F43F5E', '#10B981'];
+    const chartHoverColors = ['#D97706', '#E11D48', '#059669'];
+
     turnoverPieChartInstance = new Chart(chartCtx, {
         type: 'doughnut',
         data: {
-            labels: ['Lulus Magang', 'Resign Mandiri', 'Indisipliner'],
+            labels: chartLabels,
             datasets: [{
-                data: [lulusCount, resignCount, indisiplinerCount],
-                backgroundColor: ['#10B981', '#F59E0B', '#F43F5E'],
-                hoverBackgroundColor: ['#059669', '#D97706', '#E11D48'],
+                data: chartData,
+                backgroundColor: chartColors,
+                hoverBackgroundColor: chartHoverColors,
                 borderWidth: 0,
                 spacing: 5,
                 borderRadius: 6,
@@ -628,9 +637,8 @@ function updateTurnoverPieChart(rebuildFilter = true) {
                     callbacks: {
                         label: function(context) {
                             const val = context.raw || 0;
-                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
-                            const pct = total > 0 ? Math.round((val / total) * 100) : 0;
-                            return ` ${val} Siswa (${pct}%)`;
+                            const pct = totalSiswaTerkini > 0 ? Math.round((val / totalSiswaTerkini) * 100) : 0;
+                            return ` ${val} Siswa (${pct}% dari siswa aktif)`;
                         }
                     }
                 },

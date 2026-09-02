@@ -261,28 +261,13 @@
                     <canvas id="dashboardTurnoverPieChart"></canvas>
                     <!-- Clean Floating Center Typography -->
                     <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none text-center">
-                        <span id="dashboard-turnover-total-center" class="text-3xl font-display font-black text-slate-800 leading-none tracking-tight">0</span>
-                        <span class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Total Keluar</span>
+                        <span id="dashboard-turnover-total-center" class="text-3xl font-display font-black text-slate-800 leading-none tracking-tight">0%</span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-widest text-slate-400 mt-1">Rasio Turnover</span>
                     </div>
                 </div>
 
                 <!-- Right Legend Cards -->
                 <div class="w-full sm:w-[50%] flex flex-col gap-2">
-                    <!-- Lulus -->
-                    <div class="p-2.5 rounded-xl bg-emerald-50/70 border border-emerald-100/80 flex items-center justify-between transition-all hover:bg-emerald-50">
-                        <div class="flex items-center gap-2">
-                            <span class="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-xs"></span>
-                            <div>
-                                <p class="text-xs font-bold text-emerald-950 leading-tight">Lulus Magang</p>
-                                <p class="text-[9px] text-emerald-600/90 font-medium leading-none mt-0.5">Selesai Program</p>
-                            </div>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-xs font-extrabold text-emerald-700 font-mono" id="stat-turnover-lulus-val">0 Siswa</span>
-                            <span class="text-[10px] text-emerald-600 font-bold block" id="stat-turnover-lulus-pct">0%</span>
-                        </div>
-                    </div>
-
                     <!-- Resign -->
                     <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-100/80 flex items-center justify-between transition-all hover:bg-amber-50">
                         <div class="flex items-center gap-2">
@@ -312,19 +297,34 @@
                             <span class="text-[10px] text-rose-600 font-bold block" id="stat-turnover-indis-pct">0%</span>
                         </div>
                     </div>
+
+                    <!-- Siswa Aktif Terkini -->
+                    <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100/80 flex items-center justify-between transition-all hover:bg-blue-50">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs"></span>
+                            <div>
+                                <p class="text-xs font-bold text-blue-950 leading-tight">Siswa Aktif Terkini</p>
+                                <p class="text-[9px] text-blue-600/90 font-medium leading-none mt-0.5">Basis Populasi</p>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-extrabold text-blue-700 font-mono" id="stat-turnover-lulus-val">0 Siswa</span>
+                            <span class="text-[10px] text-blue-600 font-bold block" id="stat-turnover-lulus-pct">Basis 100%</span>
+                        </div>
+                    </div>
                 </div>
             </div>
 
             <!-- Mini Metrics Row (Pengisi Space Bawah) -->
             <div class="pt-3.5 mt-3.5 border-t border-slate-100 grid grid-cols-3 gap-2">
-                <!-- Mini Metric 1: Rasio Kelulusan -->
-                <div class="bg-emerald-50/70 border border-emerald-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-emerald-50">
-                    <div class="flex items-center gap-1.5 text-emerald-700">
-                        <span class="p-1 rounded-md bg-emerald-100/80 text-[10px]"><i class="fa-solid fa-graduation-cap"></i></span>
-                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-emerald-800 truncate">Rasio Lulus</span>
+                <!-- Mini Metric 1: Total Kasus Turnover -->
+                <div class="bg-amber-50/70 border border-amber-100/80 rounded-2xl p-2.5 flex flex-col justify-between transition-all hover:bg-amber-50">
+                    <div class="flex items-center gap-1.5 text-amber-700">
+                        <span class="p-1 rounded-md bg-amber-100/80 text-[10px]"><i class="fa-solid fa-person-walking-arrow-right"></i></span>
+                        <span class="text-[9px] font-extrabold uppercase tracking-wider text-amber-800 truncate">Total Kasus</span>
                     </div>
-                    <p id="stat-turnover-lulus-rate" class="text-base sm:text-lg font-black text-emerald-700 mt-2">0%</p>
-                    <span class="text-[8px] font-bold text-emerald-600/90 mt-0.5 truncate">Total Siswa Lulus</span>
+                    <p id="stat-turnover-lulus-rate" class="text-base sm:text-lg font-black text-amber-700 mt-2">0 Siswa</p>
+                    <span class="text-[8px] font-bold text-amber-600/90 mt-0.5 truncate">Resign + Indisiplin</span>
                 </div>
 
                 <!-- Mini Metric 2: Rasio Turnover -->
@@ -334,7 +334,7 @@
                         <span class="text-[9px] font-extrabold uppercase tracking-wider text-rose-800 truncate">Rasio Turnover</span>
                     </div>
                     <p id="stat-turnover-eval-rate" class="text-base sm:text-lg font-black text-rose-700 mt-2">0%</p>
-                    <span class="text-[8px] font-bold text-rose-600/90 mt-0.5 truncate">Resign & Indisiplin</span>
+                    <span class="text-[8px] font-bold text-rose-600/90 mt-0.5 truncate">(Resign + Indis) / Siswa</span>
                 </div>
 
                 <!-- Mini Metric 3: Turnover Bulan Ini -->
