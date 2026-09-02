@@ -4,11 +4,11 @@ function populateTurnoverCitiesDropdown() {
     if (!select) return;
     
     const currentSelected = select.value;
-    select.innerHTML = '<option value="">Semua Kota (Jawa Timur)</option>';
+    select.innerHTML = '<option value="">Semua Wilayah (Jawa Timur)</option>';
     
     const filteredSet = new Set();
 
-    // Tambahkan HANYA kota yang ada di data turnover siswa
+    // Tambahkan HANYA kota/wilayah yang ada di data turnover siswa
     const currentTurnoverDataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
     currentTurnoverDataset.forEach(s => {
         const rawCity = s.wilayah || s.asalDaerah || s.asal || s.Kota;
@@ -38,11 +38,14 @@ function populateTurnoverCitiesDropdown() {
 
 function normalizeCityName(name) {
     if (!name) return "";
-    let norm = name.toUpperCase()
-                   .replace("KABUPATEN ", "")
-                   .replace("KOTA ", "")
-                   .replace("KAB. ", "")
-                   .replace("KOT. ", "")
+    let norm = String(name).toUpperCase()
+                   .replace(/KABUPATEN\s+/gi, "")
+                   .replace(/KOTA\s+/gi, "")
+                   .replace(/KAB\.\s*/gi, "")
+                   .replace(/KOT\.\s*/gi, "")
+                   .replace(/KAB\s+/gi, "")
+                   .replace(/KOT\s+/gi, "")
+                   .replace(/ADM\.\s*/gi, "")
                    .trim();
     if (norm === "GRSIK" || norm === "GRSK" || norm === "GRESK") norm = "GRESIK";
     if (norm === "SBY") norm = "SURABAYA";
@@ -257,7 +260,7 @@ function initTurnoverMap(filteredData) {
 
     function onEachFeature(feature, layer) {
         const geoCityName = normalizeCityName(feature.properties.name || feature.properties.KABKOT || feature.properties.NAME_2);
-        const displayName = feature.properties.name || feature.properties.KABKOT || geoCityName;
+        const displayName = geoCityName;
         const stat = cityStats[geoCityName];
 
         let hasData = false;
