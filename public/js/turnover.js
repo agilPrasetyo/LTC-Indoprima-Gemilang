@@ -98,7 +98,7 @@ function renderSimplifiedFallbackMap(filteredData, cityStats) {
 
         let popupContent = `<div class="p-2 font-sans">
             <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${cityName}</h4>
-            <p class="text-xs text-slate-600 mt-2">Total Kasus: <b>${totalCases} Siswa</b></p>
+            <p class="text-xs text-slate-600 mt-2">Total Siswa: <b>${totalCases} Siswa</b></p>
             <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-medium">
                 <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
                 <p class="text-amber-600 font-semibold">● Resign Kerja: ${stat.resign} orang</p>
@@ -116,12 +116,12 @@ function renderSimplifiedFallbackMap(filteredData, cityStats) {
     const filterWilInput = document.getElementById('filter-turnover-wilayah');
     const activeCityFilter = filterWilInput ? normalizeCityName(filterWilInput.value) : "";
     if (activeCityFilter && coordsJawa[activeCityFilter]) {
-        mapTurnoverInstance.flyTo(coordsJawa[activeCityFilter], 11, { animate: true, duration: 1.2 });
+        mapTurnoverInstance.flyTo(coordsJawa[activeCityFilter], 11, { animate: true, duration: 0.8 });
         const targetMarker = window.turnoverMarkers[activeCityFilter];
         if (targetMarker) {
             setTimeout(() => {
                 targetMarker.openPopup();
-            }, 1300);
+            }, 600);
         }
     } else {
         mapTurnoverInstance.setView([-7.7, 112.5], 8);
@@ -312,7 +312,7 @@ function initTurnoverMap(filteredData) {
 
             popupContent += `
                 <div class="my-2">${zoneBadge}</div>
-                <p class="text-xs text-slate-600 font-semibold">Total Siswa Terdata: <b>${totalCases} Orang</b></p>
+                <p class="text-xs text-slate-600 font-semibold">Total Siswa: <b>${totalCases} Siswa</b></p>
                 <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-medium">
                     <p class="text-emerald-600 font-bold flex justify-between"><span>● Lulus Sukses:</span> <span>${stat.lulus} orang</span></p>
                     <p class="text-amber-600 font-bold flex justify-between"><span>● Resign Mandiri:</span> <span>${stat.resign} orang</span></p>
@@ -383,10 +383,10 @@ function initTurnoverMap(filteredData) {
                 });
             }
 
-            if (matchedLayer) {
-                mapTurnoverInstance.fitBounds(matchedLayer.getBounds(), { padding: [40, 40], animate: true, duration: 1.0 });
-            } else if (coord) {
-                mapTurnoverInstance.flyTo(coord, 11, { animate: true, duration: 1.0 });
+            if (coord) {
+                mapTurnoverInstance.flyTo(coord, 11, { animate: true, duration: 0.8 });
+            } else if (matchedLayer) {
+                mapTurnoverInstance.fitBounds(matchedLayer.getBounds(), { padding: [30, 30], animate: true, duration: 0.8 });
             }
 
             setTimeout(() => {
@@ -394,9 +394,9 @@ function initTurnoverMap(filteredData) {
                 if (targetMarker) {
                     targetMarker.openPopup();
                 } else if (matchedLayer) {
-                    matchedLayer.openPopup();
+                    matchedLayer.openPopup(coord || matchedLayer.getBounds().getCenter());
                 }
-            }, 600);
+            }, 500);
         } else {
             mapTurnoverInstance.setView([-7.7, 112.5], 8);
             mapTurnoverInstance.closePopup();
@@ -442,7 +442,7 @@ function draw3DSilverPinsOnMap(geojson, cityStats) {
             const totalCases = stat.resign + stat.lulus + stat.indisipliner;
             let popupContent = `<div class="p-2 font-sans">
                 <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${normCity}</h4>
-                <p class="text-xs text-slate-600 mt-2">Total Kasus: <b>${totalCases} Siswa</b></p>
+                <p class="text-xs text-slate-600 mt-2">Total Siswa: <b>${totalCases} Siswa</b></p>
                 <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-semibold">
                     <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
                     <p class="text-amber-600 font-semibold">● Resign Kerja: ${stat.resign} orang</p>
