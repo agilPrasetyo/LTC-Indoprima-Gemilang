@@ -97,7 +97,7 @@ function renderSimplifiedFallbackMap(filteredData, cityStats) {
         const marker = L.marker(coord, { icon: coloredPinIcon }).addTo(window.fallbackLayerGroup);
 
         let popupContent = `<div class="p-2 font-sans">
-            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${cityName}</h4>
+            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1 tracking-wide">${cityName}</h4>
             <p class="text-xs text-slate-600 mt-2">Total Siswa: <b>${totalCases} Siswa</b></p>
             <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-medium">
                 <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
@@ -296,24 +296,13 @@ function initTurnoverMap(filteredData) {
         }
 
         let popupContent = `<div class="p-2.5 font-sans">
-            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1.5 flex items-center gap-1.5">
-                <span>📍</span> <span>${displayName}</span>
-            </h4>`;
+            <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1.5 tracking-wide">${displayName}</h4>`;
         
         if (hasData) {
             const totalCases = stat.resign + stat.lulus + stat.indisipliner;
-            const totalNeg = stat.resign + stat.indisipliner;
-            const totalPos = stat.lulus;
-            
-            let zoneBadge = '';
-            if (totalNeg > totalPos) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-rose-700 bg-rose-100 border border-rose-200 rounded-md">🔴 TURNOVER TINGGI (EVALUASI)</span>';
-            else if (totalPos > totalNeg) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-emerald-700 bg-emerald-100 border border-emerald-200 rounded-md">🟢 KELULUSAN TINGGI (SUKSES)</span>';
-            else if (totalPos === totalNeg) zoneBadge = '<span class="px-2.5 py-0.5 text-[9px] font-extrabold text-amber-700 bg-amber-100 border border-amber-200 rounded-md">🟡 ZONA SEIMBANG</span>';
-
             popupContent += `
-                <div class="my-2">${zoneBadge}</div>
-                <p class="text-xs text-slate-600 font-semibold">Total Siswa: <b>${totalCases} Siswa</b></p>
-                <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-medium">
+                <p class="text-xs text-slate-600 font-bold mt-2">Total Siswa: <b class="text-slate-900">${totalCases} Siswa</b></p>
+                <div class="mt-2 text-[11px] space-y-1.5 bg-slate-50 p-2.5 rounded-lg border font-medium">
                     <p class="text-emerald-600 font-bold flex justify-between"><span>● Lulus Sukses:</span> <span>${stat.lulus} orang</span></p>
                     <p class="text-amber-600 font-bold flex justify-between"><span>● Resign Mandiri:</span> <span>${stat.resign} orang</span></p>
                     <p class="text-rose-600 font-bold flex justify-between"><span>● Indisipliner:</span> <span>${stat.indisipliner} orang</span></p>
@@ -321,8 +310,7 @@ function initTurnoverMap(filteredData) {
             `;
         } else {
             popupContent += `
-                <div class="my-2"><span class="px-2 py-0.5 text-[9px] font-bold text-slate-500 bg-slate-100 border border-slate-200 rounded">BELUM ADA DATA SISWA</span></div>
-                <p class="text-xs text-slate-500 mt-1">Belum ada siswa magang yang tercatat dari wilayah ini.</p>
+                <p class="text-xs text-slate-500 mt-2">Belum ada siswa magang yang tercatat dari wilayah ini.</p>
             `;
         }
         popupContent += `</div>`;
@@ -441,7 +429,7 @@ function draw3DSilverPinsOnMap(geojson, cityStats) {
 
             const totalCases = stat.resign + stat.lulus + stat.indisipliner;
             let popupContent = `<div class="p-2 font-sans">
-                <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1">📍 ${normCity}</h4>
+                <h4 class="font-extrabold text-sm text-slate-800 border-b pb-1 tracking-wide">${normCity}</h4>
                 <p class="text-xs text-slate-600 mt-2">Total Siswa: <b>${totalCases} Siswa</b></p>
                 <div class="mt-2 text-[11px] space-y-1 bg-slate-50 p-2 rounded-lg border font-semibold">
                     <p class="text-emerald-600 font-semibold">● Lulus Sukses: ${stat.lulus} orang</p>
