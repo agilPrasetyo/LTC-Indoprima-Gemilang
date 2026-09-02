@@ -544,9 +544,18 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     const totalCenterEl = document.getElementById('dashboard-turnover-total-center');
     if (totalCenterEl) totalCenterEl.innerText = totalTurnover;
 
+    // Jumlah Siswa Terkini (Jumlah Siswa Aktif Terkini di Dashboard / Manajemen Siswa)
+    const totalSiswaTerkini = (typeof activeData !== 'undefined' && Array.isArray(activeData) && activeData.length > 0)
+        ? activeData.length
+        : ((window.rawSiswaData && window.rawSiswaData.length > 0)
+            ? window.rawSiswaData.filter(s => String(s.status || '').toUpperCase() === 'AKTIF').length
+            : 29);
+
     // Calculate 3 Mini Metrics for Turnover Card
-    const lulusRate = totalTurnover > 0 ? Math.round((lulusCount / totalTurnover) * 100) + '%' : '0%';
-    const evalRate = totalTurnover > 0 ? Math.round(((resignCount + indisiplinerCount) / totalTurnover) * 100) + '%' : '0%';
+    // Rasio Lulus = (Lulus / Jumlah Siswa Terkini) * 100%
+    const lulusRate = totalSiswaTerkini > 0 ? Math.round((lulusCount / totalSiswaTerkini) * 100) + '%' : '0%';
+    // Rasio Turnover = Total (Resign + Indisipliner) / Jumlah Siswa Terkini * 100%
+    const evalRate = totalSiswaTerkini > 0 ? Math.round(((resignCount + indisiplinerCount) / totalSiswaTerkini) * 100) + '%' : '0%';
 
     const now = new Date();
     const curYearMonth = selectedMonth !== 'ALL' ? selectedMonth : (now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0'));
