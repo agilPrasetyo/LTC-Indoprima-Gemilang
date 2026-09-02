@@ -444,14 +444,12 @@ function populateDashTurnoverMonthFilter(records) {
     const filterEl = document.getElementById('dash-turnover-month-filter');
     if (!filterEl) return;
 
-    const currentVal = filterEl.value || 'ALL';
+    const now = new Date();
+    const curYm = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const currentVal = filterEl.value && filterEl.value !== 'ALL' ? filterEl.value : curYm;
     const monthNamesIndo = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
 
     const monthsSet = new Set();
-    
-    // Pastikan bulan berjalan saat ini (September 2026 dll) selalu ada di daftar filter
-    const now = new Date();
-    const curYm = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
     monthsSet.add(curYm);
 
     (records || []).forEach(item => {
@@ -466,7 +464,7 @@ function populateDashTurnoverMonthFilter(records) {
 
     const sortedMonths = Array.from(monthsSet).sort().reverse();
 
-    let html = '<option value="ALL">Semua Bulan</option>';
+    let html = '';
     sortedMonths.forEach(ym => {
         const [y, m] = ym.split('-');
         const mIdx = parseInt(m, 10) - 1;
@@ -475,8 +473,10 @@ function populateDashTurnoverMonthFilter(records) {
     });
 
     filterEl.innerHTML = html;
-    if (monthsSet.has(currentVal) || currentVal === 'ALL') {
+    if (monthsSet.has(currentVal)) {
         filterEl.value = currentVal;
+    } else {
+        filterEl.value = curYm;
     }
 }
 
@@ -498,15 +498,14 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     }
 
     const filterEl = document.getElementById('dash-turnover-month-filter');
-    const selectedMonth = filterEl ? filterEl.value : 'ALL';
+    const now = new Date();
+    const curYm = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0');
+    const selectedMonth = (filterEl && filterEl.value && filterEl.value !== 'ALL') ? filterEl.value : curYm;
 
-    let records = allRecords;
-    if (selectedMonth && selectedMonth !== 'ALL') {
-        records = allRecords.filter(item => {
-            const ym = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
-            return ym === selectedMonth;
-        });
-    }
+    let records = allRecords.filter(item => {
+        const ym = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').substring(0, 7);
+        return ym === selectedMonth;
+    });
 
     let resignCount = 0;
     let lulusCount = 0;
@@ -599,7 +598,7 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     if (curMonthLabelEl) curMonthLabelEl.innerText = curMonthLabel;
 
     // Donut chart merepresentasikan komponen Turnover terhadap basis total siswa saat ini
-    const chartLabels = ['Resign Mandiri', 'Indisipliner', 'Siswa Bertahan / Aktif'];
+    const chartLabels = ['Resign', 'Indisipliner', 'Siswa Bertahan / Aktif'];
     const chartData = [resignCount, indisiplinerCount, sisaBertahan];
     const chartColors = ['#F59E0B', '#F43F5E', '#10B981'];
     const chartHoverColors = ['#D97706', '#E11D48', '#059669'];

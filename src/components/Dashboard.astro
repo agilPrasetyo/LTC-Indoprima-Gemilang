@@ -248,7 +248,6 @@
                 <div class="flex items-center gap-2">
                     <select id="dash-turnover-month-filter" onchange="onDashTurnoverMonthChanged()"
                         class="px-2.5 py-1 bg-slate-50 border border-slate-200 rounded-xl text-[11px] font-bold text-brand-textMain outline-none focus:border-brand-blue transition-all cursor-pointer">
-                        <option value="ALL">Semua Bulan</option>
                         <option value="2026-09">September 2026</option>
                     </select>
                     <span class="px-3 py-1 bg-slate-100 text-slate-700 rounded-full text-[11px] font-bold font-mono" id="stat-turnover-total-badge">0 Siswa</span>
@@ -273,14 +272,10 @@
                     <div class="p-2.5 rounded-xl bg-amber-50/70 border border-amber-100/80 flex items-center justify-between transition-all hover:bg-amber-50">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs"></span>
-                            <div>
-                                <p class="text-xs font-bold text-amber-950 leading-tight">Resign Mandiri</p>
-                                <p class="text-[9px] text-amber-600/90 font-medium leading-none mt-0.5">Alasan Pribadi</p>
-                            </div>
+                            <p class="text-xs font-bold text-amber-950 leading-tight">Resign</p>
                         </div>
                         <div class="text-right">
                             <span class="text-xs font-extrabold text-amber-700 font-mono" id="stat-turnover-resign-val">0 Siswa</span>
-                            <span class="text-[10px] text-amber-600 font-bold block" id="stat-turnover-resign-pct">0%</span>
                         </div>
                     </div>
 
@@ -288,29 +283,21 @@
                     <div class="p-2.5 rounded-xl bg-rose-50/70 border border-rose-100/80 flex items-center justify-between transition-all hover:bg-rose-50">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs"></span>
-                            <div>
-                                <p class="text-xs font-bold text-rose-950 leading-tight">Indisipliner</p>
-                                <p class="text-[9px] text-rose-600/90 font-medium leading-none mt-0.5">Evaluasi Ketertiban</p>
-                            </div>
+                            <p class="text-xs font-bold text-rose-950 leading-tight">Indisipliner</p>
                         </div>
                         <div class="text-right">
                             <span class="text-xs font-extrabold text-rose-700 font-mono" id="stat-turnover-indisipliner-val">0 Siswa</span>
-                            <span class="text-[10px] text-rose-600 font-bold block" id="stat-turnover-indis-pct">0%</span>
                         </div>
                     </div>
 
-                    <!-- Siswa Aktif Terkini -->
+                    <!-- Siswa Aktif -->
                     <div class="p-2.5 rounded-xl bg-blue-50/70 border border-blue-100/80 flex items-center justify-between transition-all hover:bg-blue-50">
                         <div class="flex items-center gap-2">
                             <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs"></span>
-                            <div>
-                                <p class="text-xs font-bold text-blue-950 leading-tight">Siswa Aktif Terkini</p>
-                                <p class="text-[9px] text-blue-600/90 font-medium leading-none mt-0.5">Basis Populasi</p>
-                            </div>
+                            <p class="text-xs font-bold text-blue-950 leading-tight">Siswa Aktif</p>
                         </div>
                         <div class="text-right">
                             <span class="text-xs font-extrabold text-blue-700 font-mono" id="stat-turnover-lulus-val">0 Siswa</span>
-                            <span class="text-[10px] text-blue-600 font-bold block" id="stat-turnover-lulus-pct">Basis 100%</span>
                         </div>
                     </div>
                 </div>
@@ -325,7 +312,6 @@
                         <span class="text-[9px] font-extrabold uppercase tracking-wider text-amber-800 truncate">Total Kasus</span>
                     </div>
                     <p id="stat-turnover-lulus-rate" class="text-base sm:text-lg font-black text-amber-700 mt-2">0 Siswa</p>
-                    <span class="text-[8px] font-bold text-amber-600/90 mt-0.5 truncate">Resign + Indisiplin</span>
                 </div>
 
                 <!-- Mini Metric 2: Rasio Turnover -->
@@ -335,7 +321,6 @@
                         <span class="text-[9px] font-extrabold uppercase tracking-wider text-rose-800 truncate">Rasio Turnover</span>
                     </div>
                     <p id="stat-turnover-eval-rate" class="text-base sm:text-lg font-black text-rose-700 mt-2">0%</p>
-                    <span class="text-[8px] font-bold text-rose-600/90 mt-0.5 truncate">(Resign + Indis) / Siswa</span>
                 </div>
 
                 <!-- Mini Metric 3: Turnover Bulan Ini -->
@@ -424,19 +409,19 @@
                     </tr>
                     <tr>
                         <td class="py-2 px-3 text-left text-slate-500 font-bold bg-slate-50/50">Uang Saku</td>
-                        <td class="py-2 px-2">2.25M</td>
-                        <td class="py-2 px-2">2.35M</td>
-                        <td class="py-2 px-2">2.50M</td>
-                        <td class="py-2 px-2">2.70M</td>
-                        <td class="py-2 px-2">2.95M</td>
+                        <td class="py-2 px-2">2.250.000</td>
+                        <td class="py-2 px-2">2.350.000</td>
+                        <td class="py-2 px-2">2.500.000</td>
+                        <td class="py-2 px-2">2.700.000</td>
+                        <td class="py-2 px-2">2.950.000</td>
                     </tr>
                     <tr class="bg-blue-50/30 font-bold">
                         <td class="py-2 px-3 text-left text-brand-blue font-extrabold">Total Biaya</td>
-                        <td class="py-2 px-2 text-brand-blue">3.00M</td>
-                        <td class="py-2 px-2 text-brand-blue">3.10M</td>
-                        <td class="py-2 px-2 text-brand-blue">3.25M</td>
-                        <td class="py-2 px-2 text-brand-blue">3.45M</td>
-                        <td class="py-2 px-2 text-brand-blue">3.70M</td>
+                        <td class="py-2 px-2 text-brand-blue">3.000.000</td>
+                        <td class="py-2 px-2 text-brand-blue">3.100.000</td>
+                        <td class="py-2 px-2 text-brand-blue">3.250.000</td>
+                        <td class="py-2 px-2 text-brand-blue">3.450.000</td>
+                        <td class="py-2 px-2 text-brand-blue">3.700.000</td>
                     </tr>
                 </tbody>
             </table>
