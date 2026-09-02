@@ -144,12 +144,14 @@ function initTurnoverMap(filteredData) {
         }, 100);
     }
 
-    let tileUrl = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png';
-    let tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>';
+    let tileUrl = 'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+    let tileAttribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
     if (activeThematicTheme === 'dark') {
-        tileUrl = 'https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png';
+        tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Dark_Gray_Base/MapServer/tile/{z}/{y}/{x}';
+        tileAttribution = '&copy; Esri, DeLorme, NAVTEQ';
     } else if (activeThematicTheme === 'satellite') {
         tileUrl = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}';
+        tileAttribution = '&copy; Esri &mdash; Maxar, Earthstar Geographics';
     }
 
     mapTurnoverInstance.eachLayer(layer => {
@@ -158,9 +160,8 @@ function initTurnoverMap(filteredData) {
         }
     });
     L.tileLayer(tileUrl, {
-        maxZoom: 18,
-        attribution: tileAttribution,
-        subdomains: 'abcd'
+        maxZoom: 19,
+        attribution: tileAttribution
     }).addTo(mapTurnoverInstance);
 
     const currentTurnoverDataset = rawTurnoverData.length > 0 ? rawTurnoverData : fallbackStats.turnover;
