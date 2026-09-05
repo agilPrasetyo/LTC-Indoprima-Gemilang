@@ -612,9 +612,9 @@
                 <!-- 11. SPV -->
                 <td class="py-3 px-4 min-w-[150px] text-brand-textSub">${s.spv || '-'}</td>
                 <!-- 12. Daerah Asal -->
-                <td class="py-3 px-4 min-w-[120px] text-brand-textSub">${s.daerahAsal || s.asalDaerah || '-'}</td>
+                <td class="py-3 px-4 min-w-[120px] text-brand-textSub">${s.daerahAsal || s.asalDaerah || s.asal || s.asal_daerah || '-'}</td>
                 <!-- 13. Sekolah -->
-                <td class="py-3 px-4 min-w-[150px] text-brand-textSub">${s.asalSekolah || '-'}</td>
+                <td class="py-3 px-4 min-w-[150px] text-brand-textSub">${s.asalSekolah || s.sekolah || s.asal_sekolah || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
@@ -681,6 +681,169 @@
         sekolahSelect.value = currentSekolah;
     }
 
+    // ============================================================
+    // UTILITY: Pas Foto 3x4 Siswa (Auto Crop & Compress <= 25 KB)
+    // ============================================================
+    function resetStudentPhotoModal() {
+        const preview = document.getElementById('student-modal-foto-preview');
+        const placeholder = document.getElementById('student-modal-foto-placeholder');
+        const sizeBadge = document.getElementById('student-modal-foto-size');
+        const removeBtn = document.getElementById('student-modal-foto-remove-btn');
+        const fileInput = document.getElementById('student-modal-foto-file');
+        const base64Input = document.getElementById('student-modal-foto-base64');
+        const actionInput = document.getElementById('student-modal-foto-action');
+
+        if (preview) { preview.src = ''; preview.classList.add('hidden'); }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (sizeBadge) { sizeBadge.textContent = ''; sizeBadge.classList.add('hidden'); }
+        if (removeBtn) removeBtn.classList.add('hidden');
+        if (fileInput) fileInput.value = '';
+        if (base64Input) base64Input.value = '';
+        if (actionInput) actionInput.value = 'none';
+    }
+
+    function loadStudentPhotoInModal(noreg) {
+        resetStudentPhotoModal();
+        if (!noreg) return;
+
+        const preview = document.getElementById('student-modal-foto-preview');
+        const placeholder = document.getElementById('student-modal-foto-placeholder');
+        const removeBtn = document.getElementById('student-modal-foto-remove-btn');
+        const actionInput = document.getElementById('student-modal-foto-action');
+
+        const baseUrl = (typeof window !== 'undefined' && window.PUBLIC_SUPABASE_URL) ? window.PUBLIC_SUPABASE_URL : 'https://xpoddtzxsopwzojycmwx.supabase.co';
+        const photoUrl = `${baseUrl}/storage/v1/object/public/foto-siswa/${encodeURIComponent(noreg)}.jpg?t=${Date.now()}`;
+
+        const testImg = new Image();
+        testImg.onload = function() {
+            if (preview) {
+                preview.src = photoUrl;
+                preview.classList.remove('hidden');
+            }
+            if (placeholder) placeholder.classList.add('hidden');
+            if (removeBtn) removeBtn.classList.remove('hidden');
+            if (actionInput) actionInput.value = 'none';
+        };
+        testImg.onerror = function() {
+            if (preview) {
+                preview.src = '';
+                preview.classList.add('hidden');
+            }
+            if (placeholder) placeholder.classList.remove('hidden');
+            if (removeBtn) removeBtn.classList.add('hidden');
+            if (actionInput) actionInput.value = 'none';
+        };
+        testImg.src = photoUrl;
+    }
+
+    function clearStudentPhotoSelection() {
+        resetStudentPhotoModal();
+        const actionInput = document.getElementById('student-modal-foto-action');
+        if (actionInput) actionInput.value = 'delete';
+    }
+
+    function handleStudentPhotoSelected(event) {
+        const file = event.target?.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Pilih file gambar valid (JPG, PNG, WEBP).', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const result = cropAndCompressImageTo3x4(img, 300, 400, 25600);
+                
+                const preview = document.getElementById('student-modal-foto-preview');
+                const placeholder = document.getElementById('student-modal-foto-placeholder');
+                const sizeBadge = document.getElementById('student-modal-foto-size');
+                const removeBtn = document.getElementById('student-modal-foto-remove-btn');
+                const base64Input = document.getElementById('student-modal-foto-base64');
+                const actionInput = document.getElementById('student-modal-foto-action');
+
+                if (preview) {
+                    preview.src = result.dataUrl;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+                if (sizeBadge) {
+                    const kb = (result.sizeInBytes / 1024).toFixed(1);
+                    sizeBadge.textContent = `${kb} KB / 25 KB`;
+                    sizeBadge.className = "text-[10px] font-mono font-bold text-emerald-600";
+                    sizeBadge.classList.remove('hidden');
+                }
+                if (removeBtn) removeBtn.classList.remove('hidden');
+                if (base64Input) base64Input.value = result.dataUrl;
+                if (actionInput) actionInput.value = 'update';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    function cropAndCompressImageTo3x4(img, targetWidth = 300, targetHeight = 400, maxBytes = 25600) {
+        const canvas = document.createElement('canvas');
+        canvas.width = targetWidth;
+        canvas.height = targetHeight;
+        const ctx = canvas.getContext('2d');
+
+        const imgAspect = img.width / img.height;
+        const targetAspect = targetWidth / targetHeight; // 0.75
+        let sx = 0, sy = 0, sWidth = img.width, sHeight = img.height;
+
+        if (imgAspect > targetAspect) {
+            sHeight = img.height;
+            sWidth = img.height * targetAspect;
+            sx = (img.width - sWidth) / 2;
+            sy = 0;
+        } else {
+            sWidth = img.width;
+            sHeight = img.width / targetAspect;
+            sx = 0;
+            sy = (img.height - sHeight) / 2;
+        }
+
+        ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, targetWidth, targetHeight);
+
+        let quality = 0.85;
+        let dataUrl = canvas.toDataURL('image/jpeg', quality);
+        let base64Part = dataUrl.split(',')[1] || '';
+        let sizeInBytes = Math.round((base64Part.length * 3) / 4);
+
+        while (sizeInBytes > maxBytes && quality > 0.15) {
+            quality -= 0.05;
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+            base64Part = dataUrl.split(',')[1] || '';
+            sizeInBytes = Math.round((base64Part.length * 3) / 4);
+        }
+
+        if (sizeInBytes > maxBytes) {
+            canvas.width = 240;
+            canvas.height = 320;
+            ctx.drawImage(img, sx, sy, sWidth, sHeight, 0, 0, 240, 320);
+            quality = 0.75;
+            dataUrl = canvas.toDataURL('image/jpeg', quality);
+            base64Part = dataUrl.split(',')[1] || '';
+            sizeInBytes = Math.round((base64Part.length * 3) / 4);
+            while (sizeInBytes > maxBytes && quality > 0.15) {
+                quality -= 0.05;
+                dataUrl = canvas.toDataURL('image/jpeg', quality);
+                base64Part = dataUrl.split(',')[1] || '';
+                sizeInBytes = Math.round((base64Part.length * 3) / 4);
+            }
+        }
+
+        return { dataUrl, sizeInBytes };
+    }
+
+    if (typeof window !== 'undefined') {
+        window.handleStudentPhotoSelected = handleStudentPhotoSelected;
+        window.clearStudentPhotoSelection = clearStudentPhotoSelection;
+    }
+
     function openStudentModal(isEdit = false) {
         const modal = document.getElementById('student-form-modal');
         if (!modal) return;
@@ -692,6 +855,7 @@
         document.getElementById('student-modal-title').textContent = isEdit ? "Edit Informasi Siswa" : "Tambah Siswa Baru";
         
         if (!isEdit) {
+            resetStudentPhotoModal();
             document.getElementById('student-old-noreg').value = '';
             document.getElementById('student-noreg').value = '';
             document.getElementById('student-nama').value = '';
@@ -740,6 +904,7 @@
         if (!s) return;
         
         openStudentModal(true);
+        loadStudentPhotoInModal(s.id);
         
         document.getElementById('student-old-noreg').value = s.id;
         document.getElementById('student-noreg').value = s.id;
@@ -761,8 +926,8 @@
             spvSelect.value = spvVal;
         }
         
-        document.getElementById('student-asal-daerah').value = s.daerahAsal || s.asalDaerah || '';
-        document.getElementById('student-sekolah').value = s.asalSekolah || '';
+        document.getElementById('student-asal-daerah').value = s.daerahAsal || s.asalDaerah || s.asal || s.asal_daerah || '';
+        document.getElementById('student-sekolah').value = s.asalSekolah || s.sekolah || s.asal_sekolah || '';
         
         // Tanggal Masuk
         if (s.masuk) {
@@ -830,9 +995,35 @@
         const rpc = getRpcRunner();
         if (rpc) {
             rpc('saveSiswa', [payload])
-                .then(res => {
+                .then(async res => {
                     if (res && res.success !== false) {
-                        showToast('Data siswa berhasil disimpan!', 'success');
+                        // Proses Upload / Hapus Pas Foto Siswa jika ada perubahan
+                        const photoAction = document.getElementById('student-modal-foto-action')?.value;
+                        const photoBase64 = document.getElementById('student-modal-foto-base64')?.value;
+
+                        if (photoAction === 'update' && photoBase64) {
+                            try {
+                                const upRes = await rpc('uploadFotoSiswa', [{ noreg: noreg, photoBase64: photoBase64 }]);
+                                if (upRes && upRes.success === false) {
+                                    showToast('Siswa disimpan, tapi foto gagal: ' + (upRes.message || 'Error'), 'error');
+                                } else {
+                                    showToast('Data siswa & pas foto 3x4 berhasil disimpan!', 'success');
+                                }
+                            } catch (pErr) {
+                                console.warn('Gagal upload foto siswa:', pErr);
+                                showToast('Siswa disimpan, tapi gagal upload foto: ' + (pErr.message || pErr), 'error');
+                            }
+                        } else if (photoAction === 'delete') {
+                            try {
+                                await rpc('deleteFotoSiswa', [{ noreg: noreg }]);
+                                showToast('Data siswa disimpan & foto dihapus.', 'info');
+                            } catch (pErr) {
+                                console.warn('Gagal hapus foto siswa:', pErr);
+                            }
+                        } else {
+                            showToast('Data siswa berhasil disimpan!', 'success');
+                        }
+
                         closeStudentModal();
                         if (typeof loadDashboardData === 'function') loadDashboardData();
                         else renderAdminSiswaTable();
@@ -1005,6 +1196,8 @@
                 hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-blue-600 border border-blue-200">Sakit</span>';
             } else if (hadirUpper === 'ALPHA' || hadirUpper === 'ABSEN') {
                 hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-rose-50 text-rose-600 border border-rose-200">Alpha</span>';
+            } else if (hadirUpper === 'OFF' || hadirUpper === 'LIBUR') {
+                hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600 border border-slate-200">Off</span>';
             } else {
                 hadirBadge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">✔ Hadir</span>';
             }
@@ -1096,7 +1289,7 @@
         const hadir = document.getElementById('mp-modal-hadir')?.value;
         const prodGroup = document.getElementById('mp-modal-prod-group');
         if (!prodGroup) return;
-        if (hadir === 'Ijin' || hadir === 'Sakit' || hadir === 'Alpha') {
+        if (hadir === 'Ijin' || hadir === 'Sakit' || hadir === 'Alpha' || hadir === 'Off') {
             prodGroup.classList.add('opacity-40', 'pointer-events-none');
         } else {
             prodGroup.classList.remove('opacity-40', 'pointer-events-none');
@@ -1788,6 +1981,9 @@
             const p = rawPopulasiData.find(x => x.tanggal === tanggal || formatToYYYYMMDD(x.tanggal) === isoDate);
             if (p) {
                 document.getElementById('populasi-kontrak').value = p.kontrak;
+                if (document.getElementById('populasi-ltc')) {
+                    document.getElementById('populasi-ltc').value = p.ltc !== undefined ? p.ltc : (p.totalLtc || '');
+                }
                 document.getElementById('populasi-outsourcing').value = p.outsourcing;
                 document.getElementById('populasi-satpam-supir').value = p.satpamSupir;
                 const orderInput = document.getElementById('populasi-order');
@@ -1800,6 +1996,9 @@
                 tglInput.disabled = false;
             }
             document.getElementById('populasi-kontrak').value = '100';
+            if (document.getElementById('populasi-ltc')) {
+                document.getElementById('populasi-ltc').value = '';
+            }
             document.getElementById('populasi-outsourcing').value = '10';
             document.getElementById('populasi-satpam-supir').value = '5';
             const orderInput = document.getElementById('populasi-order');
@@ -1823,6 +2022,9 @@
         tanggal = formatToYYYYMMDD(tanggal);
 
         const kontrak = parseInt(document.getElementById('populasi-kontrak').value) || 0;
+        const ltcInput = document.getElementById('populasi-ltc');
+        const rawLtc = ltcInput ? parseInt(ltcInput.value) : NaN;
+        const ltc = isNaN(rawLtc) ? null : rawLtc;
         const outsourcing = parseInt(document.getElementById('populasi-outsourcing').value) || 0;
         const satpamSupir = parseInt(document.getElementById('populasi-satpam-supir').value) || 0;
         const rawOrder = document.getElementById('populasi-order') ? parseInt(document.getElementById('populasi-order').value) : NaN;
@@ -1833,7 +2035,7 @@
             return;
         }
 
-        const payload = { tanggal, kontrak, outsourcing, satpamSupir, order };
+        const payload = { tanggal, kontrak, ltc, totalLtc: ltc, outsourcing, satpamSupir, order };
 
         if (typeof google !== 'undefined') {
             google.script.run
@@ -1854,18 +2056,21 @@
             // Mode Pratinjau Lokal
             const idx = rawPopulasiData.findIndex(x => x.tanggal === tanggal || formatToYYYYMMDD(x.tanggal) === tanggal);
             if (idx !== -1) {
+                const finalLtc = ltc !== null ? ltc : rawPopulasiData[idx].ltc;
                 rawPopulasiData[idx] = { 
                     ...rawPopulasiData[idx], 
                     kontrak, 
+                    ltc: finalLtc,
+                    totalLtc: finalLtc,
                     outsourcing, 
                     satpamSupir,
                     order,
-                    totalKaryawan: kontrak + rawPopulasiData[idx].ltc + outsourcing + satpamSupir
+                    totalKaryawan: kontrak + finalLtc + outsourcing + satpamSupir
                 };
                 showToast('Mode Preview: Data populasi berhasil diperbarui.');
             } else {
-                // Di pratinjau lokal, jumlah LTC adalah panjang rawSiswaData
-                const ltcCount = rawSiswaData.length || 5; 
+                // Di pratinjau lokal, jumlah LTC adalah input ltc atau panjang rawSiswaData
+                const ltcCount = ltc !== null ? ltc : (rawSiswaData.length || 29); 
                 rawPopulasiData.push({
                     tanggal,
                     kontrak,

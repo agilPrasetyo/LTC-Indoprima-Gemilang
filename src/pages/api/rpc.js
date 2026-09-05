@@ -1,4 +1,16 @@
 import { supabase } from '../../lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
+const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
+const supabaseAnonKey = import.meta.env.PUBLIC_SUPABASE_ANON_KEY;
+
+// Pastikan selalu menggunakan client terisolasi untuk operasi Admin Service Role (Bypass RLS)
+function getAdminClient() {
+  return createClient(supabaseUrl, supabaseServiceKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+}
 
 async function verifyUserSession(cookies) {
   try {
@@ -129,6 +141,57 @@ export async function POST({ request, cookies }) {
       if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat menghapus akun.' }), { status: 403 });
       const res = await deleteUserFromSupabase(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- MANAJEMEN PAS FOTO SISWA (SUPABASE STORAGE, MAX 25KB) ---
+    if (action === 'uploadFotoSiswa') {
+      const { noreg, photoBase64 } = args[0] || {};
+      if (!noreg || !photoBase64) {
+        return new Response(JSON.stringify({ success: false, message: 'NoReg dan file foto wajib disertakan.' }), { status: 400 });
+      }
+
+      // Bersihkan prefix data URL (misal: data:image/jpeg;base64, dll)
+      const base64Data = photoBase64.includes(',') ? photoBase64.split(',')[1] : photoBase64;
+      const buffer = Buffer.from(base64Data, 'base64');
+
+      // Validasi ketat batas ukuran maksimal 25 KB (25,600 bytes)
+      if (buffer.length > 25600) {
+        return new Response(JSON.stringify({
+          success: false,
+          message: `Ukuran foto (${(buffer.length / 1024).toFixed(1)} KB) melebihi batas maksimal 25 KB.`
+        }), { status: 400 });
+      }
+
+      const adminClient = getAdminClient();
+      const filename = `${String(noreg).trim()}.jpg`;
+      const { data: upData, error: uploadErr } = await adminClient.storage
+        .from('foto-siswa')
+        .upload(filename, buffer, {
+          contentType: 'image/jpeg',
+          upsert: true
+        });
+
+      if (uploadErr) {
+        console.error('[uploadFotoSiswa Error]:', uploadErr);
+        return new Response(JSON.stringify({ success: false, message: uploadErr.message }), { status: 500 });
+      }
+
+      const { data: urlData } = adminClient.storage.from('foto-siswa').getPublicUrl(filename);
+      return new Response(JSON.stringify({ success: true, url: urlData.publicUrl }), { status: 200 });
+    }
+
+    if (action === 'deleteFotoSiswa') {
+      const { noreg } = args[0] || {};
+      if (!noreg) {
+        return new Response(JSON.stringify({ success: false, message: 'NoReg wajib disertakan.' }), { status: 400 });
+      }
+      const adminClient = getAdminClient();
+      const filename = `${String(noreg).trim()}.jpg`;
+      const { error: delErr } = await adminClient.storage.from('foto-siswa').remove([filename]);
+      if (delErr) {
+        return new Response(JSON.stringify({ success: false, message: delErr.message }), { status: 500 });
+      }
+      return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
 
     // --- PENULISAN DATA: LANGSUNG KE SUPABASE ---
@@ -414,23 +477,30 @@ async function getStudentLogsFromSupabase(noreg) {
 
 async function handleLogin(username, password) {
   // Login dengan lookup noreg/email
-  let targetEmail = username;
-  const isNoreg = /^\d+$/.test(username);
+  let targetEmail = typeof username === 'string' ? username.trim() : '';
+  const isEmail = targetEmail.includes('@');
 
-  if (isNoreg) {
+  if (!isEmail && targetEmail) {
     const { data: profile } = await supabase
       .from('users')
       .select('email')
-      .eq('noreg', username)
-      .single();
+      .ilike('noreg', targetEmail)
+      .maybeSingle();
     
-    if (profile) {
+    if (profile && profile.email) {
       targetEmail = profile.email;
+    } else {
+      targetEmail = `${targetEmail.toLowerCase()}@indoprima.com`;
     }
   }
 
+  // Gunakan authClient terpisah agar TIDAK mengotori sesi admin service_role!
+  const authClient = createClient(supabaseUrl, supabaseAnonKey, {
+    auth: { autoRefreshToken: false, persistSession: false }
+  });
+
   // 1. Coba login langsung terlebih dahulu (99% kasus akan langsung sukses)
-  let { data: authData, error: authErr } = await supabase.auth.signInWithPassword({
+  let { data: authData, error: authErr } = await authClient.auth.signInWithPassword({
     email: targetEmail,
     password: password
   });
@@ -552,7 +622,7 @@ async function handleLogin(username, password) {
     }
 
     // Coba login ulang setelah seeding
-    const retryResult = await supabase.auth.signInWithPassword({
+    const retryResult = await authClient.auth.signInWithPassword({
       email: targetEmail,
       password: password
     });
@@ -832,6 +902,20 @@ async function handleLocalSupabaseWrite(action, args) {
       await supabase.from('manpower_log').update({ noreg: newNoReg, nama_lengkap: nameUpper }).eq('noreg', oldNoReg);
       await supabase.from('safety_log').update({ noreg: newNoReg, nama: nameUpper }).eq('noreg', oldNoReg);
 
+      // 4. Cascade Update file foto di storage jika ada
+      try {
+        const oldFile = `${oldNoReg}.jpg`;
+        const newFile = `${newNoReg}.jpg`;
+        const { data: downloadData } = await supabase.storage.from('foto-siswa').download(oldFile);
+        if (downloadData) {
+          const arrayBuf = await downloadData.arrayBuffer();
+          await supabase.storage.from('foto-siswa').upload(newFile, Buffer.from(arrayBuf), { contentType: 'image/jpeg', upsert: true });
+          await supabase.storage.from('foto-siswa').remove([oldFile]);
+        }
+      } catch (errFoto) {
+        console.warn('Gagal migrasi file foto:', errFoto.message);
+      }
+
     } else {
       // Upsert biasa jika NoReg tidak berubah atau siswa baru
       const { data: dupCheck } = await supabase
@@ -992,16 +1076,33 @@ async function handleLocalSupabaseWrite(action, args) {
 
     // Sync directly to the absensi table for dashboard alignment
     const hadirVal = l.Hadir ? l.Hadir.toUpperCase() : '✔';
+    const ketUpper = (l.Keterangan || '').toUpperCase();
+    const isOff = hadirVal === 'OFF' || hadirVal === 'LIBUR' || 
+                  ketUpper.includes('OFF') || ketUpper.includes('LIBUR') || 
+                  ketUpper.includes('GANTI JAM') || ketUpper.includes('PINDAH SHIFT') || 
+                  ketUpper.includes('PINDAH HARI') || ketUpper.includes('OVER JAM');
+
     let statusAbsen = 'Hadir';
-    if (hadirVal === 'IJIN') statusAbsen = 'Ijin';
-    else if (hadirVal === 'SAKIT') statusAbsen = 'Sakit';
-    else if (hadirVal === 'ABSEN') statusAbsen = 'Alpha';
+    if (isOff) {
+      statusAbsen = 'Ijin'; // Map 'Off' to 'Ijin' for DB check constraint, with 'OFF' in keterangan
+    } else if (hadirVal === 'IJIN') {
+      statusAbsen = 'Ijin';
+    } else if (hadirVal === 'SAKIT') {
+      statusAbsen = 'Sakit';
+    } else if (hadirVal === 'ABSEN' || hadirVal === 'ALPHA') {
+      statusAbsen = 'Alpha';
+    }
+
+    let ketToSave = l.Keterangan ? l.Keterangan.toUpperCase() : '';
+    if (isOff && !ketToSave.includes('OFF') && !ketToSave.includes('LIBUR')) {
+      ketToSave = ketToSave ? `OFF - ${ketToSave}` : 'OFF';
+    }
 
     await supabase.from('absensi').upsert({
       noreg: l.NoReg,
       tanggal: dbDate,
       status: statusAbsen,
-      keterangan: l.Keterangan ? l.Keterangan.toUpperCase() : ''
+      keterangan: ketToSave
     }, { onConflict: 'noreg,tanggal' });
 
   } else if (action === 'deleteAbsensi') {
@@ -1164,17 +1265,6 @@ async function handleLocalSupabaseWrite(action, args) {
   } else if (action === 'savePopulasi') {
     const p = args[0];
 
-    // Hitung otomatis jumlah siswa aktif dari database
-    const { count, error: countErr } = await supabase
-      .from('siswa')
-      .select('*', { count: 'exact', head: true })
-      .eq('status', 'AKTIF');
-
-    if (countErr) {
-      console.warn('Gagal menghitung siswa aktif untuk populasi:', countErr.message);
-    }
-    const activeCount = count || 0;
-
     const rawDate = p.tanggal;
     let cleanDate = rawDate;
     if (rawDate && typeof rawDate === 'string') {
@@ -1188,13 +1278,71 @@ async function handleLocalSupabaseWrite(action, args) {
       }
     }
 
+    let finalLtc = 0;
+    const manualLtc = parseInt(p.ltc !== undefined ? p.ltc : p.totalLtc);
+    if (!isNaN(manualLtc) && manualLtc > 0) {
+      finalLtc = manualLtc;
+    } else {
+      // Hitung otomatis jumlah siswa aktif berdasarkan tanggal acuan
+      const now = new Date();
+      const currentYear = now.getFullYear();
+      const currentMonth = now.getMonth() + 1;
+      
+      const dateParts = cleanDate ? cleanDate.split('-') : [];
+      const recYear = parseInt(dateParts[0]) || currentYear;
+      const recMonth = parseInt(dateParts[1]) || currentMonth;
+
+      const isPastMonth = (recYear < currentYear) || (recYear === currentYear && recMonth < currentMonth);
+
+      if (isPastMonth) {
+        // Untuk bulan yang sudah berlalu: acuan tanggal terakhir bulan tersebut (30/31)
+        const lastDayNum = new Date(recYear, recMonth, 0).getDate();
+        const lastDayStr = `${recYear}-${String(recMonth).padStart(2, '0')}-${String(lastDayNum).padStart(2, '0')}`;
+
+        const [{ data: siswaList }, { data: turnoverList }] = await Promise.all([
+          supabase.from('siswa').select('noreg, tanggal_masuk, tanggal_keluar').neq('noreg', 'TEST-001'),
+          supabase.from('turnover').select('noreg, tanggal_masuk, tanggal_keluar').neq('noreg', 'TEST-001')
+        ]);
+
+        const studentsMap = new Map();
+        (siswaList || []).forEach(s => {
+          studentsMap.set(s.noreg, { masuk: s.tanggal_masuk, keluar: s.tanggal_keluar });
+        });
+        (turnoverList || []).forEach(t => {
+          if (!studentsMap.has(t.noreg)) {
+            studentsMap.set(t.noreg, { masuk: t.tanggal_masuk, keluar: t.tanggal_keluar });
+          } else {
+            const e = studentsMap.get(t.noreg);
+            if (t.tanggal_keluar && !e.keluar) e.keluar = t.tanggal_keluar;
+            if (t.tanggal_masuk && !e.masuk) e.masuk = t.tanggal_masuk;
+          }
+        });
+
+        let activeCount = 0;
+        studentsMap.forEach(s => {
+          if (s.masuk && s.masuk > lastDayStr) return;
+          if (s.keluar && s.keluar < lastDayStr) return;
+          activeCount++;
+        });
+        finalLtc = activeCount;
+      } else {
+        // Bulan berjalan / sekarang: hitung siswa berstatus AKTIF
+        const { count } = await supabase
+          .from('siswa')
+          .select('*', { count: 'exact', head: true })
+          .eq('status', 'AKTIF')
+          .neq('noreg', 'TEST-001');
+        finalLtc = count || 29;
+      }
+    }
+
     const populasiObj = {
       tanggal: cleanDate,
       karyawan_kontrak: p.kontrak,
-      ltc: activeCount,
+      ltc: finalLtc,
       outsourcing: p.outsourcing,
       satpam_supir: p.satpamSupir,
-      total_ltc: activeCount
+      total_ltc: finalLtc
     };
 
     let success = false;

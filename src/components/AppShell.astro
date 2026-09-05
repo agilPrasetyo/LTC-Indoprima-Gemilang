@@ -821,6 +821,42 @@ const { role } = Astro.props;
         <div class="space-y-4" id="form-siswa">
             <input type="hidden" id="student-edit-mode" value="false">
             <input type="hidden" id="student-old-noreg" value="">
+
+            <!-- Upload Pas Foto 3x4 Siswa (Maksimal 25 KB) -->
+            <div class="p-3.5 bg-slate-50 border border-slate-200/90 rounded-2xl flex flex-col sm:flex-row items-center gap-4">
+                <!-- 3x4 Preview Box -->
+                <div class="w-[72px] h-[96px] rounded-xl bg-slate-200 border-2 border-slate-300 overflow-hidden flex items-center justify-center flex-shrink-0 relative shadow-inner group">
+                    <img id="student-modal-foto-preview" src="" alt="Foto Siswa" class="w-full h-full object-cover hidden">
+                    <div id="student-modal-foto-placeholder" class="flex flex-col items-center justify-center text-slate-400 p-1 text-center select-none">
+                        <i class="fa-solid fa-user text-xl mb-0.5 text-slate-400"></i>
+                        <span class="text-[8px] font-bold text-slate-400">3x4</span>
+                    </div>
+                </div>
+
+                <!-- Controls & Instructions -->
+                <div class="flex-1 w-full space-y-1 text-left">
+                    <div class="flex items-center justify-between">
+                        <label class="block text-xs font-bold uppercase tracking-wider text-slate-700">Pas Foto Siswa (3x4)</label>
+                        <span id="student-modal-foto-size" class="text-[10px] font-mono font-bold text-slate-500 hidden">0 KB / 25 KB</span>
+                    </div>
+                    <p class="text-[11px] text-slate-500 leading-snug">
+                        Format rasio 3:4. Sistem otomatis memotong dan mengompres foto menjadi <strong>&le; 25 KB</strong>.
+                    </p>
+                    <div class="flex items-center gap-2 pt-1">
+                        <input type="file" id="student-modal-foto-file" accept="image/*" class="hidden" onchange="handleStudentPhotoSelected(event)">
+                        <button type="button" onclick="document.getElementById('student-modal-foto-file').click()"
+                            class="px-3 py-1.5 bg-brand-blue hover:bg-blue-700 text-white rounded-lg text-xs font-bold transition-all flex items-center gap-1.5 shadow-sm cursor-pointer">
+                            <i class="fa-solid fa-upload text-[10px]"></i> Pilih Foto
+                        </button>
+                        <button type="button" id="student-modal-foto-remove-btn" onclick="clearStudentPhotoSelection()"
+                            class="px-3 py-1.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-xs font-bold transition-all hidden cursor-pointer">
+                            <i class="fa-solid fa-trash-can text-[10px]"></i> Hapus Foto
+                        </button>
+                    </div>
+                </div>
+                <input type="hidden" id="student-modal-foto-base64" value="">
+                <input type="hidden" id="student-modal-foto-action" value="none">
+            </div>
             
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
@@ -1242,7 +1278,7 @@ const { role } = Astro.props;
 
 <!-- MODAL TUTORIAL PENGISIAN FORMULIR SISWA (ROOT LEVEL) -->
 <div id="modal-siswa-tutorial" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto" onclick="if(event.target===this)closeSiswaTutorialModal()">
-    <div class="bg-white p-6 sm:p-8 rounded-[28px] w-full max-w-xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
+    <div class="bg-white p-6 sm:p-8 rounded-[28px] w-full max-w-2xl max-h-[90vh] overflow-y-auto space-y-6 shadow-2xl border border-slate-100 transform transition-all duration-300">
         <!-- Header -->
         <div class="flex items-center justify-between border-b border-slate-100 pb-4">
             <div class="flex items-center gap-3">
@@ -1262,45 +1298,124 @@ const { role } = Astro.props;
         <!-- Body Content: 3 Step Cards -->
         <div class="space-y-4 text-xs">
             <!-- Step 1 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 1</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Identitas & Status Kehadiran Hari Ini</h4>
+            <div class="p-4 bg-slate-50/80 border border-slate-200/80 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 1</span>
+                        <h4 class="font-bold text-slate-800 text-xs">Identitas & Status Kehadiran Hari Ini</h4>
+                    </div>
+                    <span class="text-[10px] font-semibold text-blue-600 bg-blue-50 px-2 py-0.5 rounded-md border border-blue-100">Tahap Presensi</span>
                 </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Periksa Identitas:</strong> Nama Lengkap, NoReg, dan Kelas akan terisi secara otomatis.</li>
-                    <li><strong class="text-slate-800">Pilih Kehadiran:</strong>
-                        <ul class="list-circle list-inside pl-4 mt-1 space-y-1 text-slate-500">
-                            <li><span class="font-semibold text-blue-700">Hadir:</span> Untuk melanjutkan ke pengisian data operasional & produksi (Langkah 2).</li>
-                            <li><span class="font-semibold text-amber-700">Ijin / Sakit:</span> Wajib memilih nama <strong class="text-slate-700">Supervisor (SPV)</strong> yang telah Anda hubungi untuk konfirmasi, lalu tuliskan alasan ijin/sakit Anda.</li>
+                
+                <div class="space-y-2 text-slate-600 pl-1">
+                    <div>
+                        <strong class="text-slate-800 font-bold">1. Data Profil Peserta:</strong>
+                        <p class="text-slate-500 text-[11px] mt-0.5">Nama Lengkap, Nomor Registrasi (NoReg), Kelas, Tanggal Masuk, dan Berakhir LTC terisi otomatis sesuai akun login Anda.</p>
+                    </div>
+
+                    <div>
+                        <strong class="text-slate-800 font-bold">2. Pilih Status Kehadiran:</strong>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-1.5">
+                            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
+                                <div class="font-bold text-emerald-700">
+                                    Hadir
+                                </div>
+                                <p class="text-[11px] text-slate-500 leading-snug">
+                                    Pilih jika Anda masuk bekerja. Klik tombol <strong>"Lanjut"</strong> untuk mengisi data operasional di Langkah 2 dan hasil produksi di Langkah 3.
+                                </p>
+                            </div>
+                            <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs space-y-1">
+                                <div class="font-bold text-amber-700">
+                                    Ijin / Sakit / Off (Libur)
+                                </div>
+                                <p class="text-[11px] text-slate-500 leading-snug">
+                                    Pilih jika berhalangan hadir atau libur shift/tukar jam. Laporan langsung dikirim di Langkah 1 (tidak perlu isi Langkah 2 & 3).
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="p-3 bg-amber-50/90 rounded-xl border border-amber-200/80 text-[11px] space-y-1.5">
+                        <div class="font-bold text-amber-900">
+                            Aturan Wajib untuk Ijin / Sakit / Off (Libur):
+                        </div>
+                        <ul class="list-disc list-inside space-y-1 text-amber-800 pl-1">
+                            <li><strong>Konfirmasi SPV:</strong> Wajib konfirmasi ke Supervisor (SPV) terlebih dahulu. Jika memilih <em>"Belum"</em>, tombol kirim akan <strong>terkunci</strong> dan tidak bisa disubmit.</li>
+                            <li><strong>Pilih Nama SPV:</strong> Jika memilih <em>"Ya, sudah"</em>, pilih nama Supervisor yang telah memberi konfirmasi pada dropdown yang muncul.</li>
+                            <li><strong>Tanggal & Alasan:</strong> Tentukan tanggal dan tuliskan alasan secara jelas (contoh: surat istirahat dokter, urusan keluarga, atau libur shift/ganti jam kerja).</li>
+                            <li><strong>Kirim Langsung:</strong> Klik tombol <strong>"Kirim Konfirmasi"</strong> di Langkah 1 untuk menyelesaikan laporan ketidakhadiran.</li>
                         </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2 Card -->
+            <div class="p-4 bg-slate-50/80 border border-slate-200/80 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 2</span>
+                        <h4 class="font-bold text-slate-800 text-xs">Detail Operasional Kerja (Khusus Hadir)</h4>
+                    </div>
+                    <span class="text-[10px] font-semibold text-emerald-600 bg-emerald-50 px-2 py-0.5 rounded-md border border-emerald-100">Presensi Hadir</span>
+                </div>
+
+                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
+                    <li><strong class="text-slate-800">Hari / Tanggal Operasional:</strong> Masukkan tanggal pelaksanaan kerja shift yang dilaporkan.</li>
+                    <li><strong class="text-slate-800">Shift Kerja:</strong> Tentukan shift Anda (<strong>Shift 1</strong> Pagi, <strong>Shift 2</strong> Siang, atau <strong>Shift 3</strong> Malam).</li>
+                    <li><strong class="text-slate-800">Bagian / Section Kerja:</strong> Pilih bagian penempatan kerja Anda:
+                        <div class="mt-1 pl-4 text-[11px] text-slate-500 space-y-0.5">
+                            <div>• <em>Produksi:</em> Grinding, Painting, Core, Shotblast, Furan, Fettling, CNC/Machining, Melting, Galah IBK, PPIC, Adm Produksi.</div>
+                            <div>• <em>Engineering:</em> Pattern, Ladle, Maintenance, Adm Maintenance, Engineering Drafter.</div>
+                            <div>• <em>Personalia & SHE:</em> IRGA, SHE (Safety K3).</div>
+                            <div>• <em>Quality Control:</em> QC Pouring, QC Lab Pasir, QC Lab Logam.</div>
+                        </div>
                     </li>
                 </ul>
             </div>
 
-            <!-- Step 2 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 2</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Data Operasional & Hasil Produksi (Khusus Hadir)</h4>
-                </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Tanggal & Shift Kerja:</strong> Tentukan tanggal laporan dan shift kerja.</li>
-                    <li><strong class="text-slate-800">Penempatan Kerja:</strong> Pilih bagian pekerjaan Anda.</li>
-                    <li><strong class="text-slate-800">Target & Hasil:</strong> Masukkan jumlah target, aktual yang selesai dan barang reject (isi 0 jika tidak ada).</li>
-                    <li><strong class="text-slate-800">Supervisor Shift:</strong> Pilih nama Supervisor yang bertugas pada shift Anda.</li>
-                </ul>
-            </div>
-
             <!-- Step 3 Card -->
-            <div class="p-4 bg-slate-50/80 border border-slate-200/70 rounded-2xl space-y-2">
-                <div class="flex items-center gap-2">
-                    <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 3</span>
-                    <h4 class="font-bold text-slate-800 text-xs">Verifikasi Kinerja & Kirim Laporan</h4>
+            <div class="p-4 bg-slate-50/80 border border-slate-200/80 rounded-2xl space-y-3">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2 py-0.5 bg-blue-600 text-white rounded-md font-bold text-[10px]">LANGKAH 3</span>
+                        <h4 class="font-bold text-slate-800 text-xs">Hasil & Validasi Pekerjaan (Formulir Dinamis)</h4>
+                    </div>
+                    <span class="text-[10px] font-semibold text-purple-600 bg-purple-50 px-2 py-0.5 rounded-md border border-purple-100">Tahap Akhir</span>
                 </div>
-                <ul class="list-disc list-inside text-slate-600 space-y-1.5 leading-relaxed pl-1">
-                    <li><strong class="text-slate-800">Kirim Laporan:</strong> Klik tombol kirim laporan harian maka data akan terkirim ke database.</li>
-                </ul>
+
+                <div class="space-y-2 text-slate-600 pl-1">
+                    <p class="text-[11px] text-slate-500 italic">
+                        Formulir Langkah 3 menyesuaikan secara otomatis dengan Bagian kerja yang Anda pilih pada Langkah 2:
+                    </p>
+
+                    <div class="space-y-2 text-[11px]">
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
+                            <strong class="text-blue-700 font-bold block mb-1">Lini Produksi:</strong>
+                            <ul class="list-disc list-inside space-y-0.5 text-slate-600 pl-1">
+                                <li>Isi <strong>Nomor Mesin / Line</strong> tempat Anda beroperasi.</li>
+                                <li>Pilih <strong>Model Produk</strong> (target plan otomatis terkunci dari master data perusahaan).</li>
+                                <li>Gunakan tombol <strong>"+ Tambah Model Produk Lain"</strong> jika mengerjakan lebih dari 1 tipe produk dalam satu shift.</li>
+                                <li>Masukkan jumlah <strong>Aktual</strong> yang selesai dan jumlah <strong>Reject</strong> (isi 0 jika tidak ada).</li>
+                            </ul>
+                        </div>
+
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
+                            <strong class="text-emerald-700 font-bold block mb-1">Quality Control (QC):</strong>
+                            <p class="text-slate-600">Pilih Model/Aktivitas Pengujian, Nomor Mesin/Tungku/Ladle, Target Tes/Sampel, Aktual Hasil, dan Reject/NG.</p>
+                        </div>
+
+                        <div class="p-2.5 bg-white rounded-xl border border-slate-200/80 shadow-xs">
+                            <strong class="text-amber-700 font-bold block mb-1">Maintenance & Administrasi / PPIC / SHE / IRGA:</strong>
+                            <p class="text-slate-600">Pilih unit mesin/fasilitas yang diperbaiki (bisa memilih lebih dari 1) dan beri tanda centang pada <strong>Daftar Checklist Tugas Harian</strong> yang telah diselesaikan.</p>
+                        </div>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200/60 space-y-1 text-[11px]">
+                        <div><strong class="text-slate-800">• Supervisor Penanggung Jawab:</strong> Wajib memilih Supervisor yang bertugas mengawasi shift Anda.</div>
+                        <div><strong class="text-slate-800">• Keterangan / Kendala Lapangan:</strong> Tuliskan kendala operasional, masalah mesin, atau catatan penting jika ada (atau isi `-`).</div>
+                        <div><strong class="text-slate-800">• Kirim Laporan:</strong> Klik tombol <strong>"Kirim Laporan"</strong> untuk menyimpan hasil kerja ke database pusat.</div>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -1417,7 +1532,7 @@ const { role } = Astro.props;
 <script is:inline src="/js/dashboard.js?v=71.0"></script>
 <script is:inline src="/js/siswa.js?v=71.0"></script>
 <script is:inline src="/js/turnover.js?v=71.0"></script>
-<script is:inline src="/js/siswa_portal.js?v=71.0"></script>
+<script is:inline src="/js/siswa_portal.js?v=73.0"></script>
 <script is:inline src="/js/keuangan.js?v=71.0"></script>
 <script is:inline src="/js/admin.js?v=71.0"></script>
 <script is:inline src="/js/absensi.js?v=71.0"></script>

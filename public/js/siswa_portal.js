@@ -216,11 +216,23 @@ function goToSiswaStep(step) {
         } else {
             const presenceStatus = document.querySelector('input[name="siswa-kehadiran"]:checked')?.value || 'Hadir';
             if (step === 1 && presenceStatus !== 'Hadir') {
-                nextBtn.innerHTML = 'Kirim Konfirmasi Kehadiran <i class="fa-solid fa-paper-plane"></i>';
-                nextBtn.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-emerald-500/10";
+                const sudahHubungi = document.querySelector('input[name="siswa-hubungi-spv"]:checked')?.value || 'Tidak';
+                const btnLabel = presenceStatus === 'Off' ? 'Kirim Konfirmasi Off / Libur' : 
+                                 (presenceStatus === 'Ijin' ? 'Kirim Konfirmasi Ijin' : 
+                                 (presenceStatus === 'Sakit' ? 'Kirim Konfirmasi Sakit' : 'Kirim Konfirmasi Kehadiran'));
+                if (sudahHubungi === 'Ya') {
+                    nextBtn.innerHTML = `${btnLabel} <i class="fa-solid fa-paper-plane"></i>`;
+                    nextBtn.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-emerald-500/10 cursor-pointer";
+                    nextBtn.title = '';
+                } else {
+                    nextBtn.innerHTML = `<i class="fa-solid fa-lock text-[10px]"></i> ${btnLabel}`;
+                    nextBtn.className = "px-6 py-2.5 bg-slate-300 text-slate-500 font-bold rounded-xl text-xs transition-all flex items-center gap-2 cursor-not-allowed shadow-none";
+                    nextBtn.title = 'Konfirmasi ke Supervisor (SPV) terlebih dahulu';
+                }
             } else {
                 nextBtn.innerHTML = 'Lanjut <i class="fa-solid fa-arrow-right"></i>';
                 nextBtn.className = "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-blue-500/10";
+                nextBtn.title = '';
             }
         }
     }
@@ -229,30 +241,47 @@ function goToSiswaStep(step) {
 function submitSiswaAbsenceReport(status) {
     const user = getSiswaCurrentUser();
     const noreg = user ? (user.studentId || user.nomorRegistrasi || user.noreg || user.id) : 'TEST-001';
-    const ketAbsen = document.getElementById('input-siswa-keterangan-absen')?.value.trim() || '';
-    
-    if (!ketAbsen) {
-        showToast('Tuliskan alasan ijin / sakit Anda.', 'error');
-        return;
-    }
+    const labelStatus = status === 'Off' ? 'Off / Libur' : status;
 
+    // 1. Validasi konfirmasi ke SPV (wajib 'Ya', jika belum maka tidak bisa submit)
     const hubungiSpvRadio = document.querySelector('input[name="siswa-hubungi-spv"]:checked');
     const sudahHubungi = hubungiSpvRadio ? hubungiSpvRadio.value : 'Tidak';
     
     if (sudahHubungi !== 'Ya') {
-        showToast('Anda harus menghubungi Supervisor (SPV) terlebih dahulu sebelum dapat mengirim konfirmasi absen.', 'error');
+        showToast(`Anda belum konfirmasi ke Supervisor (SPV). Harap konfirmasi ke SPV terlebih dahulu sebelum mengirim laporan ${labelStatus}!`, 'error');
+        const spvRadio = document.querySelector('input[name="siswa-hubungi-spv"]');
+        if (spvRadio) spvRadio.scrollIntoView({ behavior: 'smooth', block: 'center' });
         return;
     }
     
+    // 2. Validasi Supervisor yang dipilih
     const spvAbsen = document.getElementById('input-siswa-spv-absen')?.value || '';
     if (!spvAbsen) {
-        showToast('Pilih nama Supervisor yang telah Anda hubungi.', 'error');
+        showToast('Pilih nama Supervisor (SPV) yang telah Anda hubungi / konfirmasi.', 'error');
+        const spvSelect = document.getElementById('input-siswa-spv-absen');
+        if (spvSelect) spvSelect.focus();
         return;
     }
 
+    // 3. Validasi Tanggal
     const dateInputAbsen = document.getElementById('input-siswa-tanggal-absen');
     const dateInput = document.getElementById('input-siswa-tanggal');
     const targetDateInput = (dateInputAbsen && dateInputAbsen.value) ? dateInputAbsen : dateInput;
+    
+    if (!targetDateInput || !targetDateInput.value) {
+        showToast('Tentukan tanggal laporan ketidakhadiran terlebih dahulu.', 'error');
+        if (dateInputAbsen) dateInputAbsen.focus();
+        return;
+    }
+
+    // 4. Validasi Alasan
+    const ketAbsen = document.getElementById('input-siswa-keterangan-absen')?.value.trim() || '';
+    if (!ketAbsen) {
+        showToast(`Tuliskan alasan ${labelStatus} Anda secara jelas.`, 'error');
+        const ketInput = document.getElementById('input-siswa-keterangan-absen');
+        if (ketInput) ketInput.focus();
+        return;
+    }
 
     let dateFormatted = '';
     if (targetDateInput && targetDateInput.value) {
@@ -270,6 +299,11 @@ function submitSiswaAbsenceReport(status) {
         dateFormatted = `${dd}/${mm}/${yyyy}`;
     }
 
+    // Susun keterangan: sertakan prefix OFF secara eksplisit jika status Off
+    const finalKeterangan = status === 'Off' 
+        ? `OFF - [SPV: ${spvAbsen}] ${ketAbsen}` 
+        : `[SPV: ${spvAbsen}] ${ketAbsen}`;
+
     const payload = {
         NoReg: noreg,
         TanggalRecord: dateFormatted,
@@ -278,7 +312,7 @@ function submitSiswaAbsenceReport(status) {
         Plan: 0,
         Aktual: 0,
         Reject: 0,
-        Keterangan: `[SPV: ${spvAbsen}] ${ketAbsen}`
+        Keterangan: finalKeterangan
     };
 
     _sendSiswaReport(payload);
@@ -553,6 +587,8 @@ function toggleKehadiranSiswa(status) {
     const ketAbsenContainer = document.getElementById('siswa-ket-absen-container');
     const inputKetAbsen = document.getElementById('input-siswa-keterangan-absen');
     const dateInputAbsen = document.getElementById('input-siswa-tanggal-absen');
+    const textTanggalAbsen = document.getElementById('text-siswa-tanggal-absen');
+    const textAlasanAbsen = document.getElementById('text-siswa-alasan-absen');
     
     if (status === 'Hadir') {
         if (ketAbsenContainer) ketAbsenContainer.classList.add('hidden');
@@ -567,6 +603,32 @@ function toggleKehadiranSiswa(status) {
             const dd = String(today.getDate()).padStart(2, '0');
             dateInputAbsen.value = `${yyyy}-${mm}-${dd}`;
         }
+
+        // Dynamic labels & placeholders
+        if (textTanggalAbsen) {
+            if (status === 'Off') textTanggalAbsen.innerText = 'Tanggal Off / Libur';
+            else if (status === 'Ijin') textTanggalAbsen.innerText = 'Tanggal Ijin';
+            else if (status === 'Sakit') textTanggalAbsen.innerText = 'Tanggal Sakit';
+            else textTanggalAbsen.innerText = 'Tanggal Absen';
+        }
+        if (textAlasanAbsen) {
+            if (status === 'Off') textAlasanAbsen.innerText = 'Alasan Off / Libur';
+            else if (status === 'Ijin') textAlasanAbsen.innerText = 'Alasan Ijin';
+            else if (status === 'Sakit') textAlasanAbsen.innerText = 'Alasan Sakit / Diagnosa Singkat';
+            else textAlasanAbsen.innerText = 'Keterangan / Alasan Absen';
+        }
+        if (inputKetAbsen) {
+            if (status === 'Off') {
+                inputKetAbsen.placeholder = 'Tuliskan alasan Off / Libur secara jelas (contoh: Libur Shift berkala, Ganti Jam kerja, Over Jam lembur, dsb)...';
+            } else if (status === 'Ijin') {
+                inputKetAbsen.placeholder = 'Tuliskan keperluan ijin Anda secara jelas...';
+            } else if (status === 'Sakit') {
+                inputKetAbsen.placeholder = 'Tuliskan gejala sakit atau surat istirahat dokter...';
+            } else {
+                inputKetAbsen.placeholder = 'Tuliskan alasan secara jelas...';
+            }
+        }
+
         // Reset hubungi SPV radio to 'Tidak'
         const tidakRadio = document.querySelector('input[name="siswa-hubungi-spv"][value="Tidak"]');
         if (tidakRadio) {
@@ -581,10 +643,10 @@ function toggleKehadiranSiswa(status) {
         if (nextBtn) {
             if (status === 'Hadir') {
                 nextBtn.innerHTML = 'Lanjut <i class="fa-solid fa-arrow-right"></i>';
-                nextBtn.className = "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-blue-500/10";
+                nextBtn.className = "px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-blue-500/10 cursor-pointer";
+                nextBtn.title = '';
             } else {
-                nextBtn.innerHTML = 'Kirim Konfirmasi Kehadiran <i class="fa-solid fa-paper-plane"></i>';
-                nextBtn.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-emerald-500/10";
+                toggleHubungiSpvSiswa('Tidak');
             }
         }
     }
@@ -592,13 +654,40 @@ function toggleKehadiranSiswa(status) {
 
 function toggleHubungiSpvSiswa(status) {
     const spvContainer = document.getElementById('siswa-spv-absen-container');
-    if (!spvContainer) return;
+    const warningBelum = document.getElementById('siswa-spv-warning-belum');
+    const spvSelect = document.getElementById('input-siswa-spv-absen');
+    const presenceStatus = document.querySelector('input[name="siswa-kehadiran"]:checked')?.value || 'Hadir';
+
     if (status === 'Ya') {
-        spvContainer.classList.remove('hidden');
+        if (spvContainer) spvContainer.classList.remove('hidden');
+        if (warningBelum) warningBelum.classList.add('hidden');
+        if (spvSelect) spvSelect.setAttribute('required', 'true');
     } else {
-        spvContainer.classList.add('hidden');
-        const spvSelect = document.getElementById('input-siswa-spv-absen');
-        if (spvSelect) spvSelect.value = '';
+        if (spvContainer) spvContainer.classList.add('hidden');
+        if (warningBelum) warningBelum.classList.remove('hidden');
+        if (spvSelect) {
+            spvSelect.removeAttribute('required');
+            spvSelect.value = '';
+        }
+    }
+
+    // Update submit button visual state on step 1
+    if (currentSiswaStep === 1 && presenceStatus !== 'Hadir') {
+        const nextBtn = document.getElementById('btn-siswa-next');
+        if (nextBtn) {
+            const btnLabel = presenceStatus === 'Off' ? 'Kirim Konfirmasi Off / Libur' : 
+                             (presenceStatus === 'Ijin' ? 'Kirim Konfirmasi Ijin' : 
+                             (presenceStatus === 'Sakit' ? 'Kirim Konfirmasi Sakit' : 'Kirim Konfirmasi Kehadiran'));
+            if (status === 'Ya') {
+                nextBtn.innerHTML = `${btnLabel} <i class="fa-solid fa-paper-plane"></i>`;
+                nextBtn.className = "px-6 py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs transition-all flex items-center gap-2 shadow-md shadow-emerald-500/10 cursor-pointer";
+                nextBtn.title = '';
+            } else {
+                nextBtn.innerHTML = `<i class="fa-solid fa-lock text-[10px]"></i> ${btnLabel}`;
+                nextBtn.className = "px-6 py-2.5 bg-slate-300 text-slate-500 font-bold rounded-xl text-xs transition-all flex items-center gap-2 cursor-not-allowed shadow-none";
+                nextBtn.title = 'Konfirmasi ke Supervisor (SPV) terlebih dahulu';
+            }
+        }
     }
 }
 
@@ -1632,6 +1721,29 @@ function populateSiswaPortalFields() {
     if (noregInput) noregInput.value = me.id || noreg || '';
     if (kelasInput) kelasInput.value = me.kelas || currentUser.kelas || 'Kelas 1';
 
+    // Set Pas Foto 3x4 Siswa
+    const fotoImg = document.getElementById('siswa-portal-foto');
+    const fotoPlaceholder = document.getElementById('siswa-portal-foto-placeholder');
+    const cleanNoreg = String(me.id || noreg || '').trim();
+
+    if (fotoImg && cleanNoreg) {
+        const baseUrl = (typeof window !== 'undefined' && window.PUBLIC_SUPABASE_URL) ? window.PUBLIC_SUPABASE_URL : 'https://xpoddtzxsopwzojycmwx.supabase.co';
+        const photoUrl = `${baseUrl}/storage/v1/object/public/foto-siswa/${encodeURIComponent(cleanNoreg)}.jpg?t=${Date.now()}`;
+
+        fotoImg.onload = function() {
+            fotoImg.classList.remove('hidden');
+            if (fotoPlaceholder) fotoPlaceholder.classList.add('hidden');
+        };
+        fotoImg.onerror = function() {
+            fotoImg.classList.add('hidden');
+            if (fotoPlaceholder) fotoPlaceholder.classList.remove('hidden');
+        };
+        fotoImg.src = photoUrl;
+    } else if (fotoPlaceholder) {
+        if (fotoImg) fotoImg.classList.add('hidden');
+        fotoPlaceholder.classList.remove('hidden');
+    }
+
     // Auto-select student's section only if not already selected
     const bagianSelect = document.getElementById('input-siswa-bagian');
     const mySection = (me.section || me.bagian || me.departemen || currentUser.section || currentUser.bagian || '').toUpperCase().trim();
@@ -1724,7 +1836,16 @@ function populateSiswaPortalFields() {
     if (cutoffDateObj && !isNaN(cutoffDateObj.getTime())) {
         let curr = new Date(cutoffDateObj.getTime());
         while (curr <= todayObj) {
-            const dStr = curr.toISOString().split('T')[0];
+            const y = curr.getFullYear();
+            const m = String(curr.getMonth() + 1).padStart(2, '0');
+            const d = String(curr.getDate()).padStart(2, '0');
+            const dStr = `${y}-${m}-${d}`;
+
+            if (dStr < CUTOFF) {
+                curr.setDate(curr.getDate() + 1);
+                continue;
+            }
+
             const isSun = curr.getDay() === 0;
             const isSat = curr.getDay() === 6;
             const isWorkDay = !isSun && (!isSat || !String(me.hk || '').includes('5'));
@@ -1873,8 +1994,11 @@ function renderStudentPersonalLogs(me) {
                 tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-100";
                 
                 const st = (a.status || '').toLowerCase();
+                const ket = (a.keterangan || '').toLowerCase();
                 let badge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-600 border border-emerald-200">✔ Hadir</span>';
-                if (st.includes('sakit')) {
+                if (st.includes('off') || st.includes('libur') || ket.includes('off') || ket.includes('libur')) {
+                    badge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-700 border border-slate-300">Off / Libur</span>';
+                } else if (st.includes('sakit')) {
                     badge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-amber-50 text-amber-700 border border-amber-200">Sakit</span>';
                 } else if (st.includes('ijin') || st.includes('izin')) {
                     badge = '<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-sky-50 text-sky-700 border border-sky-200">Ijin</span>';

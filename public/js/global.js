@@ -1437,7 +1437,8 @@ if (typeof Chart !== 'undefined') {
                 tanggalKeluar: exitVal,
                 bagian: s.bagian || s.section || '',
                 section: s.section || s.bagian || '',
-                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || ''
+                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || '',
+                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || ''
             };
         });
         activeData = JSON.parse(JSON.stringify(rawSiswaData)).filter(s => String(s.status || '').toUpperCase() === "AKTIF"); 
@@ -1454,7 +1455,8 @@ if (typeof Chart !== 'undefined') {
                 tanggalKeluar: exitVal,
                 bagian: s.bagian || s.section || '',
                 section: s.section || s.bagian || '',
-                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || ''
+                daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || '',
+                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || ''
             };
         });
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
@@ -1473,6 +1475,7 @@ if (typeof Chart !== 'undefined') {
         // Store absensi data & safety data from server
         absensiData = data.absensi || [];
         window.absensiData = absensiData;
+        window.rawAbsensiData = (data.absensi || []).map(r => ({ ...r }));
         safetyData = data.safety || [];
         window.safetyData = safetyData;
         currentVersion = data.version || "";

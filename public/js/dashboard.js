@@ -838,23 +838,26 @@ function updateLtcRatioChart() {
         }
     });
 
-    // Total Karyawan synchronized with Kelola Populasi di Admin
-    const totalKaryawanData = sortedData.map(p => {
-        if (typeof p.totalKaryawan === 'number' && p.totalKaryawan > 0) {
-            return p.totalKaryawan;
-        }
-        const k = (p.kontrak || 0) + (p.ltc || realActiveLtcCount) + (p.outsourcing || 0) + (p.satpamSupir || 0);
-        return k > 0 ? k : 146;
-    });
-
-    // Dynamically calculate totalLtc synchronized with Manajemen Siswa active students
+    // Dynamically calculate totalLtc synchronized with Manajemen Siswa & Kelola Populasi
     const totalLtcData = sortedData.map(p => {
         const m = p.tanggal ? p.tanggal.substring(0, 7) : '';
-        // For current/latest month, strictly use real-time active student count from Manajemen Siswa
-        if (m === latestMonthStr || m === '2026-07') {
+        if (typeof p.totalLtc === 'number' && p.totalLtc > 0) {
+            return p.totalLtc;
+        }
+        if (typeof p.ltc === 'number' && p.ltc > 0) {
+            return p.ltc;
+        }
+        if (m === latestMonthStr) {
             return realActiveLtcCount;
         }
-        return (typeof p.totalLtc === 'number' && p.totalLtc > 0) ? p.totalLtc : realActiveLtcCount;
+        return realActiveLtcCount;
+    });
+
+    // Total Karyawan synchronized: Kontrak + LTC + Outsourcing + Satpam & Supir
+    const totalKaryawanData = sortedData.map((p, idx) => {
+        const ltc = totalLtcData[idx];
+        const k = (p.kontrak || 0) + ltc + (p.outsourcing || 0) + (p.satpamSupir || 0);
+        return k > 0 ? k : (p.totalKaryawan || 146);
     });
 
     // Persentase LTC line dynamically calculated
