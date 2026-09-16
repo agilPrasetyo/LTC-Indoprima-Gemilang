@@ -440,6 +440,38 @@ function updateClassPopulationChart() {
     }
 }
 
+// Helper: Dapatkan populasi siswa LTC aktif per bulan secara akurat
+// Sinkron 100% dengan data "Populasi LTC vs Total Karyawan" (rawPopulasiData)
+function getLtcPopulationForMonth(ym) {
+    const popList = (typeof rawPopulasiData !== 'undefined' && Array.isArray(rawPopulasiData)) ? rawPopulasiData : [];
+    const realActiveCount = (typeof activeData !== 'undefined' && Array.isArray(activeData) && activeData.length > 0)
+        ? activeData.length
+        : 29;
+
+    if (!ym || ym === 'ALL') return realActiveCount;
+
+    // Cari data di rawPopulasiData yang tanggalnya berawalan ym (YYYY-MM)
+    const matchingEntries = popList.filter(p => p.tanggal && String(p.tanggal).startsWith(ym));
+    if (matchingEntries.length > 0) {
+        // Ambil yang paling baru/update di bulan tersebut
+        matchingEntries.sort((a, b) => String(b.tanggal).localeCompare(String(a.tanggal)));
+        const latestInMonth = matchingEntries[0];
+        const val = (typeof latestInMonth.totalLtc === 'number' && latestInMonth.totalLtc > 0)
+            ? latestInMonth.totalLtc
+            : ((typeof latestInMonth.ltc === 'number' && latestInMonth.ltc > 0) ? latestInMonth.ltc : 0);
+        if (val > 0) return val;
+    }
+
+    // Jika bulan yang dipilih adalah bulan sekarang atau lebih baru, pakai realActiveCount
+    const curYm = new Date().toISOString().substring(0, 7);
+    if (ym >= curYm) {
+        return realActiveCount;
+    }
+
+    return realActiveCount;
+}
+window.getLtcPopulationForMonth = getLtcPopulationForMonth;
+
 function populateDashTurnoverMonthFilter(records) {
     const filterEl = document.getElementById('dash-turnover-month-filter');
     if (!filterEl) return;
@@ -456,6 +488,16 @@ function populateDashTurnoverMonthFilter(records) {
         const rawDate = String(item.tgl_keluar || item.tanggal || item.tanggalKeluar || item.created_at || '').trim();
         if (rawDate.length >= 7) {
             const ym = rawDate.substring(0, 7);
+            if (/^\d{4}-\d{2}$/.test(ym)) {
+                monthsSet.add(ym);
+            }
+        }
+    });
+
+    // Tambahkan juga semua bulan dari Populasi LTC vs Total Karyawan agar lengkap
+    (typeof rawPopulasiData !== 'undefined' && Array.isArray(rawPopulasiData) ? rawPopulasiData : []).forEach(p => {
+        if (p.tanggal && String(p.tanggal).length >= 7) {
+            const ym = String(p.tanggal).substring(0, 7);
             if (/^\d{4}-\d{2}$/.test(ym)) {
                 monthsSet.add(ym);
             }
@@ -522,22 +564,18 @@ function updateTurnoverPieChart(rebuildFilter = true) {
         }
     });
 
-    // Jumlah Siswa Terkini (Jumlah Siswa Aktif Terkini di Dashboard / Manajemen Siswa)
-    const totalSiswaTerkini = (typeof activeData !== 'undefined' && Array.isArray(activeData) && activeData.length > 0)
-        ? activeData.length
-        : ((window.rawSiswaData && window.rawSiswaData.length > 0)
-            ? window.rawSiswaData.filter(s => String(s.status || '').toUpperCase() === 'AKTIF').length
-            : 30);
+    // Jumlah Siswa LTC Aktif sesuai bulan yang dipilih (sinkron 100% dengan data Populasi LTC vs Total Karyawan)
+    const totalSiswaBulanIni = getLtcPopulationForMonth(selectedMonth);
 
     // Total Kasus Turnover = Resign + Indisipliner
     const totalTurnoverCases = resignCount + indisiplinerCount;
-    // Rasio Turnover = Total (Resign + Indisipliner) / Jumlah Siswa Terkini * 100%
-    const evalRatePct = totalSiswaTerkini > 0 ? Math.round((totalTurnoverCases / totalSiswaTerkini) * 100) : 0;
+    // Rasio Turnover = Total (Resign + Indisipliner) / Jumlah Siswa Bulan Tersebut * 100%
+    const evalRatePct = totalSiswaBulanIni > 0 ? Math.round((totalTurnoverCases / totalSiswaBulanIni) * 100) : 0;
     const evalRate = evalRatePct + '%';
 
-    const resignPct = totalSiswaTerkini > 0 ? Math.round((resignCount / totalSiswaTerkini) * 100) : 0;
-    const indisPct = totalSiswaTerkini > 0 ? Math.round((indisiplinerCount / totalSiswaTerkini) * 100) : 0;
-    const sisaBertahan = Math.max(0, totalSiswaTerkini - totalTurnoverCases);
+    const resignPct = totalSiswaBulanIni > 0 ? Math.round((resignCount / totalSiswaBulanIni) * 100) : 0;
+    const indisPct = totalSiswaBulanIni > 0 ? Math.round((indisiplinerCount / totalSiswaBulanIni) * 100) : 0;
+    const sisaBertahan = Math.max(0, totalSiswaBulanIni - totalTurnoverCases);
 
     const totalBadgeEl = document.getElementById('stat-turnover-total-badge');
     if (totalBadgeEl) totalBadgeEl.innerText = totalTurnoverCases + ' Siswa';
@@ -553,7 +591,7 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     if (indisPctEl) indisPctEl.innerText = indisPct + '%';
 
     const lulusValEl = document.getElementById('stat-turnover-lulus-val');
-    if (lulusValEl) lulusValEl.innerText = totalSiswaTerkini + ' Siswa';
+    if (lulusValEl) lulusValEl.innerText = totalSiswaBulanIni + ' Siswa';
     const lulusPctEl = document.getElementById('stat-turnover-lulus-pct');
     if (lulusPctEl) lulusPctEl.innerText = 'Basis 100%';
 
@@ -596,7 +634,7 @@ function updateTurnoverPieChart(rebuildFilter = true) {
     const curMonthLabelEl = document.getElementById('stat-turnover-month-label');
     if (curMonthLabelEl) curMonthLabelEl.innerText = curMonthLabel;
 
-    // Donut chart merepresentasikan komponen Turnover terhadap basis total siswa saat ini
+    // Donut chart merepresentasikan komponen Turnover terhadap basis total siswa pada bulan tersebut
     const chartLabels = ['Resign', 'Indisipliner', 'Siswa Bertahan / Aktif'];
     const chartData = [resignCount, indisiplinerCount, sisaBertahan];
     const chartColors = ['#F59E0B', '#F43F5E', '#10B981'];
@@ -641,8 +679,8 @@ function updateTurnoverPieChart(rebuildFilter = true) {
                     callbacks: {
                         label: function(context) {
                             const val = context.raw || 0;
-                            const pct = totalSiswaTerkini > 0 ? Math.round((val / totalSiswaTerkini) * 100) : 0;
-                            return ` ${val} Siswa (${pct}% dari siswa aktif)`;
+                            const pct = totalSiswaBulanIni > 0 ? Math.round((val / totalSiswaBulanIni) * 100) : 0;
+                            return ` ${val} Siswa (${pct}% dari populasi LTC)`;
                         }
                     }
                 },
@@ -1100,12 +1138,11 @@ function updateAbsensiChart() {
         // Abaikan entri Minggu
         if (st === 'X' || stLower === 'hari minggu' || stLower === 'x') return;
 
-        // Periksa apakah siswa aktif pada tanggal rekaman ini
+        // Periksa apakah siswa terdaftar dan aktif pada tanggal rekaman ini
         const studentInfo = studentMap[a.noreg || a.id || a.siswa_id];
-        if (studentInfo) {
-            if (studentInfo.masuk && a.tanggal < studentInfo.masuk) return;
-            if (studentInfo.keluar && a.tanggal > studentInfo.keluar) return;
-        }
+        if (!studentInfo) return;
+        if (studentInfo.masuk && a.tanggal < studentInfo.masuk) return;
+        if (studentInfo.keluar && a.tanggal > studentInfo.keluar) return;
 
         let key = a.tanggal.substring(0, 7); // YYYY-MM
         if (filterType === 'date-range') {

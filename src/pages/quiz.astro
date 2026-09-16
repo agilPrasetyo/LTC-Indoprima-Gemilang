@@ -1,0 +1,259 @@
+---
+import Layout from '../layouts/Layout.astro';
+---
+
+<Layout title="Ujian Quiz & Evaluasi Teori Siswa - LTC Indoprima Gemilang">
+  <!-- Wrapper Ujian Mandiri Bebas Distraksi -->
+  <div id="quiz-exam-app" class="min-h-screen bg-slate-900 text-slate-100 flex flex-col font-sans selection:bg-indigo-500 selection:text-white relative">
+    
+    <!-- 1. Header Khusus Ujian (Fixed Sticky) -->
+    <header class="sticky top-0 z-40 bg-slate-900/90 backdrop-blur-md border-b border-slate-800 px-4 lg:px-8 py-3.5 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-3">
+        <div class="w-9 h-9 rounded-xl bg-indigo-600/20 border border-indigo-500/40 flex items-center justify-center text-indigo-400 font-bold">
+          <i class="fa-solid fa-gamepad text-base"></i>
+        </div>
+        <div>
+          <h1 id="quiz-header-title" class="font-bold text-sm sm:text-base text-white truncate max-w-[200px] sm:max-w-md">Memuat Ujian...</h1>
+          <p id="quiz-header-section" class="text-[11px] text-slate-400 flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-indigo-500"></span>
+            <span>Stasiun Kerja</span>
+          </p>
+        </div>
+      </div>
+
+      <!-- Audio Element Musik Loop Otomatis -->
+      <audio id="quiz-bgm-audio" src="/audio/quis_audio.mp3" loop preload="auto"></audio>
+
+      <!-- Center Tools: Live Countdown Timer & Speaker Button -->
+      <div class="flex items-center gap-2 sm:gap-3">
+        <!-- Live Countdown Timer Pill -->
+        <div id="quiz-timer-pill" class="flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-800 border border-slate-700/80 text-xs font-mono font-bold text-indigo-400 shadow-inner">
+          <i class="fa-regular fa-clock" id="quiz-timer-icon"></i>
+          <span id="quiz-timer-countdown">--:--</span>
+        </div>
+
+        <!-- Kontrol Volume & Musik Pengiring (BGM Player) -->
+        <div id="quiz-audio-control-pill" class="flex items-center gap-2 px-3 py-1.5 rounded-full bg-slate-800 border border-slate-700/80 shadow-inner group transition-all hover:border-slate-600">
+          <button id="btn-quiz-audio-toggle" type="button" onclick="toggleQuizAudio()"
+            class="flex items-center text-indigo-400 hover:text-indigo-300 transition-transform group-hover:scale-110 cursor-pointer focus:outline-none"
+            title="Nyalakan / Matikan Musik Latar (Mute)">
+            <i class="fa-solid fa-volume-high text-xs" id="quiz-audio-icon"></i>
+          </button>
+          <div class="flex items-center gap-1.5">
+            <input type="range" id="quiz-volume-slider" min="0" max="100" value="35" step="1"
+              oninput="setQuizVolume(this.value)"
+              class="w-16 sm:w-20 h-1.5 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-indigo-500 hover:accent-indigo-400 transition-all"
+              title="Atur Volume Musik (0 - 100%)">
+            <span id="quiz-volume-percent" class="text-[10px] font-mono font-bold text-indigo-300 min-w-[28px] text-right">35%</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Profil Siswa & Drawer Toggle -->
+      <div class="flex items-center gap-2">
+        <div class="hidden sm:flex flex-col text-right">
+          <span id="quiz-student-name" class="text-xs font-bold text-slate-200">Siswa LTC</span>
+          <span id="quiz-student-noreg" class="text-[10px] font-mono text-slate-400">NoReg: -</span>
+        </div>
+        <button id="btn-toggle-drawer" onclick="toggleQuestionDrawer()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 transition-all" title="Daftar Soal">
+          <i class="fa-solid fa-list-ol text-sm"></i>
+        </button>
+      </div>
+    </header>
+
+    <!-- 2. Main Exam Body -->
+    <main class="flex-1 max-w-5xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-between">
+      
+      <!-- Progress Bar Halus -->
+      <div class="w-full bg-slate-800 rounded-full h-1.5 mb-6 overflow-hidden">
+        <div id="quiz-progress-bar" class="bg-indigo-500 h-full rounded-full transition-all duration-300" style="width: 0%;"></div>
+      </div>
+
+      <!-- Area Pertanyaan & Opsi Jawaban -->
+      <div id="quiz-question-card" class="bg-slate-800/60 border border-slate-700/60 rounded-3xl p-6 sm:p-8 shadow-2xl backdrop-blur-sm space-y-6 flex-1 flex flex-col justify-between">
+        
+        <!-- Header Soal: Nomor & Status -->
+        <div class="space-y-4">
+          <div class="flex items-center justify-between text-xs text-slate-400 font-bold">
+            <span id="quiz-question-number" class="px-3 py-1 rounded-xl bg-indigo-500/10 text-indigo-400 border border-indigo-500/20">
+              Soal 1 dari 10
+            </span>
+            <span id="quiz-answered-count" class="text-slate-400">
+              0 Terjawab
+            </span>
+          </div>
+
+          <!-- Teks Pertanyaan -->
+          <div class="min-h-[90px] flex items-center">
+            <h2 id="quiz-question-text" class="text-base sm:text-lg lg:text-xl font-bold text-white leading-relaxed">
+              Memuat soal ujian...
+            </h2>
+          </div>
+        </div>
+
+        <!-- 4 Opsi Pilihan Jawaban (A, B, C, D) -->
+        <div id="quiz-options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
+          <!-- Opsi Jawaban A, B, C, D di-render dinamis oleh quiz_engine.js -->
+        </div>
+
+        <!-- Footer Navigasi Antar Soal -->
+        <div class="flex items-center justify-between pt-6 border-t border-slate-700/60 gap-2">
+          <button id="btn-prev-question" onclick="navigateQuestion(-1)"
+            class="px-4 py-2.5 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 text-xs font-bold transition-all flex items-center gap-2">
+            <i class="fa-solid fa-arrow-left"></i> Sebelumnya
+          </button>
+
+          <button id="btn-submit-exam" onclick="confirmSubmitExam()"
+            class="px-5 py-2.5 rounded-2xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition-all shadow-lg shadow-emerald-900/40 flex items-center gap-2">
+            <i class="fa-solid fa-check-double"></i> Selesai Ujian
+          </button>
+
+          <button id="btn-next-question" onclick="navigateQuestion(1)"
+            class="px-4 py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-bold transition-all shadow-lg shadow-indigo-900/40 flex items-center gap-2">
+            Selanjutnya <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- 3. Drawer / Modal Laci Nomor Soal (Slide In) -->
+    <div id="quiz-drawer" class="fixed inset-y-0 right-0 z-50 w-80 bg-slate-900/95 border-l border-slate-800 backdrop-blur-xl p-6 shadow-2xl flex flex-col justify-between transition-transform duration-300 translate-x-full">
+      <div class="space-y-4">
+        <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+          <h3 class="font-bold text-sm text-white flex items-center gap-2">
+            <i class="fa-solid fa-table-cells text-indigo-400"></i> Navigasi Soal
+          </h3>
+          <button onclick="toggleQuestionDrawer(false)" class="text-slate-400 hover:text-white text-sm p-1">
+            <i class="fa-solid fa-xmark"></i>
+          </button>
+        </div>
+
+        <div class="flex items-center gap-3 text-[11px] text-slate-400">
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-indigo-600"></span> Terjawab</span>
+          <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-800 border border-slate-700"></span> Belum</span>
+        </div>
+
+        <!-- Grid Nomor Soal -->
+        <div id="quiz-drawer-grid" class="grid grid-cols-5 gap-2 max-h-[60vh] overflow-y-auto pr-1">
+          <!-- Diisi dinamis -->
+        </div>
+      </div>
+
+      <div class="pt-4 border-t border-slate-800">
+        <button onclick="confirmSubmitExam()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl transition-all shadow-md">
+          <i class="fa-solid fa-paper-plane mr-1.5"></i> Kumpulkan Sekarang
+        </button>
+      </div>
+    </div>
+
+    <!-- Backdrop Laci -->
+    <div id="quiz-drawer-backdrop" onclick="toggleQuestionDrawer(false)" class="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs hidden"></div>
+
+    <!-- 4. Modal Konfirmasi Kumpulkan Ujian -->
+    <div id="modal-confirm-submit" class="fixed inset-0 z-50 bg-black/70 backdrop-blur-sm flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-md w-full p-6 text-center space-y-4 shadow-2xl">
+        <div class="w-14 h-14 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center text-2xl mx-auto">
+          <i class="fa-solid fa-cloud-arrow-up"></i>
+        </div>
+        <div>
+          <h3 class="text-base font-bold text-white">Kumpulkan Jawaban Ujian?</h3>
+          <p id="submit-summary-text" class="text-xs text-slate-400 mt-1">
+            Pastikan seluruh soal telah dijawab sebelum mengirimkan jawaban Anda.
+          </p>
+        </div>
+        <div id="submit-warning-unanswered" class="p-3 bg-amber-500/10 border border-amber-500/20 rounded-xl text-amber-300 text-xs font-semibold hidden">
+          <i class="fa-solid fa-triangle-exclamation mr-1"></i> Perhatian: Masih ada soal yang belum Anda jawab!
+        </div>
+        <div class="flex items-center justify-center gap-3 pt-2">
+          <button onclick="closeConfirmModal()" class="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-xl text-xs font-bold transition-all">
+            Batal & Periksa Lagi
+          </button>
+          <button id="btn-final-submit" onclick="executeFinalSubmit()" class="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white rounded-xl text-xs font-bold transition-all shadow-lg shadow-emerald-900/40">
+            Ya, Kumpulkan
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. Layar Hasil Ujian (Scorecard Post-Submit) -->
+    <div id="quiz-scorecard-view" class="fixed inset-0 z-50 bg-slate-950/95 backdrop-blur-xl flex items-center justify-center p-4 hidden">
+      <div class="bg-slate-900 border border-slate-800 rounded-3xl max-w-lg w-full p-8 text-center space-y-6 shadow-2xl animate-scaleUp">
+        
+        <!-- Trophy / Status Icon -->
+        <div id="scorecard-icon-wrapper" class="w-20 h-20 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center text-4xl mx-auto shadow-inner">
+          <i class="fa-solid fa-trophy" id="scorecard-icon"></i>
+        </div>
+
+        <div>
+          <span id="scorecard-status-badge" class="px-3.5 py-1 rounded-full text-xs font-bold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase tracking-wider">
+            LULUS KKM
+          </span>
+          <h2 class="text-xl sm:text-2xl font-bold text-white mt-3" id="scorecard-greeting">
+            Ujian Telah Selesai!
+          </h2>
+          <p class="text-xs text-slate-400 mt-1" id="scorecard-subtitle">
+            Jawaban Anda telah berhasil tersimpan di sistem LTC Indoprima Gemilang.
+          </p>
+        </div>
+
+        <!-- Big Score Circle / Card -->
+        <div class="p-6 rounded-2xl bg-slate-800/50 border border-slate-700/80 space-y-2">
+          <span class="text-[11px] font-bold text-slate-400 uppercase tracking-widest">NILAI AKHIR ANDA</span>
+          <div class="text-5xl sm:text-6xl font-black font-mono text-white tracking-tight" id="scorecard-score">
+            --.-
+          </div>
+          <div class="text-xs text-slate-400 pt-1" id="scorecard-kkm-info">
+            Standar Kelulusan (KKM): <span class="font-bold text-white">75</span>
+          </div>
+        </div>
+
+        <!-- Rincian Jumlah Soal & Pengerjaan (Tanpa Kunci Jawaban) -->
+        <div class="grid grid-cols-3 gap-3 text-center text-xs">
+          <div class="p-3 rounded-xl bg-slate-800/30 border border-slate-800">
+            <span class="text-slate-400 text-[10px] block font-semibold">Total Soal</span>
+            <span class="text-base font-bold text-white mt-0.5 block" id="scorecard-total-q">-</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-800/30 border border-slate-800">
+            <span class="text-slate-400 text-[10px] block font-semibold">Jawaban Benar</span>
+            <span class="text-base font-bold text-emerald-400 mt-0.5 block" id="scorecard-correct-q">-</span>
+          </div>
+          <div class="p-3 rounded-xl bg-slate-800/30 border border-slate-800">
+            <span class="text-slate-400 text-[10px] block font-semibold">Percobaan Ke</span>
+            <span class="text-base font-bold text-indigo-400 mt-0.5 block" id="scorecard-attempt">-</span>
+          </div>
+        </div>
+
+        <!-- Catatan Remidi jika Nilai < 75 -->
+        <div id="scorecard-remedial-notice" class="p-3.5 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-300 text-xs text-left hidden space-y-1">
+          <p class="font-bold flex items-center gap-1.5"><i class="fa-solid fa-circle-exclamation"></i> Belum Memenuhi Standar KKM</p>
+          <p class="text-[11px] text-slate-300 leading-relaxed">
+            Nilai Anda berada di bawah KKM 75. Silakan laporkan hasil ini ke Admin atau pembimbing untuk mendapatkan izin remidi.
+          </p>
+        </div>
+
+        <!-- Tombol Kembali -->
+        <div class="pt-2">
+          <button onclick="exitQuizToPortal()" class="w-full py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs rounded-xl transition-all shadow-lg shadow-indigo-900/40 flex items-center justify-center gap-2">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i> Kembali ke Portal Siswa
+          </button>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Realtime Quiz Execution Scripts -->
+  <script is:inline src="/js/api.js?v=71.0"></script>
+  <script is:inline src="/js/quiz_engine.js?v=1.2"></script>
+</Layout>
+
+<style>
+  @keyframes scaleUp {
+    0% { transform: scale(0.92); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+  }
+  .animate-scaleUp {
+    animation: scaleUp 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  }
+</style>

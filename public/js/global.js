@@ -275,6 +275,14 @@ if (typeof Chart !== 'undefined') {
     var _lastSyncTime = null;
     var currentVersion = "";
 
+    function getStudentPhotoUrl(noreg) {
+        if (!noreg) return '';
+        const clean = String(noreg).trim();
+        const baseUrl = (typeof window !== 'undefined' && window.PUBLIC_SUPABASE_URL) ? window.PUBLIC_SUPABASE_URL : 'https://xpoddtzxsopwzojycmwx.supabase.co';
+        return `${baseUrl}/storage/v1/object/public/foto-siswa/${encodeURIComponent(clean)}.jpg`;
+    }
+    window.getStudentPhotoUrl = getStudentPhotoUrl;
+
     // Update realtime sync indicator in header
     function _updateSyncIndicator(status) {
         const dot = document.getElementById('sync-live-dot');
@@ -880,7 +888,10 @@ if (typeof Chart !== 'undefined') {
         }
     }
 
+    let _isLoggingIn = false;
+
     function setLoginButtonState(loading, text = 'Memverifikasi...') {
+        _isLoggingIn = !!loading;
         const btn = document.getElementById('btn-login-submit');
         if (!btn) return;
         if (loading) {
@@ -895,6 +906,9 @@ if (typeof Chart !== 'undefined') {
     }
 
     function handleLogin() {
+        if (_isLoggingIn) return;
+        const btn = document.getElementById('btn-login-submit');
+        if (btn && btn.disabled) return;
         try {
             const emailInput = document.getElementById('login-email');
             const passInput = document.getElementById('login-pass');
@@ -910,6 +924,11 @@ if (typeof Chart !== 'undefined') {
                     errorBox.innerText = "Email / Nomor Registrasi dan Password wajib diisi.";
                 }
                 setLoginButtonState(false);
+                if (!loginVal && emailInput) {
+                    emailInput.focus();
+                } else if (!passVal && passInput) {
+                    passInput.focus();
+                }
                 return;
             }
 
@@ -1426,11 +1445,12 @@ if (typeof Chart !== 'undefined') {
 
     function renderData(data) {
         rawSiswaData = (data.siswa || []).map(s => {
+            const noregVal = s.id || s.noreg || s.no_reg || '';
             const masukVal = s.masuk || s.tanggal_masuk || s.tanggalMasuk || s.tgl_masuk || '';
             const exitVal = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi || s.tgl_keluar || '';
             return {
                 ...s,
-                id: s.id || s.noreg || s.no_reg || '',
+                id: noregVal,
                 namaLengkap: s.namaLengkap || s.nama_lengkap || s.nama || '',
                 masuk: masukVal,
                 tanggal_masuk: masukVal,
@@ -1438,17 +1458,24 @@ if (typeof Chart !== 'undefined') {
                 bagian: s.bagian || s.section || '',
                 section: s.section || s.bagian || '',
                 daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || '',
-                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || ''
+                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || '',
+                tempatLahir: s.tempatLahir || s.tempat_lahir || '',
+                tanggalLahir: s.tanggalLahir || s.tanggal_lahir || s.tglLahir || '',
+                alamat: s.alamat || s.alamatLengkap || s.alamat_lengkap || '',
+                telepon: s.telepon || s.no_telp || s.noTelp || s.no_hp || s.noHp || s.hp || '',
+                noTelp: s.telepon || s.no_telp || s.noTelp || s.no_hp || s.noHp || s.hp || '',
+                foto: s.foto || (noregVal ? getStudentPhotoUrl(noregVal) : '')
             };
         });
         activeData = JSON.parse(JSON.stringify(rawSiswaData)).filter(s => String(s.status || '').toUpperCase() === "AKTIF"); 
         
         rawTurnoverData = (data.turnover || []).map(s => {
+            const noregVal = s.id || s.noreg || s.no_reg || '';
             const masukVal = s.masuk || s.tanggal_masuk || s.tanggalMasuk || s.tgl_masuk || '';
             const exitVal = s.tanggalKeluar || s.tanggal_keluar || s.keluar || s.tanggal_terminasi || s.tgl_keluar || '';
             return {
                 ...s,
-                id: s.id || s.noreg || s.no_reg || '',
+                id: noregVal,
                 namaLengkap: s.namaLengkap || s.nama_lengkap || s.nama || '',
                 masuk: masukVal,
                 tanggal_masuk: masukVal,
@@ -1456,7 +1483,13 @@ if (typeof Chart !== 'undefined') {
                 bagian: s.bagian || s.section || '',
                 section: s.section || s.bagian || '',
                 daerahAsal: s.daerahAsal || s.asal_daerah || s.asalDaerah || s.wilayah || '',
-                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || ''
+                asalSekolah: s.asalSekolah || s.asal_sekolah || s.sekolah || '',
+                tempatLahir: s.tempatLahir || s.tempat_lahir || '',
+                tanggalLahir: s.tanggalLahir || s.tanggal_lahir || s.tglLahir || '',
+                alamat: s.alamat || s.alamatLengkap || s.alamat_lengkap || '',
+                telepon: s.telepon || s.no_telp || s.noTelp || s.no_hp || s.noHp || s.hp || '',
+                noTelp: s.telepon || s.no_telp || s.noTelp || s.no_hp || s.noHp || s.hp || '',
+                foto: s.foto || (noregVal ? getStudentPhotoUrl(noregVal) : '')
             };
         });
         activeTurnoverData = JSON.parse(JSON.stringify(rawTurnoverData));
@@ -1818,12 +1851,12 @@ if (typeof Chart !== 'undefined') {
 
         document.querySelectorAll('.nav-btn').forEach(btn => {
             btn.classList.remove('text-white', 'bg-blue-600');
-            btn.classList.add('text-slate-400', 'hover:bg-white/5', 'hover:text-white');
+            btn.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
         });
 
         const activeBtn = document.getElementById('nav-' + viewName);
         if (activeBtn) {
-            activeBtn.classList.remove('text-slate-400', 'hover:bg-white/5', 'hover:text-white');
+            activeBtn.classList.remove('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
             activeBtn.classList.add('text-white', 'bg-blue-600');
         }
 
@@ -2088,6 +2121,38 @@ if (typeof Chart !== 'undefined') {
                 }
             }
 
+            // Bind Login Form Enter Key & Submit handlers
+            const loginForm = document.getElementById('login-form');
+            if (loginForm) {
+                loginForm.addEventListener('submit', (e) => {
+                    e.preventDefault();
+                    handleLogin();
+                });
+            }
+
+            const loginEmailInp = document.getElementById('login-email');
+            const loginPassInp = document.getElementById('login-pass');
+            if (loginEmailInp) {
+                loginEmailInp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        if (loginPassInp && !loginPassInp.value) {
+                            loginPassInp.focus();
+                        } else {
+                            handleLogin();
+                        }
+                    }
+                });
+            }
+            if (loginPassInp) {
+                loginPassInp.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter' || e.keyCode === 13) {
+                        e.preventDefault();
+                        handleLogin();
+                    }
+                });
+            }
+
             const savedUserStr = localStorage.getItem('currentUser');
             if (savedUserStr) {
                 const savedUser = JSON.parse(savedUserStr);
@@ -2173,4 +2238,117 @@ if (typeof Chart !== 'undefined') {
             }
         }
     });
+
+    // ============================================================
+    // REUSABLE PAGINATION UI COMPONENT (25 PER HALAMAN)
+    // ============================================================
+    function renderPaginationUI({
+        infoId,
+        controlsId,
+        currentPage,
+        totalItems,
+        pageSize = 25,
+        goToPageFn,
+        itemLabel = 'siswa',
+        themeColor = '#0B3B82'
+    }) {
+        const infoEl = document.getElementById(infoId);
+        const controlsEl = document.getElementById(controlsId);
+        if (!infoEl && !controlsEl) return;
+
+        const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
+        const safePage = Math.min(Math.max(1, currentPage), totalPages);
+
+        const startIndex = totalItems === 0 ? 0 : (safePage - 1) * pageSize;
+        const endIndex = Math.min(startIndex + pageSize, totalItems);
+
+        if (infoEl) {
+            if (totalItems === 0) {
+                infoEl.innerHTML = `Menampilkan <span class="text-slate-700 font-bold">0</span> dari <span class="text-slate-700 font-bold">0</span> ${itemLabel}`;
+            } else {
+                infoEl.innerHTML = `Menampilkan <span class="text-slate-800 font-bold">${startIndex + 1} - ${endIndex}</span> dari <span class="text-slate-800 font-bold">${totalItems}</span> ${itemLabel} (Halaman <span class="font-bold text-slate-900">${safePage}</span> / ${totalPages})`;
+            }
+        }
+
+        if (controlsEl) {
+            if (totalPages <= 1) {
+                controlsEl.innerHTML = '';
+                return;
+            }
+
+            let html = '';
+
+            // Tombol Sebelumnya (Previous)
+            const prevDisabled = safePage <= 1;
+            html += `
+                <button onclick="${goToPageFn}(${safePage - 1})" ${prevDisabled ? 'disabled' : ''}
+                    class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    title="Halaman Sebelumnya">
+                    <i class="fa-solid fa-chevron-left"></i>
+                </button>
+            `;
+
+            // Hitung nomor halaman dinamis (Maksimal 5 tombol angka di sekitar halaman aktif)
+            let startPage = Math.max(1, safePage - 2);
+            let endPage = Math.min(totalPages, startPage + 4);
+            if (endPage - startPage < 4) {
+                startPage = Math.max(1, endPage - 4);
+            }
+
+            if (startPage > 1) {
+                html += `
+                    <button onclick="${goToPageFn}(1)"
+                        class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-all shadow-xs cursor-pointer">
+                        1
+                    </button>
+                `;
+                if (startPage > 2) {
+                    html += `<span class="px-1 text-slate-400 select-none text-xs">...</span>`;
+                }
+            }
+
+            for (let p = startPage; p <= endPage; p++) {
+                if (p === safePage) {
+                    html += `
+                        <button class="px-3 py-1.5 rounded-lg text-white font-bold text-xs shadow-xs cursor-default" style="background-color: ${themeColor};">
+                            ${p}
+                        </button>
+                    `;
+                } else {
+                    html += `
+                        <button onclick="${goToPageFn}(${p})"
+                            class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-all shadow-xs cursor-pointer">
+                            ${p}
+                        </button>
+                    `;
+                }
+            }
+
+            if (endPage < totalPages) {
+                if (endPage < totalPages - 1) {
+                    html += `<span class="px-1 text-slate-400 select-none text-xs">...</span>`;
+                }
+                html += `
+                    <button onclick="${goToPageFn}(${totalPages})"
+                        class="px-3 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 font-semibold text-xs transition-all shadow-xs cursor-pointer">
+                        ${totalPages}
+                    </button>
+                `;
+            }
+
+            // Tombol Selanjutnya (Next)
+            const nextDisabled = safePage >= totalPages;
+            html += `
+                <button onclick="${goToPageFn}(${safePage + 1})" ${nextDisabled ? 'disabled' : ''}
+                    class="px-2.5 py-1.5 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 disabled:opacity-40 disabled:cursor-not-allowed text-xs font-bold transition-all shadow-xs cursor-pointer"
+                    title="Halaman Berikutnya">
+                    <i class="fa-solid fa-chevron-right"></i>
+                </button>
+            `;
+
+            controlsEl.innerHTML = html;
+        }
+    }
+    window.renderPaginationUI = renderPaginationUI;
+
 

@@ -1,89 +1,115 @@
-<div class="space-y-6 animate-fadeIn">
+---
+import AdminQuiz from './AdminQuiz.astro';
+---
 
-    <!-- TAB 1: Manajemen Siswa (Default Active View) -->
-    <div id="admin-tab-kelola-siswa" class="admin-tab-content space-y-6">
-        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+<div class="animate-fadeIn flex-1 min-h-0 flex flex-col h-full">
+
+    <!-- TAB 1: Manajemen Siswa (Default Active View - Pas 1 Layar Penuh) -->
+    <div id="admin-tab-kelola-siswa" class="admin-tab-content flex-1 min-h-0 flex flex-col h-full">
+        <div class="bg-white p-3.5 sm:p-4 rounded-[20px] border border-slate-100 shadow-sm flex flex-col flex-1 min-h-0 h-full">
+            <div class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5 border-b border-slate-100 pb-2">
                 <div>
-                    <h3 class="font-display font-bold text-lg text-brand-textMain">Manajemen Siswa Aktif</h3>
-                    <p class="text-xs text-brand-textSub">Kelola data pendaftaran siswa aktif program LTC</p>
+                    <h3 class="font-display font-bold text-base md:text-lg text-brand-textMain">Manajemen Siswa Aktif</h3>
+                    <p class="text-[11px] text-brand-textSub">Kelola data pendaftaran siswa aktif program LTC</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
                     <button onclick="exportAdminSiswaToExcel()"
-                        class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </button>
                     <button onclick="openStudentModal()"
-                        class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
+                        class="px-4 py-2 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
                         <i class="fa-solid fa-user-plus"></i> Tambah Siswa Baru
                     </button>
                 </div>
             </div>
 
             <!-- Baris Filter untuk Kelola Siswa -->
-            <div class="grid grid-cols-1 sm:grid-cols-5 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+            <div class="shrink-0 grid grid-cols-1 sm:grid-cols-5 gap-2 p-2 sm:p-2.5 bg-slate-50/90 rounded-xl border border-slate-100 mb-2.5">
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Pencarian</label>
                     <div class="relative">
-                        <input type="text" id="filter-siswa-query" oninput="renderAdminSiswaTable()" placeholder="Cari nama, noreg..."
-                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
-                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                        <input type="text" id="filter-siswa-query" oninput="renderAdminSiswaTable(true)" placeholder="Cari nama, noreg..."
+                            class="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-2.5 top-2.5 text-slate-400 text-xs"></i>
                     </div>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Section</label>
-                    <select id="filter-siswa-section" onchange="renderAdminSiswaTable()"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                    <select id="filter-siswa-section" onchange="renderAdminSiswaTable(true)"
+                        class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                         <option value="">Semua Section</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Kelas</label>
-                    <select id="filter-siswa-kelas" onchange="renderAdminSiswaTable()"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                    <select id="filter-siswa-kelas" onchange="renderAdminSiswaTable(true)"
+                        class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                         <option value="">Semua Kelas</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Daerah Asal</label>
-                    <select id="filter-siswa-asal" onchange="renderAdminSiswaTable()"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                    <select id="filter-siswa-asal" onchange="renderAdminSiswaTable(true)"
+                        class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                         <option value="">Semua Daerah Asal</option>
                     </select>
                 </div>
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Sekolah</label>
-                    <select id="filter-siswa-sekolah" onchange="renderAdminSiswaTable()"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                    <select id="filter-siswa-sekolah" onchange="renderAdminSiswaTable(true)"
+                        class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                         <option value="">Semua Sekolah</option>
                     </select>
                 </div>
             </div>
 
-            <!-- Tabel Siswa Aktif -->
-            <div class="overflow-x-auto max-h-[550px]" style="overflow-y: auto;">
+            <!-- Tabel Siswa Aktif (Flex-1 Min-h-0 Pas Layar) -->
+            <div class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-2xs">
                 <table class="w-full text-left text-sm border-collapse">
                     <thead class="sticky top-0 z-30 bg-slate-50">
                         <tr class="text-brand-textSub text-xs uppercase border-b border-slate-200 bg-slate-50 font-bold">
-                            <th class="py-3.5 px-4 font-bold sticky left-0 top-0 bg-slate-50 z-30 min-w-[155px] max-w-[155px] w-[155px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">Aksi</th>
-                            <th class="py-3.5 px-4 font-bold sticky left-[155px] top-0 bg-slate-50 z-30 min-w-[90px] max-w-[90px] w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">NoReg</th>
-                            <th class="py-3.5 px-4 font-bold sticky left-[245px] top-0 bg-slate-50 z-30 min-w-[200px] max-w-[200px] w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">Nama</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[120px] sticky top-0 bg-slate-50 z-20">Departemen</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[130px] sticky top-0 bg-slate-50 z-20">Section</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[100px] sticky top-0 bg-slate-50 z-20">HK</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[100px] sticky top-0 bg-slate-50 z-20">Kelas</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[100px] sticky top-0 bg-slate-50 z-20">Masuk LTC</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[100px] sticky top-0 bg-slate-50 z-20">Distribusi</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[100px] sticky top-0 bg-slate-50 z-20">Akhir LTC</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[150px] sticky top-0 bg-slate-50 z-20">SPV</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[120px] sticky top-0 bg-slate-50 z-20">Daerah Asal</th>
-                            <th class="py-3.5 px-4 font-bold min-w-[150px] sticky top-0 bg-slate-50 z-20">Sekolah</th>
+                            <th class="py-2.5 px-3 font-bold sticky left-0 top-0 bg-slate-50 z-30 min-w-[170px] max-w-[170px] w-[170px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">Aksi</th>
+                            <th class="py-2.5 px-3 font-bold sticky left-[170px] top-0 bg-slate-50 z-30 min-w-[90px] max-w-[90px] w-[90px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">NoReg</th>
+                            <th class="py-2.5 px-3.5 font-bold sticky left-[260px] top-0 bg-slate-50 z-30 min-w-[200px] max-w-[200px] w-[200px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">Nama</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[120px] sticky top-0 bg-slate-50 z-20">Departemen</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[130px] sticky top-0 bg-slate-50 z-20">Section</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[90px] sticky top-0 bg-slate-50 z-20">HK</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[95px] sticky top-0 bg-slate-50 z-20">Kelas</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[95px] sticky top-0 bg-slate-50 z-20">Masuk LTC</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[95px] sticky top-0 bg-slate-50 z-20">Distribusi</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[95px] sticky top-0 bg-slate-50 z-20">Akhir LTC</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[140px] sticky top-0 bg-slate-50 z-20">SPV</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[110px] sticky top-0 bg-slate-50 z-20">Daerah Asal</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[140px] sticky top-0 bg-slate-50 z-20">Sekolah</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[140px] sticky top-0 bg-slate-50 z-20">Tempat, Tanggal Lahir</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[160px] sticky top-0 bg-slate-50 z-20">Alamat</th>
+                            <th class="py-2.5 px-3 font-bold min-w-[130px] sticky top-0 bg-slate-50 z-20">No. Telepon</th>
                         </tr>
                     </thead>
                     <tbody id="admin-siswa-tbody" class="divide-y divide-slate-50 text-xs font-semibold">
                         <!-- Diisi Dinamis lewat JavaScript -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Kontrol Paginasi Siswa Aktif (Pas Satu Layar) -->
+            <div id="siswa-pagination-container" class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 mt-1 border-t border-slate-100 text-xs">
+                <div class="flex items-center gap-3">
+                    <span class="text-slate-500 font-semibold" id="siswa-pagination-info">
+                        Menampilkan 0 dari 0 siswa
+                    </span>
+                    <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                        <span>Tampil:</span>
+                        <select id="siswa-page-size-select" onchange="changeSiswaPageSize(this.value)"
+                            class="px-2 py-0.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-brand-blue transition-colors">
+                            <option value="10" selected>10 baris (Pas 1 Layar)</option>
+                            <option value="15">15 baris</option>
+                            <option value="25">25 baris</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="flex items-center gap-1.5" id="siswa-pagination-controls"></div>
             </div>
         </div>
     </div>
@@ -98,7 +124,7 @@
                 </div>
                 <div class="flex flex-wrap sm:flex-nowrap items-center gap-2.5 overflow-x-auto pb-1 sm:pb-0">
                     <div class="relative w-full sm:w-60 shrink-0">
-                        <input type="text" id="filter-user-query" oninput="filterAdminUsersTable()" placeholder="Cari nama, email, noreg, role..."
+                        <input type="text" id="filter-user-query" oninput="filterAdminUsersTable(true)" placeholder="Cari nama, email, noreg, role..."
                             class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm font-semibold">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                     </div>
@@ -134,6 +160,16 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Kontrol Paginasi Manajemen Akun -->
+            <div id="user-pagination-container" class="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div id="user-pagination-info" class="text-slate-500 font-semibold">
+                    Memuat data akun...
+                </div>
+                <div id="user-pagination-controls" class="flex items-center gap-1.5">
+                    <!-- Tombol paginasi diinjeksi via JS -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -160,12 +196,12 @@
             <!-- Baris Filter untuk Log Manpower -->
             <div class="flex flex-col sm:flex-row gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
                 <div class="flex-1 relative">
-                    <input type="text" id="filter-manpower-query" onkeyup="renderAdminManpowerTable()" placeholder="Cari NoReg, Nama Siswa, Bagian, SPV..."
+                    <input type="text" id="filter-manpower-query" oninput="renderAdminManpowerTable(true)" placeholder="Cari NoReg, Nama Siswa, Bagian, SPV..."
                         class="w-full pl-9 pr-4 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                     <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
                 </div>
                 <div class="w-full sm:w-48">
-                    <input type="date" id="filter-manpower-date" onchange="renderAdminManpowerTable()"
+                    <input type="date" id="filter-manpower-date" onchange="renderAdminManpowerTable(true)"
                         class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                 </div>
             </div>
@@ -192,73 +228,107 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Kontrol Paginasi Log Manpower -->
+            <div id="manpower-pagination-container" class="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div id="manpower-pagination-info" class="text-slate-500 font-semibold">
+                    Memuat log manpower...
+                </div>
+                <div id="manpower-pagination-controls" class="flex items-center gap-1.5">
+                    <!-- Tombol paginasi diinjeksi via JS -->
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- TAB 4: Kelola Turnover -->
-    <div id="admin-tab-kelola-turnover" class="admin-tab-content hidden space-y-6">
-        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
-            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+    <!-- TAB 4: Kelola Turnover (Pas 1 Layar Penuh) -->
+    <div id="admin-tab-kelola-turnover" class="admin-tab-content hidden flex-1 min-h-0 flex flex-col h-full">
+        <div class="bg-white p-3.5 sm:p-4 rounded-[20px] border border-slate-100 shadow-sm flex flex-col flex-1 min-h-0 h-full">
+            <div class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 mb-2.5 border-b border-slate-100 pb-2">
                 <div>
-                    <h3 class="font-display font-bold text-lg text-brand-textMain">Kelola Data Turnover</h3>
-                    <p class="text-xs text-brand-textSub">Tambah, edit, dan hapus data riwayat turnover peserta LTC</p>
+                    <h3 class="font-display font-bold text-base md:text-lg text-brand-textMain">Kelola Data Turnover</h3>
+                    <p class="text-[11px] text-brand-textSub">Tambah, edit, dan hapus data riwayat turnover peserta LTC</p>
                 </div>
-                <div class="flex flex-wrap items-center gap-3">
+                <div class="flex flex-wrap items-center gap-2.5">
                     <button onclick="exportAdminTurnoverToExcel()"
-                        class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
+                        class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
                         <i class="fa-solid fa-file-excel"></i> Export Excel
                     </button>
-                    <button onclick="openTurnoverModal()" class="px-5 py-2.5 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
+                    <button onclick="openTurnoverModal()" class="px-4 py-2 bg-brand-blue hover:bg-blue-700 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md">
                         <i class="fa-solid fa-plus"></i> Tambah Turnover
                     </button>
                 </div>
             </div>
 
             <!-- Baris Filter & Search untuk Kelola Turnover -->
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-6">
+            <div class="shrink-0 grid grid-cols-1 sm:grid-cols-3 gap-2 p-2 sm:p-2.5 bg-slate-50/90 rounded-xl border border-slate-100 mb-2.5">
                 <!-- 1. Search Bar -->
                 <div class="sm:col-span-2">
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Cari Data Turnover</label>
                     <div class="relative">
-                        <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-slate-400">
+                        <span class="absolute inset-y-0 left-0 flex items-center pl-2.5 text-slate-400">
                             <i class="fa-solid fa-magnifying-glass text-xs"></i>
                         </span>
-                        <input type="text" id="filter-admin-turnover-search" oninput="renderAdminTurnoverTable()"
+                        <input type="text" id="filter-admin-turnover-search" oninput="renderAdminTurnoverTable(true)"
                             placeholder="Cari nama, noreg, bagian, kota, sekolah, alasan, dll..."
-                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all" />
+                            class="w-full pl-8 pr-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all" />
                     </div>
                 </div>
 
                 <!-- 2. Filter Bulan -->
                 <div>
                     <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Bulan Keluar</label>
-                    <select id="filter-admin-turnover-bulan" onchange="renderAdminTurnoverTable()"
-                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                    <select id="filter-admin-turnover-bulan" onchange="renderAdminTurnoverTable(true)"
+                        class="w-full px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
                         <option value="">Semua Bulan</option>
                     </select>
                 </div>
             </div>
-            <div class="overflow-x-auto max-h-[550px]" style="overflow-y: auto;">
+            
+            <!-- Tabel Kelola Turnover (Flex-1 Min-h-0 Pas Layar) -->
+            <div class="flex-1 min-h-0 overflow-x-auto overflow-y-auto rounded-xl border border-slate-100 bg-white shadow-2xs">
                 <table class="w-full text-left text-sm border-collapse">
                     <thead class="sticky top-0 z-20 bg-slate-50">
                         <tr class="text-brand-textSub text-xs uppercase border-b border-slate-200 bg-slate-50 font-bold">
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">NoReg</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Nama</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Bagian</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Kelas</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Kota / Daerah</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Sekolah Asal</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Tgl Masuk</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Tgl Keluar</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Alasan</th>
-                            <th class="py-3.5 px-4 font-semibold sticky top-0 bg-slate-50 z-20">Keterangan</th>
-                            <th class="py-3.5 px-4 font-semibold text-right sticky top-0 bg-slate-50 z-20">Aksi</th>
+                            <th class="py-2.5 px-3 font-semibold sticky left-0 top-0 bg-slate-50 z-30 min-w-[130px] max-w-[130px] w-[130px] shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 text-left">Aksi</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20">NoReg</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[200px]">Nama</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20">Bagian</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[105px] whitespace-nowrap">Kelas</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[120px]">Kota / Daerah</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[140px]">Sekolah Asal</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[150px]">Tempat, Tanggal Lahir</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[180px]">Alamat</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[130px]">No. Telepon</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[100px] whitespace-nowrap">Tgl Masuk</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20 min-w-[100px] whitespace-nowrap">Tgl Keluar</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20">Alasan</th>
+                            <th class="py-2.5 px-3 font-semibold sticky top-0 bg-slate-50 z-20">Keterangan</th>
                         </tr>
                     </thead>
                     <tbody id="admin-turnover-tbody" class="divide-y divide-slate-50 text-xs font-semibold">
                         <!-- Diisi Dinamis lewat JavaScript -->
                     </tbody>
                 </table>
+            </div>
+
+            <!-- Kontrol Paginasi Kelola Turnover (Pas Satu Layar) -->
+            <div id="turnover-pagination-container" class="shrink-0 flex flex-col sm:flex-row sm:items-center justify-between gap-2 pt-2 mt-1 border-t border-slate-100 text-xs">
+                <div class="flex items-center gap-3">
+                    <span class="text-slate-500 font-semibold" id="turnover-pagination-info">
+                        Memuat data turnover...
+                    </span>
+                    <div class="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-slate-400">
+                        <span>Tampil:</span>
+                        <select id="turnover-page-size-select" onchange="changeTurnoverPageSize(this.value)"
+                            class="px-2 py-0.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-700 outline-none cursor-pointer hover:border-brand-blue transition-colors">
+                            <option value="10" selected>10 baris (Pas 1 Layar)</option>
+                            <option value="15">15 baris</option>
+                            <option value="25">25 baris</option>
+                        </select>
+                    </div>
+                </div>
+                <div id="turnover-pagination-controls" class="flex items-center gap-1.5"></div>
             </div>
         </div>
     </div>
@@ -273,7 +343,7 @@
                 </div>
                 <div class="flex flex-wrap items-center gap-3">
                     <div class="relative w-full sm:w-48">
-                        <input type="text" id="filter-populasi-tanggal" oninput="renderAdminPopulasiTable()" placeholder="Cari tanggal (cth: 2026-06-20)..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm">
+                        <input type="text" id="filter-populasi-tanggal" oninput="renderAdminPopulasiTable(true)" placeholder="Cari tanggal (cth: 2026-06-20)..." class="w-full pl-9 pr-4 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all-300 shadow-sm">
                         <i class="fa-solid fa-magnifying-glass absolute left-3 top-3 text-slate-400 text-xs"></i>
                     </div>
                     <button onclick="exportAdminPopulasiToExcel()" class="px-4 py-2.5 bg-emerald-600 hover:bg-emerald-700 active:scale-95 text-white font-bold rounded-xl text-xs flex items-center gap-2 transition-all shadow-md cursor-pointer">
@@ -305,6 +375,16 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Kontrol Paginasi Kelola Populasi -->
+            <div id="populasi-pagination-container" class="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div id="populasi-pagination-info" class="text-slate-500 font-semibold">
+                    Memuat data populasi...
+                </div>
+                <div id="populasi-pagination-controls" class="flex items-center gap-1.5">
+                    <!-- Tombol paginasi diinjeksi via JS -->
+                </div>
+            </div>
         </div>
     </div>
 
@@ -330,10 +410,10 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <div class="lg:col-span-2 relative">
                     <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="admin-safety-search-input" onkeyup="filterAdminSafetyTable()" placeholder="Cari NoReg, Nama, SPV, Keterangan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
+                    <input type="text" id="admin-safety-search-input" oninput="filterAdminSafetyTable(true)" placeholder="Cari NoReg, Nama, SPV, Keterangan..." class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all">
                 </div>
                 <div>
-                    <select id="admin-safety-filter-kelas" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <select id="admin-safety-filter-kelas" onchange="filterAdminSafetyTable(true)" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
                         <option value="">Semua Kelas</option>
                         <option value="Kelas 1">Kelas 1</option>
                         <option value="Kelas 2">Kelas 2</option>
@@ -343,7 +423,7 @@
                     </select>
                 </div>
                 <div>
-                    <select id="admin-safety-filter-bagian" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <select id="admin-safety-filter-bagian" onchange="filterAdminSafetyTable(true)" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
                         <option value="">Semua Section</option>
                         <option value="GRINDING">GRINDING</option>
                         <option value="PAINTING">PAINTING</option>
@@ -356,7 +436,7 @@
                     </select>
                 </div>
                 <div>
-                    <select id="admin-safety-filter-kategori" onchange="filterAdminSafetyTable()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
+                    <select id="admin-safety-filter-kategori" onchange="filterAdminSafetyTable(true)" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
                         <option value="">Semua Kategori</option>
                         <option value="Near Miss">Near Miss (Hampir Celaka)</option>
                         <option value="Ringan">Ringan (First Aid)</option>
@@ -390,6 +470,218 @@
                     </tbody>
                 </table>
             </div>
+
+            <!-- Kontrol Paginasi Manajemen K3 -->
+            <div id="safety-pagination-container" class="mt-4 pt-4 border-t border-slate-100 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs">
+                <div id="safety-pagination-info" class="text-slate-500 font-semibold">
+                    Memuat data kecelakaan kerja...
+                </div>
+                <div id="safety-pagination-controls" class="flex items-center gap-1.5">
+                    <!-- Tombol paginasi diinjeksi via JS -->
+                </div>
+            </div>
         </div>
+    </div>
+
+    <!-- TAB: Kelola Sertifikat Siswa -->
+    <div id="admin-tab-kelola-sertifikat" class="admin-tab-content hidden space-y-6">
+        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 border-b border-slate-100 pb-4">
+                <div>
+                    <h3 class="font-display font-bold text-lg text-brand-textMain">
+                        Penerbitan & Kelola Sertifikat Siswa
+                    </h3>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button onclick="selectAllReadyCertStudents()"
+                        class="px-3.5 py-2.5 bg-blue-50 hover:bg-blue-100 text-[#0B3B82] border border-blue-200 font-bold rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer shadow-xs"
+                        title="Centang semua siswa yang berstatus Siap Cetak">
+                        <i class="fa-solid fa-check-double"></i> Pilih Semua Siap Cetak
+                    </button>
+                    <button onclick="renderAdminSertifikatTab()"
+                        class="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
+                        <i class="fa-solid fa-rotate"></i> Refresh Data
+                    </button>
+                </div>
+            </div>
+
+            <!-- KPI Summary Cards -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+                <div class="p-4 rounded-2xl bg-blue-50/50 border border-blue-100/80 flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-blue-600 text-white flex items-center justify-center text-lg shadow-sm">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Total Siswa</div>
+                        <div id="cert-stat-total" class="text-xl font-black text-slate-800 font-mono">0</div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-amber-50/50 border border-amber-100/80 flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-amber-500 text-white flex items-center justify-center text-lg shadow-sm">
+                        <i class="fa-solid fa-clock"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Belum Dinilai</div>
+                        <div id="cert-stat-belum" class="text-xl font-black text-amber-600 font-mono">0</div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-emerald-50/50 border border-emerald-100/80 flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-emerald-600 text-white flex items-center justify-center text-lg shadow-sm">
+                        <i class="fa-solid fa-circle-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Siap Cetak / Tersimpan</div>
+                        <div id="cert-stat-siap" class="text-xl font-black text-emerald-600 font-mono">0</div>
+                    </div>
+                </div>
+
+                <div class="p-4 rounded-2xl bg-purple-50/50 border border-purple-100/80 flex items-center gap-3.5">
+                    <div class="w-11 h-11 rounded-xl bg-purple-600 text-white flex items-center justify-center text-lg shadow-sm">
+                        <i class="fa-solid fa-award"></i>
+                    </div>
+                    <div>
+                        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400">Rata-rata Nilai</div>
+                        <div id="cert-stat-avg" class="text-xl font-black text-purple-700 font-mono">0.0</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Filter Controls -->
+            <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 p-4 bg-slate-50 rounded-2xl border border-slate-100 mb-4">
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Pencarian Siswa</label>
+                    <div class="relative">
+                        <input type="text" id="filter-cert-query" oninput="filterAdminCertTable(true)" placeholder="Cari nama, noreg..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-2.5 text-slate-400 text-xs"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Batch / Kelas</label>
+                    <select id="filter-cert-batch" onchange="filterAdminCertTable(true)"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all cursor-pointer">
+                        <option value="">Semua Batch / Kelas</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Departemen</label>
+                    <select id="filter-cert-dept" onchange="filterAdminCertTable(true)"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all cursor-pointer">
+                        <option value="">Semua Departemen</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Filter Status</label>
+                    <select id="filter-cert-status" onchange="filterAdminCertTable(true)"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-brand-blue transition-all cursor-pointer">
+                        <option value="">Semua Status</option>
+                        <option value="belum">Belum Dinilai</option>
+                        <option value="siap">Siap Cetak / Tersimpan</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- Batch Action Bar: Muncul Dinamis Saat Ada Siswa Dicentang -->
+            <div id="cert-batch-action-bar" class="hidden flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-gradient-to-r from-slate-900 via-blue-950 to-indigo-950 text-white rounded-2xl shadow-xl border border-blue-500/30 mb-4 animate-fadeIn">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 rounded-xl bg-blue-500/20 border border-blue-400/30 flex items-center justify-center text-blue-300 text-base shrink-0 shadow-inner">
+                        <i class="fa-solid fa-list-check"></i>
+                    </div>
+                    <div>
+                        <div class="text-xs font-bold text-white flex items-center gap-2">
+                            <span id="cert-batch-selected-count">0 Siswa Dipilih</span>
+                            <span class="px-2 py-0.5 rounded-md text-[10px] font-mono font-bold bg-blue-500/20 text-blue-300 border border-blue-400/30">Download Massal</span>
+                        </div>
+                        <p class="text-[11px] text-slate-300 mt-0.5">Pilih format download sertifikat resmi:</p>
+                    </div>
+                </div>
+                <div class="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                    <button onclick="downloadBatchCertificates('pdf')"
+                        class="flex-1 sm:flex-initial px-4 py-2.5 bg-[#0B3B82] hover:bg-blue-600 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-file-pdf"></i>
+                        <span>Download Gabungan (1 PDF)</span>
+                    </button>
+                    <button onclick="downloadBatchCertificates('zip')"
+                        class="flex-1 sm:flex-initial px-4 py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs rounded-xl flex items-center justify-center gap-2 shadow-md transition-all active:scale-95 cursor-pointer">
+                        <i class="fa-solid fa-file-zipper"></i>
+                        <span>Download ZIP (Per Siswa)</span>
+                    </button>
+                    <button onclick="clearCertStudentSelection()"
+                        class="p-2.5 bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white rounded-xl text-xs transition-all cursor-pointer"
+                        title="Batalkan Pilihan">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabel Penerbitan Sertifikat Siswa -->
+            <div class="overflow-x-auto rounded-xl border border-slate-200/80 max-h-[550px]" style="overflow-y: auto;">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead class="sticky top-0 z-20 bg-slate-50 shadow-xs">
+                        <tr class="bg-slate-50 text-brand-textMain font-bold border-b border-slate-200 uppercase text-[10px] tracking-wider">
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 w-10">
+                                <input type="checkbox" id="cert-select-all" onchange="toggleSelectAllCertStudents(this.checked)"
+                                    class="w-4 h-4 rounded text-[#0B3B82] focus:ring-blue-500 border-slate-300 cursor-pointer"
+                                    title="Pilih Semua Siswa Siap Cetak di Halaman Ini">
+                            </th>
+                            <th class="py-3 px-3.5 text-center sticky top-0 bg-slate-50 z-20 w-10">NO</th>
+                            <th class="py-3 px-4 sticky top-0 bg-slate-50 z-20 min-w-[200px]">SISWA</th>
+                            <th class="py-3 px-3.5 sticky top-0 bg-slate-50 z-20 min-w-[110px]">KELAS / DEPT</th>
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 min-w-[90px]" title="Bobot 40%">KINERJA (40%)</th>
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 min-w-[80px]" title="Bobot 30%">BMK (30%)</th>
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 min-w-[80px]" title="Bobot 20%">SIKAP (20%)</th>
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 min-w-[80px]" title="Bobot 10%">LAPORAN (10%)</th>
+                            <th class="py-3 px-3.5 text-center sticky top-0 bg-slate-50 z-20 min-w-[110px]">NILAI AKHIR</th>
+                            <th class="py-3 px-3 text-center sticky top-0 bg-slate-50 z-20 min-w-[100px]">STATUS</th>
+                            <th class="py-3 px-4 text-center sticky top-0 bg-slate-50 z-20 min-w-[190px]">AKSI</th>
+                        </tr>
+                    </thead>
+                    <tbody id="admin-cert-tbody" class="divide-y divide-slate-100 font-normal text-brand-textMain">
+                        <tr>
+                            <td colspan="11" class="py-12 text-center text-xs text-slate-400 italic">
+                                <i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>
+                                Memuat data penerbitan sertifikat siswa...
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kontrol Paginasi Penerbitan Sertifikat (25 Siswa per Halaman) -->
+            <div id="cert-pagination-container" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs">
+                <div class="text-slate-500 font-semibold" id="cert-pagination-info">
+                    Menampilkan 0 dari 0 siswa
+                </div>
+                <div class="flex items-center gap-1.5" id="cert-pagination-controls"></div>
+            </div>
+        </div>
+
+        <!-- Modal Progress Batch Download Sertifikat -->
+        <div id="modal-cert-batch-progress" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4 hidden animate-fadeIn">
+            <div class="bg-white rounded-3xl shadow-2xl border border-slate-100 max-w-md w-full p-6 space-y-4 text-center">
+                <div class="w-14 h-14 rounded-2xl bg-blue-50 text-[#0B3B82] flex items-center justify-center text-2xl mx-auto shadow-inner">
+                    <i class="fa-solid fa-file-arrow-down animate-bounce"></i>
+                </div>
+                <div>
+                    <h4 class="font-display font-bold text-base text-slate-800" id="cert-batch-progress-title">Menyiapkan Sertifikat Siswa...</h4>
+                    <p class="text-xs text-slate-500 mt-1 truncate" id="cert-batch-progress-desc">Memproses dokumen...</p>
+                </div>
+                <!-- Progress bar -->
+                <div class="w-full bg-slate-100 rounded-full h-3 overflow-hidden">
+                    <div id="cert-batch-progress-bar" class="bg-gradient-to-r from-[#0B3B82] to-blue-500 h-3 rounded-full transition-all duration-300" style="width: 0%;"></div>
+                </div>
+                <div class="flex items-center justify-between text-[11px] font-mono font-bold text-slate-400">
+                    <span id="cert-batch-progress-status">0 / 0 Siswa</span>
+                    <span id="cert-batch-progress-percent">0%</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB 4: Manajemen Quiz Interaktif -->
+    <div id="admin-tab-kelola-quiz" class="admin-tab-content hidden -mt-5 md:-mt-7 space-y-4">
+        <AdminQuiz />
     </div>
 </div>

@@ -1,0 +1,360 @@
+{
+  "sections": [
+    {
+      "id": "sec-grinding",
+      "name": "Grinding",
+      "description": ""
+    },
+    {
+      "id": "sec-furan",
+      "name": "Furan",
+      "description": ""
+    },
+    {
+      "id": "sec-melting",
+      "name": "Melting",
+      "description": ""
+    },
+    {
+      "id": "sec-machining",
+      "name": "Machining",
+      "description": ""
+    },
+    {
+      "id": "sec-safety",
+      "name": "Kaizen, 5R & Safety",
+      "description": ""
+    }
+  ],
+  "questions": [
+    {
+      "id": "q-furan-01",
+      "section_id": "sec-furan",
+      "question": "Fungsi dari resin dan hardener pada proses pembuatan cetakan pasir furan adalah?",
+      "options": {
+        "A": "Sebagai bahan pewarna pasir",
+        "B": "Sebagai pengikat (binder) agar pasir mengeras secara kimiawi",
+        "C": "Sebagai pelumas logam cair",
+        "D": "Sebagai bahan pembersih debu cetakan"
+      },
+      "correct_answer": "B"
+    },
+    {
+      "id": "q-furan-02",
+      "section_id": "sec-furan",
+      "question": "Cacat coran 'gas hole' pada cetakan furan umumnya disebabkan oleh?",
+      "options": {
+        "A": "Pengeringan cetakan yang terlalu sempurna",
+        "B": "Ventilasi udara pada cetakan kurang atau kelembapan pasir terlalu tinggi",
+        "C": "Temperatur penuangan logam terlalu tinggi",
+        "D": "Jumlah pasir terlalu padat"
+      },
+      "correct_answer": "B"
+    },
+    {
+      "id": "q-1788833676109-uwo5",
+      "section_id": "sec-grinding",
+      "question": "Apa definisi dari proses melting dalam alur pengecoran logam?",
+      "options": {
+        "A": "Proses pencampuran pasir untuk cetakan",
+        "B": "Proses peleburan bahan baku menjadi cairan besi cor",
+        "C": "Proses pemisahan produk dari sistem saluran tuang",
+        "D": "Proses pembersihan sisa pasir pada produk"
+      },
+      "correct_answer": "B"
+    },
+    {
+      "id": "q-1788833676109-82e4",
+      "section_id": "sec-grinding",
+      "question": "Manakah kelompok material yang ditambahkan secara khusus untuk menyesuaikan komposisi kimia cairan besi cor agar memenuhi standar spesifikasi?",
+      "options": {
+        "A": "Steel Scrap",
+        "B": "Return Scrap",
+        "C": "Alloy Material (seperti C, Fe-Si, Fe-Mn, Cu, Sn, S, Fe-Cr)",
+        "D": "Sand Mold"
+      },
+      "correct_answer": "C"
+    },
+    {
+      "id": "q-1788833676109-12vq",
+      "section_id": "sec-grinding",
+      "question": "Bagaimana karakteristik utama dari tipe material FC (Ferro Casting) atau besi cor kelabu?",
+      "options": {
+        "A": "Ulet (tidak mudah patah) dan berkekuatan tinggi",
+        "B": "Getas (mudah patah), keras, dan tahan gores",
+        "C": "Memiliki keuletan dan kekuatan yang sangat tinggi",
+        "D": "Sangat elastis dan mudah dibengkokkan"
+      },
+      "correct_answer": "B"
+    },
+    {
+      "id": "q-1788833676109-5v2s",
+      "section_id": "sec-grinding",
+      "question": "Komponen kendaraan seperti Body Caliper dan Bracket merupakan contoh aplikasi penting dari tipe material...",
+      "options": {
+        "A": "FC (Ferro Casting)",
+        "B": "FCD (Ferro Casting Ductile)",
+        "C": "Steel Casting",
+        "D": "Grey Iron Casting"
+      },
+      "correct_answer": "B"
+    },
+    {
+      "id": "q-1788833676109-vur3",
+      "section_id": "sec-grinding",
+      "question": "Bentuk grafit seperti apakah yang terlihat pada pengujian struktur mikro material FCD (Ferro Casting Ductile) dengan perbesaran 100x?",
+      "options": {
+        "A": "Berbentuk flake (cacing)",
+        "B": "Berbentuk nodular (bulat)",
+        "C": "Berbentuk serat acak",
+        "D": "Tidak memiliki struktur grafit"
+      },
+      "correct_answer": "B"
+    }
+  ],
+  "quizzes": [
+    {
+      "id": "quiz-1788839948404",
+      "title": "UJIAN KENAIKAN KELAS",
+      "section_id": "sec-grinding",
+      "kelas_level": 1,
+      "start_time": "2026-09-08T10:58",
+      "end_time": "2026-09-08T14:58",
+      "duration_minutes": 45,
+      "kkm": 75,
+      "participants": [
+        "PRA0784"
+      ],
+      "status": "scheduled",
+      "created_at": "2026-09-08T03:59:08.404Z"
+    },
+    {
+      "id": "quiz-1788947845305",
+      "title": "UJIAN KELAS 2",
+      "section_id": "sec-grinding",
+      "kelas_level": 1,
+      "start_time": "2026-09-09T16:57",
+      "end_time": "2026-09-09T20:57",
+      "duration_minutes": 45,
+      "kkm": 75,
+      "participants": [
+        "PRA0784"
+      ],
+      "status": "scheduled",
+      "created_at": "2026-09-09T09:57:25.305Z"
+    },
+    {
+      "id": "quiz-1789023129585",
+      "title": "KENAIKAN KELAS",
+      "section_id": "sec-grinding",
+      "kelas_level": 1,
+      "start_time": "2026-09-10T13:51",
+      "end_time": "2026-09-10T17:51",
+      "duration_minutes": 45,
+      "kkm": 75,
+      "participants": [
+        "2608055",
+        "PRA0778"
+      ],
+      "status": "scheduled",
+      "created_at": "2026-09-10T06:52:09.585Z"
+    },
+    {
+      "id": "quiz-1789547987561",
+      "title": "UJIAN KENAIKAN KELAS 5",
+      "section_id": "sec-grinding",
+      "kelas_level": 5,
+      "start_time": "2026-09-16T15:39",
+      "end_time": "2026-09-16T19:39",
+      "duration_minutes": 45,
+      "kkm": 75,
+      "participants": [
+        "2605046"
+      ],
+      "status": "scheduled",
+      "created_at": "2026-09-16T08:39:47.561Z"
+    }
+  ],
+  "submissions": [
+    {
+      "id": "sub-1788756352738-rdbp",
+      "quiz_id": "quiz-1788756352697",
+      "noreg": "131",
+      "nama": "Muntoho Adi Putro",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 100,
+      "correct_count": 2,
+      "total_questions": 2,
+      "is_remedial": false,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-07T04:45:52.738Z"
+    },
+    {
+      "id": "sub-1788756372407-slfz",
+      "quiz_id": "quiz-remedial-test",
+      "noreg": "999",
+      "nama": "Test Siswa",
+      "kelas_level": 2,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 50,
+      "correct_count": 1,
+      "total_questions": 2,
+      "is_remedial": false,
+      "remedial_granted": true,
+      "submitted_at": "2026-09-07T04:46:12.407Z"
+    },
+    {
+      "id": "sub-1788756372458-qc77",
+      "quiz_id": "quiz-remedial-test",
+      "noreg": "999",
+      "nama": "Test Siswa",
+      "kelas_level": 2,
+      "section_name": "Grinding",
+      "attempt": 2,
+      "score": 100,
+      "correct_count": 2,
+      "total_questions": 2,
+      "is_remedial": true,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-07T04:46:12.458Z"
+    },
+    {
+      "id": "sub-1788758907936-ed31",
+      "quiz_id": "quiz-1788756981922",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 50,
+      "correct_count": 1,
+      "total_questions": 2,
+      "is_remedial": false,
+      "remedial_granted": true,
+      "submitted_at": "2026-09-07T05:28:27.936Z"
+    },
+    {
+      "id": "sub-1788834414852-wf59",
+      "quiz_id": "quiz-1788756981922",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 2,
+      "score": 40,
+      "correct_count": 2,
+      "total_questions": 5,
+      "is_remedial": true,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-08T02:26:54.852Z"
+    },
+    {
+      "id": "sub-1788839434182-r01u",
+      "quiz_id": "quiz-1788839281182",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 20,
+      "correct_count": 1,
+      "total_questions": 5,
+      "is_remedial": false,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-08T03:50:34.182Z"
+    },
+    {
+      "id": "sub-1788840051667-d2nr",
+      "quiz_id": "quiz-1788839948404",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 20,
+      "correct_count": 1,
+      "total_questions": 5,
+      "is_remedial": false,
+      "remedial_granted": true,
+      "submitted_at": "2026-09-08T04:00:51.667Z"
+    },
+    {
+      "id": "sub-1788842030482-wj7l",
+      "quiz_id": "quiz-1788839948404",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 2,
+      "score": 0,
+      "correct_count": 0,
+      "total_questions": 5,
+      "is_remedial": true,
+      "remedial_granted": true,
+      "submitted_at": "2026-09-08T04:33:50.483Z"
+    },
+    {
+      "id": "sub-1789023227938-suhk",
+      "quiz_id": "quiz-1789023129585",
+      "noreg": "2608055",
+      "nama": "ABDUL MUIZ'ZAIN",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 60,
+      "correct_count": 3,
+      "total_questions": 5,
+      "is_remedial": false,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-10T06:53:47.938Z"
+    },
+    {
+      "id": "sub-1789445776005-8bhk",
+      "quiz_id": "quiz-1788839948404",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 3,
+      "score": 20,
+      "correct_count": 1,
+      "total_questions": 5,
+      "is_remedial": true,
+      "remedial_granted": true,
+      "submitted_at": "2026-09-15T04:16:16.005Z"
+    },
+    {
+      "id": "sub-1789459252958-zqtx",
+      "quiz_id": "quiz-1788839948404",
+      "noreg": "PRA0784",
+      "nama": "CHANG ALI ROCHIM JAGA BUMI",
+      "kelas_level": 1,
+      "section_name": "Grinding",
+      "attempt": 4,
+      "score": 60,
+      "correct_count": 3,
+      "total_questions": 5,
+      "is_remedial": true,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-15T08:00:52.958Z"
+    },
+    {
+      "id": "sub-1789548185182-org3",
+      "quiz_id": "quiz-1789547987561",
+      "noreg": "2605046",
+      "nama": "ARDO ARDIANTARA FARREL",
+      "kelas_level": 5,
+      "section_name": "Grinding",
+      "attempt": 1,
+      "score": 20,
+      "correct_count": 1,
+      "total_questions": 5,
+      "is_remedial": false,
+      "remedial_granted": false,
+      "submitted_at": "2026-09-16T08:43:05.182Z"
+    }
+  ]
+}

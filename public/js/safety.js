@@ -354,7 +354,13 @@ function filterSafetyTable() {
     });
 }
 
-function filterAdminSafetyTable() {
+let safetyCurrentPage = 1;
+const SAFETY_PAGE_SIZE = 25;
+
+function filterAdminSafetyTable(resetPage = false) {
+    if (resetPage === true) {
+        safetyCurrentPage = 1;
+    }
     const tbody = document.getElementById('admin-safety-tbody');
     if (!tbody) return;
 
@@ -401,14 +407,35 @@ function filterAdminSafetyTable() {
                 </td>
             </tr>
         `;
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'safety-pagination-info',
+                controlsId: 'safety-pagination-controls',
+                currentPage: 1,
+                totalItems: 0,
+                pageSize: SAFETY_PAGE_SIZE,
+                goToPageFn: 'goToSafetyPage',
+                itemLabel: 'insiden',
+                themeColor: '#0B3B82'
+            });
+        }
         return;
     }
+
+    const totalItems = filtered.length;
+    const totalPages = Math.max(1, Math.ceil(totalItems / SAFETY_PAGE_SIZE));
+    if (safetyCurrentPage > totalPages) safetyCurrentPage = totalPages;
+    if (safetyCurrentPage < 1) safetyCurrentPage = 1;
+
+    const startIndex = (safetyCurrentPage - 1) * SAFETY_PAGE_SIZE;
+    const endIndex = Math.min(startIndex + SAFETY_PAGE_SIZE, totalItems);
+    const pageItems = filtered.slice(startIndex, endIndex);
 
     const studentList = (typeof rawSiswaData !== 'undefined' && Array.isArray(rawSiswaData) && rawSiswaData.length > 0)
         ? rawSiswaData
         : (typeof activeData !== 'undefined' && Array.isArray(activeData) ? activeData : []);
 
-    filtered.forEach(item => {
+    pageItems.forEach(item => {
         const tr = document.createElement('tr');
         tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
 
@@ -459,7 +486,29 @@ function filterAdminSafetyTable() {
         `;
         tbody.appendChild(tr);
     });
+
+    if (typeof renderPaginationUI === 'function') {
+        renderPaginationUI({
+            infoId: 'safety-pagination-info',
+            controlsId: 'safety-pagination-controls',
+            currentPage: safetyCurrentPage,
+            totalItems: totalItems,
+            pageSize: SAFETY_PAGE_SIZE,
+            goToPageFn: 'goToSafetyPage',
+            itemLabel: 'insiden',
+            themeColor: '#0B3B82'
+        });
+    }
 }
+
+function goToSafetyPage(page) {
+    safetyCurrentPage = page;
+    filterAdminSafetyTable(false);
+    const scrollContainer = document.querySelector('#admin-tab-kelola-k3 .overflow-x-auto');
+    if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+}
+window.goToSafetyPage = goToSafetyPage;
+window.filterAdminSafetyTable = filterAdminSafetyTable;
 
 function toggleSafetyFilterInputs() {
     const filterType = document.getElementById('safety-chart-filter-type')?.value || 'all';
@@ -569,6 +618,10 @@ function updateSafetyCharts() {
     if (badgeTotal) {
         badgeTotal.textContent = `${filtered.length} Kasus`;
     }
+    const execTotalNum = document.getElementById('safety-executive-total-num');
+    const execTotalLabel = document.getElementById('safety-executive-total-label');
+    if (execTotalNum) execTotalNum.textContent = filtered.length;
+    if (execTotalLabel) execTotalLabel.textContent = filtered.length > 0 ? 'Kasus Insiden' : 'Nihil Insiden';
 
     // ========================================================
     // 1. TREN INSIDEN PER PERIODE (STACKED SEVERITY + LINE)
@@ -617,8 +670,93 @@ function updateSafetyCharts() {
     const totalTrendData = sortedKeys.map(k => periodMap[k].total);
 
     const trendCtx = trendCanvas.getContext('2d');
+
+    // Helper Gradient Canvas Dinamis (Scriptable Function agar gradasi selalu presisi sesuai tinggi render aktif)
+    // Set default Chart.js font to match the application theme (Inter, sans-serif)
+    if (window.Chart && Chart.defaults) {
+        Chart.defaults.font.family = "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif";
+    }
+
+    // Helper Gradient Canvas Dinamis (Scriptable Function agar gradasi selalu presisi sesuai tinggi render aktif)
+    function createPillarGradient(ctx, chartArea, colTop, colBottom) {
+        if (!chartArea) return colTop;
+        const g = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+        g.addColorStop(0, colTop);
+        g.addColorStop(1, colBottom);
+        return g;
+    }
+
+    // Custom Plugin: Satu-Satunya Renderer Angka Mengambang (Bersih, Non-Overlapping, Elegan ala Gambar 1)
+    const executiveFloatingLabelsPlugin = {
+        id: 'safetyExecutiveFloatingLabels',
+        afterDatasetsDraw(chart) {
+            const { ctx, chartArea } = chart;
+            if (!chartArea) return;
+            const lineDatasetIndex = chart.data.datasets.findIndex(d => d.type === 'line');
+            if (lineDatasetIndex === -1) return;
+            const lineMeta = chart.getDatasetMeta(lineDatasetIndex);
+            if (!lineMeta || lineMeta.hidden) return;
+
+            const lineData = chart.data.datasets[lineDatasetIndex].data || [];
+            const maxVal = Math.max(...lineData, 0);
+
+            ctx.save();
+            lineMeta.data.forEach((element, index) => {
+                const val = lineData[index];
+                if (val === undefined || val === null || val === 0) return;
+                const pos = element.tooltipPosition();
+                if (!pos || isNaN(pos.x) || isNaN(pos.y)) return;
+
+                const text = String(val);
+                const isPeak = val === maxVal && val > 0;
+
+                if (isPeak) {
+                    // Highlighted Badge untuk Nilai Puncak ala Gambar 1 (contoh: 20.6)
+                    ctx.font = "bold 11px 'Inter', -apple-system, sans-serif";
+                    const textWidth = ctx.measureText(text).width;
+                    const padX = 7;
+                    const w = Math.max(textWidth + padX * 2, 22);
+                    const h = 19;
+                    const rx = pos.x - w / 2;
+                    const ry = pos.y - 30;
+
+                    ctx.shadowColor = 'rgba(15, 23, 42, 0.28)';
+                    ctx.shadowBlur = 6;
+                    ctx.fillStyle = '#0F172A';
+                    ctx.beginPath();
+                    if (typeof ctx.roundRect === 'function') {
+                        ctx.roundRect(rx, ry, w, h, 6);
+                    } else {
+                        ctx.rect(rx, ry, w, h);
+                    }
+                    ctx.fill();
+
+                    // Teks putih kontras di dalam badge
+                    ctx.shadowColor = 'transparent';
+                    ctx.fillStyle = '#FFFFFF';
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'middle';
+                    ctx.fillText(text, pos.x, ry + h / 2 + 0.5);
+                } else {
+                    // Angka tebal mengambang dengan halo putih lembut di sekelilingnya
+                    ctx.font = "800 12.5px 'Inter', -apple-system, sans-serif";
+                    ctx.textAlign = 'center';
+                    ctx.textBaseline = 'bottom';
+                    ctx.shadowColor = 'rgba(255, 255, 255, 0.95)';
+                    ctx.shadowBlur = 5;
+                    ctx.fillStyle = '#0F172A';
+                    ctx.fillText(text, pos.x, pos.y - 12);
+                }
+            });
+            ctx.restore();
+        }
+    };
+
+    const maxValInTrend = Math.max(...totalTrendData, 0) || 4;
+
     safetyTrendChartInstance = new Chart(trendCtx, {
         type: 'bar',
+        plugins: [executiveFloatingLabelsPlugin],
         data: {
             labels: labels.length > 0 ? labels : ['Belum Ada Data'],
             datasets: [
@@ -626,51 +764,82 @@ function updateSafetyCharts() {
                     type: 'bar',
                     label: 'Near Miss',
                     data: nearMissData.length > 0 ? nearMissData : [0],
-                    backgroundColor: '#F59E0B',
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FDE68A', '#D97706'), // Amber / Kuning Waspada
+                    hoverBackgroundColor: '#B45309',
                     stack: 'severity',
-                    borderRadius: 0,
-                    order: 5
+                    barThickness: 34,
+                    maxBarThickness: 38,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                    order: 5,
+                    datalabels: { display: false }
                 },
                 {
                     type: 'bar',
                     label: 'Ringan',
                     data: ringanData.length > 0 ? ringanData : [0],
-                    backgroundColor: '#3B82F6',
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#93C5FD', '#2563EB'), // Biru / Penanganan Ringan
+                    hoverBackgroundColor: '#1D4ED8',
                     stack: 'severity',
-                    borderRadius: 0,
-                    order: 4
+                    barThickness: 34,
+                    maxBarThickness: 38,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                    order: 4,
+                    datalabels: { display: false }
                 },
                 {
                     type: 'bar',
                     label: 'Sedang',
                     data: sedangData.length > 0 ? sedangData : [0],
-                    backgroundColor: '#F97316',
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FED7AA', '#C2410C'), // Cokelat / Oranye Perawatan Medis
+                    hoverBackgroundColor: '#9A3412',
                     stack: 'severity',
-                    borderRadius: 0,
-                    order: 3
+                    barThickness: 34,
+                    maxBarThickness: 38,
+                    borderRadius: 5,
+                    borderSkipped: false,
+                    order: 3,
+                    datalabels: { display: false }
                 },
                 {
                     type: 'bar',
                     label: 'Berat',
                     data: beratData.length > 0 ? beratData : [0],
-                    backgroundColor: '#EF4444',
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FCA5A5', '#DC2626'), // Merah / Kasus Berat & Fatal
+                    hoverBackgroundColor: '#991B1B',
                     stack: 'severity',
-                    borderRadius: { topLeft: 6, topRight: 6, bottomLeft: 0, bottomRight: 0 },
-                    order: 2
+                    barThickness: 34,
+                    maxBarThickness: 38,
+                    borderRadius: 6,
+                    borderSkipped: false,
+                    order: 2,
+                    datalabels: { display: false }
                 },
                 {
                     type: 'line',
-                    label: 'Total Insiden',
+                    label: 'Total Tren',
                     data: totalTrendData.length > 0 ? totalTrendData : [0],
-                    borderColor: '#1E293B',
-                    borderWidth: 2.2,
+                    borderColor: '#0F172A',
+                    borderWidth: 2.8,
                     pointBackgroundColor: '#FFFFFF',
-                    pointBorderColor: '#1E293B',
-                    pointBorderWidth: 2,
-                    pointRadius: 4,
-                    pointHoverRadius: 6,
-                    tension: 0.3,
-                    fill: false,
+                    pointBorderColor: '#0F172A',
+                    pointBorderWidth: 2.5,
+                    pointRadius: 6,
+                    pointHoverRadius: 8,
+                    pointHoverBackgroundColor: '#38BDF8',
+                    pointHoverBorderColor: '#0F172A',
+                    tension: 0.45,
+                    fill: true,
+                    backgroundColor: (c) => {
+                        const { ctx, chartArea } = c.chart;
+                        if (!chartArea) return 'transparent';
+                        const grad = ctx.createLinearGradient(0, chartArea.top, 0, chartArea.bottom);
+                        grad.addColorStop(0, 'rgba(59, 130, 246, 0.28)'); // soft tech blue glow
+                        grad.addColorStop(0.55, 'rgba(234, 88, 12, 0.08)'); // warm amber ambient
+                        grad.addColorStop(1, 'rgba(255, 255, 255, 0.0)'); // clear at bottom
+                        return grad;
+                    },
                     order: 1,
                     datalabels: { display: false }
                 }
@@ -685,19 +854,27 @@ function updateSafetyCharts() {
             },
             plugins: {
                 legend: { display: false },
+                datalabels: { display: false },
                 tooltip: {
-                    backgroundColor: 'rgba(15, 23, 42, 0.92)',
-                    titleFont: { size: 11, family: 'Inter', weight: 'bold' },
-                    bodyFont: { size: 10.5, family: 'Inter' },
-                    padding: 10,
-                    cornerRadius: 10,
+                    backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                    titleFont: { size: 12, family: "'Inter', -apple-system, sans-serif", weight: 'bold' },
+                    bodyFont: { size: 11, family: "'Inter', -apple-system, sans-serif" },
+                    padding: 12,
+                    cornerRadius: 12,
+                    borderColor: 'rgba(255, 255, 255, 0.12)',
+                    borderWidth: 1,
                     callbacks: {
+                        label: (context) => {
+                            const val = context.raw || 0;
+                            if (val === 0) return null; // lewati kategori yang bernilai 0
+                            return ` ${context.dataset.label}: ${val} kasus`;
+                        },
                         footer: (items) => {
                             let sum = 0;
                             items.forEach(i => {
                                 if (i.dataset.type === 'bar') sum += i.raw;
                             });
-                            return 'Total: ' + sum + ' Insiden';
+                            return 'Total: ' + sum + ' Kasus Insiden';
                         }
                     }
                 }
@@ -706,14 +883,28 @@ function updateSafetyCharts() {
                 x: {
                     stacked: true,
                     grid: { display: false },
-                    ticks: { font: { size: 10.5, family: 'Inter', weight: '600' }, color: '#64748B' }
+                    border: { display: false },
+                    ticks: {
+                        font: { size: 11.5, family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", weight: '600' },
+                        color: '#475569',
+                        padding: 8
+                    }
                 },
                 y: {
                     stacked: true,
                     beginAtZero: true,
-                    suggestedMax: Math.max(...totalTrendData, 2) + 1,
-                    ticks: { precision: 0, font: { size: 10, family: 'Inter' }, color: '#94A3B8' },
-                    grid: { color: 'rgba(226, 232, 240, 0.6)' }
+                    suggestedMax: maxValInTrend + 0.85,
+                    border: { display: false, dash: [5, 5] },
+                    ticks: {
+                        precision: 0,
+                        padding: 10,
+                        font: { size: 10.5, family: "'Inter', -apple-system, BlinkMacSystemFont, sans-serif", weight: '500' },
+                        color: '#94A3B8'
+                    },
+                    grid: {
+                        color: 'rgba(226, 232, 240, 0.6)',
+                        drawTicks: false
+                    }
                 }
             }
         }

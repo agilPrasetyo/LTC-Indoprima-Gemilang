@@ -99,46 +99,70 @@
 
         <!-- 2 Kolom Grafik Visualisasi Safety (Concept A - Executive EHS Dashboard) -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            <!-- 1. Grafik Tren Insiden per Periode (Stacked Severity + Smooth Trend Curve) -->
-            <div class="lg:col-span-7 bg-slate-50/70 p-5 rounded-2xl border border-slate-100 flex flex-col justify-between space-y-4">
-                <div class="flex items-center justify-between">
+            <!-- 1. Grafik Tren Insiden per Periode (Executive Style ala Gambar 1) -->
+            <div class="lg:col-span-7 bg-white p-6 sm:p-7 rounded-[28px] border border-slate-200/80 shadow-sm flex flex-col justify-between space-y-4 relative overflow-hidden">
+                <!-- Background subtle decorative glow & ambient light -->
+                <div class="absolute -top-16 -right-16 w-56 h-56 bg-sky-100/40 rounded-full blur-3xl pointer-events-none"></div>
+
+                <!-- Executive Telemetry Header ala Gambar 1 -->
+                <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 relative z-10">
                     <div>
-                        <h5 class="font-display font-bold text-xs text-brand-textMain flex items-center gap-1.5">
-                            <i class="fa-solid fa-chart-simple text-blue-600"></i> Tren Insiden per Periode (Stacked Severity)
-                        </h5>
-                        <p class="text-[11px] text-brand-textSub mt-0.5">Komposisi tingkat keparahan insiden per rentang waktu</p>
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
+                            <h5 class="font-display font-extrabold text-xs uppercase tracking-wider text-slate-600">
+                                Tren Insiden & Frekuensi K3
+                            </h5>
+                        </div>
+
+                        <!-- Big Bold Number Typography ala Gambar 1 -->
+                        <div class="flex items-baseline gap-2.5 mt-1">
+                            <h2 class="font-display font-black text-4xl sm:text-5xl text-slate-900 tracking-tight" id="safety-executive-total-num">12</h2>
+                            <span class="text-xs sm:text-sm font-semibold text-slate-500 font-sans" id="safety-executive-total-label">Kasus Insiden</span>
+                        </div>
+
+                        <!-- Micro Legend ala Gambar 1 (berada tepat di bawah angka besar) -->
+                        <div class="flex flex-wrap items-center gap-3.5 mt-3 text-[11px] font-sans">
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-4 h-1 bg-slate-900 rounded-full"></span>
+                                <span class="font-bold text-slate-800">Total Tren</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-amber-400 shadow-xs"></span>
+                                <span class="font-semibold text-slate-600">Near Miss</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-blue-500 shadow-xs"></span>
+                                <span class="font-semibold text-slate-600">Ringan</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-orange-600 shadow-xs"></span>
+                                <span class="font-semibold text-slate-600">Sedang</span>
+                            </div>
+                            <div class="flex items-center gap-1.5">
+                                <span class="w-2.5 h-2.5 rounded-sm bg-rose-600 shadow-xs"></span>
+                                <span class="font-semibold text-slate-600">Berat</span>
+                            </div>
+                        </div>
                     </div>
-                    <span id="safety-trend-badge-total" class="px-2.5 py-1 rounded-full text-[10px] font-extrabold bg-blue-50 text-blue-700 border border-blue-200/60 shadow-xs">
-                        0 Kasus
-                    </span>
+
+                    <!-- Right Period / Total Badge -->
+                    <div class="flex items-center gap-2 self-start sm:self-auto">
+                        <span id="safety-trend-badge-total" class="px-3.5 py-1.5 rounded-xl text-xs font-extrabold bg-blue-50 text-blue-800 border border-blue-200/80 shadow-xs font-sans">
+                            12 Kasus
+                        </span>
+                    </div>
                 </div>
 
-                <div class="relative h-64 w-full">
-                    <canvas id="safetyTrendChart"></canvas>
-                </div>
-
-                <!-- Custom Modern Mini Legend -->
-                <div class="flex flex-wrap items-center justify-center gap-3 pt-3 border-t border-slate-200/70 text-[10.5px]">
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-amber-500 shadow-xs"></span>
-                        <span class="font-semibold text-slate-600">Near Miss</span>
+                <!-- Canvas Chart Container with extra height and background wave silhouette -->
+                <div class="relative h-72 w-full pt-1">
+                    <!-- Subtle corporate skyline & wave backdrop ala Gambar 1 -->
+                    <div class="absolute inset-x-0 bottom-6 h-36 pointer-events-none opacity-25 overflow-hidden flex items-end">
+                        <svg class="w-full h-full text-sky-200" viewBox="0 0 800 120" fill="currentColor" preserveAspectRatio="none">
+                            <path d="M0,85 Q120,45 240,80 T480,65 T720,40 T800,50 L800,120 L0,120 Z" opacity="0.45"></path>
+                            <path d="M0,98 Q160,70 320,95 T640,70 T800,75 L800,120 L0,120 Z" opacity="0.75"></path>
+                        </svg>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-blue-500 shadow-xs"></span>
-                        <span class="font-semibold text-slate-600">Ringan</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-orange-500 shadow-xs"></span>
-                        <span class="font-semibold text-slate-600">Sedang</span>
-                    </div>
-                    <div class="flex items-center gap-1.5">
-                        <span class="w-2.5 h-2.5 rounded-full bg-rose-500 shadow-xs"></span>
-                        <span class="font-semibold text-slate-600">Berat</span>
-                    </div>
-                    <div class="flex items-center gap-1.5 pl-2 border-l border-slate-200">
-                        <span class="w-3.5 h-0.5 bg-slate-800 rounded-full"></span>
-                        <span class="font-bold text-slate-800">Total Tren</span>
-                    </div>
+                    <canvas id="safetyTrendChart" class="relative z-10"></canvas>
                 </div>
             </div>
 

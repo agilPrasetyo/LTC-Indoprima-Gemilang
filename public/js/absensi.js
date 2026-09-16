@@ -568,18 +568,43 @@
         const classFilter = document.getElementById('abs-filter-class');
         const classVal = classFilter ? classFilter.value : 'all';
 
-        let targetNoregs = {};
-        (activeData || []).forEach(s => {
-            if (classVal === 'all') {
-                targetNoregs[s.id] = true;
-            } else if (classVal === 'Kelas 5') {
-                const num = parseInt((s.kelas || '').replace('Kelas ', ''));
-                if (s.kelas === 'Kelas 5' || (!isNaN(num) && num > 5)) {
-                    targetNoregs[s.id] = true;
-                }
-            } else if (s.kelas === classVal) {
-                targetNoregs[s.id] = true;
+        // 1. Ambil seluruh siswa (aktif maupun turnover yang sempat aktif pada bulan terpilih)
+        const allStudents = [...(activeData || []), ...(activeTurnoverData || [])];
+        const uniqueMap = {};
+        allStudents.forEach(s => {
+            if (s.id && !uniqueMap[s.id]) {
+                uniqueMap[s.id] = s;
             }
+        });
+
+        const firstDayStr = `${year}-${monthStr}-01`;
+        const lastDayNum = new Date(year, month + 1, 0).getDate();
+        const lastDayStr = `${year}-${monthStr}-${String(lastDayNum).padStart(2, '0')}`;
+
+        const validStudentMap = {};
+        Object.values(uniqueMap).forEach(s => {
+            const isAktif = (s.status || '').toUpperCase() === 'AKTIF';
+            const masuk = s.masuk || s.tglMasuk || s.tanggalMasuk || '';
+            const rawKeluar = s.keluar || s.tanggalKeluar || s.tglKeluar || s.distribusi || '';
+            const keluar = (isAktif || (rawKeluar && masuk && rawKeluar < masuk)) ? '' : rawKeluar;
+
+            // Syarat 1: Tanggal Masuk <= Hari Terakhir Bulan ini
+            if (masuk && masuk > lastDayStr) return;
+            // Syarat 2: Tanggal Keluar >= Hari Pertama Bulan ini (berlaku bagi siswa yang sudah non-aktif / turnover)
+            if (keluar && keluar < firstDayStr) return;
+
+            // Filter kelas jika dipilih
+            if (classVal !== 'all') {
+                const sKelas = s.kelas || _getStudentKelas(s.id);
+                if (classVal === 'Kelas 5') {
+                    const num = parseInt((sKelas || '').replace('Kelas ', ''));
+                    if (sKelas !== 'Kelas 5' && (isNaN(num) || num <= 5)) return;
+                } else if (sKelas !== classVal) {
+                    return;
+                }
+            }
+
+            validStudentMap[s.id] = { masuk, keluar };
         });
 
         let totalHadir = 0;
@@ -590,16 +615,24 @@
         const todayStr = new Date().toISOString().slice(0, 10); // 'yyyy-mm-dd'
 
         absensiData.forEach(r => {
-            if (r.tanggal.startsWith(prefix) && r.tanggal <= todayStr && targetNoregs[r.noreg]) {
-                const parts = r.tanggal.split('-');
-                const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
-                const isSunday = dObj.getDay() === 0;
+            if (!r.tanggal || !r.noreg) return;
+            if (!r.tanggal.startsWith(prefix) || r.tanggal > todayStr) return;
 
-                if (r.status === 'Hadir') totalHadir++;
-                else if (r.status === 'Ijin') totalIjin++;
-                else if (r.status === 'Sakit') totalSakit++;
-                else if (r.status === 'Alpha' && !isSunday) totalAlpha++;
-            }
+            const studentInfo = validStudentMap[r.noreg];
+            if (!studentInfo) return;
+
+            // Pastikan tanggal absensi berada dalam rentang aktif siswa
+            if (studentInfo.masuk && r.tanggal < studentInfo.masuk) return;
+            if (studentInfo.keluar && r.tanggal > studentInfo.keluar) return;
+
+            const parts = r.tanggal.split('-');
+            const dObj = new Date(parseInt(parts[0]), parseInt(parts[1]) - 1, parseInt(parts[2]));
+            const isSunday = dObj.getDay() === 0;
+
+            if (r.status === 'Hadir') totalHadir++;
+            else if (r.status === 'Ijin') totalIjin++;
+            else if (r.status === 'Sakit') totalSakit++;
+            else if (r.status === 'Alpha' && !isSunday) totalAlpha++;
         });
 
         document.getElementById('abs-stat-hadir').innerText = totalHadir;

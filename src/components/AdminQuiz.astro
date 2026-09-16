@@ -1,0 +1,495 @@
+<!-- ======================================================== -->
+<!-- MODUL ADMIN QUIZ INTERAKTIF (LTC INDOPRIMA GEMILANG)      -->
+<!-- Mengadopsi Konsep Quizizz / Wayground                      -->
+<!-- ======================================================== -->
+
+<div class="space-y-4">
+    <!-- Header Modul Quiz -->
+    <div class="bg-white p-4 sm:p-5 rounded-2xl border border-slate-100 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+        <div>
+            <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-2xl bg-indigo-50 border border-indigo-100 flex items-center justify-center text-indigo-600 font-bold text-lg">
+                    <i class="fa-solid fa-gamepad"></i>
+                </div>
+                <div>
+                    <h3 class="font-display font-bold text-lg text-slate-800 leading-tight">Sistem Quiz & Evaluasi Teori</h3>
+                </div>
+            </div>
+        </div>
+
+        <!-- Sub-Tab Navigasi Quiz -->
+        <div class="flex items-center p-1.5 bg-slate-50 border border-slate-200/80 rounded-2xl gap-1">
+            <button id="tab-btn-quiz-rekap" onclick="switchQuizSubTab('rekap')"
+                class="quiz-subtab-btn px-4 py-2 rounded-xl text-xs font-bold transition-all bg-white text-indigo-600 shadow-sm border border-slate-100">
+                <i class="fa-solid fa-chart-column mr-1.5"></i> Rekap Nilai Siswa
+            </button>
+            <button id="tab-btn-quiz-soal" onclick="switchQuizSubTab('soal')"
+                class="quiz-subtab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">
+                <i class="fa-solid fa-layer-group mr-1.5"></i> Bank Soal & Section
+            </button>
+            <button id="tab-btn-quiz-jadwal" onclick="switchQuizSubTab('jadwal')"
+                class="quiz-subtab-btn px-4 py-2 rounded-xl text-xs font-bold text-slate-600 hover:text-slate-900 transition-all">
+                <i class="fa-solid fa-calendar-check mr-1.5"></i> Jadwal Ujian
+            </button>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SUB-TAB 1: REKAP NILAI SISWA                            -->
+    <!-- ======================================================== -->
+    <div id="quiz-subview-rekap" class="quiz-subview space-y-4">
+        <div class="bg-white p-5 sm:p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-base leading-tight">Rekap Nilai Siswa per Tingkat Kelas</h4>
+                </div>
+                <div class="flex items-center gap-3">
+                    <button onclick="refreshQuizData()" class="px-3.5 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all">
+                        <i class="fa-solid fa-rotate"></i> Refresh
+                    </button>
+                </div>
+            </div>
+
+            <!-- Filter & Search Bar -->
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 p-3 bg-slate-50 rounded-2xl border border-slate-100">
+                <div>
+                    <input type="text" id="filter-quiz-rekap-query" oninput="renderQuizRekapTable(true)" placeholder="Cari siswa / NoReg..."
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-indigo-500 font-semibold">
+                </div>
+                <div>
+                    <select id="filter-quiz-rekap-status" onchange="renderQuizRekapTable(true)"
+                        class="w-full px-3 py-2 bg-white border border-slate-200 rounded-xl text-xs outline-none focus:border-indigo-500 font-semibold">
+                        <option value="">Semua Status Kelulusan</option>
+                        <option value="lulus">Lulus Semua (>= 75)</option>
+                        <option value="remidi">Ada Remidi (< 75)</option>
+                        <option value="belum">Belum Ada Nilai</option>
+                    </select>
+                </div>
+                <div class="flex items-center justify-end">
+                    <span class="text-xs text-slate-500 font-semibold" id="rekap-summary-count">Menampilkan: 0 siswa</span>
+                </div>
+            </div>
+
+            <!-- Tabel Rekap Nilai -->
+            <div class="overflow-x-auto max-h-[550px]" style="overflow-y: auto;">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead class="sticky top-0 z-20 bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-3 min-w-[75px] whitespace-nowrap">NoReg</th>
+                            <th class="py-3 px-3 min-w-[180px] whitespace-nowrap">Nama Siswa</th>
+                            <th class="py-3 px-3 text-center min-w-[75px] whitespace-nowrap">Kelas 1</th>
+                            <th class="py-3 px-3 text-center min-w-[75px] whitespace-nowrap">Kelas 2</th>
+                            <th class="py-3 px-3 text-center min-w-[75px] whitespace-nowrap">Kelas 3</th>
+                            <th class="py-3 px-3 text-center min-w-[75px] whitespace-nowrap">Kelas 4</th>
+                            <th class="py-3 px-3 text-center min-w-[75px] whitespace-nowrap">Kelas 5</th>
+                            <th class="py-3 px-3 text-center min-w-[110px] whitespace-nowrap">Rata-Rata Teori</th>
+                            <th class="py-3 px-3 text-center min-w-[130px] whitespace-nowrap">Status KKM</th>
+                            <th class="py-3 px-3 text-center min-w-[190px] whitespace-nowrap">Aksi Admin</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quiz-rekap-tbody" class="divide-y divide-slate-100 font-semibold">
+                        <!-- Diisi secara dinamis oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Kontrol Paginasi Rekap Nilai Quiz (25 Siswa per Halaman) -->
+            <div id="quiz-rekap-pagination-container" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-4 border-t border-slate-100 text-xs">
+                <div class="text-slate-500 font-semibold" id="quiz-rekap-pagination-info">
+                    Menampilkan 0 dari 0 siswa
+                </div>
+                <div class="flex items-center gap-1.5" id="quiz-rekap-pagination-controls"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SUB-TAB 2: BANK SOAL & SECTION                          -->
+    <!-- ======================================================== -->
+    <div id="quiz-subview-soal" class="quiz-subview hidden space-y-6">
+        <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+            <!-- Kolom Kiri: Manajemen Section / Stasiun Kerja -->
+            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4 lg:col-span-1">
+                <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <h4 class="font-bold text-slate-800 text-sm">Daftar Section</h4>
+                    <button onclick="openModalAddSection()" class="p-1.5 bg-indigo-50 hover:bg-indigo-100 text-indigo-600 rounded-lg text-xs font-bold transition-all" title="Tambah Section">
+                        <i class="fa-solid fa-plus"></i>
+                    </button>
+                </div>
+                <div id="quiz-section-list" class="space-y-2 max-h-[500px] overflow-y-auto">
+                    <!-- Diisi dinamis -->
+                </div>
+            </div>
+
+            <!-- Kolom Kanan: Bank Soal Pilihan Ganda -->
+            <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4 lg:col-span-3">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                    <div>
+                        <h4 class="font-bold text-slate-800 text-base leading-tight" id="current-section-title">Daftar Soal</h4>
+                    </div>
+                    <div class="flex flex-wrap items-center gap-2">
+                        <button onclick="downloadQuizTemplate('csv')" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all" title="Download Template CSV">
+                            <i class="fa-solid fa-download"></i> Template CSV
+                        </button>
+                        <button onclick="downloadQuizTemplate('xlsx')" class="px-3 py-2 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all" title="Download Template Excel">
+                            <i class="fa-solid fa-file-excel"></i> Template Excel
+                        </button>
+                        <button onclick="openModalImportSoal()" class="px-3.5 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+                            <i class="fa-solid fa-file-import"></i> Import Excel/CSV
+                        </button>
+                        <button onclick="openModalAddQuestion()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-1.5 transition-all shadow-sm">
+                            <i class="fa-solid fa-plus"></i> Tambah Soal
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Daftar Kartu Soal -->
+                <div id="quiz-question-container" class="space-y-3 max-h-[550px] overflow-y-auto pr-1">
+                    <!-- Diisi dinamis -->
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ======================================================== -->
+    <!-- SUB-TAB 3: JADWAL UJIAN (QUIZ SCHEDULER)                 -->
+    <!-- ======================================================== -->
+    <div id="quiz-subview-jadwal" class="quiz-subview hidden space-y-6">
+        <div class="bg-white p-6 rounded-[24px] border border-slate-100 shadow-sm space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+                <div>
+                    <h4 class="font-bold text-slate-800 text-base leading-tight">Jadwal Ujian Aktif & Terjadwal</h4>
+                </div>
+                <div>
+                    <button onclick="openModalAddSchedule()" class="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl flex items-center gap-2 transition-all shadow-sm">
+                        <i class="fa-solid fa-calendar-plus"></i> Jadwalkan Ujian Baru
+                    </button>
+                </div>
+            </div>
+
+            <!-- Tabel Jadwal Ujian -->
+            <div class="overflow-x-auto max-h-[550px]" style="overflow-y: auto;">
+                <table class="w-full text-left text-xs border-collapse">
+                    <thead class="sticky top-0 z-20 bg-slate-50 text-slate-600 uppercase font-bold border-b border-slate-200">
+                        <tr>
+                            <th class="py-3 px-3 min-w-[180px]">Judul Ujian</th>
+                            <th class="py-3 px-3 min-w-[120px]">Section / Stasiun</th>
+                            <th class="py-3 px-3 text-center min-w-[90px]">Tingkat</th>
+                            <th class="py-3 px-3 min-w-[140px]">Jadwal Mulai</th>
+                            <th class="py-3 px-3 min-w-[140px]">Jadwal Selesai</th>
+                            <th class="py-3 px-3 text-center min-w-[80px]">Durasi</th>
+                            <th class="py-3 px-3 text-center min-w-[90px]">Peserta</th>
+                            <th class="py-3 px-3 text-center min-w-[100px]">Status</th>
+                            <th class="py-3 px-3 text-center min-w-[120px]">Aksi</th>
+                        </tr>
+                    </thead>
+                    <tbody id="quiz-schedule-tbody" class="divide-y divide-slate-100 font-semibold">
+                        <!-- Diisi secara dinamis oleh JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL 1: TAMBAH / EDIT SECTION                          -->
+<!-- ======================================================== -->
+<div id="modal-quiz-section" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+    <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h4 class="font-bold text-slate-800 text-sm" id="modal-section-title">Tambah Section Baru</h4>
+            <button onclick="closeModalQuizSection()" class="text-slate-400 hover:text-slate-600 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <input type="hidden" id="quiz-section-id">
+        <div class="space-y-3 text-xs">
+            <div>
+                <label class="block font-bold text-slate-600 mb-1">Nama Section / Stasiun Kerja *</label>
+                <input type="text" id="quiz-section-name" placeholder="Contoh: Grinding / Furan / Melting"
+                    class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+            </div>
+            <div>
+                <label class="block font-bold text-slate-600 mb-1">Deskripsi Singkat</label>
+                <textarea id="quiz-section-desc" rows="2" placeholder="Deskripsi materi dan lingkup stasiun kerja..."
+                    class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold"></textarea>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModalQuizSection()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+                Batal
+            </button>
+            <button onclick="saveQuizSection()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                Simpan Section
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL 2: TAMBAH / EDIT SOAL PILIHAN GANDA               -->
+<!-- ======================================================== -->
+<div id="modal-quiz-question" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h4 class="font-bold text-slate-800 text-sm" id="modal-question-title">Tambah Soal Pilihan Ganda</h4>
+            <button onclick="closeModalQuizQuestion()" class="text-slate-400 hover:text-slate-600 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <input type="hidden" id="quiz-question-id">
+        <div class="space-y-4 text-xs">
+            <div>
+                <label class="block font-bold text-slate-600 mb-1">Section / Stasiun Kerja *</label>
+                <select id="quiz-question-section" class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                    <!-- Diisi dinamis -->
+                </select>
+            </div>
+            <div>
+                <label class="block font-bold text-slate-600 mb-1">Pertanyaan / Soal *</label>
+                <textarea id="quiz-question-text" rows="3" placeholder="Tuliskan pertanyaan di sini..."
+                    class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold"></textarea>
+            </div>
+            <div class="space-y-2">
+                <label class="block font-bold text-slate-600">Pilihan Jawaban & Kunci Jawaban *</label>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div class="p-3 border border-slate-200 rounded-xl flex items-center gap-2 bg-slate-50/50">
+                        <input type="radio" name="quiz-correct-answer" id="radio-ans-A" value="A" class="w-4 h-4 text-indigo-600 cursor-pointer">
+                        <span class="font-bold text-slate-700 w-5">A.</span>
+                        <input type="text" id="quiz-opt-A" placeholder="Teks Pilihan A" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg outline-none font-semibold text-xs">
+                    </div>
+                    <div class="p-3 border border-slate-200 rounded-xl flex items-center gap-2 bg-slate-50/50">
+                        <input type="radio" name="quiz-correct-answer" id="radio-ans-B" value="B" class="w-4 h-4 text-indigo-600 cursor-pointer">
+                        <span class="font-bold text-slate-700 w-5">B.</span>
+                        <input type="text" id="quiz-opt-B" placeholder="Teks Pilihan B" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg outline-none font-semibold text-xs">
+                    </div>
+                    <div class="p-3 border border-slate-200 rounded-xl flex items-center gap-2 bg-slate-50/50">
+                        <input type="radio" name="quiz-correct-answer" id="radio-ans-C" value="C" class="w-4 h-4 text-indigo-600 cursor-pointer">
+                        <span class="font-bold text-slate-700 w-5">C.</span>
+                        <input type="text" id="quiz-opt-C" placeholder="Teks Pilihan C" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg outline-none font-semibold text-xs">
+                    </div>
+                    <div class="p-3 border border-slate-200 rounded-xl flex items-center gap-2 bg-slate-50/50">
+                        <input type="radio" name="quiz-correct-answer" id="radio-ans-D" value="D" class="w-4 h-4 text-indigo-600 cursor-pointer">
+                        <span class="font-bold text-slate-700 w-5">D.</span>
+                        <input type="text" id="quiz-opt-D" placeholder="Teks Pilihan D" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg outline-none font-semibold text-xs">
+                    </div>
+                </div>
+                <p class="text-[11px] text-slate-400 italic">Pilih bulatan radio di samping huruf untuk menetapkan kunci jawaban yang benar.</p>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModalQuizQuestion()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+                Batal
+            </button>
+            <button onclick="saveQuizQuestion()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                Simpan Soal
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL 3: IMPORT SOAL DARI EXCEL / CSV                    -->
+<!-- ======================================================== -->
+<div id="modal-quiz-import" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h4 class="font-bold text-slate-800 text-sm">Import Soal Massal dari Excel / CSV</h4>
+            <button onclick="closeModalQuizImport()" class="text-slate-400 hover:text-slate-600 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <div class="space-y-4 text-xs">
+            <div class="p-3 bg-amber-50 border border-amber-200 rounded-xl text-amber-800 text-[11.5px] leading-relaxed">
+                <p class="font-bold mb-1"><i class="fa-solid fa-circle-info mr-1"></i> Format Kolom Excel/CSV Wajib:</p>
+                <code>Section, Pertanyaan, Pilihan_A, Pilihan_B, Pilihan_C, Pilihan_D, Kunci_Jawaban</code>
+                <p class="mt-1">Gunakan template yang telah disediakan agar format kolom terbaca sempurna oleh sistem.</p>
+            </div>
+
+            <div>
+                <label class="block font-bold text-slate-600 mb-1">Pilih File (.xlsx / .xls / .csv)</label>
+                <input type="file" id="quiz-import-file" accept=".csv, .xlsx, .xls" onchange="previewQuizImportFile()"
+                    class="w-full px-3 py-2 border border-slate-200 rounded-xl text-xs bg-slate-50 cursor-pointer">
+            </div>
+
+            <!-- Preview Tabel Soal yang Akan Di-import -->
+            <div id="quiz-import-preview-wrapper" class="hidden space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="font-bold text-slate-700" id="quiz-import-count">Preview: 0 soal terdeteksi</span>
+                </div>
+                <div class="max-h-60 overflow-y-auto border border-slate-200 rounded-xl">
+                    <table class="w-full text-left text-[11px]">
+                        <thead class="bg-slate-100 text-slate-600 font-bold sticky top-0">
+                            <tr>
+                                <th class="p-2">Section</th>
+                                <th class="p-2">Pertanyaan</th>
+                                <th class="p-2">Kunci</th>
+                            </tr>
+                        </thead>
+                        <tbody id="quiz-import-tbody" class="divide-y divide-slate-100"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModalQuizImport()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+                Batal
+            </button>
+            <button id="btn-submit-import-quiz" onclick="executeQuizImport()" disabled
+                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                Proses Import Soal
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL 4: JADWALKAN UJIAN BARU / EDIT JADWAL              -->
+<!-- ======================================================== -->
+<div id="modal-quiz-schedule" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <h4 class="font-bold text-slate-800 text-sm" id="modal-schedule-title">Jadwalkan Ujian Baru</h4>
+            <button onclick="closeModalQuizSchedule()" class="text-slate-400 hover:text-slate-600 text-sm">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+        <input type="hidden" id="quiz-schedule-id">
+        <div class="space-y-4 text-xs">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div class="sm:col-span-2">
+                    <label class="block font-bold text-slate-600 mb-1">Judul Ujian *</label>
+                    <input type="text" id="quiz-sched-title" placeholder="Contoh: Ujian Kenaikan Kelas 1 - Grinding"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Section / Stasiun Kerja *</label>
+                    <select id="quiz-sched-section" class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                        <!-- Diisi dinamis -->
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Tingkat Kelas *</label>
+                    <select id="quiz-sched-kelas" class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                        <option value="1">Kelas 1 (Ujian Kenaikan ke Kelas 2)</option>
+                        <option value="2">Kelas 2 (Ujian Kenaikan ke Kelas 3)</option>
+                        <option value="3">Kelas 3 (Ujian Kenaikan ke Kelas 4)</option>
+                        <option value="4">Kelas 4 (Ujian Kenaikan ke Kelas 5)</option>
+                        <option value="5">Kelas 5 (Ujian Akhir Kelulusan)</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Tanggal & Jam Mulai *</label>
+                    <input type="datetime-local" id="quiz-sched-start"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Tanggal & Jam Selesai *</label>
+                    <input type="datetime-local" id="quiz-sched-end"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Durasi Pengerjaan (Menit) *</label>
+                    <input type="number" id="quiz-sched-duration" value="45" min="5" max="180"
+                        class="w-full px-3 py-2 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold">
+                </div>
+                <div>
+                    <label class="block font-bold text-slate-600 mb-1">Nilai KKM (Standar Remidi)</label>
+                    <input type="number" id="quiz-sched-kkm" value="75" readonly
+                        class="w-full px-3 py-2 bg-slate-100 border border-slate-200 rounded-xl outline-none font-bold text-slate-600">
+                </div>
+            </div>
+
+            <!-- Checklist Peserta Siswa -->
+            <div class="space-y-2.5 pt-2 border-t border-slate-100">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <div class="flex items-center gap-2">
+                        <label class="block font-bold text-slate-700">Pilih Siswa yang Ikut Ujian *</label>
+                        <span id="quiz-participant-count-badge" class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-indigo-50 text-indigo-700 border border-indigo-200">
+                            0 Siswa Terpilih
+                        </span>
+                    </div>
+                    <div class="flex items-center gap-2 text-xs">
+                        <button type="button" onclick="selectAllQuizParticipants(true)" class="text-indigo-600 font-bold hover:underline cursor-pointer">Pilih Semua</button>
+                        <span class="text-slate-300">|</span>
+                        <button type="button" onclick="selectAllQuizParticipants(false)" class="text-slate-500 hover:underline cursor-pointer">Batal Semua</button>
+                    </div>
+                </div>
+
+                <!-- Filter Section & Kolom Pencarian Siswa -->
+                <div class="grid grid-cols-1 sm:grid-cols-12 gap-2">
+                    <div class="sm:col-span-7 relative">
+                        <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                        <input type="text" id="quiz-participant-search" oninput="filterQuizParticipantsList()"
+                            placeholder="Cari nama atau NoReg siswa..."
+                            class="w-full pl-8 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium">
+                    </div>
+                    <div class="sm:col-span-5">
+                        <select id="quiz-participant-section-filter" onchange="filterQuizParticipantsList()"
+                            class="w-full px-2.5 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 font-semibold cursor-pointer">
+                            <option value="">Semua Section</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Kontainer Checklist Siswa Aktif -->
+                <div class="max-h-52 overflow-y-auto border border-slate-200 rounded-xl p-2 space-y-1 bg-slate-50 shadow-inner" id="quiz-participants-checklist">
+                    <!-- Diisi dinamis daftar siswa aktif -->
+                </div>
+            </div>
+        </div>
+        <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-100">
+            <button onclick="closeModalQuizSchedule()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all">
+                Batal
+            </button>
+            <button onclick="saveQuizSchedule()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl transition-all shadow-sm">
+                Simpan Jadwal Ujian
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- ======================================================== -->
+<!-- MODAL 5: LIHAT DAFTAR PESERTA UJIAN                       -->
+<!-- ======================================================== -->
+<div id="modal-quiz-participants-detail" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+    <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[85vh] flex flex-col">
+        <!-- Header Modal -->
+        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-indigo-50 border border-indigo-100 text-indigo-600 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-users text-sm"></i>
+                </div>
+                <div class="min-w-0">
+                    <h4 class="font-bold text-slate-800 text-sm truncate" id="modal-part-detail-title">Daftar Peserta Ujian</h4>
+                    <p class="text-[11px] text-slate-400 font-semibold truncate" id="modal-part-detail-subtitle">Memuat data jadwal...</p>
+                </div>
+            </div>
+            <button onclick="closeModalQuizParticipantsDetail()" class="text-slate-400 hover:text-slate-600 text-sm p-1.5 rounded-lg hover:bg-slate-100 transition-all cursor-pointer">
+                <i class="fa-solid fa-xmark"></i>
+            </button>
+        </div>
+
+        <!-- Search input for quick filtering in modal -->
+        <div class="relative">
+            <i class="fa-solid fa-magnifying-glass absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="modal-part-detail-search" oninput="filterModalParticipantsDetail()"
+                placeholder="Cari nama, NoReg, atau section peserta..."
+                class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl outline-none focus:border-indigo-500 focus:bg-white transition-all font-medium">
+        </div>
+
+        <!-- Container List Peserta (Scrollable List) -->
+        <div class="flex-1 overflow-y-auto border border-slate-200 rounded-2xl bg-slate-50/50 p-2 space-y-1.5 shadow-inner max-h-[50vh]" id="modal-part-detail-list">
+            <!-- Diisi dinamis -->
+        </div>
+
+        <!-- Footer Modal -->
+        <div class="flex items-center justify-between pt-3 border-t border-slate-100 text-xs">
+            <span class="text-slate-500 font-semibold" id="modal-part-detail-count">Total: 0 Peserta</span>
+            <button onclick="closeModalQuizParticipantsDetail()" class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all cursor-pointer">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>

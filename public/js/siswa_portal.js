@@ -1744,6 +1744,11 @@ function populateSiswaPortalFields() {
         fotoPlaceholder.classList.remove('hidden');
     }
 
+    // Periksa dan render banner ujian aktif atau remidi untuk siswa ini
+    if (cleanNoreg && typeof checkAndRenderStudentActiveQuiz === 'function') {
+        checkAndRenderStudentActiveQuiz(cleanNoreg);
+    }
+
     // Auto-select student's section only if not already selected
     const bagianSelect = document.getElementById('input-siswa-bagian');
     const mySection = (me.section || me.bagian || me.departemen || currentUser.section || currentUser.bagian || '').toUpperCase().trim();
@@ -1906,6 +1911,11 @@ function populateSiswaPortalFields() {
     if (typeof renderStudentPersonalLogs === 'function') {
         renderStudentPersonalLogs(me);
     }
+
+    // Check and render active quiz banners for this student
+    if (typeof checkAndRenderStudentActiveQuiz === 'function') {
+        checkAndRenderStudentActiveQuiz(me.id || noreg);
+    }
 }
 
 function renderStudentPersonalLogs(me) {
@@ -2016,4 +2026,103 @@ function renderStudentPersonalLogs(me) {
         }
     }
 }
+
+// ----------------------------------------------------------------------------
+// Realtime Active Quiz Detection & Banner Rendering for Student Portal
+// ----------------------------------------------------------------------------
+async function checkAndRenderStudentActiveQuiz(noreg) {
+    const container = document.getElementById('siswa-active-quiz-container');
+    if (!container) return;
+
+    const cleanNoreg = String(noreg || '').trim();
+    if (!cleanNoreg) {
+        container.classList.add('hidden');
+        return;
+    }
+
+    try {
+        const res = await executeRpcCall('getStudentActiveQuizzes', [cleanNoreg]);
+        if (res && res.success && Array.isArray(res.data) && res.data.length > 0) {
+            // Filter hanya kuis yang dapat diambil (belum dikerjakan atau diizinkan remidi)
+            const availableQuizzes = res.data.filter(q => q.can_take);
+
+            if (availableQuizzes.length === 0) {
+                container.classList.add('hidden');
+                container.innerHTML = '';
+                return;
+            }
+
+            container.innerHTML = availableQuizzes.map(q => {
+                const isRemedial = q.remedial_granted;
+                const statusBadge = isRemedial
+                    ? '<span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-amber-400/20 text-amber-300 border border-amber-400/30 uppercase tracking-wider"><i class="fa-solid fa-rotate mr-1"></i>Izin Remidi Dibuka</span>'
+                    : '<span class="px-2.5 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-400/20 text-emerald-300 border border-emerald-400/30 uppercase tracking-wider animate-pulse"><i class="fa-solid fa-signal mr-1"></i>Ujian Aktif Tersedia</span>';
+
+                const scoreInfo = q.last_score !== null 
+                    ? `<span class="text-indigo-200/90">• Nilai Sebelumnya: <strong class="text-amber-300 font-mono">${q.last_score}</strong></span>` 
+                    : '';
+
+                return `
+                    <div class="p-5 sm:p-6 rounded-[24px] bg-gradient-to-r from-slate-900 via-indigo-950 to-blue-950 text-white shadow-xl border border-indigo-500/30 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 animate-fadeIn">
+                        <div class="flex items-start gap-4">
+                            <div class="w-12 h-12 rounded-2xl bg-indigo-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 text-2xl shrink-0 shadow-inner">
+                                <i class="fa-solid fa-gamepad"></i>
+                            </div>
+                            <div class="space-y-1">
+                                <div class="flex flex-wrap items-center gap-2">
+                                    ${statusBadge}
+                                    <span class="px-2 py-0.5 rounded-lg text-[10.5px] font-bold bg-white/10 text-white border border-white/10">Kelas ${q.kelas_level}</span>
+                                </div>
+                                <h3 class="text-base sm:text-lg font-bold text-white leading-tight">${q.title}</h3>
+                                <p class="text-xs text-slate-300 flex flex-wrap items-center gap-x-2 gap-y-1">
+                                    <span>Stasiun: <strong class="text-white">${q.section_name}</strong></span>
+                                    <span>• Durasi: <strong class="text-white">${q.duration_minutes} Menit</strong></span>
+                                    <span>• KKM: <strong class="text-emerald-400">${q.kkm}</strong></span>
+                                    ${scoreInfo}
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="startStudentQuiz('${q.id}')"
+                            class="w-full sm:w-auto px-6 py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs shadow-lg shadow-indigo-950/60 hover:shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 shrink-0 active:scale-95 cursor-pointer">
+                            <span>Mulai Ujian Sekarang</span>
+                            <i class="fa-solid fa-arrow-right"></i>
+                        </button>
+                    </div>
+                `;
+            }).join('');
+
+            container.classList.remove('hidden');
+        } else {
+            container.classList.add('hidden');
+            container.innerHTML = '';
+        }
+    } catch (err) {
+        console.warn('[checkAndRenderStudentActiveQuiz] Notice:', err.message);
+        container.classList.add('hidden');
+    }
+}
+window.checkAndRenderStudentActiveQuiz = checkAndRenderStudentActiveQuiz;
+
+function startStudentQuiz(quizId) {
+    if (!quizId) return;
+    window.location.href = `/quiz?id=${encodeURIComponent(quizId)}`;
+}
+window.startStudentQuiz = startStudentQuiz;
+
+// Auto-check on load jika siswa sudah dalam sesi portal
+function autoCheckActiveQuizOnLoad() {
+    const user = getSiswaCurrentUser();
+    if (user) {
+        const noreg = user.studentId || user.nomorRegistrasi || user.noreg || user.id;
+        if (noreg) {
+            checkAndRenderStudentActiveQuiz(noreg);
+        }
+    }
+}
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', autoCheckActiveQuizOnLoad);
+} else {
+    setTimeout(autoCheckActiveQuizOnLoad, 500);
+}
+
 

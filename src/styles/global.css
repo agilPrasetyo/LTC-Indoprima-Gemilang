@@ -295,20 +295,42 @@ body {
 
 /* Navigation Button Styles Override */
 .nav-btn {
-    color: #64748B !important;
+    color: #1e293b !important;
     background-color: transparent !important;
     border: 1px solid transparent !important;
-    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+    font-weight: 400 !important;
+}
+.nav-btn i {
+    color: #475569 !important;
+    transition: color 0.2s ease !important;
 }
 .nav-btn:hover {
-    color: #0F3A8C !important;
-    background-color: rgba(15, 58, 140, 0.06) !important;
+    color: #0B3B82 !important;
+    background-color: rgba(11, 59, 130, 0.05) !important;
+}
+.nav-btn:hover i {
+    color: #0B3B82 !important;
 }
 .nav-btn.bg-blue-600 {
     color: #FFFFFF !important;
-    background-color: #0F3A8C !important;
-    border-color: rgba(15, 58, 140, 0.15) !important;
-    box-shadow: 0 8px 20px 0 rgba(15, 58, 140, 0.25) !important;
+    background-color: #0B3B82 !important;
+    border-color: rgba(11, 59, 130, 0.2) !important;
+    box-shadow: 0 4px 12px 0 rgba(11, 59, 130, 0.2) !important;
+    font-weight: 400 !important;
+}
+.nav-btn.bg-blue-600 i {
+    color: #FFFFFF !important;
+}
+.admin-subnav-btn {
+    color: #475569 !important;
+    font-size: 13px !important;
+    font-weight: 400 !important;
+    transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+.admin-subnav-btn:hover {
+    color: #0B3B82 !important;
+    background-color: rgba(11, 59, 130, 0.05) !important;
 }
 
 /* =============================================

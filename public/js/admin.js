@@ -52,22 +52,22 @@
 
     function updateAdminSubmenuHighlight(tabId) {
         document.querySelectorAll('.admin-subnav-btn').forEach(btn => {
-            btn.classList.remove('bg-white', 'text-brand-blue', 'font-bold', 'shadow-xs', 'border', 'border-slate-200/80');
-            btn.classList.add('text-slate-600', 'hover:text-brand-blue', 'hover:bg-white', 'font-semibold');
+            btn.classList.remove('bg-blue-50', 'text-[#0B3B82]', 'font-medium', 'bg-white', 'text-brand-blue', 'font-bold', 'font-semibold', 'shadow-xs', 'border', 'border-slate-200/80');
+            btn.classList.add('text-slate-600', 'hover:text-[#0B3B82]', 'hover:bg-slate-50', 'font-normal');
             const icon = btn.querySelector('i');
             if (icon) {
-                icon.classList.remove('text-brand-blue');
+                icon.classList.remove('text-[#0B3B82]', 'text-brand-blue');
                 icon.classList.add('text-slate-400');
             }
         });
         const activeSub = document.getElementById('subnav-admin-' + tabId);
         if (activeSub) {
-            activeSub.classList.remove('text-slate-600', 'hover:text-brand-blue', 'hover:bg-white', 'font-semibold');
-            activeSub.classList.add('bg-white', 'text-brand-blue', 'font-bold', 'shadow-xs', 'border', 'border-slate-200/80');
+            activeSub.classList.remove('text-slate-600', 'hover:bg-slate-50', 'font-bold', 'font-semibold');
+            activeSub.classList.add('bg-blue-50', 'text-[#0B3B82]', 'font-medium');
             const icon = activeSub.querySelector('i');
             if (icon) {
                 icon.classList.remove('text-slate-400');
-                icon.classList.add('text-brand-blue');
+                icon.classList.add('text-[#0B3B82]');
             }
         }
     }
@@ -117,10 +117,22 @@
             renderAdminPopulasiTable();
         } else if (currentAdminTab === 'kelola-k3') {
             if (typeof filterAdminSafetyTable === 'function') filterAdminSafetyTable();
+        } else if (currentAdminTab === 'kelola-sertifikat') {
+            renderAdminSertifikatTab();
+        } else if (currentAdminTab === 'kelola-quiz') {
+            if (typeof loadQuizAdminData === 'function') {
+                loadQuizAdminData();
+            }
         }
     }
 
-    function filterAdminUsersTable() {
+    let userCurrentPage = 1;
+    const USER_PAGE_SIZE = 25;
+
+    function filterAdminUsersTable(resetPage = false) {
+        if (resetPage === true) {
+            userCurrentPage = 1;
+        }
         const input = document.getElementById('filter-user-query');
         const query = input ? input.value.trim().toLowerCase() : '';
         const users = rawUsersData || [];
@@ -157,10 +169,31 @@
             const query = input ? input.value.trim() : '';
             const msg = query ? `Tidak ada akun yang cocok dengan pencarian "${query}".` : 'Tidak ada kredensial pengguna terdaftar.';
             tbody.innerHTML = `<tr><td colspan="7" class="py-8 text-center text-xs text-brand-textSub italic">${msg}</td></tr>`;
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'user-pagination-info',
+                    controlsId: 'user-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: USER_PAGE_SIZE,
+                    goToPageFn: 'goToUserPage',
+                    itemLabel: 'akun',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
-        users.forEach(u => {
+        const totalItems = users.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / USER_PAGE_SIZE));
+        if (userCurrentPage > totalPages) userCurrentPage = totalPages;
+        if (userCurrentPage < 1) userCurrentPage = 1;
+
+        const startIndex = (userCurrentPage - 1) * USER_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + USER_PAGE_SIZE, totalItems);
+        const pageItems = users.slice(startIndex, endIndex);
+
+        pageItems.forEach(u => {
             const tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50/50 transition-all-300 text-xs font-semibold";
 
@@ -196,7 +229,29 @@
             `;
             tbody.appendChild(tr);
         });
+
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'user-pagination-info',
+                controlsId: 'user-pagination-controls',
+                currentPage: userCurrentPage,
+                totalItems: totalItems,
+                pageSize: USER_PAGE_SIZE,
+                goToPageFn: 'goToUserPage',
+                itemLabel: 'akun',
+                themeColor: '#0B3B82'
+            });
+        }
     }
+
+    function goToUserPage(page) {
+        userCurrentPage = page;
+        filterAdminUsersTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-sync-akun .overflow-x-auto');
+        if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.goToUserPage = goToUserPage;
+    window.filterAdminUsersTable = filterAdminUsersTable;
 
     function openUserRegisterModal() {
         clearFormUserAdmin();
@@ -497,17 +552,41 @@
     // MANAJEMEN SISWA (TAB 2)
     // ============================================================
 
-    function renderAdminSiswaTable() {
+    let siswaCurrentPage = 1;
+    let SISWA_PAGE_SIZE = 10;
+
+    function changeSiswaPageSize(size) {
+        SISWA_PAGE_SIZE = parseInt(size, 10) || 10;
+        renderAdminSiswaTable(true);
+    }
+    window.changeSiswaPageSize = changeSiswaPageSize;
+
+    function renderAdminSiswaTable(resetPage = false) {
+        if (resetPage === true) {
+            siswaCurrentPage = 1;
+        }
         const tbody = document.getElementById('admin-siswa-tbody');
         if (!tbody) return;
-        tbody.innerHTML = '<tr><td colspan="13" class="py-8 text-center text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data siswa...</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="16" class="py-8 text-center text-brand-textSub"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data siswa...</td></tr>';
 
         // Ambil data siswa aktif
         const students = activeData || [];
         tbody.innerHTML = '';
 
         if (students.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="13" class="py-8 text-center text-brand-textSub italic">Tidak ada data siswa aktif terdaftar.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="16" class="py-8 text-center text-brand-textSub italic">Tidak ada data siswa aktif terdaftar.</td></tr>';
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'siswa-pagination-info',
+                    controlsId: 'siswa-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: SISWA_PAGE_SIZE,
+                    goToPageFn: 'goToSiswaPage',
+                    itemLabel: 'siswa',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
@@ -530,7 +609,9 @@
                 (s.departemen || '').toLowerCase().includes(queryFilter) ||
                 (s.spv || '').toLowerCase().includes(queryFilter) ||
                 (s.asalSekolah || '').toLowerCase().includes(queryFilter) ||
-                (s.daerahAsal || s.asalDaerah || '').toLowerCase().includes(queryFilter)
+                (s.daerahAsal || s.asalDaerah || '').toLowerCase().includes(queryFilter) ||
+                (s.alamat || '').toLowerCase().includes(queryFilter) ||
+                (s.telepon || s.noTelp || s.no_telp || '').toLowerCase().includes(queryFilter)
             );
         }
 
@@ -561,7 +642,34 @@
             return (a.namaLengkap || '').localeCompare(b.namaLengkap || '');
         });
 
-        filtered.forEach(s => {
+        const totalItems = filtered.length;
+        if (totalItems === 0) {
+            tbody.innerHTML = '<tr><td colspan="16" class="py-8 text-center text-brand-textSub italic">Tidak ada data siswa yang cocok dengan filter.</td></tr>';
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'siswa-pagination-info',
+                    controlsId: 'siswa-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: SISWA_PAGE_SIZE,
+                    goToPageFn: 'goToSiswaPage',
+                    itemLabel: 'siswa',
+                    themeColor: '#0B3B82'
+                });
+            }
+            return;
+        }
+
+        // Hitung paginasi 25 siswa per halaman
+        const totalPages = Math.max(1, Math.ceil(totalItems / SISWA_PAGE_SIZE));
+        if (siswaCurrentPage > totalPages) siswaCurrentPage = totalPages;
+        if (siswaCurrentPage < 1) siswaCurrentPage = 1;
+
+        const startIndex = (siswaCurrentPage - 1) * SISWA_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + SISWA_PAGE_SIZE, totalItems);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach(s => {
             const tr = document.createElement('tr');
             tr.className = "group hover:bg-slate-50/50 transition-all-300 border-b border-slate-50 text-xs font-semibold";
 
@@ -572,27 +680,30 @@
 
             tr.innerHTML = `
                 <!-- 1. Aksi (Sticky Left 0) -->
-                <td class="py-3 px-3 sticky left-0 bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[155px] max-w-[155px] w-[155px] whitespace-nowrap">
-                    <button onclick="editStudentTrigger('${s.id}')" class="px-2.5 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300 mr-1">
+                <td class="py-2 px-2.5 sticky left-0 bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[170px] max-w-[170px] w-[170px] whitespace-nowrap">
+                    <button onclick="openCertificateModal('${s.id}')" class="px-2 py-0.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 rounded-lg text-[10px] font-bold transition-all-300 mr-1 shadow-xs" title="Penerbitan & Cetak Sertifikat Siswa">
+                        <i class="fa-solid fa-award"></i>
+                    </button>
+                    <button onclick="editStudentTrigger('${s.id}')" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300 mr-1">
                         <i class="fa-solid fa-user-pen"></i> Edit
                     </button>
-                    <button onclick="deleteStudentConfirm('${s.id}')" class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300">
+                    <button onclick="deleteStudentConfirm('${s.id}')" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                     </button>
                 </td>
-                <!-- 2. NoReg (Sticky Left 155px) -->
-                <td class="py-3 px-4 sticky left-[155px] bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[90px] max-w-[90px] w-[90px] font-mono font-bold text-slate-800">${s.id}</td>
-                <!-- 3. Nama (Sticky Left 245px) -->
-                <td class="py-3 px-4 sticky left-[245px] bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[200px] max-w-[200px] w-[200px] font-bold text-brand-textMain whitespace-nowrap overflow-hidden text-ellipsis">${s.namaLengkap}</td>
+                <!-- 2. NoReg (Sticky Left 170px) -->
+                <td class="py-2 px-3 sticky left-[170px] bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[90px] max-w-[90px] w-[90px] font-mono font-bold text-slate-800">${s.id}</td>
+                <!-- 3. Nama (Sticky Left 260px) -->
+                <td class="py-2 px-3.5 sticky left-[260px] bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[200px] max-w-[200px] w-[200px] font-bold text-brand-textMain whitespace-nowrap overflow-hidden text-ellipsis">${s.namaLengkap}</td>
                 <!-- 4. Departemen -->
-                <td class="py-3 px-4 min-w-[120px]"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-blue-50 text-brand-blue border border-blue-100">${s.departemen || '-'}</span></td>
+                <td class="py-2 px-3 min-w-[120px]"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-50 text-brand-blue border border-blue-100">${s.departemen || '-'}</span></td>
                 <!-- 5. Section -->
-                <td class="py-3 px-4 min-w-[130px] font-bold text-slate-700">${s.section || '-'}</td>
+                <td class="py-2 px-3 min-w-[130px] font-bold text-slate-700">${s.section || '-'}</td>
                 <!-- 6. HK -->
-                <td class="py-3 px-4 min-w-[100px]"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-50 text-slate-600 border border-slate-200">${s.hk || s.hariKerja || '6 Hari'}</span></td>
+                <td class="py-2 px-3 min-w-[90px]"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-50 text-slate-600 border border-slate-200">${s.hk || s.hariKerja || '6 Hari'}</span></td>
                 <!-- 7. Kelas (dihitung otomatis dari tanggal masuk) -->
-                <td class="py-3 px-4 min-w-[100px]">
-                    <span class="px-2.5 py-1 rounded-full text-[10px] font-bold border whitespace-nowrap
+                <td class="py-2 px-3 min-w-[95px]">
+                    <span class="px-2 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap
                         ${(() => { 
                             const k = hitungKelas(s); 
                             if (k.includes('Kelas 1')) return 'bg-red-100 text-red-800 border-red-300';
@@ -604,21 +715,52 @@
                     ">${hitungKelas(s)}</span>
                 </td>
                 <!-- 8. Masuk LTC -->
-                <td class="py-3 px-4 min-w-[100px] text-brand-textSub font-mono">${masukFormatted}</td>
+                <td class="py-2 px-3 min-w-[95px] text-brand-textSub font-mono">${masukFormatted}</td>
                 <!-- 9. Distribusi -->
-                <td class="py-3 px-4 min-w-[100px] text-brand-textSub font-mono">${distribusiFormatted}</td>
+                <td class="py-2 px-3 min-w-[95px] text-brand-textSub font-mono">${distribusiFormatted}</td>
                 <!-- 10. Akhir LTC -->
-                <td class="py-3 px-4 min-w-[100px] text-brand-textSub font-mono">${keluarFormatted}</td>
+                <td class="py-2 px-3 min-w-[95px] text-brand-textSub font-mono">${keluarFormatted}</td>
                 <!-- 11. SPV -->
-                <td class="py-3 px-4 min-w-[150px] text-brand-textSub">${s.spv || '-'}</td>
+                <td class="py-2 px-3 min-w-[140px] text-brand-textSub">${s.spv || '-'}</td>
                 <!-- 12. Daerah Asal -->
-                <td class="py-3 px-4 min-w-[120px] text-brand-textSub">${s.daerahAsal || s.asalDaerah || s.asal || s.asal_daerah || '-'}</td>
+                <td class="py-2 px-3 min-w-[110px] text-brand-textSub">${s.daerahAsal || s.asalDaerah || s.asal || s.asal_daerah || '-'}</td>
                 <!-- 13. Sekolah -->
-                <td class="py-3 px-4 min-w-[150px] text-brand-textSub">${s.asalSekolah || s.sekolah || s.asal_sekolah || '-'}</td>
+                <td class="py-2 px-3 min-w-[140px] text-brand-textSub">${s.asalSekolah || s.sekolah || s.asal_sekolah || '-'}</td>
+                <!-- 14. Tgl Lahir -->
+                <td class="py-2 px-3 min-w-[125px] text-brand-textSub">${s.tanggalLahir ? (s.tempatLahir ? s.tempatLahir + ', ' : '') + s.tanggalLahir.split('-').reverse().join('/') : (s.tempatLahir || '-')}</td>
+                <!-- 15. Alamat -->
+                <td class="py-2 px-3 min-w-[150px] text-brand-textSub max-w-[190px] truncate" title="${s.alamat || ''}">${s.alamat || '-'}</td>
+                <!-- 16. No Telp -->
+                <td class="py-2 px-3 min-w-[120px] font-mono text-brand-textSub">${s.telepon || s.noTelp || s.no_telp || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
+
+        // Perbarui Kontrol Paginasi Siswa Aktif
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'siswa-pagination-info',
+                controlsId: 'siswa-pagination-controls',
+                currentPage: siswaCurrentPage,
+                totalItems: totalItems,
+                pageSize: SISWA_PAGE_SIZE,
+                goToPageFn: 'goToSiswaPage',
+                itemLabel: 'siswa',
+                themeColor: '#0B3B82'
+            });
+        }
     }
+
+    function goToSiswaPage(page) {
+        siswaCurrentPage = page;
+        renderAdminSiswaTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-kelola-siswa .overflow-x-auto');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    window.goToSiswaPage = goToSiswaPage;
+    window.renderAdminSiswaTable = renderAdminSiswaTable;
 
     function populateAdminSiswaFilters() {
         const sectionSelect = document.getElementById('filter-siswa-section');
@@ -865,6 +1007,8 @@
             document.getElementById('student-spv').value = '';
             document.getElementById('student-asal-daerah').value = '';
             document.getElementById('student-sekolah').value = '';
+            if (document.getElementById('student-tempat-lahir')) document.getElementById('student-tempat-lahir').value = '';
+            if (document.getElementById('student-tanggal-lahir')) document.getElementById('student-tanggal-lahir').value = '';
             document.getElementById('student-distribusi').value = '';
             
             // Set tgl masuk ke hari ini
@@ -928,6 +1072,12 @@
         
         document.getElementById('student-asal-daerah').value = s.daerahAsal || s.asalDaerah || s.asal || s.asal_daerah || '';
         document.getElementById('student-sekolah').value = s.asalSekolah || s.sekolah || s.asal_sekolah || '';
+        if (document.getElementById('student-tempat-lahir')) {
+            document.getElementById('student-tempat-lahir').value = s.tempatLahir || s.tempat_lahir || '';
+        }
+        if (document.getElementById('student-tanggal-lahir')) {
+            document.getElementById('student-tanggal-lahir').value = s.tanggalLahir || s.tanggal_lahir || '';
+        }
         
         // Tanggal Masuk
         if (s.masuk) {
@@ -963,6 +1113,8 @@
         const spv = document.getElementById('student-spv').value.trim();
         const asal = document.getElementById('student-asal-daerah').value.trim();
         const sekolah = document.getElementById('student-sekolah').value.trim();
+        const tempatLahir = document.getElementById('student-tempat-lahir') ? document.getElementById('student-tempat-lahir').value.trim() : '';
+        const tanggalLahir = document.getElementById('student-tanggal-lahir') ? document.getElementById('student-tanggal-lahir').value : '';
         const tglMasuk = document.getElementById('student-tgl-masuk').value;
         const tglKeluar = document.getElementById('student-tgl-keluar').value;
         const distribusi = document.getElementById('student-distribusi').value;
@@ -986,6 +1138,8 @@
             Distribusi: distribusi || null,
             AsalDaerah: asal,
             AsalSekolah: sekolah,
+            TempatLahir: tempatLahir,
+            TanggalLahir: tanggalLahir || null,
             HK: hk,
             isEdit: isEdit
         };
@@ -1107,7 +1261,13 @@
         renderAdminManpowerTable();
     }
 
-    function renderAdminManpowerTable() {
+    let manpowerCurrentPage = 1;
+    const MANPOWER_PAGE_SIZE = 25;
+
+    function renderAdminManpowerTable(resetPage = false) {
+        if (resetPage === true) {
+            manpowerCurrentPage = 1;
+        }
         const tbody = document.getElementById('admin-manpower-tbody');
         if (!tbody) return;
 
@@ -1174,10 +1334,31 @@
 
         if (logs.length === 0) {
             tbody.innerHTML = '<tr><td colspan="8" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada catatan log manpower harian terdaftar. Klik "+ Input Log Manpower" untuk menambah baru.</td></tr>';
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'manpower-pagination-info',
+                    controlsId: 'manpower-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: MANPOWER_PAGE_SIZE,
+                    goToPageFn: 'goToManpowerPage',
+                    itemLabel: 'catatan',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
-        logs.forEach(r => {
+        const totalItems = logs.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / MANPOWER_PAGE_SIZE));
+        if (manpowerCurrentPage > totalPages) manpowerCurrentPage = totalPages;
+        if (manpowerCurrentPage < 1) manpowerCurrentPage = 1;
+
+        const startIndex = (manpowerCurrentPage - 1) * MANPOWER_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + MANPOWER_PAGE_SIZE, totalItems);
+        const pageItems = logs.slice(startIndex, endIndex);
+
+        pageItems.forEach(r => {
             const tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50 text-xs font-semibold";
 
@@ -1260,7 +1441,29 @@
             `;
             tbody.appendChild(tr);
         });
+
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'manpower-pagination-info',
+                controlsId: 'manpower-pagination-controls',
+                currentPage: manpowerCurrentPage,
+                totalItems: totalItems,
+                pageSize: MANPOWER_PAGE_SIZE,
+                goToPageFn: 'goToManpowerPage',
+                itemLabel: 'catatan',
+                themeColor: '#0B3B82'
+            });
+        }
     }
+
+    function goToManpowerPage(page) {
+        manpowerCurrentPage = page;
+        renderAdminManpowerTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-log-manpower .overflow-x-auto');
+        if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.goToManpowerPage = goToManpowerPage;
+    window.renderAdminManpowerTable = renderAdminManpowerTable;
 
     function updateMpModalEfficiency() {
         const plan = parseInt(document.getElementById('mp-modal-plan')?.value, 10) || 0;
@@ -1610,7 +1813,19 @@
         select.innerHTML = html;
     }
 
-    function renderAdminTurnoverTable() {
+    let turnoverCurrentPage = 1;
+    let TURNOVER_PAGE_SIZE = 10;
+
+    function changeTurnoverPageSize(size) {
+        TURNOVER_PAGE_SIZE = parseInt(size, 10) || 10;
+        renderAdminTurnoverTable(true);
+    }
+    window.changeTurnoverPageSize = changeTurnoverPageSize;
+
+    function renderAdminTurnoverTable(resetPage = false) {
+        if (resetPage === true) {
+            turnoverCurrentPage = 1;
+        }
         const tbody = document.getElementById('admin-turnover-tbody');
         if (!tbody) return;
 
@@ -1618,7 +1833,19 @@
         tbody.innerHTML = '';
 
         if (records.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover terdaftar.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="14" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover terdaftar.</td></tr>';
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'turnover-pagination-info',
+                    controlsId: 'turnover-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: TURNOVER_PAGE_SIZE,
+                    goToPageFn: 'goToTurnoverPage',
+                    itemLabel: 'data',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
@@ -1646,6 +1873,11 @@
                 const tglMasukStr = String(t.masuk || '').toLowerCase();
                 const tglKeluarStr = String(t.tanggalKeluar || t.keluar || '').toLowerCase();
 
+                const stdMatch = (typeof rawSiswaData !== 'undefined' ? rawSiswaData : []).find(x => String(x.id) === String(t.id));
+                const ttlStr = String((t.tempatLahir || (stdMatch ? stdMatch.tempatLahir : '') || '') + ' ' + (t.tanggalLahir || (stdMatch ? stdMatch.tanggalLahir : '') || '')).toLowerCase();
+                const alamatStr = String(t.alamat || (stdMatch ? stdMatch.alamat : '') || '').toLowerCase();
+                const telpStr = String(t.telepon || t.noTelp || (stdMatch ? (stdMatch.telepon || stdMatch.noTelp) : '') || '').toLowerCase();
+
                 const matchSearch = idStr.includes(searchQuery) ||
                                     namaStr.includes(searchQuery) ||
                                     bagianStr.includes(searchQuery) ||
@@ -1654,7 +1886,10 @@
                                     alasanStr.includes(searchQuery) ||
                                     ketStr.includes(searchQuery) ||
                                     tglMasukStr.includes(searchQuery) ||
-                                    tglKeluarStr.includes(searchQuery);
+                                    tglKeluarStr.includes(searchQuery) ||
+                                    ttlStr.includes(searchQuery) ||
+                                    alamatStr.includes(searchQuery) ||
+                                    telpStr.includes(searchQuery);
 
                 if (!matchSearch) return false;
             }
@@ -1670,13 +1905,34 @@
         });
 
         if (filtered.length === 0) {
-            tbody.innerHTML = '<tr><td colspan="11" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover yang sesuai filter pencarian.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="14" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data turnover yang sesuai filter pencarian.</td></tr>';
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'turnover-pagination-info',
+                    controlsId: 'turnover-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: TURNOVER_PAGE_SIZE,
+                    goToPageFn: 'goToTurnoverPage',
+                    itemLabel: 'data',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
-        filtered.forEach(t => {
+        const totalItems = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / TURNOVER_PAGE_SIZE));
+        if (turnoverCurrentPage > totalPages) turnoverCurrentPage = totalPages;
+        if (turnoverCurrentPage < 1) turnoverCurrentPage = 1;
+
+        const startIndex = (turnoverCurrentPage - 1) * TURNOVER_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + TURNOVER_PAGE_SIZE, totalItems);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach(t => {
             const tr = document.createElement('tr');
-            tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50";
+            tr.className = "hover:bg-slate-50/50 transition-all-300 border-b border-slate-50 text-xs font-semibold";
             const alasanColors = {
                 'Resign': 'bg-rose-50 text-rose-600',
                 'Lulus': 'bg-emerald-50 text-emerald-600',
@@ -1685,29 +1941,166 @@
             const alasanBadge = alasanColors[t.alasan] || 'bg-slate-50 text-slate-500';
             const kelasDisplay = (t.kelas && t.kelas !== '-') ? t.kelas : (typeof hitungKelasSiswa === 'function' ? hitungKelasSiswa(t.masuk || t.tanggalMasuk, t.tanggalKeluar || t.keluar) : (typeof hitungKelas === 'function' ? hitungKelas(t.masuk) : '-'));
 
+            const photoUrl = t.foto || (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(t.id) : '');
+            const photoHtml = photoUrl 
+                ? `<img src="${photoUrl}" loading="lazy" class="w-7 h-7 rounded-full object-cover border border-slate-200 shrink-0 shadow-xs" alt="Foto" onerror="this.onerror=null; this.outerHTML='<div class=\\\'w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0\\\'><i class=\\\'fa-solid fa-user text-[10px]\\\'></i></div>'" />`
+                : `<div class="w-7 h-7 rounded-full bg-slate-100 flex items-center justify-center text-slate-400 font-bold text-xs shrink-0"><i class="fa-solid fa-user text-[10px]"></i></div>`;
+
+            // Sinkronkan TTL, Alamat, dan No. Telepon dari objek turnover atau data siswa
+            const std = (typeof rawSiswaData !== 'undefined' ? rawSiswaData : []).find(x => String(x.id) === String(t.id));
+            const tempatLahir = t.tempatLahir || (std ? std.tempatLahir : '') || '';
+            const tanggalLahir = t.tanggalLahir || (std ? std.tanggalLahir : '') || '';
+            const alamat = t.alamat || (std ? std.alamat : '') || '';
+            const telepon = t.telepon || t.noTelp || t.no_telp || (std ? (std.telepon || std.noTelp || std.no_telp) : '') || '';
+
+            const ttlFormatted = tanggalLahir 
+                ? (tempatLahir ? tempatLahir + ', ' : '') + tanggalLahir.split('-').reverse().join('/') 
+                : (tempatLahir || '-');
+            const alamatFormatted = alamat || '-';
+            const telpFormatted = telepon || '-';
+
             tr.innerHTML = `
-                <td class="py-3 px-4 font-mono font-bold text-slate-700">${t.id}</td>
-                <td class="py-3 px-4 font-bold text-brand-textMain">${t.namaLengkap}</td>
-                <td class="py-3 px-4 text-brand-textSub">${t.bagian || '-'}</td>
-                <td class="py-3 px-4 text-brand-textSub font-semibold">${kelasDisplay}</td>
-                <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalDaerah || t.wilayah || t.asal || '-'}</td>
-                <td class="py-3 px-4 text-brand-textSub font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
-                <td class="py-3 px-4 font-mono text-brand-textSub">${t.masuk ? t.masuk.split('-').reverse().join('/') : '-'}</td>
-                <td class="py-3 px-4 font-mono text-brand-textSub">${t.tanggalKeluar ? t.tanggalKeluar.split('-').reverse().join('/') : '-'}</td>
-                <td class="py-3 px-4"><span class="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase ${alasanBadge}">${t.alasan || '-'}</span></td>
-                <td class="py-3 px-4 text-brand-textSub max-w-[160px] truncate" title="${t.keterangan || ''}">${t.keterangan || '-'}</td>
-                <td class="py-3 px-4 text-right space-x-1.5 whitespace-nowrap">
-                    <button onclick="editTurnoverTrigger('${t.id}')" class="px-2 py-1 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
+                <!-- 1. Aksi (Sticky Left 0) -->
+                <td class="py-2 px-2.5 sticky left-0 bg-white group-hover:bg-slate-50 transition-colors duration-300 z-10 shadow-[2px_0_5px_-2px_rgba(0,0,0,0.1)] border-r border-slate-100 min-w-[130px] max-w-[130px] w-[130px] whitespace-nowrap text-left space-x-1">
+                    <button onclick="editTurnoverTrigger('${t.id}')" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-pen"></i> Edit
                     </button>
-                    <button onclick="deleteTurnoverConfirm('${t.id}')" class="px-2 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300">
+                    <button onclick="deleteTurnoverConfirm('${t.id}')" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                     </button>
                 </td>
+                <!-- 2. NoReg -->
+                <td class="py-2 px-3 font-mono font-bold text-slate-700">${t.id}</td>
+                <!-- 3. Nama -->
+                <td class="py-2 px-3">
+                    <div class="flex items-center gap-2.5">
+                        ${photoHtml}
+                        <span class="font-bold text-brand-textMain whitespace-nowrap">${t.namaLengkap}</span>
+                    </div>
+                </td>
+                <!-- 4. Bagian -->
+                <td class="py-2 px-3 text-brand-textSub">${t.bagian || '-'}</td>
+                <!-- 5. Kelas -->
+                <td class="py-2 px-3 text-brand-textSub font-semibold whitespace-nowrap min-w-[105px]">${kelasDisplay}</td>
+                <!-- 6. Kota / Daerah -->
+                <td class="py-2 px-3 text-brand-textSub font-semibold">${t.asalDaerah || t.wilayah || t.asal || '-'}</td>
+                <!-- 7. Sekolah Asal -->
+                <td class="py-2 px-3 text-brand-textSub font-semibold">${t.asalSekolah || t.sekolah || '-'}</td>
+                <!-- 8. Tempat, Tanggal Lahir -->
+                <td class="py-2 px-3 min-w-[130px] text-brand-textSub">${ttlFormatted}</td>
+                <!-- 9. Alamat -->
+                <td class="py-2 px-3 min-w-[160px] text-brand-textSub max-w-[190px] truncate" title="${alamat !== '-' ? alamat : ''}">${alamatFormatted}</td>
+                <!-- 10. No. Telepon -->
+                <td class="py-2 px-3 min-w-[125px] font-mono text-brand-textSub">${telpFormatted}</td>
+                <!-- 11. Tgl Masuk -->
+                <td class="py-2 px-3 font-mono text-brand-textSub whitespace-nowrap min-w-[95px]">${t.masuk ? t.masuk.split('-').reverse().join('/') : '-'}</td>
+                <!-- 12. Tgl Keluar -->
+                <td class="py-2 px-3 font-mono text-brand-textSub whitespace-nowrap min-w-[95px]">${t.tanggalKeluar ? t.tanggalKeluar.split('-').reverse().join('/') : '-'}</td>
+                <!-- 13. Alasan -->
+                <td class="py-2 px-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${alasanBadge}">${t.alasan || '-'}</span></td>
+                <!-- 14. Keterangan -->
+                <td class="py-2 px-3 text-brand-textSub max-w-[150px] truncate" title="${t.keterangan || ''}">${t.keterangan || '-'}</td>
             `;
             tbody.appendChild(tr);
         });
+
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'turnover-pagination-info',
+                controlsId: 'turnover-pagination-controls',
+                currentPage: turnoverCurrentPage,
+                totalItems: totalItems,
+                pageSize: TURNOVER_PAGE_SIZE,
+                goToPageFn: 'goToTurnoverPage',
+                itemLabel: 'data',
+                themeColor: '#0B3B82'
+            });
+        }
     }
+
+    function goToTurnoverPage(page) {
+        turnoverCurrentPage = page;
+        renderAdminTurnoverTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-kelola-turnover .overflow-x-auto');
+        if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.goToTurnoverPage = goToTurnoverPage;
+    window.renderAdminTurnoverTable = renderAdminTurnoverTable;
+
+    function resetTurnoverPhotoModal() {
+        const preview = document.getElementById('turnover-modal-foto-preview');
+        const placeholder = document.getElementById('turnover-modal-foto-placeholder');
+        const sizeBadge = document.getElementById('turnover-modal-foto-size');
+        const removeBtn = document.getElementById('turnover-modal-foto-remove-btn');
+        const fileInput = document.getElementById('turnover-modal-foto-file');
+        const base64Input = document.getElementById('turnover-modal-foto-base64');
+        const actionInput = document.getElementById('turnover-modal-foto-action');
+
+        if (preview) {
+            preview.src = '';
+            preview.classList.add('hidden');
+        }
+        if (placeholder) placeholder.classList.remove('hidden');
+        if (sizeBadge) {
+            sizeBadge.textContent = '0 KB / 25 KB';
+            sizeBadge.classList.add('hidden');
+        }
+        if (removeBtn) removeBtn.classList.add('hidden');
+        if (fileInput) fileInput.value = '';
+        if (base64Input) base64Input.value = '';
+        if (actionInput) actionInput.value = 'none';
+    }
+
+    function clearTurnoverPhotoSelection() {
+        resetTurnoverPhotoModal();
+        const actionInput = document.getElementById('turnover-modal-foto-action');
+        if (actionInput) actionInput.value = 'delete';
+    }
+
+    function handleTurnoverPhotoSelected(event) {
+        const file = event.target?.files?.[0];
+        if (!file) return;
+
+        if (!file.type.startsWith('image/')) {
+            showToast('Pilih file gambar valid (JPG, PNG, WEBP).', 'error');
+            return;
+        }
+
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const result = cropAndCompressImageTo3x4(img, 300, 400, 25600);
+                
+                const preview = document.getElementById('turnover-modal-foto-preview');
+                const placeholder = document.getElementById('turnover-modal-foto-placeholder');
+                const sizeBadge = document.getElementById('turnover-modal-foto-size');
+                const removeBtn = document.getElementById('turnover-modal-foto-remove-btn');
+                const base64Input = document.getElementById('turnover-modal-foto-base64');
+                const actionInput = document.getElementById('turnover-modal-foto-action');
+
+                if (preview) {
+                    preview.src = result.dataUrl;
+                    preview.classList.remove('hidden');
+                }
+                if (placeholder) placeholder.classList.add('hidden');
+                if (sizeBadge) {
+                    const kb = (result.sizeInBytes / 1024).toFixed(1);
+                    sizeBadge.textContent = `${kb} KB / 25 KB`;
+                    sizeBadge.className = "text-[10px] font-mono font-bold text-emerald-600";
+                    sizeBadge.classList.remove('hidden');
+                }
+                if (removeBtn) removeBtn.classList.remove('hidden');
+                if (base64Input) base64Input.value = result.dataUrl;
+                if (actionInput) actionInput.value = 'update';
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    window.handleTurnoverPhotoSelected = handleTurnoverPhotoSelected;
+    window.clearTurnoverPhotoSelection = clearTurnoverPhotoSelection;
 
     function openTurnoverModal(isEdit = false) {
         const modal = document.getElementById('turnover-form-modal');
@@ -1715,6 +2108,7 @@
         modal.classList.remove('hidden');
         document.getElementById('turnover-edit-mode').value = isEdit ? 'true' : 'false';
         document.getElementById('turnover-modal-title').textContent = isEdit ? 'Edit Data Turnover' : 'Tambah Data Turnover';
+        resetTurnoverPhotoModal();
         if (!isEdit) {
             document.getElementById('turnover-edit-id').value = '';
             document.getElementById('turnover-noreg').value = '';
@@ -1726,6 +2120,10 @@
             if (daerahInput) daerahInput.value = '';
             const sekolahInput = document.getElementById('turnover-sekolah');
             if (sekolahInput) sekolahInput.value = '';
+            if (document.getElementById('turnover-tempat-lahir')) document.getElementById('turnover-tempat-lahir').value = '';
+            if (document.getElementById('turnover-tanggal-lahir')) document.getElementById('turnover-tanggal-lahir').value = '';
+            if (document.getElementById('turnover-telepon')) document.getElementById('turnover-telepon').value = '';
+            if (document.getElementById('turnover-alamat')) document.getElementById('turnover-alamat').value = '';
             document.getElementById('turnover-alasan').value = 'Resign';
             document.getElementById('turnover-keterangan').value = '';
             const today = new Date();
@@ -1733,12 +2131,13 @@
             document.getElementById('turnover-tgl-masuk').value = fmt(today);
             document.getElementById('turnover-tgl-keluar').value = fmt(today);
         }
-        setTimeout(() => modal.querySelector('.glass-modal-card').classList.replace('scale-95','scale-100'), 10);
+        setTimeout(() => modal.querySelector('.glass-modal-card')?.classList?.replace('scale-95','scale-100'), 10);
     }
 
     function closeTurnoverModal() {
         const modal = document.getElementById('turnover-form-modal');
         if (modal) modal.classList.add('hidden');
+        resetTurnoverPhotoModal();
     }
 
     function editTurnoverTrigger(idOrIdx) {
@@ -1774,6 +2173,12 @@
         const sekolahInput = document.getElementById('turnover-sekolah');
         if (sekolahInput) sekolahInput.value = t.asalSekolah || t.sekolah || '';
 
+        const std = (typeof rawSiswaData !== 'undefined' ? rawSiswaData : []).find(x => String(x.id) === String(t.id));
+        if (document.getElementById('turnover-tempat-lahir')) document.getElementById('turnover-tempat-lahir').value = t.tempatLahir || (std ? std.tempatLahir : '') || '';
+        if (document.getElementById('turnover-tanggal-lahir')) document.getElementById('turnover-tanggal-lahir').value = t.tanggalLahir || (std ? std.tanggalLahir : '') || '';
+        if (document.getElementById('turnover-telepon')) document.getElementById('turnover-telepon').value = t.telepon || t.noTelp || (std ? (std.telepon || std.noTelp) : '') || '';
+        if (document.getElementById('turnover-alamat')) document.getElementById('turnover-alamat').value = t.alamat || (std ? std.alamat : '') || '';
+
         const alasanSelect = document.getElementById('turnover-alasan');
         if (alasanSelect) {
             const targetAlasan = String(t.alasan || '').toLowerCase();
@@ -1791,6 +2196,29 @@
         document.getElementById('turnover-keterangan').value = t.keterangan || '';
         document.getElementById('turnover-tgl-masuk').value = t.masuk || '';
         document.getElementById('turnover-tgl-keluar').value = t.tanggalKeluar || '';
+
+        // Tampilkan Pas Foto yang sudah tersimpan jika ada
+        const photoUrl = t.foto || (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(t.id) : '');
+        if (photoUrl) {
+            const preview = document.getElementById('turnover-modal-foto-preview');
+            const placeholder = document.getElementById('turnover-modal-foto-placeholder');
+            const removeBtn = document.getElementById('turnover-modal-foto-remove-btn');
+            const actionInput = document.getElementById('turnover-modal-foto-action');
+            if (preview && placeholder) {
+                const testImg = new Image();
+                testImg.onload = function() {
+                    preview.src = photoUrl;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    if (removeBtn) removeBtn.classList.remove('hidden');
+                    if (actionInput) actionInput.value = 'none';
+                };
+                testImg.onerror = function() {
+                    resetTurnoverPhotoModal();
+                };
+                testImg.src = photoUrl;
+            }
+        }
     }
 
     function saveTurnoverData() {
@@ -1800,6 +2228,10 @@
         const kelasVal = document.getElementById('turnover-kelas') ? document.getElementById('turnover-kelas').value.trim() : '';
         const daerahVal = document.getElementById('turnover-daerah') ? document.getElementById('turnover-daerah').value.trim() : '';
         const sekolahVal = document.getElementById('turnover-sekolah') ? document.getElementById('turnover-sekolah').value.trim() : '';
+        const tempatLahirVal = document.getElementById('turnover-tempat-lahir') ? document.getElementById('turnover-tempat-lahir').value.trim() : '';
+        const tglLahirVal = document.getElementById('turnover-tanggal-lahir') ? document.getElementById('turnover-tanggal-lahir').value : '';
+        const teleponVal = document.getElementById('turnover-telepon') ? document.getElementById('turnover-telepon').value.trim() : '';
+        const alamatVal = document.getElementById('turnover-alamat') ? document.getElementById('turnover-alamat').value.trim() : '';
         const alasan = document.getElementById('turnover-alasan').value;
         const keterangan = document.getElementById('turnover-keterangan').value.trim();
         const tglMasuk = document.getElementById('turnover-tgl-masuk').value;
@@ -1815,9 +2247,79 @@
         const payload = {
             NoReg: noreg, NamaLengkap: nama, Bagian: bagian,
             Kelas: kelasVal, AsalDaerah: daerahVal, Kota: daerahVal, AsalSekolah: sekolahVal, Sekolah: sekolahVal,
+            TempatLahir: tempatLahirVal, TanggalLahir: tglLahirVal, Telepon: teleponVal, NoTelp: teleponVal, Alamat: alamatVal,
             TanggalMasuk: tglMasuk || null, TanggalKeluar: tglKeluar || null,
             Alasan: alasan, Keterangan: keterangan, isEdit, editId
         };
+
+        const rpc = getRpcRunner();
+        if (rpc) {
+            showToast('Menyimpan data turnover...', 'info');
+            rpc('saveTurnoverRecord', [payload])
+                .then(async res => {
+                    if (res && res.success !== false) {
+                        const photoAction = document.getElementById('turnover-modal-foto-action')?.value;
+                        const photoBase64 = document.getElementById('turnover-modal-foto-base64')?.value;
+
+                        if (photoAction === 'update' && photoBase64) {
+                            try {
+                                const upRes = await rpc('uploadFotoSiswa', [{ noreg: noreg, photoBase64: photoBase64 }]);
+                                if (upRes && upRes.success === false) {
+                                    showToast('Turnover disimpan, tapi foto gagal: ' + (upRes.message || 'Error'), 'error');
+                                } else {
+                                    showToast('Data turnover & foto berhasil disimpan!', 'success');
+                                }
+                            } catch (pErr) {
+                                console.warn('Gagal upload foto turnover:', pErr);
+                                showToast('Turnover disimpan, tapi gagal upload foto: ' + (pErr.message || pErr), 'error');
+                            }
+                        } else if (photoAction === 'delete') {
+                            try {
+                                await rpc('deleteFotoSiswa', [{ noreg: noreg }]);
+                                showToast('Data turnover disimpan & foto dihapus.', 'info');
+                            } catch (pErr) {
+                                console.warn('Gagal hapus foto turnover:', pErr);
+                            }
+                        } else {
+                            showToast('Data turnover berhasil disimpan!', 'success');
+                        }
+
+                        // Perbarui data foto lokal jika ada
+                        const targetPhoto = (photoAction === 'update' && photoBase64)
+                            ? photoBase64
+                            : (photoAction === 'delete' ? '' : (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(noreg) : ''));
+
+                        if (!isEdit) {
+                            activeTurnoverData.unshift({
+                                id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal,
+                                tempatLahir: tempatLahirVal, tanggalLahir: tglLahirVal, telepon: teleponVal, noTelp: teleponVal, alamat: alamatVal,
+                                alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar, foto: targetPhoto
+                            });
+                        } else {
+                            const idx = activeTurnoverData.findIndex(t => t.id === editId);
+                            if (idx !== -1) {
+                                activeTurnoverData[idx] = { 
+                                    ...activeTurnoverData[idx], 
+                                    id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal,
+                                    tempatLahir: tempatLahirVal, tanggalLahir: tglLahirVal, telepon: teleponVal, noTelp: teleponVal, alamat: alamatVal,
+                                    alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar,
+                                    foto: targetPhoto || activeTurnoverData[idx].foto
+                                };
+                            }
+                        }
+
+                        closeTurnoverModal();
+                        if (typeof loadDashboardData === 'function') loadDashboardData();
+                        else renderAdminTurnoverTable();
+                    } else {
+                        showToast('Gagal menyimpan data turnover: ' + (res?.message || 'Unknown error'), 'error');
+                    }
+                })
+                .catch(err => {
+                    showToast('Gagal menyimpan: ' + (err.message || err.toString()), 'error');
+                });
+            return;
+        }
 
         if (typeof google !== 'undefined') {
             google.script.run.withSuccessHandler(res => {
@@ -1835,13 +2337,19 @@
         } else {
             if (!isEdit) {
                 activeTurnoverData.unshift({
-                    id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal, alasan, keterangan,
-                    masuk: tglMasuk, tanggalKeluar: tglKeluar
+                    id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal,
+                    tempatLahir: tempatLahirVal, tanggalLahir: tglLahirVal, telepon: teleponVal, noTelp: teleponVal, alamat: alamatVal,
+                    alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar
                 });
             } else {
                 const idx = activeTurnoverData.findIndex(t => t.id === editId);
                 if (idx !== -1) {
-                    activeTurnoverData[idx] = { ...activeTurnoverData[idx], id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal, alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar };
+                    activeTurnoverData[idx] = { 
+                        ...activeTurnoverData[idx], 
+                        id: noreg, namaLengkap: nama, bagian, kelas: kelasVal, asalDaerah: daerahVal, wilayah: daerahVal, asalSekolah: sekolahVal, sekolah: sekolahVal,
+                        tempatLahir: tempatLahirVal, tanggalLahir: tglLahirVal, telepon: teleponVal, noTelp: teleponVal, alamat: alamatVal,
+                        alasan, keterangan, masuk: tglMasuk, tanggalKeluar: tglKeluar 
+                    };
                 }
             }
             showToast('Mode Preview: Data turnover disimpan di memori lokal.');
@@ -1857,6 +2365,27 @@
             confirmText: 'Ya, Hapus',
             confirmClass: 'bg-rose-600 hover:bg-rose-700',
             onConfirm: () => {
+                const rpc = getRpcRunner();
+                if (rpc) {
+                    showToast('Menghapus data turnover...', 'info');
+                    rpc('deleteTurnoverRecord', [id])
+                        .then(res => {
+                            if (res && res.success !== false) {
+                                showToast('Data turnover berhasil dihapus.', 'success');
+                                const idx = activeTurnoverData.findIndex(t => t.id === id);
+                                if (idx !== -1) activeTurnoverData.splice(idx, 1);
+                                if (typeof loadDashboardData === 'function') loadDashboardData();
+                                else renderAdminTurnoverTable();
+                            } else {
+                                showToast('Gagal menghapus: ' + (res?.message || 'Unknown error'), 'error');
+                            }
+                        })
+                        .catch(err => {
+                            showToast('Gagal menghapus: ' + (err.message || err.toString()), 'error');
+                        });
+                    return;
+                }
+
                 if (typeof google !== 'undefined') {
                     google.script.run.withSuccessHandler(res => {
                         if (res.success) {
@@ -1881,7 +2410,13 @@
     // KELOLA POPULASI BULANAN
     // ============================================================
 
-    function renderAdminPopulasiTable() {
+    let populasiCurrentPage = 1;
+    const POPULASI_PAGE_SIZE = 25;
+
+    function renderAdminPopulasiTable(resetPage = false) {
+        if (resetPage === true) {
+            populasiCurrentPage = 1;
+        }
         const tbody = document.getElementById('admin-populasi-tbody');
         if (!tbody) return;
         tbody.innerHTML = '';
@@ -1900,13 +2435,34 @@
         if (filtered.length === 0) {
             tbody.innerHTML = `
                 <tr>
-                    <td colspan="9" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data populasi ditemukan.</td>
+                    <td colspan="10" class="py-8 text-center text-xs text-brand-textSub italic">Tidak ada data populasi ditemukan.</td>
                 </tr>
             `;
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'populasi-pagination-info',
+                    controlsId: 'populasi-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: POPULASI_PAGE_SIZE,
+                    goToPageFn: 'goToPopulasiPage',
+                    itemLabel: 'hari',
+                    themeColor: '#0B3B82'
+                });
+            }
             return;
         }
 
-        filtered.forEach(p => {
+        const totalItems = filtered.length;
+        const totalPages = Math.max(1, Math.ceil(totalItems / POPULASI_PAGE_SIZE));
+        if (populasiCurrentPage > totalPages) populasiCurrentPage = totalPages;
+        if (populasiCurrentPage < 1) populasiCurrentPage = 1;
+
+        const startIndex = (populasiCurrentPage - 1) * POPULASI_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + POPULASI_PAGE_SIZE, totalItems);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        pageItems.forEach(p => {
             const tr = document.createElement('tr');
             tr.className = "hover:bg-slate-50/50 transition-all-300 text-xs font-semibold";
             
@@ -1934,7 +2490,29 @@
             `;
             tbody.appendChild(tr);
         });
+
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'populasi-pagination-info',
+                controlsId: 'populasi-pagination-controls',
+                currentPage: populasiCurrentPage,
+                totalItems: totalItems,
+                pageSize: POPULASI_PAGE_SIZE,
+                goToPageFn: 'goToPopulasiPage',
+                itemLabel: 'hari',
+                themeColor: '#0B3B82'
+            });
+        }
     }
+
+    function goToPopulasiPage(page) {
+        populasiCurrentPage = page;
+        renderAdminPopulasiTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-kelola-populasi .overflow-x-auto');
+        if (scrollContainer) scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+    window.goToPopulasiPage = goToPopulasiPage;
+    window.renderAdminPopulasiTable = renderAdminPopulasiTable;
 
     function formatToYYYYMMDD(str) {
         if (!str) return '';
@@ -2265,19 +2843,31 @@
     };
 
     window.exportAdminTurnoverToExcel = function() {
-        const headers = ['NoReg', 'Nama Lengkap', 'Bagian / Section', 'Kelas', 'Kota / Daerah', 'Sekolah Asal', 'Tgl Masuk', 'Tgl Keluar', 'Tipe Turnover / Alasan', 'Keterangan'];
-        const rows = (activeTurnoverData || []).map(s => [
-            s.id || '-',
-            s.namaLengkap || '-',
-            s.bagian || s.section || '-',
-            s.kelas || 'Kelas 1',
-            s.daerahAsal || s.asalDaerah || s.wilayah || '-',
-            s.asalSekolah || '-',
-            s.masuk || s.tanggalMasuk || '-',
-            s.tanggalKeluar || s.keluar || '-',
-            s.tipeTurnover || s.alasan || '-',
-            s.keterangan || '-'
-        ]);
+        const headers = ['NoReg', 'Nama Lengkap', 'Bagian / Section', 'Kelas', 'Kota / Daerah', 'Sekolah Asal', 'Tempat, Tanggal Lahir', 'Alamat', 'No. Telepon', 'Tgl Masuk', 'Tgl Keluar', 'Tipe Turnover / Alasan', 'Keterangan'];
+        const rows = (activeTurnoverData || []).map(s => {
+            const std = (typeof rawSiswaData !== 'undefined' ? rawSiswaData : []).find(x => String(x.id) === String(s.id));
+            const tempatLahir = s.tempatLahir || (std ? std.tempatLahir : '') || '';
+            const tanggalLahir = s.tanggalLahir || (std ? std.tanggalLahir : '') || '';
+            const ttl = tanggalLahir ? (tempatLahir ? tempatLahir + ', ' : '') + tanggalLahir.split('-').reverse().join('/') : (tempatLahir || '-');
+            const alamat = s.alamat || (std ? std.alamat : '') || '-';
+            const telp = s.telepon || s.noTelp || s.no_telp || (std ? (std.telepon || std.noTelp || std.no_telp) : '') || '-';
+
+            return [
+                s.id || '-',
+                s.namaLengkap || '-',
+                s.bagian || s.section || '-',
+                s.kelas || 'Kelas 1',
+                s.daerahAsal || s.asalDaerah || s.wilayah || '-',
+                s.asalSekolah || '-',
+                ttl,
+                alamat,
+                telp,
+                s.masuk || s.tanggalMasuk || '-',
+                s.tanggalKeluar || s.keluar || '-',
+                s.tipeTurnover || s.alasan || '-',
+                s.keterangan || '-'
+            ];
+        });
         exportDataArrayToExcel(headers, rows, 'Data_Kelola_Turnover_LTC.xlsx', 'Kelola Turnover');
     };
 
@@ -2317,5 +2907,1061 @@
         ]);
         exportDataArrayToExcel(headers, rows, 'Data_Manajemen_K3_LTC.xlsx', 'Manajemen K3');
     };
+
+    // ============================================================
+    // FITUR SERTIFIKAT SISWA LTC (ADMIN ONLY)
+    // ============================================================
+
+    function formatIndoDate(dateStr) {
+        if (!dateStr) return '';
+        const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+        if (typeof dateStr === 'string' && dateStr.includes('/')) {
+            const parts = dateStr.split('/');
+            if (parts.length === 3) {
+                const day = parseInt(parts[0], 10);
+                const mon = parseInt(parts[1], 10) - 1;
+                const yr = parseInt(parts[2], 10);
+                if (!isNaN(day) && !isNaN(mon) && !isNaN(yr)) {
+                    return `${day} ${months[mon] || ''} ${yr}`;
+                }
+            }
+        }
+        const d = new Date(dateStr);
+        if (isNaN(d.getTime())) return dateStr;
+        return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    }
+
+    function openCertificateModal(studentId) {
+        const modal = document.getElementById('modal-sertifikat-siswa');
+        if (!modal) return;
+
+        // Cari siswa di activeData atau rawTurnoverData
+        const s = (activeData || []).find(std => String(std.id) === String(studentId)) ||
+                  (rawTurnoverData || []).find(std => String(std.id) === String(studentId)) ||
+                  (rawSiswaData || []).find(std => String(std.id) === String(studentId));
+
+        if (!s) {
+            showToast('Data siswa tidak ditemukan.', 'error');
+            return;
+        }
+
+        if (typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(s)) {
+            showToast(`Siswa ${s.namaLengkap || studentId} berstatus Resign / Indisipliner sehingga tidak berhak mendapatkan sertifikat.`, 'warning');
+            return;
+        }
+
+        // Set biodata
+        document.getElementById('cert-noreg').value = s.id;
+        const badgeNoreg = document.getElementById('cert-badge-noreg');
+        if (badgeNoreg) badgeNoreg.textContent = s.id;
+        
+        const namaEl = document.getElementById('cert-display-nama');
+        if (namaEl) namaEl.textContent = s.namaLengkap || '-';
+
+        const deptEl = document.getElementById('cert-display-dept');
+        if (deptEl) deptEl.textContent = `${s.departemen || 'PRODUKSI'} • ${s.section || s.bagian || '-'}`;
+
+        const tglMasukStr = s.masuk || s.tanggalMasuk || '';
+        const tglKeluarStr = s.tanggalKeluar || s.keluar || '';
+        const textPeriode = (tglMasukStr ? tglMasukStr.split('-').reverse().join('/') : '-') + 
+                            ' s.d ' + 
+                            (tglKeluarStr ? tglKeluarStr.split('-').reverse().join('/') : '-');
+        const dispPeriode = document.getElementById('cert-display-periode-text');
+        if (dispPeriode) dispPeriode.textContent = textPeriode;
+
+        // Foto preview
+        const fotoImg = document.getElementById('cert-foto-preview');
+        const fotoPlc = document.getElementById('cert-foto-placeholder');
+        const candidatePhotoUrl = s.foto || (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(s.id) : '');
+        if (candidatePhotoUrl && fotoImg) {
+            fotoImg.onload = function() {
+                fotoImg.classList.remove('hidden');
+                if (fotoPlc) fotoPlc.classList.add('hidden');
+            };
+            fotoImg.onerror = function() {
+                fotoImg.classList.add('hidden');
+                if (fotoPlc) fotoPlc.classList.remove('hidden');
+            };
+            fotoImg.src = candidatePhotoUrl + (candidatePhotoUrl.includes('?') ? '' : `?t=${Date.now()}`);
+        } else if (fotoImg) {
+            fotoImg.src = '';
+            fotoImg.classList.add('hidden');
+            if (fotoPlc) fotoPlc.classList.remove('hidden');
+        }
+
+        // Default Nomor Sertifikat
+        const yearNow = new Date().getFullYear();
+        const noregSuffix = String(s.id || '0000').slice(-3);
+        const defaultNoSertifikat = `${noregSuffix}/LTC/17-G/V/${yearNow}`;
+        document.getElementById('cert-nomor-sertifikat').value = defaultNoSertifikat;
+
+        // Tempat, Tanggal Lahir
+        let ttlStr = '';
+        if (s.tempatLahir && s.tanggalLahir) {
+            ttlStr = `${s.tempatLahir}, ${formatIndoDate(s.tanggalLahir)}`;
+        } else if (s.tanggalLahir) {
+            ttlStr = formatIndoDate(s.tanggalLahir);
+        } else if (s.daerahAsal || s.asalDaerah) {
+            ttlStr = `${s.daerahAsal || s.asalDaerah}, -`;
+        }
+        document.getElementById('cert-ttl').value = ttlStr;
+
+        // Periode Pelatihan (dalam teks formal sertifikat)
+        let formalPeriode = '';
+        if (tglMasukStr && tglKeluarStr) {
+            formalPeriode = `${formatIndoDate(tglMasukStr)} s.d ${formatIndoDate(tglKeluarStr)}`;
+        } else {
+            formalPeriode = '17 November 2025 s.d 16 April 2026';
+        }
+        document.getElementById('cert-periode').value = formalPeriode;
+
+        // Kota & Tanggal Terbit Sertifikat
+        const todayIndo = formatIndoDate(new Date());
+        document.getElementById('cert-tgl-terbit').value = `Gresik, ${todayIndo}`;
+
+        // Reset Form Nilai Sementara
+        document.getElementById('cert-nilai-basic-theory').value = '';
+        document.getElementById('cert-nilai-vocational').value = '';
+        document.getElementById('cert-nilai-performance').value = '';
+        document.getElementById('cert-nilai-user-obs').value = '';
+        document.getElementById('cert-nilai-bmk').value = '';
+        document.getElementById('cert-nilai-attendance').value = '';
+        document.getElementById('cert-nilai-attitude').value = '';
+        document.getElementById('cert-nilai-laporan').value = '';
+
+        // Auto-fill performa & absensi awal
+        autoFillPerformanceScore(false);
+        autoFillAttendanceScore(false);
+
+        // Ambil data sertifikat tersimpan dari database via RPC
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('getSertifikatByNoreg', [s.id])
+                .then(res => {
+                    if (res && res.success && res.data) {
+                        const d = res.data;
+                        if (d.nomor_sertifikat) document.getElementById('cert-nomor-sertifikat').value = d.nomor_sertifikat;
+                        if (d.tempat_tanggal_lahir) document.getElementById('cert-ttl').value = d.tempat_tanggal_lahir;
+                        if (d.periode_pelatihan) document.getElementById('cert-periode').value = d.periode_pelatihan;
+                        if (d.tanggal_terbit) document.getElementById('cert-tgl-terbit').value = d.tanggal_terbit;
+                        
+                        if (d.basic_theory !== null && d.basic_theory !== undefined) document.getElementById('cert-nilai-basic-theory').value = d.basic_theory;
+                        if (d.vocational_theory !== null && d.vocational_theory !== undefined) document.getElementById('cert-nilai-vocational').value = d.vocational_theory;
+                        if (d.performance !== null && d.performance !== undefined) document.getElementById('cert-nilai-performance').value = d.performance;
+                        if (d.user_observation !== null && d.user_observation !== undefined) document.getElementById('cert-nilai-user-obs').value = d.user_observation;
+                        if (d.bmk !== null && d.bmk !== undefined) document.getElementById('cert-nilai-bmk').value = d.bmk;
+                        if (d.attendance !== null && d.attendance !== undefined) document.getElementById('cert-nilai-attendance').value = d.attendance;
+                        if (d.attitude !== null && d.attitude !== undefined) document.getElementById('cert-nilai-attitude').value = d.attitude;
+                        if (d.laporan !== null && d.laporan !== undefined) document.getElementById('cert-nilai-laporan').value = d.laporan;
+                    }
+                    recalculateCertificateScores();
+                })
+                .catch(err => {
+                    console.warn('Info load sertifikat:', err.message);
+                    recalculateCertificateScores();
+                });
+        } else {
+            recalculateCertificateScores();
+        }
+
+        modal.classList.remove('hidden');
+    }
+
+    function closeCertificateModal() {
+        const modal = document.getElementById('modal-sertifikat-siswa');
+        if (modal) modal.classList.add('hidden');
+    }
+
+    function autoFillPerformanceScore(triggerToast = true) {
+        const noreg = document.getElementById('cert-noreg')?.value;
+        if (!noreg) return;
+
+        const s = (activeData || []).find(std => String(std.id) === String(noreg));
+        let score = 90.0;
+
+        if (s) {
+            const recs = s.dailyRecords || [];
+            let totalActual = 0;
+            let totalPlan = 0;
+
+            recs.forEach(r => {
+                if (r.plan && r.plan > 0 && r.actual !== null && r.actual !== undefined) {
+                    totalPlan += r.plan;
+                    totalActual += r.actual;
+                }
+            });
+
+            if (totalPlan > 0) {
+                score = Math.min(100, Math.max(0, Math.round((totalActual / totalPlan) * 1000) / 10));
+            } else if (s.percent !== undefined && s.percent !== null && !isNaN(s.percent)) {
+                score = Math.min(100, Math.max(0, parseFloat(s.percent)));
+            } else {
+                score = 90.0;
+            }
+        }
+
+        const input = document.getElementById('cert-nilai-performance');
+        if (input) {
+            input.value = score.toFixed(1);
+            recalculateCertificateScores();
+            if (triggerToast && typeof showToast === 'function') {
+                showToast(`Nilai Performa ${score.toFixed(1)} berhasil diisi otomatis!`, 'info');
+            }
+        }
+    }
+
+    function autoFillAttendanceScore(triggerToast = true) {
+        const noreg = document.getElementById('cert-noreg')?.value;
+        if (!noreg) return;
+
+        const s = (activeData || []).find(std => String(std.id) === String(noreg));
+        let score = 100.0;
+
+        if (s && s.dailyRecords && s.dailyRecords.length > 0) {
+            let totalDays = 0;
+            let hadirDays = 0;
+            s.dailyRecords.forEach(r => {
+                const h = String(r.hadir || '').toUpperCase();
+                if (h !== 'OFF' && h !== 'LIBUR') {
+                    totalDays++;
+                    if (h === '✔' || h === 'HADIR' || h === 'TRUE') {
+                        hadirDays++;
+                    }
+                }
+            });
+            if (totalDays > 0) {
+                score = Math.min(100, Math.max(0, Math.round((hadirDays / totalDays) * 1000) / 10));
+            }
+        } else {
+            score = 100.0;
+        }
+
+        const input = document.getElementById('cert-nilai-attendance');
+        if (input) {
+            input.value = score.toFixed(1);
+            recalculateCertificateScores();
+            if (triggerToast && typeof showToast === 'function') {
+                showToast(`Nilai Kehadiran ${score.toFixed(1)}% berhasil diisi otomatis!`, 'info');
+            }
+        }
+    }
+
+    function recalculateCertificateScores() {
+        const parse = (id) => {
+            const val = parseFloat(document.getElementById(id)?.value);
+            return isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
+        };
+
+        // I. Kinerja (Bobot 40%): Average of Basic Theory, Vocational, Performance, User Obs
+        const basicTheory = parse('cert-nilai-basic-theory');
+        const vocational = parse('cert-nilai-vocational');
+        const performance = parse('cert-nilai-performance');
+        const userObs = parse('cert-nilai-user-obs');
+
+        const avgKinerja = (basicTheory + vocational + performance + userObs) / 4;
+        const subtotalKinerja = (avgKinerja * 0.40);
+        const badgeKinerja = document.getElementById('cert-badge-subtotal-kinerja');
+        if (badgeKinerja) badgeKinerja.textContent = `Subtotal: ${subtotalKinerja.toFixed(2)} / 40.0`;
+
+        // II. BMK (Bobot 30%): 5R, Safety & Kaizen
+        const bmk = parse('cert-nilai-bmk');
+        const subtotalBmk = (bmk * 0.30);
+        const badgeBmk = document.getElementById('cert-badge-subtotal-bmk');
+        if (badgeBmk) badgeBmk.textContent = `${subtotalBmk.toFixed(2)} / 30.0`;
+
+        // III. Sikap (Bobot 20%): Average of Attendance & Attitude
+        const attendance = parse('cert-nilai-attendance');
+        const attitude = parse('cert-nilai-attitude');
+        const avgSikap = (attendance + attitude) / 2;
+        const subtotalSikap = (avgSikap * 0.20);
+        const badgeSikap = document.getElementById('cert-badge-subtotal-sikap');
+        if (badgeSikap) badgeSikap.textContent = `${subtotalSikap.toFixed(2)} / 20.0`;
+
+        // IV. Laporan (Bobot 10%): Presentasi Laporan
+        const laporan = parse('cert-nilai-laporan');
+        const subtotalLaporan = (laporan * 0.10);
+        const badgeLaporan = document.getElementById('cert-badge-subtotal-laporan');
+        if (badgeLaporan) badgeLaporan.textContent = `${subtotalLaporan.toFixed(2)} / 10.0`;
+
+        // Total Nilai Akhir
+        const nilaiAkhir = subtotalKinerja + subtotalBmk + subtotalSikap + subtotalLaporan;
+        const dispNilaiAkhir = document.getElementById('cert-display-nilai-akhir');
+        if (dispNilaiAkhir) dispNilaiAkhir.textContent = nilaiAkhir.toFixed(1);
+
+        // Predikat Kelulusan
+        let predikat = 'Kurang (D)';
+        let badgeClass = 'bg-rose-500/20 text-rose-300 border-rose-400/30';
+        if (nilaiAkhir >= 90) {
+            predikat = 'Sangat Baik (A)';
+            badgeClass = 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30';
+        } else if (nilaiAkhir >= 80) {
+            predikat = 'Baik (B)';
+            badgeClass = 'bg-blue-500/20 text-blue-300 border-blue-400/30';
+        } else if (nilaiAkhir >= 70) {
+            predikat = 'Cukup (C)';
+            badgeClass = 'bg-amber-500/20 text-amber-300 border-amber-400/30';
+        }
+
+        const dispPredikat = document.getElementById('cert-display-predikat');
+        if (dispPredikat) {
+            dispPredikat.textContent = predikat;
+            dispPredikat.className = `px-3 py-1 rounded-xl text-xs font-bold border ${badgeClass}`;
+        }
+
+        return {
+            avgKinerja, subtotalKinerja,
+            bmk, subtotalBmk,
+            avgSikap, subtotalSikap,
+            laporan, subtotalLaporan,
+            nilaiAkhir, predikat
+        };
+    }
+
+    async function saveCertificateData(showFeedback = true) {
+        const noreg = document.getElementById('cert-noreg')?.value;
+        if (!noreg) {
+            if (showFeedback && typeof showToast === 'function') showToast('NoReg siswa tidak valid.', 'error');
+            return null;
+        }
+
+        const sTarget = (activeData || []).find(std => String(std.id) === String(noreg)) ||
+                        (typeof activeTurnoverData !== 'undefined' ? activeTurnoverData : []).find(std => String(std.id) === String(noreg)) ||
+                        (rawSiswaData || []).find(std => String(std.id) === String(noreg));
+
+        if (sTarget && typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(sTarget)) {
+            if (showFeedback && typeof showToast === 'function') {
+                showToast(`Siswa ${sTarget.namaLengkap || noreg} berstatus Resign / Indisipliner (tidak berhak mendapatkan sertifikat).`, 'warning');
+            }
+            return null;
+        }
+
+        const calc = recalculateCertificateScores();
+        const payload = {
+            noreg: noreg,
+            nomor_sertifikat: document.getElementById('cert-nomor-sertifikat')?.value || '',
+            tempat_tanggal_lahir: document.getElementById('cert-ttl')?.value || '',
+            periode_pelatihan: document.getElementById('cert-periode')?.value || '',
+            tanggal_terbit: document.getElementById('cert-tgl-terbit')?.value || '',
+            basic_theory: parseFloat(document.getElementById('cert-nilai-basic-theory')?.value) || 0,
+            vocational_theory: parseFloat(document.getElementById('cert-nilai-vocational')?.value) || 0,
+            performance: parseFloat(document.getElementById('cert-nilai-performance')?.value) || 0,
+            user_observation: parseFloat(document.getElementById('cert-nilai-user-obs')?.value) || 0,
+            kinerja_subtotal: calc.subtotalKinerja,
+            bmk: parseFloat(document.getElementById('cert-nilai-bmk')?.value) || 0,
+            bmk_subtotal: calc.subtotalBmk,
+            attendance: parseFloat(document.getElementById('cert-nilai-attendance')?.value) || 0,
+            attitude: parseFloat(document.getElementById('cert-nilai-attitude')?.value) || 0,
+            sikap_subtotal: calc.subtotalSikap,
+            laporan: parseFloat(document.getElementById('cert-nilai-laporan')?.value) || 0,
+            laporan_subtotal: calc.subtotalLaporan,
+            nilai_akhir: calc.nilaiAkhir,
+            predikat: calc.predikat
+        };
+
+        if (showFeedback && typeof showToast === 'function') {
+            showToast('Menyimpan data sertifikat...', 'info');
+        }
+
+        const rpc = getRpcRunner();
+        if (rpc) {
+            try {
+                const res = await rpc('saveSertifikat', [payload]);
+                if (res && res.success !== false) {
+                    if (showFeedback && typeof showToast === 'function') showToast('Data sertifikat berhasil disimpan!', 'success');
+                } else if (showFeedback && typeof showToast === 'function') {
+                    showToast('Info: Disimpan lokal. (' + (res?.message || 'Database belum dimigrasi') + ')', 'info');
+                }
+            } catch (err) {
+                console.warn('Error RPC saveSertifikat:', err);
+                if (showFeedback && typeof showToast === 'function') {
+                    showToast('Info: Disimpan lokal. (' + (err.message || 'Database belum dimigrasi') + ')', 'info');
+                }
+            }
+        } else if (showFeedback && typeof showToast === 'function') {
+            showToast('Mode Lokal: Data sertifikat disimpan sementara.', 'info');
+        }
+
+        // Simpan ke cache certRecordsMap dan refresh tabel sertifikat jika sedang aktif
+        certRecordsMap[String(payload.noreg).trim()] = {
+            ...payload,
+            subtotal_kinerja: payload.kinerja_subtotal,
+            subtotal_bmk: payload.bmk_subtotal,
+            subtotal_sikap: payload.sikap_subtotal,
+            nilai_laporan_akhir: payload.laporan_subtotal
+        };
+        if (typeof filterAdminCertTable === 'function') {
+            filterAdminCertTable();
+        }
+
+        return payload;
+    }
+
+    async function saveAndDownloadCertificatePDF() {
+        const noreg = document.getElementById('cert-noreg')?.value;
+        if (!noreg) {
+            showToast('Pilih siswa terlebih dahulu.', 'error');
+            return;
+        }
+
+        const s = (activeData || []).find(std => String(std.id) === String(noreg)) ||
+                  (typeof activeTurnoverData !== 'undefined' ? activeTurnoverData : []).find(std => String(std.id) === String(noreg)) ||
+                  (rawSiswaData || []).find(std => String(std.id) === String(noreg));
+
+        if (!s) {
+            showToast('Data siswa tidak ditemukan.', 'error');
+            return;
+        }
+
+        if (typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(s)) {
+            showToast(`Siswa ${s.namaLengkap || noreg} berstatus Resign / Indisipliner sehingga tidak berhak mendapatkan sertifikat.`, 'warning');
+            return;
+        }
+
+        if (typeof window.generateAndDownloadCertificate !== 'function') {
+            showToast('Engine sertifikat belum siap. Periksa koneksi ke script sertifikat.', 'error');
+            return;
+        }
+
+        showToast('Menyiapkan dan menyimpan data sertifikat...', 'info');
+
+        // 1. Simpan data sertifikat ke backend/lokal terlebih dahulu
+        await saveCertificateData(false);
+        const calc = recalculateCertificateScores();
+
+        // 2. Siapkan data untuk PDF engine
+        const certData = {
+            noreg: noreg,
+            nama: s.namaLengkap || document.getElementById('cert-display-nama')?.textContent || 'SISWA',
+            nomorSertifikat: document.getElementById('cert-nomor-sertifikat')?.value || '',
+            ttl: document.getElementById('cert-ttl')?.value || '',
+            periode: document.getElementById('cert-periode')?.value || '',
+            tglTerbit: document.getElementById('cert-tgl-terbit')?.value || '',
+            fotoUrl: s.foto || (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(noreg) : ''),
+            // 4 Komponen Nilai untuk Halaman 3
+            subtotalKinerja: calc.subtotalKinerja,
+            subtotalBmk: calc.subtotalBmk,
+            subtotalSikap: calc.subtotalSikap,
+            subtotalLaporan: calc.subtotalLaporan,
+            nilaiAkhir: calc.nilaiAkhir,
+            predikat: calc.predikat
+        };
+
+        try {
+            showToast('Sedang membuat file PDF Sertifikat...', 'info');
+            const result = await window.generateAndDownloadCertificate(certData);
+            if (result && result.success) {
+                showToast(`Sertifikat ${certData.nama} berhasil diunduh!`, 'success');
+            }
+        } catch (err) {
+            console.error('Gagal membuat sertifikat PDF:', err);
+            showToast('Gagal membuat PDF: ' + (err.message || err.toString()), 'error');
+        }
+    }
+
+    // =========================================================================
+    // MODUL TABEL KELOLA SERTIFIKAT & FILTERING ADMIN
+    // =========================================================================
+    var certRecordsMap = {};
+
+    function isStudentIneligibleForCertificate(student) {
+        if (!student) return true;
+        const id = String(student.id || student.noreg || '').trim();
+
+        // 1. Cek status & alasan langsung pada record siswa
+        const statusStr = String(student.status || '').toLowerCase().trim();
+        const alasanStr = String(student.alasan || '').toLowerCase().trim();
+
+        if (statusStr.includes('resign') || statusStr.includes('indisiplin') || statusStr.includes('indisipliner') || statusStr.includes('keluar') || statusStr.includes('dropout')) {
+            return true;
+        }
+        if (alasanStr.includes('resign') || alasanStr.includes('indisiplin') || alasanStr.includes('indisipliner') || alasanStr.includes('keluar') || alasanStr.includes('dropout')) {
+            return true;
+        }
+
+        // 2. Cek histori pada daftar turnover (activeTurnoverData / rawTurnoverData)
+        const turnoverList = (typeof activeTurnoverData !== 'undefined' && Array.isArray(activeTurnoverData)) 
+            ? activeTurnoverData 
+            : (typeof rawTurnoverData !== 'undefined' && Array.isArray(rawTurnoverData) ? rawTurnoverData : []);
+            
+        const turnoverRecord = turnoverList.find(t => String(t.id || t.noreg || '').trim() === id);
+        if (turnoverRecord) {
+            const tAlasan = String(turnoverRecord.alasan || '').toLowerCase().trim();
+            const tStatus = String(turnoverRecord.status || '').toLowerCase().trim();
+            if (tAlasan.includes('resign') || tAlasan.includes('indisiplin') || tAlasan.includes('indisipliner')) {
+                return true;
+            }
+            if (tStatus.includes('resign') || tStatus.includes('indisiplin') || tStatus.includes('indisipliner')) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    function getAllStudentsForCertificate() {
+        const list = [];
+        const seen = new Set();
+        const turnoverList = (typeof activeTurnoverData !== 'undefined' && Array.isArray(activeTurnoverData)) 
+            ? activeTurnoverData 
+            : (typeof rawTurnoverData !== 'undefined' && Array.isArray(rawTurnoverData) ? rawTurnoverData : []);
+
+        [activeData, turnoverList, rawSiswaData].forEach(arr => {
+            if (Array.isArray(arr)) {
+                arr.forEach(s => {
+                    if (s && s.id && !seen.has(String(s.id))) {
+                        seen.add(String(s.id));
+                        // Eksklusif filter: Siswa dengan status Resign atau Indisipliner TIDAK DAPAT sertifikat
+                        if (!isStudentIneligibleForCertificate(s)) {
+                            list.push(s);
+                        }
+                    }
+                });
+            }
+        });
+        return list;
+    }
+
+    function renderAdminSertifikatTab() {
+        const tbody = document.getElementById('admin-cert-tbody');
+        if (tbody && (!tbody.children.length || tbody.innerText.includes('Memuat'))) {
+            tbody.innerHTML = '<tr><td colspan="10" class="py-12 text-center text-xs text-slate-400 italic"><i class="fa-solid fa-spinner animate-spin text-brand-blue text-lg mb-2"></i><br>Memuat basis data evaluasi dan sertifikat...</td></tr>';
+        }
+
+        const rpc = getRpcRunner();
+        if (rpc) {
+            rpc('getSertifikatList', [])
+                .then(res => {
+                    const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
+                    list.forEach(c => {
+                        if (c && c.noreg) {
+                            certRecordsMap[String(c.noreg).trim()] = c;
+                        }
+                    });
+                    populateCertFilters();
+                    filterAdminCertTable();
+                })
+                .catch(err => {
+                    console.warn('[renderAdminSertifikatTab] Notice load sertifikat list:', err);
+                    populateCertFilters();
+                    filterAdminCertTable();
+                });
+        } else {
+            populateCertFilters();
+            filterAdminCertTable();
+        }
+    }
+
+    function populateCertFilters() {
+        const batchSelect = document.getElementById('filter-cert-batch');
+        const deptSelect = document.getElementById('filter-cert-dept');
+        const students = getAllStudentsForCertificate();
+
+        if (batchSelect && batchSelect.options.length <= 1) {
+            const currentVal = batchSelect.value;
+            const batches = new Set();
+            students.forEach(s => {
+                if (s.kelas) batches.add(String(s.kelas).trim());
+            });
+            Array.from(batches).sort().forEach(b => {
+                const opt = document.createElement('option');
+                opt.value = b;
+                opt.textContent = b;
+                batchSelect.appendChild(opt);
+            });
+            batchSelect.value = currentVal;
+        }
+
+        if (deptSelect && deptSelect.options.length <= 1) {
+            const currentVal = deptSelect.value;
+            const depts = new Set();
+            students.forEach(s => {
+                if (s.departemen) depts.add(String(s.departemen).trim());
+            });
+            Array.from(depts).sort().forEach(d => {
+                const opt = document.createElement('option');
+                opt.value = d;
+                opt.textContent = d;
+                deptSelect.appendChild(opt);
+            });
+            deptSelect.value = currentVal;
+        }
+    }
+
+    let certCurrentPage = 1;
+    const CERT_PAGE_SIZE = 25;
+    let selectedCertStudentIds = new Set();
+
+    function filterAdminCertTable(resetPage = false) {
+        if (resetPage === true) {
+            certCurrentPage = 1;
+        }
+        const query = document.getElementById('filter-cert-query')?.value.trim().toLowerCase() || '';
+        const filterBatch = document.getElementById('filter-cert-batch')?.value.trim().toLowerCase() || '';
+        const filterDept = document.getElementById('filter-cert-dept')?.value.trim().toLowerCase() || '';
+        const filterStatus = document.getElementById('filter-cert-status')?.value || '';
+
+        const students = getAllStudentsForCertificate();
+
+        const filtered = students.filter(s => {
+            const idStr = String(s.id || '').toLowerCase();
+            const namaStr = String(s.namaLengkap || '').toLowerCase();
+            if (query && !idStr.includes(query) && !namaStr.includes(query)) return false;
+
+            if (filterBatch && String(s.kelas || '').toLowerCase() !== filterBatch) return false;
+            if (filterDept && String(s.departemen || '').toLowerCase() !== filterDept) return false;
+
+            const cert = certRecordsMap[String(s.id).trim()];
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+
+            if (filterStatus === 'siap' && !isEvaluated) return false;
+            if (filterStatus === 'belum' && isEvaluated) return false;
+
+            return true;
+        });
+
+        // Hitung Ringkasan KPI (berdasarkan seluruh data terfilter)
+        let siapCount = 0;
+        let totalScore = 0;
+
+        filtered.forEach(s => {
+            const cert = certRecordsMap[String(s.id).trim()];
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            if (isEvaluated) {
+                siapCount++;
+                totalScore += parseFloat(cert.nilai_akhir || 0);
+            }
+        });
+
+        const totalSiswa = filtered.length;
+        const belumCount = Math.max(0, totalSiswa - siapCount);
+        const avgScore = siapCount > 0 ? (totalScore / siapCount).toFixed(1) : '0.0';
+
+        const elTotal = document.getElementById('cert-stat-total');
+        if (elTotal) elTotal.textContent = totalSiswa;
+        const elBelum = document.getElementById('cert-stat-belum');
+        if (elBelum) elBelum.textContent = belumCount;
+        const elSiap = document.getElementById('cert-stat-siap');
+        if (elSiap) elSiap.textContent = siapCount;
+        const elAvg = document.getElementById('cert-stat-avg');
+        if (elAvg) elAvg.textContent = avgScore;
+
+        // Render Baris Tabel
+        const tbody = document.getElementById('admin-cert-tbody');
+        if (!tbody) return;
+
+        if (filtered.length === 0) {
+            tbody.innerHTML = `
+                <tr>
+                    <td colspan="11" class="py-12 text-center text-xs text-slate-400 italic">
+                        <i class="fa-solid fa-circle-exclamation text-slate-300 text-lg mb-2"></i><br>
+                        Tidak ada data siswa yang cocok dengan kriteria filter saat ini.
+                    </td>
+                </tr>
+            `;
+            const selectAllCb = document.getElementById('cert-select-all');
+            if (selectAllCb) {
+                selectAllCb.checked = false;
+                selectAllCb.indeterminate = false;
+            }
+            updateCertBatchActionsUI();
+            if (typeof renderPaginationUI === 'function') {
+                renderPaginationUI({
+                    infoId: 'cert-pagination-info',
+                    controlsId: 'cert-pagination-controls',
+                    currentPage: 1,
+                    totalItems: 0,
+                    pageSize: CERT_PAGE_SIZE,
+                    goToPageFn: 'goToCertPage',
+                    itemLabel: 'siswa',
+                    themeColor: '#0B3B82'
+                });
+            }
+            return;
+        }
+
+        // Paginasi 25 Siswa per Halaman
+        const totalPages = Math.max(1, Math.ceil(totalSiswa / CERT_PAGE_SIZE));
+        if (certCurrentPage > totalPages) certCurrentPage = totalPages;
+        if (certCurrentPage < 1) certCurrentPage = 1;
+
+        const startIndex = (certCurrentPage - 1) * CERT_PAGE_SIZE;
+        const endIndex = Math.min(startIndex + CERT_PAGE_SIZE, totalSiswa);
+        const pageItems = filtered.slice(startIndex, endIndex);
+
+        tbody.innerHTML = pageItems.map((s, idx) => {
+            const cert = certRecordsMap[String(s.id).trim()] || null;
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            const isSelected = selectedCertStudentIds.has(String(s.id).trim());
+
+            const kVal = cert ? parseFloat(cert.subtotal_kinerja ?? cert.kinerja_subtotal ?? 0) : null;
+            const bVal = cert ? parseFloat(cert.subtotal_bmk ?? cert.bmk_subtotal ?? 0) : null;
+            const sVal = cert ? parseFloat(cert.subtotal_sikap ?? cert.sikap_subtotal ?? 0) : null;
+            const lVal = cert ? parseFloat(cert.nilai_laporan_akhir ?? cert.laporan_subtotal ?? 0) : null;
+            const nAkhir = cert ? parseFloat(cert.nilai_akhir ?? 0) : null;
+
+            let predikatBadge = '-';
+            if (isEvaluated && nAkhir !== null) {
+                let pClass = 'bg-emerald-50 text-emerald-700 border-emerald-200';
+                if (nAkhir < 70) pClass = 'bg-rose-50 text-rose-700 border-rose-200';
+                else if (nAkhir < 80) pClass = 'bg-amber-50 text-amber-700 border-amber-200';
+                else if (nAkhir < 90) pClass = 'bg-blue-50 text-blue-700 border-blue-200';
+
+                predikatBadge = `
+                    <div class="flex items-center justify-center gap-1.5">
+                        <span class="font-mono font-black text-xs text-slate-800">${nAkhir.toFixed(1)}</span>
+                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border ${pClass}">${cert.predikat || 'A'}</span>
+                    </div>
+                `;
+            }
+
+            const statusBadge = isEvaluated
+                ? `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 whitespace-nowrap"><i class="fa-solid fa-circle-check mr-1"></i>Siap Cetak</span>`
+                : `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-500 border border-slate-200 whitespace-nowrap"><i class="fa-regular fa-clock mr-1"></i>Belum Dinilai</span>`;
+
+            return `
+                <tr class="hover:bg-slate-50/80 transition-colors ${isSelected ? 'bg-blue-50/40' : ''}">
+                    <td class="py-3 px-3 text-center">
+                        ${isEvaluated 
+                            ? `<input type="checkbox" name="cert-student-item" value="${s.id}" ${isSelected ? 'checked' : ''} onchange="toggleCertStudentSelection('${s.id}', this.checked)" class="w-4 h-4 rounded text-[#0B3B82] focus:ring-blue-500 border-slate-300 cursor-pointer">`
+                            : `<input type="checkbox" disabled class="w-4 h-4 rounded text-slate-300 border-slate-200 cursor-not-allowed opacity-30" title="Siswa belum dinilai">`
+                        }
+                    </td>
+                    <td class="py-3 px-3.5 text-center font-mono text-xs text-slate-400">${startIndex + idx + 1}</td>
+                    <td class="py-3 px-4">
+                        <div class="min-w-0">
+                            <div class="font-bold text-slate-800 text-xs truncate">${s.namaLengkap || '-'}</div>
+                            <div class="font-mono text-slate-400 text-[11px]">${s.id}</div>
+                        </div>
+                    </td>
+                    <td class="py-3 px-3.5">
+                        <span class="px-2 py-0.5 bg-blue-50 text-[#0B3B82] rounded-md font-bold text-[10px]">${s.kelas || 'Kelas 1'}</span>
+                        <div class="text-[11px] text-slate-500 font-normal mt-0.5 truncate">${s.departemen || '-'}</div>
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        ${kVal !== null ? `<span class="font-mono font-bold text-blue-700 text-xs">${kVal.toFixed(1)}</span> <span class="text-[10px] text-slate-400">/ 40</span>` : '<span class="text-slate-300 font-mono">-</span>'}
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        ${bVal !== null ? `<span class="font-mono font-bold text-amber-700 text-xs">${bVal.toFixed(1)}</span> <span class="text-[10px] text-slate-400">/ 30</span>` : '<span class="text-slate-300 font-mono">-</span>'}
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        ${sVal !== null ? `<span class="font-mono font-bold text-emerald-700 text-xs">${sVal.toFixed(1)}</span> <span class="text-[10px] text-slate-400">/ 20</span>` : '<span class="text-slate-300 font-mono">-</span>'}
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        ${lVal !== null ? `<span class="font-mono font-bold text-purple-700 text-xs">${lVal.toFixed(1)}</span> <span class="text-[10px] text-slate-400">/ 10</span>` : '<span class="text-slate-300 font-mono">-</span>'}
+                    </td>
+                    <td class="py-3 px-3.5 text-center">
+                        ${predikatBadge}
+                    </td>
+                    <td class="py-3 px-3 text-center">
+                        ${statusBadge}
+                    </td>
+                    <td class="py-3 px-4 text-center">
+                        <div class="flex items-center justify-center gap-1.5">
+                            <button onclick="openCertificateModal('${s.id}')"
+                                class="w-8 h-8 rounded-lg bg-blue-50 hover:bg-blue-100 text-[#0B3B82] border border-blue-200/80 flex items-center justify-center transition-all cursor-pointer shadow-xs text-xs" 
+                                title="${isEvaluated ? 'Edit Nilai Siswa' : 'Input Nilai Siswa'}">
+                                <i class="fa-solid fa-pen-to-square"></i>
+                            </button>
+                            <button onclick="downloadStudentCertificatePDF('${s.id}')"
+                                class="w-8 h-8 rounded-lg ${isEvaluated ? 'bg-[#0B3B82] hover:bg-blue-700 text-white shadow-xs cursor-pointer' : 'bg-slate-100 text-slate-400 border border-slate-200 cursor-not-allowed'} flex items-center justify-center transition-all text-xs"
+                                ${!isEvaluated ? 'disabled title="Harap lengkapi penilaian siswa terlebih dahulu"' : 'title="Cetak file resmi Sertifikat PDF"'}>
+                                <i class="fa-solid fa-file-pdf"></i>
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+            `;
+        }).join('');
+
+        // Perbarui Status Checkbox Select All Halaman Ini
+        const pageEvaluatedIds = pageItems
+            .filter(s => {
+                const cert = certRecordsMap[String(s.id).trim()];
+                return !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            })
+            .map(s => String(s.id).trim());
+
+        const selectAllCb = document.getElementById('cert-select-all');
+        if (selectAllCb) {
+            if (pageEvaluatedIds.length > 0) {
+                const checkedCount = pageEvaluatedIds.filter(id => selectedCertStudentIds.has(id)).length;
+                selectAllCb.checked = (checkedCount === pageEvaluatedIds.length);
+                selectAllCb.indeterminate = (checkedCount > 0 && checkedCount < pageEvaluatedIds.length);
+            } else {
+                selectAllCb.checked = false;
+                selectAllCb.indeterminate = false;
+            }
+        }
+
+        updateCertBatchActionsUI();
+
+        // Perbarui Kontrol Paginasi Kelola Sertifikat
+        if (typeof renderPaginationUI === 'function') {
+            renderPaginationUI({
+                infoId: 'cert-pagination-info',
+                controlsId: 'cert-pagination-controls',
+                currentPage: certCurrentPage,
+                totalItems: totalSiswa,
+                pageSize: CERT_PAGE_SIZE,
+                goToPageFn: 'goToCertPage',
+                itemLabel: 'siswa',
+                themeColor: '#0B3B82'
+            });
+        }
+    }
+
+    function goToCertPage(page) {
+        certCurrentPage = page;
+        filterAdminCertTable(false);
+        const scrollContainer = document.querySelector('#admin-tab-kelola-sertifikat .overflow-x-auto');
+        if (scrollContainer) {
+            scrollContainer.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+    }
+    window.goToCertPage = goToCertPage;
+
+    // ==========================================
+    // SELEKSI SISWA & BATCH DOWNLOAD SERTIFIKAT
+    // ==========================================
+
+    function toggleCertStudentSelection(studentId, isChecked) {
+        const sId = String(studentId).trim();
+        if (isChecked) {
+            selectedCertStudentIds.add(sId);
+        } else {
+            selectedCertStudentIds.delete(sId);
+        }
+        updateCertSelectAllCheckbox();
+        updateCertBatchActionsUI();
+    }
+
+    function toggleSelectAllCertStudents(isChecked) {
+        const checkboxes = document.querySelectorAll('input[name="cert-student-item"]:not(:disabled)');
+        checkboxes.forEach(cb => {
+            cb.checked = isChecked;
+            const sId = String(cb.value).trim();
+            if (isChecked) {
+                selectedCertStudentIds.add(sId);
+            } else {
+                selectedCertStudentIds.delete(sId);
+            }
+        });
+        updateCertSelectAllCheckbox();
+        updateCertBatchActionsUI();
+    }
+
+    function selectAllReadyCertStudents() {
+        const students = getAllStudentsForCertificate();
+        let addedCount = 0;
+        students.forEach(s => {
+            if (typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(s)) return;
+            const cert = certRecordsMap[String(s.id).trim()];
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            if (isEvaluated) {
+                selectedCertStudentIds.add(String(s.id).trim());
+                addedCount++;
+            }
+        });
+        filterAdminCertTable(false);
+        showToast(`${addedCount} siswa berstatus Siap Cetak berhasil dicentang.`, 'info');
+    }
+
+    function clearCertStudentSelection() {
+        selectedCertStudentIds.clear();
+        filterAdminCertTable(false);
+    }
+
+    function updateCertSelectAllCheckbox() {
+        const selectAllCb = document.getElementById('cert-select-all');
+        if (!selectAllCb) return;
+        const checkboxes = Array.from(document.querySelectorAll('input[name="cert-student-item"]:not(:disabled)'));
+        if (checkboxes.length === 0) {
+            selectAllCb.checked = false;
+            selectAllCb.indeterminate = false;
+            return;
+        }
+        const checkedCount = checkboxes.filter(cb => cb.checked).length;
+        selectAllCb.checked = (checkedCount === checkboxes.length);
+        selectAllCb.indeterminate = (checkedCount > 0 && checkedCount < checkboxes.length);
+    }
+
+    function updateCertBatchActionsUI() {
+        const bar = document.getElementById('cert-batch-action-bar');
+        const countEl = document.getElementById('cert-batch-selected-count');
+        const totalSelected = selectedCertStudentIds.size;
+        if (!bar) return;
+
+        if (totalSelected > 0) {
+            bar.classList.remove('hidden');
+            bar.classList.add('flex');
+            if (countEl) countEl.textContent = `${totalSelected} Siswa Dipilih`;
+        } else {
+            bar.classList.add('hidden');
+            bar.classList.remove('flex');
+        }
+    }
+
+    function getStudentCertificateData(studentId) {
+        const s = (activeData || []).find(std => String(std.id) === String(studentId)) ||
+                  (typeof activeTurnoverData !== 'undefined' ? activeTurnoverData : []).find(std => String(std.id) === String(studentId)) ||
+                  (rawSiswaData || []).find(std => String(std.id) === String(studentId));
+
+        if (!s) return null;
+        if (typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(s)) return null;
+
+        const cert = certRecordsMap[String(studentId).trim()];
+        if (!cert || (!cert.nilai_akhir && cert.nilai_akhir !== 0)) return null;
+
+        const yearNow = new Date().getFullYear();
+        const noregSuffix = String(s.id || '0000').slice(-3);
+        const defaultNoSertifikat = `${noregSuffix}/LTC/17-G/V/${yearNow}`;
+
+        const tglMasukStr = s.masuk || s.tanggalMasuk || '';
+        const tglKeluarStr = s.tanggalKeluar || s.keluar || '';
+        const formalPeriode = (tglMasukStr && tglKeluarStr) 
+            ? `${formatIndoDate(tglMasukStr)} s.d ${formatIndoDate(tglKeluarStr)}` 
+            : '17 November 2025 s.d 16 April 2026';
+
+        let ttlStr = '';
+        if (s.tempatLahir && s.tanggalLahir) {
+            ttlStr = `${s.tempatLahir}, ${formatIndoDate(s.tanggalLahir)}`;
+        } else if (s.tanggalLahir) {
+            ttlStr = formatIndoDate(s.tanggalLahir);
+        } else if (s.daerahAsal || s.asalDaerah) {
+            ttlStr = `${s.daerahAsal || s.asalDaerah}, -`;
+        }
+
+        return {
+            noreg: s.id,
+            nama: s.namaLengkap || 'SISWA',
+            nomorSertifikat: cert.nomor_sertifikat || defaultNoSertifikat,
+            ttl: cert.tempat_tanggal_lahir || ttlStr,
+            periode: cert.periode_pelatihan || formalPeriode,
+            tglTerbit: cert.tanggal_terbit || `Gresik, ${formatIndoDate(new Date())}`,
+            fotoUrl: s.foto || (typeof getStudentPhotoUrl === 'function' ? getStudentPhotoUrl(s.id) : ''),
+            subtotalKinerja: parseFloat(cert.subtotal_kinerja ?? cert.kinerja_subtotal ?? 0),
+            subtotalBmk: parseFloat(cert.subtotal_bmk ?? cert.bmk_subtotal ?? 0),
+            subtotalSikap: parseFloat(cert.subtotal_sikap ?? cert.sikap_subtotal ?? 0),
+            subtotalLaporan: parseFloat(cert.nilai_laporan_akhir ?? cert.laporan_subtotal ?? 0),
+            nilaiAkhir: parseFloat(cert.nilai_akhir ?? 0),
+            predikat: cert.predikat || 'Sangat Baik (A)'
+        };
+    }
+
+    async function downloadStudentCertificatePDF(studentId) {
+        const certData = getStudentCertificateData(studentId);
+        if (!certData) {
+            const s = (activeData || []).find(std => String(std.id) === String(studentId));
+            if (s && typeof isStudentIneligibleForCertificate === 'function' && isStudentIneligibleForCertificate(s)) {
+                showToast(`Siswa ${s.namaLengkap || studentId} berstatus Resign / Indisipliner sehingga tidak berhak mendapatkan sertifikat.`, 'warning');
+            } else {
+                showToast(`Nilai siswa belum diisi atau data tidak ditemukan. Harap isi nilai siswa terlebih dahulu.`, 'warning');
+            }
+            return;
+        }
+
+        if (typeof window.generateAndDownloadCertificate !== 'function') {
+            showToast('Engine sertifikat belum siap di browser.', 'error');
+            return;
+        }
+
+        showToast(`Membuat sertifikat PDF untuk ${certData.nama}...`, 'info');
+
+        try {
+            const result = await window.generateAndDownloadCertificate(certData);
+            if (result && result.success) {
+                showToast(`Sertifikat ${certData.nama} berhasil diunduh!`, 'success');
+            }
+        } catch (err) {
+            console.error('Gagal membuat sertifikat PDF:', err);
+            showToast('Gagal membuat PDF: ' + (err.message || err.toString()), 'error');
+        }
+    }
+
+    async function downloadBatchCertificates(format = 'pdf') {
+        if (selectedCertStudentIds.size === 0) {
+            showToast('Pilih minimal satu siswa untuk mengunduh sertifikat.', 'warning');
+            return;
+        }
+
+        if (typeof window.generateBatchCertificates !== 'function') {
+            showToast('Engine pembuatan sertifikat belum siap di browser.', 'error');
+            return;
+        }
+
+        const certDataList = [];
+        for (const sId of selectedCertStudentIds) {
+            const certData = getStudentCertificateData(sId);
+            if (certData) {
+                certDataList.push(certData);
+            }
+        }
+
+        if (certDataList.length === 0) {
+            showToast('Tidak ada data siswa terpilih yang memiliki nilai valid untuk dicetak.', 'warning');
+            return;
+        }
+
+        const modal = document.getElementById('modal-cert-batch-progress');
+        const titleEl = document.getElementById('cert-batch-progress-title');
+        const descEl = document.getElementById('cert-batch-progress-desc');
+        const barEl = document.getElementById('cert-batch-progress-bar');
+        const statusEl = document.getElementById('cert-batch-progress-status');
+        const percentEl = document.getElementById('cert-batch-progress-percent');
+
+        if (modal) modal.classList.remove('hidden');
+        if (titleEl) titleEl.textContent = format === 'zip' ? 'Membuat Arsip ZIP Sertifikat...' : 'Menggabungkan Dokumen PDF...';
+        if (barEl) barEl.style.width = '0%';
+        if (statusEl) statusEl.textContent = `0 / ${certDataList.length} Siswa`;
+        if (percentEl) percentEl.textContent = '0%';
+
+        const onProgress = ({ current, total, studentName }) => {
+            const pct = Math.round((current / total) * 100);
+            if (barEl) barEl.style.width = `${pct}%`;
+            if (statusEl) statusEl.textContent = `${current} / ${total} Siswa`;
+            if (percentEl) percentEl.textContent = `${pct}%`;
+            if (descEl) descEl.textContent = `Memproses: ${studentName}`;
+        };
+
+        try {
+            const result = await window.generateBatchCertificates(certDataList, format, onProgress);
+            if (modal) modal.classList.add('hidden');
+            showToast(`Berhasil mengunduh ${result.count} sertifikat (${format === 'zip' ? 'File ZIP' : '1 File PDF Gabungan'})!`, 'success');
+        } catch (err) {
+            console.error('Gagal download batch sertifikat:', err);
+            if (modal) modal.classList.add('hidden');
+            showToast('Gagal memproses batch: ' + (err.message || err.toString()), 'error');
+        }
+    }
+
+    function resetAdminCertFilters() {
+        const q = document.getElementById('filter-cert-query');
+        if (q) q.value = '';
+        const b = document.getElementById('filter-cert-batch');
+        if (b) b.value = '';
+        const d = document.getElementById('filter-cert-dept');
+        if (d) d.value = '';
+        const s = document.getElementById('filter-cert-status');
+        if (s) s.value = '';
+        filterAdminCertTable(true);
+    }
+
+    // Ekspor fungsi sertifikat ke window global
+    window.openCertificateModal = openCertificateModal;
+    window.closeCertificateModal = closeCertificateModal;
+    window.autoFillPerformanceScore = autoFillPerformanceScore;
+    window.autoFillAttendanceScore = autoFillAttendanceScore;
+    window.recalculateCertificateScores = recalculateCertificateScores;
+    window.saveCertificateData = saveCertificateData;
+    window.saveAndDownloadCertificatePDF = saveAndDownloadCertificatePDF;
+    window.renderAdminSertifikatTab = renderAdminSertifikatTab;
+    window.filterAdminCertTable = filterAdminCertTable;
+    window.downloadStudentCertificatePDF = downloadStudentCertificatePDF;
+    window.resetAdminCertFilters = resetAdminCertFilters;
+    window.toggleCertStudentSelection = toggleCertStudentSelection;
+    window.toggleSelectAllCertStudents = toggleSelectAllCertStudents;
+    window.selectAllReadyCertStudents = selectAllReadyCertStudents;
+    window.clearCertStudentSelection = clearCertStudentSelection;
+    window.downloadBatchCertificates = downloadBatchCertificates;
 
 

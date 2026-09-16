@@ -1,5 +1,7 @@
 import { supabase } from '../../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
+import fs from 'fs';
+import path from 'path';
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -56,6 +58,12 @@ export async function POST({ request, cookies }) {
       const noreg = args[0];
       const logs = await getStudentLogsFromSupabase(noreg);
       return new Response(JSON.stringify(logs), { status: 200 });
+    }
+
+    if (action === 'getSertifikatByNoreg') {
+      const noreg = args[0];
+      const cert = await getSertifikatFromSupabase(noreg);
+      return new Response(JSON.stringify(cert), { status: 200 });
     }
 
     if (action === 'login') {
@@ -194,12 +202,502 @@ export async function POST({ request, cookies }) {
       return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
 
+    // --- MANAJEMEN PENERBITAN SERTIFIKAT SISWA ---
+    if (action === 'getSertifikatList') {
+      const list = await getSertifikatListFromSupabase();
+      return new Response(JSON.stringify(list), { status: 200 });
+    }
+
+    if (action === 'getSertifikatByNoreg') {
+      const noreg = args[0];
+      const res = await getSertifikatFromSupabase(noreg);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- MANAJEMEN SISTEM QUIZ LTC INDOPRIMA GEMILANG ---
+    if (action === 'getQuizData') {
+      const res = handleGetQuizData();
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveQuizSection') {
+      const res = handleSaveQuizSection(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteQuizSection') {
+      const res = handleDeleteQuizSection(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveQuizQuestion') {
+      const res = handleSaveQuizQuestion(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteQuizQuestion') {
+      const res = handleDeleteQuizQuestion(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveQuizSchedule') {
+      const res = handleSaveQuizSchedule(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteQuizSchedule') {
+      const res = handleDeleteQuizSchedule(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'submitQuizAnswer') {
+      const res = handleSubmitQuizAnswer(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'grantQuizRemedial') {
+      const res = handleGrantQuizRemedial(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'getStudentActiveQuizzes') {
+      const noreg = args[0];
+      const res = handleGetStudentActiveQuizzes(noreg);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'syncQuizToCertificate') {
+      const noreg = args[0];
+      const res = handleSyncQuizToCertificate(noreg);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
     // --- PENULISAN DATA: LANGSUNG KE SUPABASE ---
     await handleLocalSupabaseWrite(action, args);
     return new Response(JSON.stringify({ success: true }), { status: 200 });
   } catch (error) {
     return new Response(JSON.stringify({ success: false, message: error.message }), { status: 500 });
   }
+}
+
+// STORAGE LOKAL FALLBACK UNTUK SERTIFIKAT JIKA TABEL SUPABASE BELUM DIJALANKAN
+const LOCAL_CERT_FILE = path.resolve(process.cwd(), 'src/data/sertifikat_storage.json');
+
+function readLocalCertStorage() {
+  try {
+    if (fs.existsSync(LOCAL_CERT_FILE)) {
+      const raw = fs.readFileSync(LOCAL_CERT_FILE, 'utf-8');
+      return JSON.parse(raw) || {};
+    }
+  } catch (e) {
+    console.warn('[readLocalCertStorage] Warning:', e.message);
+  }
+  return {};
+}
+
+function writeLocalCertStorage(data) {
+  try {
+    const dir = path.dirname(LOCAL_CERT_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(LOCAL_CERT_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('[writeLocalCertStorage] Warning:', e.message);
+  }
+}
+
+async function getSertifikatListFromSupabase() {
+  const localMap = readLocalCertStorage();
+  try {
+    const { data, error } = await supabase.from('sertifikat').select('*');
+    if (!error && Array.isArray(data) && data.length > 0) {
+      const mergedMap = { ...localMap };
+      data.forEach(item => {
+        if (item && item.noreg) mergedMap[item.noreg] = item;
+      });
+      return { success: true, data: Object.values(mergedMap) };
+    }
+  } catch (err) {
+    console.warn('[getSertifikatListFromSupabase] Fallback to local:', err.message);
+  }
+  return { success: true, data: Object.values(localMap) };
+}
+
+async function getSertifikatFromSupabase(noreg) {
+  const cleanNoreg = String(noreg || '').trim();
+  const localMap = readLocalCertStorage();
+  try {
+    const { data, error } = await supabase
+      .from('sertifikat')
+      .select('*')
+      .eq('noreg', cleanNoreg)
+      .maybeSingle();
+    if (!error && data) {
+      return { success: true, data: data };
+    }
+  } catch (err) {
+    // fallback to local
+  }
+  return { success: true, data: localMap[cleanNoreg] || null };
+}
+
+async function saveSertifikatToSupabase(payload) {
+  if (!payload || !payload.noreg) {
+    return { success: false, message: 'Data sertifikat tidak valid (NoReg kosong).' };
+  }
+  const cleanNoreg = String(payload.noreg).trim();
+
+  // 1. Selalu simpan ke local storage sebagai backup aman
+  const localMap = readLocalCertStorage();
+  localMap[cleanNoreg] = {
+    ...payload,
+    noreg: cleanNoreg,
+    updated_at: new Date().toISOString()
+  };
+  writeLocalCertStorage(localMap);
+
+  // 2. Coba simpan ke Supabase
+  try {
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
+      .from('sertifikat')
+      .upsert({
+        noreg: cleanNoreg,
+        nomor_sertifikat: payload.nomor_sertifikat || '',
+        tempat_tanggal_lahir: payload.tempat_tanggal_lahir || '',
+        tanggal_cetak: payload.tanggal_terbit || null,
+        nilai_basic_theory: payload.basic_theory || 0,
+        nilai_vocational: payload.vocational_theory || 0,
+        nilai_performance: payload.performance || 0,
+        nilai_user_observation: payload.user_observation || 0,
+        subtotal_kinerja: payload.kinerja_subtotal || 0,
+        nilai_bmk: payload.bmk || 0,
+        nilai_attendance: payload.attendance || 0,
+        nilai_attitude: payload.attitude || 0,
+        subtotal_sikap: payload.sikap_subtotal || 0,
+        nilai_laporan_akhir: payload.laporan || 0,
+        nilai_akhir: payload.nilai_akhir || 0,
+        predikat: payload.predikat || 'A',
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'noreg' });
+
+    if (error) {
+      console.warn('[saveSertifikatToSupabase] Supabase notice:', error.message);
+      return { success: true, message: 'Data sertifikat tersimpan aman di sistem lokal!', data: payload };
+    }
+    return { success: true, message: 'Data sertifikat berhasil disimpan ke database!', data: payload };
+  } catch (err) {
+    console.warn('[saveSertifikatToSupabase] Notice:', err.message);
+    return { success: true, message: 'Data sertifikat tersimpan aman di sistem lokal.', data: payload };
+  }
+}
+
+// =======================================================
+// STORAGE LOKAL & LOGIKA SISTEM QUIZ LTC INDOPRIMA GEMILANG
+// =======================================================
+const LOCAL_QUIZ_FILE = path.resolve(process.cwd(), 'src/data/quiz_storage.json');
+
+function readLocalQuizStorage() {
+  try {
+    if (fs.existsSync(LOCAL_QUIZ_FILE)) {
+      const raw = fs.readFileSync(LOCAL_QUIZ_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return {
+        sections: parsed.sections || [],
+        questions: parsed.questions || [],
+        quizzes: parsed.quizzes || [],
+        submissions: parsed.submissions || []
+      };
+    }
+  } catch (e) {
+    console.warn('[readLocalQuizStorage] Warning:', e.message);
+  }
+  return { sections: [], questions: [], quizzes: [], submissions: [] };
+}
+
+function writeLocalQuizStorage(data) {
+  try {
+    const dir = path.dirname(LOCAL_QUIZ_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(LOCAL_QUIZ_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('[writeLocalQuizStorage] Warning:', e.message);
+  }
+}
+
+function handleGetQuizData() {
+  const data = readLocalQuizStorage();
+  return { success: true, data };
+}
+
+function handleSaveQuizSection(sec) {
+  if (!sec || !sec.name) return { success: false, message: 'Nama section wajib diisi.' };
+  const store = readLocalQuizStorage();
+  const id = sec.id || `sec-${Date.now()}`;
+  const idx = store.sections.findIndex(s => s.id === id);
+  const newSec = {
+    id,
+    name: String(sec.name).trim(),
+    description: String(sec.description || '').trim()
+  };
+  if (idx >= 0) {
+    store.sections[idx] = newSec;
+  } else {
+    store.sections.push(newSec);
+  }
+  writeLocalQuizStorage(store);
+  return { success: true, section: newSec, data: store };
+}
+
+function handleDeleteQuizSection(secId) {
+  const store = readLocalQuizStorage();
+  store.sections = store.sections.filter(s => s.id !== secId);
+  store.questions = store.questions.filter(q => q.section_id !== secId);
+  store.quizzes = store.quizzes.filter(q => q.section_id !== secId);
+  writeLocalQuizStorage(store);
+  return { success: true, data: store };
+}
+
+function handleSaveQuizQuestion(payload) {
+  const store = readLocalQuizStorage();
+  const items = Array.isArray(payload) ? payload : [payload];
+  let addedCount = 0;
+
+  items.forEach(q => {
+    if (!q || !q.question || !q.section_id) return;
+    const qId = q.id || `q-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const newQ = {
+      id: qId,
+      section_id: q.section_id,
+      question: String(q.question).trim(),
+      options: {
+        A: String(q.options?.A || q.optionA || '').trim(),
+        B: String(q.options?.B || q.optionB || '').trim(),
+        C: String(q.options?.C || q.optionC || '').trim(),
+        D: String(q.options?.D || q.optionD || '').trim()
+      },
+      correct_answer: String(q.correct_answer || q.kunci || 'A').toUpperCase().trim()
+    };
+    const idx = store.questions.findIndex(x => x.id === qId);
+    if (idx >= 0) {
+      store.questions[idx] = newQ;
+    } else {
+      store.questions.push(newQ);
+    }
+    addedCount++;
+  });
+
+  writeLocalQuizStorage(store);
+  return { success: true, count: addedCount, data: store };
+}
+
+function handleDeleteQuizQuestion(qId) {
+  const store = readLocalQuizStorage();
+  store.questions = store.questions.filter(q => q.id !== qId);
+  writeLocalQuizStorage(store);
+  return { success: true, data: store };
+}
+
+function handleSaveQuizSchedule(quiz) {
+  if (!quiz || !quiz.title || !quiz.section_id) {
+    return { success: false, message: 'Judul dan Section wajib dipilih.' };
+  }
+  const store = readLocalQuizStorage();
+  const id = quiz.id || `quiz-${Date.now()}`;
+  const newQuiz = {
+    id,
+    title: String(quiz.title).trim(),
+    section_id: quiz.section_id,
+    kelas_level: parseInt(quiz.kelas_level) || 1,
+    start_time: quiz.start_time,
+    end_time: quiz.end_time,
+    duration_minutes: parseInt(quiz.duration_minutes) || 45,
+    kkm: parseInt(quiz.kkm) || 75,
+    participants: Array.isArray(quiz.participants) ? quiz.participants : [],
+    status: quiz.status || 'scheduled',
+    created_at: quiz.created_at || new Date().toISOString()
+  };
+
+  const idx = store.quizzes.findIndex(q => q.id === id);
+  if (idx >= 0) {
+    store.quizzes[idx] = newQuiz;
+  } else {
+    store.quizzes.push(newQuiz);
+  }
+  writeLocalQuizStorage(store);
+  return { success: true, quiz: newQuiz, data: store };
+}
+
+function handleDeleteQuizSchedule(quizId) {
+  const store = readLocalQuizStorage();
+  store.quizzes = store.quizzes.filter(q => q.id !== quizId);
+  writeLocalQuizStorage(store);
+  return { success: true, data: store };
+}
+
+function handleSubmitQuizAnswer(payload) {
+  const { quiz_id, noreg, nama, answers } = payload;
+  const store = readLocalQuizStorage();
+  const quiz = store.quizzes.find(q => q.id === quiz_id);
+  if (!quiz) return { success: false, message: 'Quiz tidak ditemukan.' };
+
+  const questions = store.questions.filter(q => q.section_id === quiz.section_id);
+  if (questions.length === 0) return { success: false, message: 'Tidak ada soal dalam kuis ini.' };
+
+  let correctCount = 0;
+  questions.forEach(q => {
+    const userAns = String(answers[q.id] || '').toUpperCase().trim();
+    if (userAns === String(q.correct_answer).toUpperCase().trim()) {
+      correctCount++;
+    }
+  });
+
+  const score = Math.round((correctCount / questions.length) * 1000) / 10;
+  const kkm = quiz.kkm || 75;
+
+  const prevSubs = store.submissions.filter(s => s.quiz_id === quiz_id && String(s.noreg) === String(noreg));
+  const attempt = prevSubs.length + 1;
+  const isRemedial = attempt > 1;
+
+  const newSub = {
+    id: `sub-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+    quiz_id,
+    noreg: String(noreg).trim(),
+    nama: String(nama).trim(),
+    kelas_level: quiz.kelas_level || 1,
+    section_name: (store.sections.find(s => s.id === quiz.section_id)?.name) || 'Teori',
+    attempt,
+    score,
+    correct_count: correctCount,
+    total_questions: questions.length,
+    is_remedial: isRemedial,
+    remedial_granted: false,
+    submitted_at: new Date().toISOString()
+  };
+
+  store.submissions.push(newSub);
+  writeLocalQuizStorage(store);
+
+  return {
+    success: true,
+    score,
+    correctCount,
+    totalQuestions: questions.length,
+    kkm,
+    isPassed: score >= kkm,
+    attempt
+  };
+}
+
+function handleGrantQuizRemedial(payload) {
+  const { quiz_id, noreg } = payload;
+  const store = readLocalQuizStorage();
+  let updated = false;
+  for (let i = store.submissions.length - 1; i >= 0; i--) {
+    const sub = store.submissions[i];
+    if (sub.quiz_id === quiz_id && String(sub.noreg) === String(noreg)) {
+      sub.remedial_granted = true;
+      updated = true;
+      break;
+    }
+  }
+  writeLocalQuizStorage(store);
+  return { success: true, updated };
+}
+
+function handleGetStudentActiveQuizzes(noreg) {
+  const cleanNoreg = String(noreg || '').trim().toUpperCase();
+  const store = readLocalQuizStorage();
+  const now = new Date();
+
+  const available = [];
+  store.quizzes.forEach(quiz => {
+    const rawParticipants = Array.isArray(quiz.participants) ? quiz.participants : [];
+    const participants = rawParticipants.map(p => String(p).trim().toUpperCase()).filter(p => p.length > 0);
+    const isParticipant = participants.length === 0 || participants.includes(cleanNoreg);
+    if (!isParticipant) return;
+
+    const subs = store.submissions.filter(s => s.quiz_id === quiz.id && String(s.noreg) === cleanNoreg);
+    const hasSubmitted = subs.length > 0;
+    const lastSub = hasSubmitted ? subs[subs.length - 1] : null;
+    const remedialGranted = lastSub ? !!lastSub.remedial_granted : false;
+
+    const start = quiz.start_time ? new Date(quiz.start_time) : null;
+    const end = quiz.end_time ? new Date(quiz.end_time) : null;
+    const isTimeActive = (!start || now >= start) && (!end || now <= end);
+    const isManuallyActive = quiz.status === 'active';
+
+    // Kuis dianggap aktif jika:
+    // 1. Sedang dalam rentang jadwal reguler, ATAU
+    // 2. Diaktifkan manual oleh admin ('active'), ATAU
+    // 3. Siswa ini telah diberikan izin REMIDI khusus oleh admin (bypasses batas waktu jadwal reguler)
+    if (!isTimeActive && !isManuallyActive && !remedialGranted) return;
+
+    const canTake = !hasSubmitted || remedialGranted;
+
+    const qCount = store.questions.filter(q => q.section_id === quiz.section_id).length;
+
+    available.push({
+      id: quiz.id,
+      title: quiz.title,
+      section_id: quiz.section_id,
+      section_name: (store.sections.find(s => s.id === quiz.section_id)?.name) || 'Teori',
+      kelas_level: quiz.kelas_level,
+      duration_minutes: quiz.duration_minutes,
+      kkm: quiz.kkm || 75,
+      total_questions: qCount,
+      start_time: quiz.start_time,
+      end_time: quiz.end_time,
+      has_submitted: hasSubmitted,
+      remedial_granted: remedialGranted,
+      last_score: lastSub ? lastSub.score : null,
+      can_take: canTake,
+      attempt: subs.length + (canTake && hasSubmitted ? 1 : 0)
+    });
+  });
+
+  return { success: true, data: available };
+}
+
+function handleSyncQuizToCertificate(noreg) {
+  const cleanNoreg = String(noreg || '').trim();
+  const store = readLocalQuizStorage();
+
+  const studentSubs = store.submissions.filter(s => String(s.noreg) === cleanNoreg);
+  if (studentSubs.length === 0) {
+    return { success: false, message: 'Belum ada riwayat nilai quiz untuk siswa ini.' };
+  }
+
+  // Nilai tertinggi per tingkat kelas
+  const classScores = {};
+  studentSubs.forEach(s => {
+    const lvl = s.kelas_level || 1;
+    if (classScores[lvl] === undefined || s.score > classScores[lvl]) {
+      classScores[lvl] = s.score;
+    }
+  });
+
+  const levels = Object.keys(classScores);
+  if (levels.length === 0) {
+    return { success: false, message: 'Nilai quiz tidak valid.' };
+  }
+
+  const sum = levels.reduce((acc, lvl) => acc + classScores[lvl], 0);
+  const avgTheory = Math.round((sum / levels.length) * 10) / 10;
+
+  const certStore = readLocalCertStorage();
+  if (!certStore[cleanNoreg]) {
+    certStore[cleanNoreg] = { noreg: cleanNoreg };
+  }
+  certStore[cleanNoreg].basic_theory = avgTheory;
+  certStore[cleanNoreg].updated_at = new Date().toISOString();
+  writeLocalCertStorage(certStore);
+
+  return {
+    success: true,
+    basic_theory: avgTheory,
+    breakdown: classScores,
+    message: `Nilai Basic Theory ${avgTheory} berhasil disinkronkan ke sertifikat!`
+  };
 }
 
 // HELPER PAGINASI UNTUK MENGAMBIL SELURUH BARIS DATA TANPA BATASAN 1000 ROWS SUPABASE
@@ -314,6 +812,12 @@ async function getStatsFromSupabase() {
       asal: s.asal_daerah || '',
       asalSekolah: s.asal_sekolah || '',
       sekolah: s.asal_sekolah || '',
+      tempatLahir: s.tempat_lahir || '',
+      tanggalLahir: s.tanggal_lahir || '',
+      tglLahir: s.tanggal_lahir || '',
+      alamat: s.alamat || s.alamat_lengkap || '',
+      telepon: s.telepon || s.no_telp || s.noTelp || s.hp || '',
+      noTelp: s.telepon || s.no_telp || s.noTelp || s.hp || '',
       distribusi: s.distribusi || '',
       status: s.status === 'TURNOVER' ? "Terminasi" : "Aktif",
       dailyRecords: daily,
@@ -354,7 +858,19 @@ async function getStatsFromSupabase() {
   }
 
   const totalSiswa = siswaList.filter(s => s.status === "Aktif").length;
-  const turnoverList = (turnover || []).map(t => {
+  
+  // Proteksi deduplikasi: pastikan setiap noreg hanya memiliki 1 catatan turnover unik (ambil yang terbaru)
+  const seenTurnoverNoreg = new Set();
+  const sortedTurnover = [...(turnover || [])].sort((a, b) => (b.id || 0) - (a.id || 0));
+  const uniqueTurnover = [];
+  for (const t of sortedTurnover) {
+    const key = String(t.noreg || '').trim();
+    if (!key || seenTurnoverNoreg.has(key)) continue;
+    seenTurnoverNoreg.add(key);
+    uniqueTurnover.push(t);
+  }
+
+  const turnoverList = uniqueTurnover.map(t => {
     const student = siswaList.find(s => s.id === t.noreg);
     const masukDate = t.tanggal_masuk || (student ? student.masuk : null);
     const keluarDate = t.tanggal_keluar || (student ? student.keluar : null);
@@ -378,7 +894,12 @@ async function getStatsFromSupabase() {
       wilayah: t.asal_daerah ? t.asal_daerah.toUpperCase() : (student ? student.asalDaerah : ''),
       asalDaerah: t.asal_daerah ? t.asal_daerah.toUpperCase() : (student ? student.asalDaerah : ''),
       sekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : (student ? student.asalSekolah : ''),
-      asalSekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : (student ? student.asalSekolah : '')
+      asalSekolah: t.asal_sekolah ? t.asal_sekolah.toUpperCase() : (student ? student.asalSekolah : ''),
+      tempatLahir: t.tempat_lahir || (student ? student.tempatLahir : ''),
+      tanggalLahir: t.tanggal_lahir || (student ? student.tanggalLahir : ''),
+      alamat: t.alamat || (student ? student.alamat : ''),
+      telepon: t.telepon || t.no_telp || (student ? (student.telepon || student.noTelp) : ''),
+      noTelp: t.telepon || t.no_telp || (student ? (student.telepon || student.noTelp) : '')
     };
   });
 
@@ -832,23 +1353,34 @@ async function handleLocalSupabaseWrite(action, args) {
     // PENTING: Jika NoReg diubah saat Edit Informasi Siswa
     if (oldNoReg && newNoReg && oldNoReg !== newNoReg) {
       // 1. Update NoReg di tabel siswa
-      const { error: siswaErr } = await supabase
-        .from('siswa')
-        .update({
-          noreg: newNoReg,
-          nama_lengkap: nameUpper,
-          kelas: s.Kelas,
-          departemen: s.Departemen ? s.Departemen.toUpperCase() : (s.Bagian ? s.Bagian.toUpperCase() : null),
-          section: s.Section ? s.Section.toUpperCase() : '',
-          hk: s.HK ? s.HK.toUpperCase() : (s.HariKerja ? s.HariKerja.toUpperCase() : '6 HARI'),
-          nama_spv: s.NamaSPV ? s.NamaSPV.toUpperCase() : null,
-          tanggal_masuk: s.TanggalMasuk,
-          tanggal_keluar: s.TanggalKeluar || null,
-          asal_daerah: s.AsalDaerah ? s.AsalDaerah.toUpperCase() : null,
-          asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
-          distribusi: s.Distribusi
-        })
-        .eq('noreg', oldNoReg);
+      const updatePayload = {
+        noreg: newNoReg,
+        nama_lengkap: nameUpper,
+        kelas: s.Kelas,
+        departemen: s.Departemen ? s.Departemen.toUpperCase() : (s.Bagian ? s.Bagian.toUpperCase() : null),
+        section: s.Section ? s.Section.toUpperCase() : '',
+        hk: s.HK ? s.HK.toUpperCase() : (s.HariKerja ? s.HariKerja.toUpperCase() : '6 HARI'),
+        nama_spv: s.NamaSPV ? s.NamaSPV.toUpperCase() : null,
+        tanggal_masuk: s.TanggalMasuk,
+        tanggal_keluar: s.TanggalKeluar || null,
+        asal_daerah: s.AsalDaerah ? s.AsalDaerah.toUpperCase() : null,
+        asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
+        distribusi: s.Distribusi
+      };
+      if (s.TempatLahir !== undefined) updatePayload.tempat_lahir = s.TempatLahir ? s.TempatLahir.toUpperCase() : null;
+      if (s.TanggalLahir !== undefined) updatePayload.tanggal_lahir = s.TanggalLahir || null;
+      if (s.Alamat !== undefined) updatePayload.alamat = s.Alamat || null;
+      if (s.Telepon !== undefined || s.NoTelp !== undefined) updatePayload.no_telp = s.Telepon || s.NoTelp || null;
+
+      let { error: siswaErr } = await supabase.from('siswa').update(updatePayload).eq('noreg', oldNoReg);
+      if (siswaErr && (siswaErr.message.includes('tanggal_lahir') || siswaErr.message.includes('tempat_lahir') || siswaErr.message.includes('alamat') || siswaErr.message.includes('no_telp'))) {
+        if (siswaErr.message.includes('tempat_lahir')) delete updatePayload.tempat_lahir;
+        if (siswaErr.message.includes('tanggal_lahir')) delete updatePayload.tanggal_lahir;
+        if (siswaErr.message.includes('alamat')) delete updatePayload.alamat;
+        if (siswaErr.message.includes('no_telp')) delete updatePayload.no_telp;
+        const fbRes = await supabase.from('siswa').update(updatePayload).eq('noreg', oldNoReg);
+        siswaErr = fbRes.error;
+      }
 
       if (siswaErr) throw siswaErr;
 
@@ -930,7 +1462,7 @@ async function handleLocalSupabaseWrite(action, args) {
         throw new Error(`Siswa dengan nama "${nameUpper}" sudah terdaftar sebagai siswa AKTIF dengan NoReg ${dupCheck[0].noreg}!`);
       }
       
-      await supabase.from('siswa').upsert({
+      const upsertPayload = {
         noreg: newNoReg,
         nama_lengkap: nameUpper,
         kelas: s.Kelas,
@@ -944,7 +1476,22 @@ async function handleLocalSupabaseWrite(action, args) {
         asal_sekolah: s.AsalSekolah ? s.AsalSekolah.toUpperCase() : null,
         distribusi: s.Distribusi,
         status: 'AKTIF'
-      });
+      };
+      if (s.TempatLahir !== undefined) upsertPayload.tempat_lahir = s.TempatLahir ? s.TempatLahir.toUpperCase() : null;
+      if (s.TanggalLahir !== undefined) upsertPayload.tanggal_lahir = s.TanggalLahir || null;
+      if (s.Alamat !== undefined) upsertPayload.alamat = s.Alamat || null;
+      if (s.Telepon !== undefined || s.NoTelp !== undefined) upsertPayload.no_telp = s.Telepon || s.NoTelp || null;
+
+      let { error: upErr } = await supabase.from('siswa').upsert(upsertPayload);
+      if (upErr && (upErr.message.includes('tanggal_lahir') || upErr.message.includes('tempat_lahir') || upErr.message.includes('alamat') || upErr.message.includes('no_telp'))) {
+        if (upErr.message.includes('tempat_lahir')) delete upsertPayload.tempat_lahir;
+        if (upErr.message.includes('tanggal_lahir')) delete upsertPayload.tanggal_lahir;
+        if (upErr.message.includes('alamat')) delete upsertPayload.alamat;
+        if (upErr.message.includes('no_telp')) delete upsertPayload.no_telp;
+        const fbRes = await supabase.from('siswa').upsert(upsertPayload);
+        upErr = fbRes.error;
+      }
+      if (upErr) throw upErr;
 
       const { data: existingUser } = await supabase.from('users').select('id').eq('noreg', newNoReg).maybeSingle();
       if (!existingUser) {
@@ -981,7 +1528,8 @@ async function handleLocalSupabaseWrite(action, args) {
     
     const { data: student } = await supabase.from('siswa').select('*').eq('noreg', noreg).single();
     if (student) {
-      // 1. Tulis ke turnover
+      // 1. Tulis ke turnover (hapus record lama jika ada untuk mencegah duplikasi)
+      await supabase.from('turnover').delete().eq('noreg', student.noreg);
       await supabase.from('turnover').insert({
         noreg: student.noreg,
         nama_lengkap: student.nama_lengkap ? student.nama_lengkap.toUpperCase() : '',
@@ -1173,6 +1721,8 @@ async function handleLocalSupabaseWrite(action, args) {
 
     if (isEdit && editId) {
       await supabase.from('turnover').delete().eq('noreg', editId);
+    } else if (t.NoReg) {
+      await supabase.from('turnover').delete().eq('noreg', t.NoReg);
     }
 
     const { error: insertErr } = await supabase.from('turnover').insert({
@@ -1384,5 +1934,42 @@ async function handleLocalSupabaseWrite(action, args) {
 
   } else if (action === 'deletePopulasi') {
     await supabase.from('populasi').delete().eq('tanggal', args[0]);
+  } else if (action === 'saveSertifikat') {
+    const payload = args[0] || {};
+    const noreg = String(payload.noreg || '').trim();
+    if (!noreg) throw new Error('NoReg wajib diisi.');
+
+    const certData = {
+      noreg: noreg,
+      nomor_sertifikat: payload.nomor_sertifikat || null,
+      tempat_tanggal_lahir: payload.tempat_tanggal_lahir || null,
+      tanggal_cetak: payload.tanggal_cetak || null,
+      nilai_basic_theory: Number(payload.nilai_basic_theory || 0),
+      nilai_vocational: Number(payload.nilai_vocational || 0),
+      nilai_performance: Number(payload.nilai_performance || 0),
+      nilai_user_observation: Number(payload.nilai_user_observation || 0),
+      subtotal_kinerja: Number(payload.subtotal_kinerja || 0),
+      nilai_bmk: Number(payload.nilai_bmk || 0),
+      nilai_attendance: Number(payload.nilai_attendance || 0),
+      nilai_attitude: Number(payload.nilai_attitude || 0),
+      subtotal_sikap: Number(payload.subtotal_sikap || 0),
+      nilai_laporan_akhir: Number(payload.nilai_laporan_akhir || 0),
+      nilai_akhir: Number(payload.nilai_akhir || 0),
+      predikat: payload.predikat || 'A',
+      updated_at: new Date().toISOString()
+    };
+
+    const { error } = await supabase
+      .from('sertifikat')
+      .upsert(certData, { onConflict: 'noreg' });
+
+    if (error) {
+      console.warn('[saveSertifikat] Warning:', error.message);
+      if (error.code === 'PGRST205' || error.message.includes('not find the table')) {
+        throw new Error('Tabel "sertifikat" belum dibuat di Supabase. Silakan jalankan query pembuatan tabel di SQL Editor Supabase terlebih dahulu.');
+      }
+      throw error;
+    }
+    return { success: true };
   }
 }
