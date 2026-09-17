@@ -195,7 +195,7 @@
 <!-- ======================================================== -->
 <!-- MODAL 1: TAMBAH / EDIT SECTION                          -->
 <!-- ======================================================== -->
-<div id="modal-quiz-section" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+<div id="modal-quiz-section" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-md w-full p-6 shadow-2xl space-y-4 border border-slate-100">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h4 class="font-bold text-slate-800 text-sm" id="modal-section-title">Tambah Section Baru</h4>
@@ -230,7 +230,7 @@
 <!-- ======================================================== -->
 <!-- MODAL 2: TAMBAH / EDIT SOAL PILIHAN GANDA               -->
 <!-- ======================================================== -->
-<div id="modal-quiz-question" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+<div id="modal-quiz-question" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h4 class="font-bold text-slate-800 text-sm" id="modal-question-title">Tambah Soal Pilihan Ganda</h4>
@@ -292,7 +292,7 @@
 <!-- ======================================================== -->
 <!-- MODAL 3: IMPORT SOAL DARI EXCEL / CSV                    -->
 <!-- ======================================================== -->
-<div id="modal-quiz-import" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+<div id="modal-quiz-import" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h4 class="font-bold text-slate-800 text-sm">Import Soal Massal dari Excel / CSV</h4>
@@ -347,12 +347,12 @@
 <!-- ======================================================== -->
 <!-- MODAL 4: JADWALKAN UJIAN BARU / EDIT JADWAL              -->
 <!-- ======================================================== -->
-<div id="modal-quiz-schedule" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
-    <div class="bg-white rounded-3xl max-w-2xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[90vh] overflow-y-auto">
+<div id="modal-quiz-schedule" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-3 sm:p-4 hidden animate-fadeIn overflow-y-auto">
+    <div class="bg-white rounded-3xl max-w-3xl w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[92vh] overflow-y-auto my-auto">
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">
             <h4 class="font-bold text-slate-800 text-sm" id="modal-schedule-title">Jadwalkan Ujian Baru</h4>
-            <button onclick="closeModalQuizSchedule()" class="text-slate-400 hover:text-slate-600 text-sm">
-                <i class="fa-solid fa-xmark"></i>
+            <button onclick="closeModalQuizSchedule()" class="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-500 hover:text-slate-700 flex items-center justify-center transition-colors">
+                <i class="fa-solid fa-xmark text-sm"></i>
             </button>
         </div>
         <input type="hidden" id="quiz-schedule-id">
@@ -453,7 +453,7 @@
 <!-- ======================================================== -->
 <!-- MODAL 5: LIHAT DAFTAR PESERTA UJIAN                       -->
 <!-- ======================================================== -->
-<div id="modal-quiz-participants-detail" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
+<div id="modal-quiz-participants-detail" class="fixed inset-0 z-[9999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 hidden animate-fadeIn">
     <div class="bg-white rounded-3xl max-w-lg w-full p-6 shadow-2xl space-y-4 border border-slate-100 max-h-[85vh] flex flex-col">
         <!-- Header Modal -->
         <div class="flex items-center justify-between border-b border-slate-100 pb-3">

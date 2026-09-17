@@ -18,6 +18,17 @@
     // ------------------------------------------------------------------------
     // 1. Inisialisasi & Navigasi Sub-Tab
     // ------------------------------------------------------------------------
+    // Helper Portal Modal Quiz ke root body (menghindari clipping dan celah putih di navbar)
+    function openQuizModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (!modal) return;
+        if (modal.parentElement !== document.body) {
+            document.body.appendChild(modal);
+        }
+        modal.classList.remove('hidden');
+    }
+    window.openQuizModal = openQuizModal;
+
     function switchQuizSubTab(tabName) {
         currentQuizSubTab = tabName || 'rekap';
 
@@ -523,7 +534,7 @@
         document.getElementById('quiz-section-name').value = '';
         document.getElementById('quiz-section-desc').value = '';
         document.getElementById('modal-section-title').textContent = 'Tambah Section Baru';
-        document.getElementById('modal-quiz-section').classList.remove('hidden');
+        openQuizModal('modal-quiz-section');
     }
     window.openModalAddSection = openModalAddSection;
 
@@ -610,7 +621,7 @@
             document.getElementById('radio-ans-A').checked = true;
         }
 
-        document.getElementById('modal-quiz-question').classList.remove('hidden');
+        openQuizModal('modal-quiz-question');
     }
     window.openModalAddQuestion = openModalAddQuestion;
 
@@ -695,7 +706,7 @@
         document.getElementById('quiz-import-file').value = '';
         document.getElementById('quiz-import-preview-wrapper').classList.add('hidden');
         document.getElementById('btn-submit-import-quiz').disabled = true;
-        document.getElementById('modal-quiz-import').classList.remove('hidden');
+        openQuizModal('modal-quiz-import');
     }
     window.openModalImportSoal = openModalImportSoal;
 
@@ -923,9 +934,8 @@
                     <td class="py-3 px-3 text-center font-bold text-slate-700">${q.duration_minutes} Mnt</td>
                     <td class="py-3 px-3 text-center">
                         <button onclick="openQuizParticipantsDetailModal('${q.id}')"
-                            class="inline-flex items-center gap-1.5 px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95"
+                            class="inline-flex items-center justify-center px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95"
                             title="Klik untuk melihat daftar nama siswa yang ikut ujian ini">
-                            <i class="fa-solid fa-users text-[11px] text-indigo-500"></i>
                             <span>${partCount}</span>
                         </button>
                     </td>
@@ -1032,7 +1042,7 @@
         // Render checklist siswa
         renderQuizParticipantsChecklist(activeStudents);
 
-        document.getElementById('modal-quiz-schedule').classList.remove('hidden');
+        openQuizModal('modal-quiz-schedule');
     }
     window.openModalAddSchedule = openModalAddSchedule;
 
@@ -1261,7 +1271,7 @@
         currentModalParticipantsList.sort((a, b) => a.namaLengkap.localeCompare(b.namaLengkap));
 
         renderModalParticipantsList(currentModalParticipantsList);
-        document.getElementById('modal-quiz-participants-detail')?.classList.remove('hidden');
+        openQuizModal('modal-quiz-participants-detail');
     }
     window.openQuizParticipantsDetailModal = openQuizParticipantsDetailModal;
 
