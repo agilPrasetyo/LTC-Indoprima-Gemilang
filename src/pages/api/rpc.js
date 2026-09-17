@@ -60,10 +60,22 @@ export async function POST({ request, cookies }) {
       return new Response(JSON.stringify(logs), { status: 200 });
     }
 
+    // --- MANAJEMEN PENERBITAN SERTIFIKAT SISWA ---
+    if (action === 'getSertifikatList') {
+      const list = await getSertifikatListFromSupabase();
+      return new Response(JSON.stringify(list), { status: 200 });
+    }
+
     if (action === 'getSertifikatByNoreg') {
       const noreg = args[0];
       const cert = await getSertifikatFromSupabase(noreg);
       return new Response(JSON.stringify(cert), { status: 200 });
+    }
+
+    if (action === 'saveSertifikat') {
+      const payload = args[0];
+      const res = await saveSertifikatToSupabase(payload);
+      return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'login') {
@@ -202,17 +214,6 @@ export async function POST({ request, cookies }) {
       return new Response(JSON.stringify({ success: true }), { status: 200 });
     }
 
-    // --- MANAJEMEN PENERBITAN SERTIFIKAT SISWA ---
-    if (action === 'getSertifikatList') {
-      const list = await getSertifikatListFromSupabase();
-      return new Response(JSON.stringify(list), { status: 200 });
-    }
-
-    if (action === 'getSertifikatByNoreg') {
-      const noreg = args[0];
-      const res = await getSertifikatFromSupabase(noreg);
-      return new Response(JSON.stringify(res), { status: 200 });
-    }
 
     // --- MANAJEMEN SISTEM QUIZ LTC INDOPRIMA GEMILANG ---
     if (action === 'getQuizData') {
@@ -283,6 +284,59 @@ export async function POST({ request, cookies }) {
 // STORAGE LOKAL FALLBACK UNTUK SERTIFIKAT JIKA TABEL SUPABASE BELUM DIJALANKAN
 const LOCAL_CERT_FILE = path.resolve(process.cwd(), 'src/data/sertifikat_storage.json');
 
+function normalizeCertRecord(raw) {
+  if (!raw) return null;
+  const basic = Number(raw.basic_theory ?? raw.nilai_basic_theory ?? 0);
+  const vocational = Number(raw.vocational_theory ?? raw.nilai_vocational ?? 0);
+  const perf = Number(raw.performance ?? raw.nilai_performance ?? 0);
+  const userObs = Number(raw.user_observation ?? raw.nilai_user_observation ?? 0);
+  const subKinerja = Number(raw.kinerja_subtotal ?? raw.subtotal_kinerja ?? 0);
+  const bmk = Number(raw.bmk ?? raw.nilai_bmk ?? 0);
+  const subBmk = Number(raw.bmk_subtotal ?? raw.subtotal_bmk ?? 0);
+  const att = Number(raw.attendance ?? raw.nilai_attendance ?? 0);
+  const attit = Number(raw.attitude ?? raw.nilai_attitude ?? 0);
+  const subSikap = Number(raw.sikap_subtotal ?? raw.subtotal_sikap ?? 0);
+  const lap = Number(raw.laporan ?? raw.nilai_laporan_akhir ?? 0);
+  const subLap = Number(raw.laporan_subtotal ?? raw.subtotal_laporan ?? (lap * 0.1));
+  const tglTerbit = raw.tanggal_terbit ?? raw.tanggal_cetak ?? '';
+
+  return {
+    ...raw,
+    noreg: String(raw.noreg || '').trim(),
+    nomor_sertifikat: raw.nomor_sertifikat || '',
+    tempat_tanggal_lahir: raw.tempat_tanggal_lahir || '',
+    periode_pelatihan: raw.periode_pelatihan || '',
+    tanggal_terbit: tglTerbit,
+    tanggal_cetak: tglTerbit,
+    basic_theory: basic,
+    nilai_basic_theory: basic,
+    vocational_theory: vocational,
+    nilai_vocational: vocational,
+    performance: perf,
+    nilai_performance: perf,
+    user_observation: userObs,
+    nilai_user_observation: userObs,
+    kinerja_subtotal: subKinerja,
+    subtotal_kinerja: subKinerja,
+    bmk: bmk,
+    nilai_bmk: bmk,
+    bmk_subtotal: subBmk,
+    subtotal_bmk: subBmk,
+    attendance: att,
+    nilai_attendance: att,
+    attitude: attit,
+    nilai_attitude: attit,
+    sikap_subtotal: subSikap,
+    subtotal_sikap: subSikap,
+    laporan: lap,
+    nilai_laporan_akhir: lap,
+    laporan_subtotal: subLap,
+    subtotal_laporan: subLap,
+    nilai_akhir: Number(raw.nilai_akhir ?? 0),
+    predikat: raw.predikat || 'A'
+  };
+}
+
 function readLocalCertStorage() {
   try {
     if (fs.existsSync(LOCAL_CERT_FILE)) {
@@ -307,37 +361,40 @@ function writeLocalCertStorage(data) {
 
 async function getSertifikatListFromSupabase() {
   const localMap = readLocalCertStorage();
+  const mergedMap = { ...localMap };
   try {
-    const { data, error } = await supabase.from('sertifikat').select('*');
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient.from('sertifikat').select('*');
     if (!error && Array.isArray(data) && data.length > 0) {
-      const mergedMap = { ...localMap };
       data.forEach(item => {
-        if (item && item.noreg) mergedMap[item.noreg] = item;
+        if (item && item.noreg) mergedMap[String(item.noreg).trim()] = item;
       });
-      return { success: true, data: Object.values(mergedMap) };
     }
   } catch (err) {
-    console.warn('[getSertifikatListFromSupabase] Fallback to local:', err.message);
+    console.warn('[getSertifikatListFromSupabase] Notice:', err.message);
   }
-  return { success: true, data: Object.values(localMap) };
+  const list = Object.values(mergedMap).map(normalizeCertRecord).filter(Boolean);
+  return { success: true, data: list };
 }
 
 async function getSertifikatFromSupabase(noreg) {
   const cleanNoreg = String(noreg || '').trim();
   const localMap = readLocalCertStorage();
+  let found = localMap[cleanNoreg] || null;
   try {
-    const { data, error } = await supabase
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
       .from('sertifikat')
       .select('*')
       .eq('noreg', cleanNoreg)
       .maybeSingle();
     if (!error && data) {
-      return { success: true, data: data };
+      found = { ...found, ...data };
     }
   } catch (err) {
     // fallback to local
   }
-  return { success: true, data: localMap[cleanNoreg] || null };
+  return { success: true, data: normalizeCertRecord(found) };
 }
 
 async function saveSertifikatToSupabase(payload) {
@@ -345,49 +402,52 @@ async function saveSertifikatToSupabase(payload) {
     return { success: false, message: 'Data sertifikat tidak valid (NoReg kosong).' };
   }
   const cleanNoreg = String(payload.noreg).trim();
+  const normalized = normalizeCertRecord({ ...payload, noreg: cleanNoreg });
 
   // 1. Selalu simpan ke local storage sebagai backup aman
   const localMap = readLocalCertStorage();
   localMap[cleanNoreg] = {
-    ...payload,
-    noreg: cleanNoreg,
+    ...normalized,
     updated_at: new Date().toISOString()
   };
   writeLocalCertStorage(localMap);
 
-  // 2. Coba simpan ke Supabase
+  // 2. Coba simpan ke Supabase (jika tabel sudah ada)
   try {
     const adminClient = getAdminClient();
     const { data, error } = await adminClient
       .from('sertifikat')
       .upsert({
         noreg: cleanNoreg,
-        nomor_sertifikat: payload.nomor_sertifikat || '',
-        tempat_tanggal_lahir: payload.tempat_tanggal_lahir || '',
-        tanggal_cetak: payload.tanggal_terbit || null,
-        nilai_basic_theory: payload.basic_theory || 0,
-        nilai_vocational: payload.vocational_theory || 0,
-        nilai_performance: payload.performance || 0,
-        nilai_user_observation: payload.user_observation || 0,
-        subtotal_kinerja: payload.kinerja_subtotal || 0,
-        nilai_bmk: payload.bmk || 0,
-        nilai_attendance: payload.attendance || 0,
-        nilai_attitude: payload.attitude || 0,
-        subtotal_sikap: payload.sikap_subtotal || 0,
-        nilai_laporan_akhir: payload.laporan || 0,
-        nilai_akhir: payload.nilai_akhir || 0,
-        predikat: payload.predikat || 'A',
+        nomor_sertifikat: normalized.nomor_sertifikat,
+        tempat_tanggal_lahir: normalized.tempat_tanggal_lahir,
+        periode_pelatihan: normalized.periode_pelatihan,
+        tanggal_cetak: normalized.tanggal_cetak,
+        nilai_basic_theory: normalized.nilai_basic_theory,
+        nilai_vocational: normalized.nilai_vocational,
+        nilai_performance: normalized.nilai_performance,
+        nilai_user_observation: normalized.nilai_user_observation,
+        subtotal_kinerja: normalized.subtotal_kinerja,
+        nilai_bmk: normalized.nilai_bmk,
+        subtotal_bmk: normalized.subtotal_bmk,
+        nilai_attendance: normalized.nilai_attendance,
+        nilai_attitude: normalized.nilai_attitude,
+        subtotal_sikap: normalized.subtotal_sikap,
+        nilai_laporan_akhir: normalized.nilai_laporan_akhir,
+        subtotal_laporan: normalized.subtotal_laporan,
+        nilai_akhir: normalized.nilai_akhir,
+        predikat: normalized.predikat,
         updated_at: new Date().toISOString()
       }, { onConflict: 'noreg' });
 
     if (error) {
       console.warn('[saveSertifikatToSupabase] Supabase notice:', error.message);
-      return { success: true, message: 'Data sertifikat tersimpan aman di sistem lokal!', data: payload };
+      return { success: true, savedLocally: true, message: 'Data sertifikat tersimpan aman di sistem lokal!', data: normalized };
     }
-    return { success: true, message: 'Data sertifikat berhasil disimpan ke database!', data: payload };
+    return { success: true, savedLocally: false, message: 'Data sertifikat berhasil disimpan ke database!', data: normalized };
   } catch (err) {
     console.warn('[saveSertifikatToSupabase] Notice:', err.message);
-    return { success: true, message: 'Data sertifikat tersimpan aman di sistem lokal.', data: payload };
+    return { success: true, savedLocally: true, message: 'Data sertifikat tersimpan aman di sistem lokal.', data: normalized };
   }
 }
 
@@ -1934,42 +1994,5 @@ async function handleLocalSupabaseWrite(action, args) {
 
   } else if (action === 'deletePopulasi') {
     await supabase.from('populasi').delete().eq('tanggal', args[0]);
-  } else if (action === 'saveSertifikat') {
-    const payload = args[0] || {};
-    const noreg = String(payload.noreg || '').trim();
-    if (!noreg) throw new Error('NoReg wajib diisi.');
-
-    const certData = {
-      noreg: noreg,
-      nomor_sertifikat: payload.nomor_sertifikat || null,
-      tempat_tanggal_lahir: payload.tempat_tanggal_lahir || null,
-      tanggal_cetak: payload.tanggal_cetak || null,
-      nilai_basic_theory: Number(payload.nilai_basic_theory || 0),
-      nilai_vocational: Number(payload.nilai_vocational || 0),
-      nilai_performance: Number(payload.nilai_performance || 0),
-      nilai_user_observation: Number(payload.nilai_user_observation || 0),
-      subtotal_kinerja: Number(payload.subtotal_kinerja || 0),
-      nilai_bmk: Number(payload.nilai_bmk || 0),
-      nilai_attendance: Number(payload.nilai_attendance || 0),
-      nilai_attitude: Number(payload.nilai_attitude || 0),
-      subtotal_sikap: Number(payload.subtotal_sikap || 0),
-      nilai_laporan_akhir: Number(payload.nilai_laporan_akhir || 0),
-      nilai_akhir: Number(payload.nilai_akhir || 0),
-      predikat: payload.predikat || 'A',
-      updated_at: new Date().toISOString()
-    };
-
-    const { error } = await supabase
-      .from('sertifikat')
-      .upsert(certData, { onConflict: 'noreg' });
-
-    if (error) {
-      console.warn('[saveSertifikat] Warning:', error.message);
-      if (error.code === 'PGRST205' || error.message.includes('not find the table')) {
-        throw new Error('Tabel "sertifikat" belum dibuat di Supabase. Silakan jalankan query pembuatan tabel di SQL Editor Supabase terlebih dahulu.');
-      }
-      throw error;
-    }
-    return { success: true };
   }
 }

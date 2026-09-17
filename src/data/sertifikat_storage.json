@@ -11,8 +11,21 @@
   },
   "2605046": {
     "noreg": "2605046",
-    "basic_theory": 20,
-    "updated_at": "2026-09-16T08:44:58.927Z"
+    "basic_theory": 90,
+    "vocational_theory": 85,
+    "performance": 88,
+    "user_observation": 90,
+    "kinerja_subtotal": 35.3,
+    "bmk": 80,
+    "bmk_subtotal": 24,
+    "attendance": 100,
+    "attitude": 85,
+    "sikap_subtotal": 18.5,
+    "laporan": 90,
+    "laporan_subtotal": 9,
+    "nilai_akhir": 86.8,
+    "predikat": "Baik (B)",
+    "updated_at": "2026-09-16T17:49:14.475Z"
   },
   "2608055": {
     "noreg": "2608055",

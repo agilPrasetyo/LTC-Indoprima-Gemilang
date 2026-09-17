@@ -2931,6 +2931,25 @@
         return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
     }
 
+    // CACHE LOKAL BROWSER (PERSISTENSI PENILAIAN SERTIFIKAT)
+    function loadLocalCertCache() {
+        try {
+            const raw = localStorage.getItem('ltc_cert_cache');
+            if (raw) return JSON.parse(raw) || {};
+        } catch (e) {}
+        return {};
+    }
+
+    function saveLocalCertCache(map) {
+        try {
+            if (map && typeof map === 'object') {
+                localStorage.setItem('ltc_cert_cache', JSON.stringify(map));
+            }
+        } catch (e) {}
+    }
+
+    var certRecordsMap = loadLocalCertCache();
+
     function openCertificateModal(studentId) {
         const modal = document.getElementById('modal-sertifikat-siswa');
         if (!modal) return;
@@ -3033,31 +3052,63 @@
         autoFillPerformanceScore(false);
         autoFillAttendanceScore(false);
 
+        const populateFromData = (d) => {
+            if (!d) return;
+            if (d.nomor_sertifikat) document.getElementById('cert-nomor-sertifikat').value = d.nomor_sertifikat;
+            if (d.tempat_tanggal_lahir) document.getElementById('cert-ttl').value = d.tempat_tanggal_lahir;
+            if (d.periode_pelatihan) document.getElementById('cert-periode').value = d.periode_pelatihan;
+            if (d.tanggal_terbit || d.tanggal_cetak) document.getElementById('cert-tgl-terbit').value = d.tanggal_terbit || d.tanggal_cetak;
+            
+            const bTheory = d.basic_theory ?? d.nilai_basic_theory;
+            if (bTheory !== null && bTheory !== undefined && bTheory !== '') document.getElementById('cert-nilai-basic-theory').value = bTheory;
+
+            const vTheory = d.vocational_theory ?? d.nilai_vocational;
+            if (vTheory !== null && vTheory !== undefined && vTheory !== '') document.getElementById('cert-nilai-vocational').value = vTheory;
+
+            const perf = d.performance ?? d.nilai_performance;
+            if (perf !== null && perf !== undefined && perf !== '') document.getElementById('cert-nilai-performance').value = perf;
+
+            const uObs = d.user_observation ?? d.nilai_user_observation;
+            if (uObs !== null && uObs !== undefined && uObs !== '') document.getElementById('cert-nilai-user-obs').value = uObs;
+
+            const bmk = d.bmk ?? d.nilai_bmk;
+            if (bmk !== null && bmk !== undefined && bmk !== '') document.getElementById('cert-nilai-bmk').value = bmk;
+
+            const att = d.attendance ?? d.nilai_attendance;
+            if (att !== null && att !== undefined && att !== '') document.getElementById('cert-nilai-attendance').value = att;
+
+            const attit = d.attitude ?? d.nilai_attitude;
+            if (attit !== null && attit !== undefined && attit !== '') document.getElementById('cert-nilai-attitude').value = attit;
+
+            const lap = d.laporan ?? d.nilai_laporan_akhir;
+            if (lap !== null && lap !== undefined && lap !== '') document.getElementById('cert-nilai-laporan').value = lap;
+
+            recalculateCertificateScores();
+        };
+
+        // Langsung tampilkan dari cache memori jika sudah pernah dimuat
+        const cachedCert = certRecordsMap[String(s.id).trim()];
+        if (cachedCert) {
+            populateFromData(cachedCert);
+        }
+
         // Ambil data sertifikat tersimpan dari database via RPC
         const rpc = getRpcRunner();
         if (rpc) {
             rpc('getSertifikatByNoreg', [s.id])
                 .then(res => {
                     if (res && res.success && res.data) {
-                        const d = res.data;
-                        if (d.nomor_sertifikat) document.getElementById('cert-nomor-sertifikat').value = d.nomor_sertifikat;
-                        if (d.tempat_tanggal_lahir) document.getElementById('cert-ttl').value = d.tempat_tanggal_lahir;
-                        if (d.periode_pelatihan) document.getElementById('cert-periode').value = d.periode_pelatihan;
-                        if (d.tanggal_terbit) document.getElementById('cert-tgl-terbit').value = d.tanggal_terbit;
-                        
-                        if (d.basic_theory !== null && d.basic_theory !== undefined) document.getElementById('cert-nilai-basic-theory').value = d.basic_theory;
-                        if (d.vocational_theory !== null && d.vocational_theory !== undefined) document.getElementById('cert-nilai-vocational').value = d.vocational_theory;
-                        if (d.performance !== null && d.performance !== undefined) document.getElementById('cert-nilai-performance').value = d.performance;
-                        if (d.user_observation !== null && d.user_observation !== undefined) document.getElementById('cert-nilai-user-obs').value = d.user_observation;
-                        if (d.bmk !== null && d.bmk !== undefined) document.getElementById('cert-nilai-bmk').value = d.bmk;
-                        if (d.attendance !== null && d.attendance !== undefined) document.getElementById('cert-nilai-attendance').value = d.attendance;
-                        if (d.attitude !== null && d.attitude !== undefined) document.getElementById('cert-nilai-attitude').value = d.attitude;
-                        if (d.laporan !== null && d.laporan !== undefined) document.getElementById('cert-nilai-laporan').value = d.laporan;
+                        populateFromData(res.data);
+                        certRecordsMap[String(s.id).trim()] = res.data;
+                        saveLocalCertCache(certRecordsMap);
+                    } else if (cachedCert) {
+                        populateFromData(cachedCert);
                     }
                     recalculateCertificateScores();
                 })
                 .catch(err => {
                     console.warn('Info load sertifikat:', err.message);
+                    if (cachedCert) populateFromData(cachedCert);
                     recalculateCertificateScores();
                 });
         } else {
@@ -3148,7 +3199,8 @@
 
     function recalculateCertificateScores() {
         const parse = (id) => {
-            const val = parseFloat(document.getElementById(id)?.value);
+            const raw = String(document.getElementById(id)?.value || '').replace(',', '.').trim();
+            const val = parseFloat(raw);
             return isNaN(val) ? 0 : Math.min(100, Math.max(0, val));
         };
 
@@ -3236,24 +3288,34 @@
         }
 
         const calc = recalculateCertificateScores();
+        const parseNum = (id) => {
+            const raw = String(document.getElementById(id)?.value || '').replace(',', '.').trim();
+            const val = parseFloat(raw);
+            return isNaN(val) ? 0 : val;
+        };
+
         const payload = {
             noreg: noreg,
             nomor_sertifikat: document.getElementById('cert-nomor-sertifikat')?.value || '',
             tempat_tanggal_lahir: document.getElementById('cert-ttl')?.value || '',
             periode_pelatihan: document.getElementById('cert-periode')?.value || '',
             tanggal_terbit: document.getElementById('cert-tgl-terbit')?.value || '',
-            basic_theory: parseFloat(document.getElementById('cert-nilai-basic-theory')?.value) || 0,
-            vocational_theory: parseFloat(document.getElementById('cert-nilai-vocational')?.value) || 0,
-            performance: parseFloat(document.getElementById('cert-nilai-performance')?.value) || 0,
-            user_observation: parseFloat(document.getElementById('cert-nilai-user-obs')?.value) || 0,
+            basic_theory: parseNum('cert-nilai-basic-theory'),
+            vocational_theory: parseNum('cert-nilai-vocational'),
+            performance: parseNum('cert-nilai-performance'),
+            user_observation: parseNum('cert-nilai-user-obs'),
             kinerja_subtotal: calc.subtotalKinerja,
-            bmk: parseFloat(document.getElementById('cert-nilai-bmk')?.value) || 0,
+            subtotal_kinerja: calc.subtotalKinerja,
+            bmk: parseNum('cert-nilai-bmk'),
             bmk_subtotal: calc.subtotalBmk,
-            attendance: parseFloat(document.getElementById('cert-nilai-attendance')?.value) || 0,
-            attitude: parseFloat(document.getElementById('cert-nilai-attitude')?.value) || 0,
+            subtotal_bmk: calc.subtotalBmk,
+            attendance: parseNum('cert-nilai-attendance'),
+            attitude: parseNum('cert-nilai-attitude'),
             sikap_subtotal: calc.subtotalSikap,
-            laporan: parseFloat(document.getElementById('cert-nilai-laporan')?.value) || 0,
+            subtotal_sikap: calc.subtotalSikap,
+            laporan: parseNum('cert-nilai-laporan'),
             laporan_subtotal: calc.subtotalLaporan,
+            subtotal_laporan: calc.subtotalLaporan,
             nilai_akhir: calc.nilaiAkhir,
             predikat: calc.predikat
         };
@@ -3269,29 +3331,29 @@
                 if (res && res.success !== false) {
                     if (showFeedback && typeof showToast === 'function') showToast('Data sertifikat berhasil disimpan!', 'success');
                 } else if (showFeedback && typeof showToast === 'function') {
-                    showToast('Info: Disimpan lokal. (' + (res?.message || 'Database belum dimigrasi') + ')', 'info');
+                    showToast('Data sertifikat berhasil disimpan lokal.', 'info');
                 }
             } catch (err) {
                 console.warn('Error RPC saveSertifikat:', err);
                 if (showFeedback && typeof showToast === 'function') {
-                    showToast('Info: Disimpan lokal. (' + (err.message || 'Database belum dimigrasi') + ')', 'info');
+                    showToast('Data sertifikat berhasil disimpan lokal.', 'info');
                 }
             }
         } else if (showFeedback && typeof showToast === 'function') {
-            showToast('Mode Lokal: Data sertifikat disimpan sementara.', 'info');
+            showToast('Data sertifikat berhasil disimpan lokal.', 'info');
         }
 
         // Simpan ke cache certRecordsMap dan refresh tabel sertifikat jika sedang aktif
         certRecordsMap[String(payload.noreg).trim()] = {
-            ...payload,
-            subtotal_kinerja: payload.kinerja_subtotal,
-            subtotal_bmk: payload.bmk_subtotal,
-            subtotal_sikap: payload.sikap_subtotal,
-            nilai_laporan_akhir: payload.laporan_subtotal
+            ...payload
         };
+        saveLocalCertCache(certRecordsMap);
         if (typeof filterAdminCertTable === 'function') {
             filterAdminCertTable();
         }
+
+        // Otomatis menutup modal penilaian sertifikat
+        closeCertificateModal();
 
         return payload;
     }
@@ -3324,11 +3386,14 @@
 
         showToast('Menyiapkan dan menyimpan data sertifikat...', 'info');
 
-        // 1. Simpan data sertifikat ke backend/lokal terlebih dahulu
+        // 1. Simpan data sertifikat ke backend/lokal terlebih dahulu (sekaligus menutup modal)
         await saveCertificateData(false);
         const calc = recalculateCertificateScores();
 
-        // 2. Siapkan data untuk PDF engine
+        // 2. Tutup modal secara otomatis
+        closeCertificateModal();
+
+        // 3. Siapkan data untuk PDF engine
         const certData = {
             noreg: noreg,
             nama: s.namaLengkap || document.getElementById('cert-display-nama')?.textContent || 'SISWA',
@@ -3361,7 +3426,6 @@
     // =========================================================================
     // MODUL TABEL KELOLA SERTIFIKAT & FILTERING ADMIN
     // =========================================================================
-    var certRecordsMap = {};
 
     function isStudentIneligibleForCertificate(student) {
         if (!student) return true;
@@ -3434,9 +3498,13 @@
                     const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
                     list.forEach(c => {
                         if (c && c.noreg) {
-                            certRecordsMap[String(c.noreg).trim()] = c;
+                            certRecordsMap[String(c.noreg).trim()] = {
+                                ...(certRecordsMap[String(c.noreg).trim()] || {}),
+                                ...c
+                            };
                         }
                     });
+                    saveLocalCertCache(certRecordsMap);
                     populateCertFilters();
                     filterAdminCertTable();
                 })
@@ -3511,7 +3579,7 @@
             if (filterDept && String(s.departemen || '').toLowerCase() !== filterDept) return false;
 
             const cert = certRecordsMap[String(s.id).trim()];
-            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && parseFloat(cert.nilai_akhir) > 0) || (cert.subtotal_kinerja !== undefined && parseFloat(cert.subtotal_kinerja) > 0) || (cert.kinerja_subtotal !== undefined && parseFloat(cert.kinerja_subtotal) > 0)));
 
             if (filterStatus === 'siap' && !isEvaluated) return false;
             if (filterStatus === 'belum' && isEvaluated) return false;
@@ -3525,7 +3593,7 @@
 
         filtered.forEach(s => {
             const cert = certRecordsMap[String(s.id).trim()];
-            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && parseFloat(cert.nilai_akhir) > 0) || (cert.subtotal_kinerja !== undefined && parseFloat(cert.subtotal_kinerja) > 0) || (cert.kinerja_subtotal !== undefined && parseFloat(cert.kinerja_subtotal) > 0)));
             if (isEvaluated) {
                 siapCount++;
                 totalScore += parseFloat(cert.nilai_akhir || 0);
@@ -3590,14 +3658,14 @@
 
         tbody.innerHTML = pageItems.map((s, idx) => {
             const cert = certRecordsMap[String(s.id).trim()] || null;
-            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+            const isEvaluated = !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && parseFloat(cert.nilai_akhir) > 0) || (cert.subtotal_kinerja !== undefined && parseFloat(cert.subtotal_kinerja) > 0) || (cert.kinerja_subtotal !== undefined && parseFloat(cert.kinerja_subtotal) > 0)));
             const isSelected = selectedCertStudentIds.has(String(s.id).trim());
 
-            const kVal = cert ? parseFloat(cert.subtotal_kinerja ?? cert.kinerja_subtotal ?? 0) : null;
-            const bVal = cert ? parseFloat(cert.subtotal_bmk ?? cert.bmk_subtotal ?? 0) : null;
-            const sVal = cert ? parseFloat(cert.subtotal_sikap ?? cert.sikap_subtotal ?? 0) : null;
-            const lVal = cert ? parseFloat(cert.nilai_laporan_akhir ?? cert.laporan_subtotal ?? 0) : null;
-            const nAkhir = cert ? parseFloat(cert.nilai_akhir ?? 0) : null;
+            const kVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_kinerja ?? cert.kinerja_subtotal ?? 0) : null;
+            const bVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_bmk ?? cert.bmk_subtotal ?? 0) : null;
+            const sVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_sikap ?? cert.sikap_subtotal ?? 0) : null;
+            const lVal = (isEvaluated && cert) ? parseFloat(cert.nilai_laporan_akhir ?? cert.laporan_subtotal ?? 0) : null;
+            const nAkhir = (isEvaluated && cert) ? parseFloat(cert.nilai_akhir ?? 0) : null;
 
             let predikatBadge = '-';
             if (isEvaluated && nAkhir !== null) {
@@ -3677,7 +3745,7 @@
         const pageEvaluatedIds = pageItems
             .filter(s => {
                 const cert = certRecordsMap[String(s.id).trim()];
-                return !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && cert.nilai_akhir > 0) || cert.subtotal_kinerja !== undefined));
+                return !!(cert && ((cert.nilai_akhir !== undefined && cert.nilai_akhir !== null && parseFloat(cert.nilai_akhir) > 0) || (cert.subtotal_kinerja !== undefined && parseFloat(cert.subtotal_kinerja) > 0) || (cert.kinerja_subtotal !== undefined && parseFloat(cert.kinerja_subtotal) > 0)));
             })
             .map(s => String(s.id).trim());
 
