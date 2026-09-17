@@ -66,12 +66,51 @@
         }
     }
 
+    const QUIZ_CACHE_KEY = 'ltc_quiz_cache_v1';
+
+    function saveQuizToLocalCache(data) {
+        try {
+            if (!data) return;
+            const payload = {
+                data: data,
+                updated_at: Date.now()
+            };
+            localStorage.setItem(QUIZ_CACHE_KEY, JSON.stringify(payload));
+        } catch (e) {
+            console.warn('[saveQuizToLocalCache] Warning:', e);
+        }
+    }
+
+    function getQuizFromLocalCache() {
+        try {
+            const raw = localStorage.getItem(QUIZ_CACHE_KEY);
+            if (!raw) return null;
+            return JSON.parse(raw);
+        } catch (e) {
+            return null;
+        }
+    }
+
     async function loadQuizAdminData() {
         try {
-            // Muat data kuis
+            // 1. Cek cache lokal browser terlebih dahulu untuk render instan
+            const localCached = getQuizFromLocalCache();
+            if (localCached && localCached.data) {
+                quizGlobalData = localCached.data;
+                renderCurrentQuizSubtab();
+            }
+
+            // 2. Muat data kuis dari server (Supabase / local storage fallback)
             const res = await executeRpcCall('getQuizData', []);
             if (res && res.success && res.data) {
-                quizGlobalData = res.data;
+                const serverTime = res.data.updated_at ? new Date(res.data.updated_at).getTime() : 0;
+                const clientTime = localCached ? (localCached.updated_at || 0) : 0;
+
+                // Gunakan data server jika lebih baru atau jika cache lokal kosong
+                if (!localCached || serverTime >= clientTime || !localCached.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                }
             }
 
             // Muat daftar siswa aktif untuk mapping nama & checklist peserta dari seluruh pool data
@@ -96,7 +135,7 @@
             cachedStudentsList = Array.from(studentMapPool.values());
 
             // Default section jika belum terpilih
-            if (!currentSelectedSectionId && quizGlobalData.sections.length > 0) {
+            if (!currentSelectedSectionId && quizGlobalData.sections && quizGlobalData.sections.length > 0) {
                 currentSelectedSectionId = quizGlobalData.sections[0].id;
             }
 
@@ -560,7 +599,13 @@
                 if (!currentSelectedSectionId && res.section) {
                     currentSelectedSectionId = res.section.id;
                 }
-                loadQuizAdminData();
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
+                }
             } else {
                 alert(res?.message || 'Gagal menyimpan section.');
             }
@@ -573,12 +618,27 @@
     async function deleteQuizSection(secId, secName) {
         if (!confirm(`Hapus section "${secName}" beserta semua soal di dalamnya?`)) return;
         try {
+            // Optimistic update
+            if (quizGlobalData && Array.isArray(quizGlobalData.sections)) {
+                quizGlobalData.sections = quizGlobalData.sections.filter(s => s.id !== secId);
+                quizGlobalData.questions = (quizGlobalData.questions || []).filter(q => q.section_id !== secId);
+                quizGlobalData.quizzes = (quizGlobalData.quizzes || []).filter(q => q.section_id !== secId);
+                if (currentSelectedSectionId === secId) {
+                    currentSelectedSectionId = quizGlobalData.sections[0]?.id || null;
+                }
+                saveQuizToLocalCache(quizGlobalData);
+                renderCurrentQuizSubtab();
+            }
+
             const res = await executeRpcCall('deleteQuizSection', [secId]);
             if (res && res.success) {
-                if (currentSelectedSectionId === secId) {
-                    currentSelectedSectionId = null;
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
                 }
-                loadQuizAdminData();
             }
         } catch (e) {
             alert('Error: ' + e.message);
@@ -663,7 +723,13 @@
             if (res && res.success) {
                 closeModalQuizQuestion();
                 currentSelectedSectionId = section_id;
-                loadQuizAdminData();
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
+                }
             } else {
                 alert(res?.message || 'Gagal menyimpan soal.');
             }
@@ -676,9 +742,22 @@
     async function deleteQuizQuestion(qId) {
         if (!confirm('Apakah Anda yakin ingin menghapus soal ini?')) return;
         try {
+            // Optimistic update
+            if (quizGlobalData && Array.isArray(quizGlobalData.questions)) {
+                quizGlobalData.questions = quizGlobalData.questions.filter(q => q.id !== qId);
+                saveQuizToLocalCache(quizGlobalData);
+                renderCurrentQuizSubtab();
+            }
+
             const res = await executeRpcCall('deleteQuizQuestion', [qId]);
             if (res && res.success) {
-                loadQuizAdminData();
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
+                }
             }
         } catch (e) {
             alert('Error: ' + e.message);
@@ -1173,7 +1252,13 @@
             const res = await executeRpcCall('saveQuizSchedule', [payload]);
             if (res && res.success) {
                 closeModalQuizSchedule();
-                loadQuizAdminData();
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
+                }
             } else {
                 alert(res?.message || 'Gagal menjadwalkan ujian.');
             }
@@ -1186,12 +1271,30 @@
     async function deleteQuizSchedule(quizId, quizTitle) {
         if (!confirm(`Hapus jadwal ujian "${quizTitle}"?`)) return;
         try {
+            // 1. Optimistic & Immediate UI update
+            if (quizGlobalData && Array.isArray(quizGlobalData.quizzes)) {
+                quizGlobalData.quizzes = quizGlobalData.quizzes.filter(q => q.id !== quizId);
+                saveQuizToLocalCache(quizGlobalData);
+                renderCurrentQuizSubtab();
+            }
+
             const res = await executeRpcCall('deleteQuizSchedule', [quizId]);
             if (res && res.success) {
+                if (res.data) {
+                    quizGlobalData = res.data;
+                    saveQuizToLocalCache(quizGlobalData);
+                    renderCurrentQuizSubtab();
+                } else {
+                    loadQuizAdminData();
+                }
+            } else {
+                alert('Gagal menghapus jadwal: ' + (res?.message || 'Error tidak diketahui'));
                 loadQuizAdminData();
             }
         } catch (e) {
+            console.error('[deleteQuizSchedule] Error:', e);
             alert('Error: ' + e.message);
+            loadQuizAdminData();
         }
     }
     // ------------------------------------------------------------------------

@@ -217,59 +217,59 @@ export async function POST({ request, cookies }) {
 
     // --- MANAJEMEN SISTEM QUIZ LTC INDOPRIMA GEMILANG ---
     if (action === 'getQuizData') {
-      const res = handleGetQuizData();
+      const res = await handleGetQuizData();
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'saveQuizSection') {
-      const res = handleSaveQuizSection(args[0]);
+      const res = await handleSaveQuizSection(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'deleteQuizSection') {
-      const res = handleDeleteQuizSection(args[0]);
+      const res = await handleDeleteQuizSection(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'saveQuizQuestion') {
-      const res = handleSaveQuizQuestion(args[0]);
+      const res = await handleSaveQuizQuestion(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'deleteQuizQuestion') {
-      const res = handleDeleteQuizQuestion(args[0]);
+      const res = await handleDeleteQuizQuestion(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'saveQuizSchedule') {
-      const res = handleSaveQuizSchedule(args[0]);
+      const res = await handleSaveQuizSchedule(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'deleteQuizSchedule') {
-      const res = handleDeleteQuizSchedule(args[0]);
+      const res = await handleDeleteQuizSchedule(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'submitQuizAnswer') {
-      const res = handleSubmitQuizAnswer(args[0]);
+      const res = await handleSubmitQuizAnswer(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'grantQuizRemedial') {
-      const res = handleGrantQuizRemedial(args[0]);
+      const res = await handleGrantQuizRemedial(args[0]);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'getStudentActiveQuizzes') {
       const noreg = args[0];
-      const res = handleGetStudentActiveQuizzes(noreg);
+      const res = await handleGetStudentActiveQuizzes(noreg);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
     if (action === 'syncQuizToCertificate') {
       const noreg = args[0];
-      const res = handleSyncQuizToCertificate(noreg);
+      const res = await handleSyncQuizToCertificate(noreg);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
@@ -452,7 +452,7 @@ async function saveSertifikatToSupabase(payload) {
 }
 
 // =======================================================
-// STORAGE LOKAL & LOGIKA SISTEM QUIZ LTC INDOPRIMA GEMILANG
+// STORAGE & LOGIKA SISTEM QUIZ LTC INDOPRIMA GEMILANG (SUPABASE + LOCAL FALLBACK)
 // =======================================================
 const LOCAL_QUIZ_FILE = path.resolve(process.cwd(), 'src/data/quiz_storage.json');
 
@@ -484,14 +484,76 @@ function writeLocalQuizStorage(data) {
   }
 }
 
-function handleGetQuizData() {
-  const data = readLocalQuizStorage();
+async function getQuizDataFromStorage() {
+  const localData = readLocalQuizStorage();
+  try {
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
+      .from('quiz_storage')
+      .select('data, updated_at')
+      .eq('id', 'main')
+      .maybeSingle();
+
+    if (!error && data && data.data) {
+      return {
+        sections: Array.isArray(data.data.sections) ? data.data.sections : localData.sections,
+        questions: Array.isArray(data.data.questions) ? data.data.questions : localData.questions,
+        quizzes: Array.isArray(data.data.quizzes) ? data.data.quizzes : localData.quizzes,
+        submissions: Array.isArray(data.data.submissions) ? data.data.submissions : localData.submissions,
+        updated_at: data.updated_at
+      };
+    }
+
+    // Jika tabel ada tapi belum ada row 'main', inisialisasi / seed dari data lokal
+    if (!error && !data) {
+      try {
+        await adminClient.from('quiz_storage').upsert({
+          id: 'main',
+          data: localData,
+          updated_at: new Date().toISOString()
+        });
+      } catch (seedErr) {
+        console.warn('[getQuizDataFromStorage] Seed initial quiz notice:', seedErr.message);
+      }
+    }
+  } catch (e) {
+    console.warn('[getQuizDataFromStorage] Supabase notice (fallback to local):', e.message);
+  }
+  return localData;
+}
+
+async function saveQuizDataToStorage(store) {
+  // 1. Selalu coba simpan ke file lokal (aman saat dev, catch error saat serverless)
+  writeLocalQuizStorage(store);
+
+  // 2. Simpan ke Supabase tabel quiz_storage (agar tersimpan permanen di cloud Vercel)
+  try {
+    const adminClient = getAdminClient();
+    const { error } = await adminClient
+      .from('quiz_storage')
+      .upsert({
+        id: 'main',
+        data: store,
+        updated_at: new Date().toISOString()
+      }, { onConflict: 'id' });
+
+    if (error) {
+      console.warn('[saveQuizDataToStorage] Supabase note:', error.message);
+    }
+  } catch (e) {
+    console.warn('[saveQuizDataToStorage] Supabase exception:', e.message);
+  }
+  return store;
+}
+
+async function handleGetQuizData() {
+  const data = await getQuizDataFromStorage();
   return { success: true, data };
 }
 
-function handleSaveQuizSection(sec) {
+async function handleSaveQuizSection(sec) {
   if (!sec || !sec.name) return { success: false, message: 'Nama section wajib diisi.' };
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
   const id = sec.id || `sec-${Date.now()}`;
   const idx = store.sections.findIndex(s => s.id === id);
   const newSec = {
@@ -504,21 +566,21 @@ function handleSaveQuizSection(sec) {
   } else {
     store.sections.push(newSec);
   }
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, section: newSec, data: store };
 }
 
-function handleDeleteQuizSection(secId) {
-  const store = readLocalQuizStorage();
+async function handleDeleteQuizSection(secId) {
+  const store = await getQuizDataFromStorage();
   store.sections = store.sections.filter(s => s.id !== secId);
   store.questions = store.questions.filter(q => q.section_id !== secId);
   store.quizzes = store.quizzes.filter(q => q.section_id !== secId);
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, data: store };
 }
 
-function handleSaveQuizQuestion(payload) {
-  const store = readLocalQuizStorage();
+async function handleSaveQuizQuestion(payload) {
+  const store = await getQuizDataFromStorage();
   const items = Array.isArray(payload) ? payload : [payload];
   let addedCount = 0;
 
@@ -546,22 +608,22 @@ function handleSaveQuizQuestion(payload) {
     addedCount++;
   });
 
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, count: addedCount, data: store };
 }
 
-function handleDeleteQuizQuestion(qId) {
-  const store = readLocalQuizStorage();
+async function handleDeleteQuizQuestion(qId) {
+  const store = await getQuizDataFromStorage();
   store.questions = store.questions.filter(q => q.id !== qId);
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, data: store };
 }
 
-function handleSaveQuizSchedule(quiz) {
+async function handleSaveQuizSchedule(quiz) {
   if (!quiz || !quiz.title || !quiz.section_id) {
     return { success: false, message: 'Judul dan Section wajib dipilih.' };
   }
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
   const id = quiz.id || `quiz-${Date.now()}`;
   const newQuiz = {
     id,
@@ -583,20 +645,20 @@ function handleSaveQuizSchedule(quiz) {
   } else {
     store.quizzes.push(newQuiz);
   }
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, quiz: newQuiz, data: store };
 }
 
-function handleDeleteQuizSchedule(quizId) {
-  const store = readLocalQuizStorage();
+async function handleDeleteQuizSchedule(quizId) {
+  const store = await getQuizDataFromStorage();
   store.quizzes = store.quizzes.filter(q => q.id !== quizId);
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, data: store };
 }
 
-function handleSubmitQuizAnswer(payload) {
+async function handleSubmitQuizAnswer(payload) {
   const { quiz_id, noreg, nama, answers } = payload;
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
   const quiz = store.quizzes.find(q => q.id === quiz_id);
   if (!quiz) return { success: false, message: 'Quiz tidak ditemukan.' };
 
@@ -635,7 +697,7 @@ function handleSubmitQuizAnswer(payload) {
   };
 
   store.submissions.push(newSub);
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
 
   return {
     success: true,
@@ -648,9 +710,9 @@ function handleSubmitQuizAnswer(payload) {
   };
 }
 
-function handleGrantQuizRemedial(payload) {
+async function handleGrantQuizRemedial(payload) {
   const { quiz_id, noreg } = payload;
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
   let updated = false;
   for (let i = store.submissions.length - 1; i >= 0; i--) {
     const sub = store.submissions[i];
@@ -660,13 +722,13 @@ function handleGrantQuizRemedial(payload) {
       break;
     }
   }
-  writeLocalQuizStorage(store);
+  await saveQuizDataToStorage(store);
   return { success: true, updated };
 }
 
-function handleGetStudentActiveQuizzes(noreg) {
+async function handleGetStudentActiveQuizzes(noreg) {
   const cleanNoreg = String(noreg || '').trim().toUpperCase();
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
   const now = new Date();
 
   const available = [];
@@ -686,14 +748,9 @@ function handleGetStudentActiveQuizzes(noreg) {
     const isTimeActive = (!start || now >= start) && (!end || now <= end);
     const isManuallyActive = quiz.status === 'active';
 
-    // Kuis dianggap aktif jika:
-    // 1. Sedang dalam rentang jadwal reguler, ATAU
-    // 2. Diaktifkan manual oleh admin ('active'), ATAU
-    // 3. Siswa ini telah diberikan izin REMIDI khusus oleh admin (bypasses batas waktu jadwal reguler)
     if (!isTimeActive && !isManuallyActive && !remedialGranted) return;
 
     const canTake = !hasSubmitted || remedialGranted;
-
     const qCount = store.questions.filter(q => q.section_id === quiz.section_id).length;
 
     available.push({
@@ -718,9 +775,9 @@ function handleGetStudentActiveQuizzes(noreg) {
   return { success: true, data: available };
 }
 
-function handleSyncQuizToCertificate(noreg) {
+async function handleSyncQuizToCertificate(noreg) {
   const cleanNoreg = String(noreg || '').trim();
-  const store = readLocalQuizStorage();
+  const store = await getQuizDataFromStorage();
 
   const studentSubs = store.submissions.filter(s => String(s.noreg) === cleanNoreg);
   if (studentSubs.length === 0) {
@@ -751,6 +808,13 @@ function handleSyncQuizToCertificate(noreg) {
   certStore[cleanNoreg].basic_theory = avgTheory;
   certStore[cleanNoreg].updated_at = new Date().toISOString();
   writeLocalCertStorage(certStore);
+
+  // Jika fungsi penyimpanan sertifikat Supabase ada, sinkronkan juga
+  try {
+    await saveSertifikatToSupabase(certStore[cleanNoreg]);
+  } catch (syncErr) {
+    console.warn('[handleSyncQuizToCertificate] Sync notice:', syncErr.message);
+  }
 
   return {
     success: true,
