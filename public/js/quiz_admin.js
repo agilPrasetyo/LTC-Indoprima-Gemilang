@@ -1001,7 +1001,7 @@
 
             return `
                 <tr class="hover:bg-slate-50 transition-colors">
-                    <td class="py-3 px-3 font-bold text-slate-800">${q.title}</td>
+                    <td class="py-3 px-3 font-normal text-slate-700">${q.title}</td>
                     <td class="py-3 px-3 text-slate-600">${secName}</td>
                     <td class="py-3 px-3 text-center">
                         <span class="px-2 py-0.5 rounded-lg text-xs font-bold bg-blue-50 text-brand-blue border border-blue-100">
@@ -1010,12 +1010,12 @@
                     </td>
                     <td class="py-3 px-3 text-slate-600 font-mono text-[11px]">${formatDt(q.start_time)}</td>
                     <td class="py-3 px-3 text-slate-600 font-mono text-[11px]">${formatDt(q.end_time)}</td>
-                    <td class="py-3 px-3 text-center font-bold text-slate-700">${q.duration_minutes} Mnt</td>
-                    <td class="py-3 px-3 text-center">
+                    <td class="py-3 px-3 text-center font-normal text-slate-600">${q.duration_minutes} Mnt</td>
+                    <td class="py-3 px-3 text-center whitespace-nowrap">
                         <button onclick="openQuizParticipantsDetailModal('${q.id}')"
-                            class="inline-flex items-center justify-center px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95"
+                            class="inline-flex items-center justify-center px-3 py-1 rounded-xl text-xs font-bold bg-indigo-50 hover:bg-indigo-100 text-indigo-700 border border-indigo-200 transition-all cursor-pointer shadow-xs hover:scale-105 active:scale-95 whitespace-nowrap"
                             title="Klik untuk melihat daftar nama siswa yang ikut ujian ini">
-                            <span>${partCount}</span>
+                            <span class="whitespace-nowrap">${partCount}</span>
                         </button>
                     </td>
                     <td class="py-3 px-3 text-center">${statusBadge}</td>
