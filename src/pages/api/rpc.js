@@ -726,6 +726,24 @@ async function handleGrantQuizRemedial(payload) {
   return { success: true, updated };
 }
 
+// Helper konversi datetime string WIB ke objek Date yang valid lintas timezone server (Vercel UTC)
+function parseWibDate(dtStr) {
+  if (!dtStr) return null;
+  let str = String(dtStr).trim();
+  if (!str) return null;
+  if (!str.includes('Z') && !str.match(/[+-]\d{2}(:\d{2})?$/)) {
+    if (str.length === 16) {
+      str += ':00+07:00';
+    } else if (str.length === 19) {
+      str += '+07:00';
+    } else if (str.length === 10) {
+      str += 'T00:00:00+07:00';
+    }
+  }
+  const d = new Date(str);
+  return isNaN(d.getTime()) ? null : d;
+}
+
 async function handleGetStudentActiveQuizzes(noreg) {
   const cleanNoreg = String(noreg || '').trim().toUpperCase();
   const store = await getQuizDataFromStorage();
@@ -743,9 +761,10 @@ async function handleGetStudentActiveQuizzes(noreg) {
     const lastSub = hasSubmitted ? subs[subs.length - 1] : null;
     const remedialGranted = lastSub ? !!lastSub.remedial_granted : false;
 
-    const start = quiz.start_time ? new Date(quiz.start_time) : null;
-    const end = quiz.end_time ? new Date(quiz.end_time) : null;
-    const isTimeActive = (!start || now >= start) && (!end || now <= end);
+    const start = parseWibDate(quiz.start_time);
+    const end = parseWibDate(quiz.end_time);
+    // Beri toleransi 1 menit (60000ms) untuk mencegah delay clock antar client dan server
+    const isTimeActive = (!start || now.getTime() >= (start.getTime() - 60000)) && (!end || now <= end);
     const isManuallyActive = quiz.status === 'active';
 
     if (!isTimeActive && !isManuallyActive && !remedialGranted) return;

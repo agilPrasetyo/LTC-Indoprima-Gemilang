@@ -973,12 +973,25 @@
 
         const now = new Date();
 
+        function parseWibDate(dtStr) {
+            if (!dtStr) return null;
+            let str = String(dtStr).trim();
+            if (!str) return null;
+            if (!str.includes('Z') && !str.match(/[+-]\d{2}(:\d{2})?$/)) {
+                if (str.length === 16) str += ':00+07:00';
+                else if (str.length === 19) str += '+07:00';
+                else if (str.length === 10) str += 'T00:00:00+07:00';
+            }
+            const d = new Date(str);
+            return isNaN(d.getTime()) ? null : d;
+        }
+
         tbody.innerHTML = quizzes.map(q => {
             const sec = (quizGlobalData.sections || []).find(s => s.id === q.section_id);
             const secName = sec ? sec.name : 'Teori';
 
-            const start = q.start_time ? new Date(q.start_time) : null;
-            const end = q.end_time ? new Date(q.end_time) : null;
+            const start = parseWibDate(q.start_time);
+            const end = parseWibDate(q.end_time);
 
             let statusBadge = `<span class="px-2.5 py-1 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600">Terjadwal</span>`;
             if (end && now > end) {
