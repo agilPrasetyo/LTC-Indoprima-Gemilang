@@ -3098,9 +3098,15 @@
             rpc('getSertifikatByNoreg', [s.id])
                 .then(res => {
                     if (res && res.success && res.data) {
-                        populateFromData(res.data);
-                        certRecordsMap[String(s.id).trim()] = res.data;
-                        saveLocalCertCache(certRecordsMap);
+                        const serverTime = new Date(res.data.updated_at || 0).getTime();
+                        const localTime = new Date(cachedCert?.updated_at || 0).getTime();
+                        if (!cachedCert || serverTime >= localTime) {
+                            populateFromData(res.data);
+                            certRecordsMap[String(s.id).trim()] = res.data;
+                            saveLocalCertCache(certRecordsMap);
+                        } else if (cachedCert) {
+                            populateFromData(cachedCert);
+                        }
                     } else if (cachedCert) {
                         populateFromData(cachedCert);
                     }
@@ -3294,6 +3300,7 @@
             return isNaN(val) ? 0 : val;
         };
 
+        const nowIso = new Date().toISOString();
         const payload = {
             noreg: noreg,
             nomor_sertifikat: document.getElementById('cert-nomor-sertifikat')?.value || '',
@@ -3317,7 +3324,8 @@
             laporan_subtotal: calc.subtotalLaporan,
             subtotal_laporan: calc.subtotalLaporan,
             nilai_akhir: calc.nilaiAkhir,
-            predikat: calc.predikat
+            predikat: calc.predikat,
+            updated_at: nowIso
         };
 
         if (showFeedback && typeof showToast === 'function') {
@@ -3345,7 +3353,8 @@
 
         // Simpan ke cache certRecordsMap dan refresh tabel sertifikat jika sedang aktif
         certRecordsMap[String(payload.noreg).trim()] = {
-            ...payload
+            ...payload,
+            updated_at: nowIso
         };
         saveLocalCertCache(certRecordsMap);
         if (typeof filterAdminCertTable === 'function') {
@@ -3498,10 +3507,14 @@
                     const list = (res && res.data) ? res.data : (Array.isArray(res) ? res : []);
                     list.forEach(c => {
                         if (c && c.noreg) {
-                            certRecordsMap[String(c.noreg).trim()] = {
-                                ...(certRecordsMap[String(c.noreg).trim()] || {}),
-                                ...c
-                            };
+                            const id = String(c.noreg).trim();
+                            const existing = certRecordsMap[id];
+                            const serverTime = new Date(c.updated_at || 0).getTime();
+                            const localTime = new Date(existing?.updated_at || 0).getTime();
+                            // Jika data lokal browser lebih baru (misal hasil simpan pengguna di device ini), pertahankan data lokal!
+                            if (!existing || serverTime >= localTime) {
+                                certRecordsMap[id] = c;
+                            }
                         }
                     });
                     saveLocalCertCache(certRecordsMap);
@@ -3664,7 +3677,7 @@
             const kVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_kinerja ?? cert.kinerja_subtotal ?? 0) : null;
             const bVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_bmk ?? cert.bmk_subtotal ?? 0) : null;
             const sVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_sikap ?? cert.sikap_subtotal ?? 0) : null;
-            const lVal = (isEvaluated && cert) ? parseFloat(cert.nilai_laporan_akhir ?? cert.laporan_subtotal ?? 0) : null;
+            const lVal = (isEvaluated && cert) ? parseFloat(cert.subtotal_laporan ?? cert.laporan_subtotal ?? (cert.nilai_laporan_akhir ? cert.nilai_laporan_akhir * 0.1 : 0)) : null;
             const nAkhir = (isEvaluated && cert) ? parseFloat(cert.nilai_akhir ?? 0) : null;
 
             let predikatBadge = '-';
