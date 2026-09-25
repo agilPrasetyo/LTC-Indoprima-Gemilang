@@ -1316,34 +1316,6 @@ async function getStatsFromSupabase() {
     };
   });
 
-  // Ensure TEST-001 test student is always present for testing simulation
-  if (!siswaList.some(s => s.id === 'TEST-001')) {
-    siswaList.push({
-      id: 'TEST-001',
-      namaLengkap: 'SISWA TESTING (SIMULASI)',
-      nama: 'SISWA TESTING (SIMULASI)',
-      kelas: 'Kelas 4',
-      departemen: 'PRODUKSI',
-      bagian: 'PRODUKSI',
-      section: 'GRINDING',
-      hk: '6 HARI',
-      hariKerja: '6 HARI',
-      spv: "MOHAMMAT YASIR MA'ARIF",
-      masuk: '2026-05-01',
-      keluar: null,
-      tanggalKeluar: null,
-      asalDaerah: 'SURABAYA',
-      daerahAsal: 'SURABAYA',
-      asal: 'SURABAYA',
-      asalSekolah: 'SMK TESTING',
-      sekolah: 'SMK TESTING',
-      distribusi: '2026-08-01',
-      status: 'Aktif',
-      dailyRecords: logsByStudent['TEST-001'] || [],
-      perfLabel: 'Hadir'
-    });
-  }
-
   function computeTurnoverKelas(masukStr, targetDateStr) {
     return computeKelasFromMasuk(masukStr, targetDateStr);
   }
@@ -1441,16 +1413,33 @@ async function getStatsFromSupabase() {
     costRates: (cost || []).map(c => ({ kelas: c.keterangan, uangSaku: parseFloat(c.uang_saku), transport: parseFloat(c.transport) })),
     absensi: absensiRecords,
     safety: safetyRecords,
-    populasi: (populasi || []).map(p => ({
-      tanggal: p.tanggal,
-      kontrak: p.karyawan_kontrak,
-      ltc: p.ltc,
-      outsourcing: p.outsourcing,
-      satpamSupir: p.satpam_supir,
-      totalKaryawan: p.total_karyawan,
-      totalLtc: p.total_ltc,
-      order: p.no_order !== undefined && p.no_order !== null ? p.no_order : (p.order_val !== undefined && p.order_val !== null ? p.order_val : (p.order !== undefined && p.order !== null ? p.order : null))
-    })),
+    populasi: (() => {
+      const curYm = new Date().toISOString().substring(0, 7);
+      let latestPopDate = '';
+      (populasi || []).forEach(p => {
+        if (p.tanggal && p.tanggal > latestPopDate) latestPopDate = p.tanggal;
+      });
+
+      return (populasi || []).map(p => {
+        const isCurrentOrLatest = Boolean(p.tanggal && (p.tanggal.startsWith(curYm) || p.tanggal === latestPopDate));
+        const effectiveLtc = (isCurrentOrLatest && totalSiswa > 0) ? totalSiswa : (p.total_ltc || p.ltc || 0);
+        const hasBreakdown = (typeof p.karyawan_kontrak === 'number') || (typeof p.outsourcing === 'number') || (typeof p.satpam_supir === 'number');
+        const effectiveTotalKaryawan = hasBreakdown
+          ? ((p.karyawan_kontrak || 0) + effectiveLtc + (p.outsourcing || 0) + (p.satpam_supir || 0))
+          : (p.total_karyawan || 146);
+
+        return {
+          tanggal: p.tanggal,
+          kontrak: p.karyawan_kontrak,
+          ltc: effectiveLtc,
+          outsourcing: p.outsourcing,
+          satpamSupir: p.satpam_supir,
+          totalKaryawan: effectiveTotalKaryawan,
+          totalLtc: effectiveLtc,
+          order: p.no_order !== undefined && p.no_order !== null ? p.no_order : (p.order_val !== undefined && p.order_val !== null ? p.order_val : (p.order !== undefined && p.order !== null ? p.order : null))
+        };
+      });
+    })(),
     monthYear: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 }
   };
 }

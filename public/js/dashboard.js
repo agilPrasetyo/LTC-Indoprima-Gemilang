@@ -450,6 +450,12 @@ function getLtcPopulationForMonth(ym) {
 
     if (!ym || ym === 'ALL') return realActiveCount;
 
+    // Jika bulan yang dipilih adalah bulan sekarang atau lebih baru, utamakan realActiveCount dari Manajemen Siswa
+    const curYm = new Date().toISOString().substring(0, 7);
+    if (ym >= curYm && realActiveCount > 0) {
+        return realActiveCount;
+    }
+
     // Cari data di rawPopulasiData yang tanggalnya berawalan ym (YYYY-MM)
     const matchingEntries = popList.filter(p => p.tanggal && String(p.tanggal).startsWith(ym));
     if (matchingEntries.length > 0) {
@@ -460,12 +466,6 @@ function getLtcPopulationForMonth(ym) {
             ? latestInMonth.totalLtc
             : ((typeof latestInMonth.ltc === 'number' && latestInMonth.ltc > 0) ? latestInMonth.ltc : 0);
         if (val > 0) return val;
-    }
-
-    // Jika bulan yang dipilih adalah bulan sekarang atau lebih baru, pakai realActiveCount
-    const curYm = new Date().toISOString().substring(0, 7);
-    if (ym >= curYm) {
-        return realActiveCount;
     }
 
     return realActiveCount;
@@ -877,16 +877,18 @@ function updateLtcRatioChart() {
     });
 
     // Dynamically calculate totalLtc synchronized with Manajemen Siswa & Kelola Populasi
-    const totalLtcData = sortedData.map(p => {
+    const curYm = new Date().toISOString().substring(0, 7);
+    const totalLtcData = sortedData.map((p, idx) => {
         const m = p.tanggal ? p.tanggal.substring(0, 7) : '';
+        const isLatest = (idx === sortedData.length - 1) || (m && m === latestMonthStr) || (m && m >= curYm);
+        if (isLatest && realActiveLtcCount > 0) {
+            return realActiveLtcCount;
+        }
         if (typeof p.totalLtc === 'number' && p.totalLtc > 0) {
             return p.totalLtc;
         }
         if (typeof p.ltc === 'number' && p.ltc > 0) {
             return p.ltc;
-        }
-        if (m === latestMonthStr) {
-            return realActiveLtcCount;
         }
         return realActiveLtcCount;
     });
@@ -894,8 +896,12 @@ function updateLtcRatioChart() {
     // Total Karyawan synchronized: Kontrak + LTC + Outsourcing + Satpam & Supir
     const totalKaryawanData = sortedData.map((p, idx) => {
         const ltc = totalLtcData[idx];
-        const k = (p.kontrak || 0) + ltc + (p.outsourcing || 0) + (p.satpamSupir || 0);
-        return k > 0 ? k : (p.totalKaryawan || 146);
+        const hasBreakdown = (typeof p.kontrak === 'number') || (typeof p.outsourcing === 'number') || (typeof p.satpamSupir === 'number');
+        if (hasBreakdown) {
+            const k = (p.kontrak || 0) + ltc + (p.outsourcing || 0) + (p.satpamSupir || 0);
+            if (k > 0) return k;
+        }
+        return p.totalKaryawan || 146;
     });
 
     // Persentase LTC line dynamically calculated
