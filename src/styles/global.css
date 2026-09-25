@@ -381,17 +381,17 @@ body {
         gap: 0 !important;
     }
     
-    /* 3. Hide text contents */
-    .sidebar-collapsed .brand-full,
-    .sidebar-collapsed .brand-text-container,
-    .sidebar-collapsed .user-info-container,
-    .sidebar-collapsed nav button span,
-    .sidebar-collapsed .logout-btn span {
+    /* 3. Hide text contents only inside app sidebar */
+    .sidebar-collapsed #app-sidebar .brand-full,
+    .sidebar-collapsed #app-sidebar .brand-text-container,
+    .sidebar-collapsed #app-sidebar .user-info-container,
+    .sidebar-collapsed #app-sidebar nav button span,
+    .sidebar-collapsed #app-sidebar .logout-btn span {
         display: none !important;
     }
     
-    /* 4. Center button content and adjust padding */
-    .sidebar-collapsed nav button {
+    /* 4. Center button content and adjust padding only inside app sidebar */
+    .sidebar-collapsed #app-sidebar nav button {
         justify-content: center !important;
         padding-left: 0 !important;
         padding-right: 0 !important;
@@ -402,12 +402,12 @@ body {
         border-radius: 12px !important;
     }
     
-    .sidebar-collapsed nav button i {
+    .sidebar-collapsed #app-sidebar nav button i {
         font-size: 1.25rem !important;
         margin: 0 !important;
     }
     
-    .sidebar-collapsed .logout-btn {
+    .sidebar-collapsed #app-sidebar .logout-btn {
         width: 48px !important;
         height: 48px !important;
         padding: 0 !important;
@@ -540,4 +540,15 @@ table thead th {
 table thead tr {
     background-color: #f8fafc !important;
 }
+
+/* Skill Map Matrix Table Dark Contrast Header Override */
+.skillmap-matrix-table thead th,
+.skillmap-matrix-table thead tr {
+    background-color: #1e293b !important;
+    color: #f8fafc !important;
+}
+.skillmap-matrix-table thead th.bg-navy-dark {
+    background-color: #0f172a !important;
+}
+
 

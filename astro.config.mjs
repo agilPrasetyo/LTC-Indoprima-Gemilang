@@ -9,3 +9,4 @@ export default defineConfig({
   adapter: vercel(),
   integrations: [tailwind()],
 });
+// Dev server cache refresh (changed sidebar font weight to regular / normal font-weight: 400 without bolding)

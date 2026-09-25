@@ -1,0 +1,2313 @@
+---
+// src/components/AdminSetting.astro
+// Desain Modern, Bersih & Minimalis (SaaS Enterprise Standard - Two-Column Layout)
+---
+
+<style>
+  .setting-subtab-btn {
+    transition: all 0.15s ease-in-out;
+    font-size: 0.9375rem !important; /* 15px */
+    line-height: 1.35rem !important;
+    font-weight: 400 !important;
+  }
+  .setting-subtab-btn.active-subtab {
+    background-color: #ffffff !important;
+    color: #000000 !important;
+    font-weight: 400 !important;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.15), 0 2px 4px -2px rgba(0, 0, 0, 0.1) !important;
+  }
+  .setting-subtab-btn.active-subtab span {
+    color: #000000 !important;
+    font-size: 0.9375rem !important;
+    font-weight: 400 !important;
+  }
+  .setting-subtab-btn.active-subtab .nav-count-badge {
+    background-color: #f1f5f9 !important;
+    color: #000000 !important;
+    font-size: 0.75rem !important;
+    font-weight: 500 !important;
+  }
+  .setting-subtab-btn:not(.active-subtab) {
+    background-color: transparent !important;
+    color: #ffffff !important;
+    font-weight: 400 !important;
+  }
+  .setting-subtab-btn:not(.active-subtab) span {
+    color: #ffffff !important;
+    font-size: 0.9375rem !important;
+    font-weight: 400 !important;
+  }
+  .setting-subtab-btn:not(.active-subtab):hover {
+    background-color: rgba(255, 255, 255, 0.18) !important;
+    color: #ffffff !important;
+  }
+</style>
+
+<div class="animate-fadeIn max-w-7xl mx-auto w-full pb-16 pt-2">
+
+  <!-- TWO-COLUMN LAYOUT (SEJAJAR HORIZONTAL) -->
+  <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+
+    <!-- SISI KIRI: SIDEBAR KATEGORI & MENU SETTINGS (BLUE INDOPRIMA THEME) -->
+    <aside class="lg:col-span-3 space-y-3">
+      <div class="bg-blue-600 rounded-2xl border border-blue-700 p-4 shadow-xl shadow-blue-700/20 space-y-4 sticky top-4">
+
+        <!-- GRUP 1: AKADEMIK & PENILAIAN -->
+        <div class="space-y-1">
+          <div class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-100/90">
+            Akademik & Penilaian
+          </div>
+          <div class="space-y-1">
+            <button onclick="switchSettingSubTab('kelulusan')" id="setting-nav-kelulusan"
+              style="background-color: #ffffff !important; color: #000000 !important;"
+              class="setting-subtab-btn active-subtab w-full text-left px-4 py-3 rounded-xl text-sm font-normal flex items-center justify-between transition-all cursor-pointer shadow-md">
+              <span style="color: #000000 !important;">Aturan Kelulusan & KKM</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('reportcard')" id="setting-nav-reportcard"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Komponen Report Card</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('sertifikat')" id="setting-nav-sertifikat"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Template Sertifikat</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('batch')" id="setting-nav-batch"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Batch & Angkatan</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GRUP 2: MASTER OPERASIONAL -->
+        <div class="space-y-1 pt-3 border-t border-white/20">
+          <div class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-100/90">
+            Master Operasional
+          </div>
+          <div class="space-y-1">
+            <button onclick="switchSettingSubTab('machines')" id="setting-nav-machines"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Daftar Mesin</span>
+              <span id="nav-machines-count" class="nav-count-badge px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">0</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('products')" id="setting-nav-products"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Produk & Target</span>
+              <span id="nav-products-count" class="nav-count-badge px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">0</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('spv')" id="setting-nav-spv"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Daftar SPV</span>
+              <span id="nav-spv-count" class="nav-count-badge px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">0</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('sections')" id="setting-nav-sections"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Daftar Section</span>
+              <span id="nav-sections-count" class="nav-count-badge px-2.5 py-0.5 rounded-full text-xs font-medium bg-white/20 text-white">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GRUP 3: TATA KELOLA & AUDIT -->
+        <div class="space-y-1 pt-3 border-t border-white/20">
+          <div class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-100/90">
+            Tata Kelola & Audit
+          </div>
+          <div class="space-y-1">
+            <button onclick="switchSettingSubTab('logs')" id="setting-nav-logs"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Log Aktivitas Admin</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('recycle')" id="setting-nav-recycle"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Recycle Bin</span>
+              <span id="nav-recycle-badge" class="nav-count-badge badge-recycle px-2.5 py-0.5 rounded-full text-xs font-medium bg-rose-500 text-white">0</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- GRUP 4: KEAMANAN & SISTEM -->
+        <div class="space-y-1 pt-3 border-t border-white/20">
+          <div class="px-2.5 py-1 text-xs font-semibold uppercase tracking-wider text-blue-100/90">
+            Keamanan & Sistem
+          </div>
+          <div class="space-y-1">
+            <button onclick="switchSettingSubTab('pin')" id="setting-nav-pin"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Master Security PIN</span>
+            </button>
+
+            <button onclick="switchSettingSubTab('backup')" id="setting-nav-backup"
+              class="setting-subtab-btn w-full text-left px-4 py-3 rounded-xl text-sm font-normal text-white hover:bg-white/15 flex items-center justify-between transition-all cursor-pointer">
+              <span>Backup & Snapshot</span>
+            </button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- SISI KANAN: KONTEN PANEL AKTIF (lg:col-span-9) -->
+    <main class="lg:col-span-9 space-y-6">
+
+      <!-- ====================================================================
+           PANEL 1: ATURAN KELULUSAN & KKM
+           ==================================================================== -->
+      <div id="setting-panel-kelulusan" class="setting-panel space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Aturan Kelulusan & Standar KKM</h3>
+            </div>
+            <button onclick="saveGraduationRulesForm()"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer self-start sm:self-auto">
+              <i class="fa-solid fa-check"></i> Simpan Aturan Kelulusan
+            </button>
+          </div>
+
+          <!-- Grid Standar Nilai KKM -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Teori -->
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 hover:bg-white transition-all space-y-2">
+              <div class="flex items-center justify-between text-slate-600">
+                <span class="text-xs font-semibold">KKM Teori</span>
+                <i class="fa-solid fa-book-open text-slate-400 text-xs"></i>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rule-kkm-teori" min="0" max="100"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">poin</span>
+              </div>
+            </div>
+
+            <!-- Praktik -->
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 hover:bg-white transition-all space-y-2">
+              <div class="flex items-center justify-between text-slate-600">
+                <span class="text-xs font-semibold">KKM Praktik</span>
+                <i class="fa-solid fa-wrench text-slate-400 text-xs"></i>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rule-kkm-praktik" min="0" max="100"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">poin</span>
+              </div>
+            </div>
+
+            <!-- Sikap -->
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 hover:bg-white transition-all space-y-2">
+              <div class="flex items-center justify-between text-slate-600">
+                <span class="text-xs font-semibold">KKM Sikap</span>
+                <i class="fa-solid fa-shield-halved text-slate-400 text-xs"></i>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rule-kkm-sikap" min="0" max="100"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">poin</span>
+              </div>
+            </div>
+
+            <!-- Min Kehadiran -->
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 hover:bg-white transition-all space-y-2">
+              <div class="flex items-center justify-between text-slate-600">
+                <span class="text-xs font-semibold">Min. Kehadiran</span>
+                <i class="fa-solid fa-calendar-check text-slate-400 text-xs"></i>
+              </div>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rule-min-absensi" min="0" max="100" step="0.5"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Parameter Tambahan -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6 pt-2">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Maksimal Toleransi Alpa / Tanpa Keterangan</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rule-max-alpa" min="0" max="10"
+                  class="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+                <span class="text-xs text-slate-500 font-medium">hari</span>
+              </div>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Mekanisme Penentuan Kelulusan</label>
+              <select id="rule-evaluasi-mode"
+                class="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all cursor-pointer">
+                <option value="AUTOMATIC">Otomatis Lulus jika semua parameter >= KKM</option>
+                <option value="NEED_SPV_REVIEW">Verifikasi Manual / Butuh Review Instruktur SPV</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- Catatan / Klausul Kelulusan -->
+          <div class="space-y-1.5">
+            <label class="block text-xs font-semibold text-slate-700">Klausul Keterangan Kelulusan (Tercetak di Rapor)</label>
+            <textarea id="rule-catatan" rows="3" placeholder="Siswa dinyatakan Lulus bila seluruh nilai memenuhi KKM..."
+              class="w-full p-3.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all resize-none"></textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 2: KONFIGURASI KOMPONEN REPORT CARD
+           ==================================================================== -->
+      <div id="setting-panel-reportcard" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div class="flex items-center gap-3">
+              <h3 class="text-base font-bold text-slate-900">Bobot Komponen Penilaian Report Card</h3>
+              <span id="reportcard-total-badge" class="px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60">
+                Total: 100%
+              </span>
+            </div>
+            <button onclick="saveReportCardConfigForm()"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer self-start sm:self-auto">
+              <i class="fa-solid fa-check"></i> Simpan Bobot Rapor
+            </button>
+          </div>
+
+          <!-- Bobot Persentase 4 Aspek -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">Teori Dasar & Kejuruan</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rc-bobot-teori" min="0" max="100" oninput="calculateTotalBobot()"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">%</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">Praktik Kerja / Kinerja</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rc-bobot-praktik" min="0" max="100" oninput="calculateTotalBobot()"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">%</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">Sikap & Kedisiplinan</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rc-bobot-sikap" min="0" max="100" oninput="calculateTotalBobot()"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">%</span>
+              </div>
+            </div>
+
+            <div class="p-4 rounded-xl border border-slate-200/70 bg-slate-50/40 space-y-2">
+              <label class="block text-xs font-semibold text-slate-700">Safety, 5S & K3</label>
+              <div class="flex items-center gap-2">
+                <input type="number" id="rc-bobot-safety" min="0" max="100" oninput="calculateTotalBobot()"
+                  class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-sm font-bold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+                <span class="text-xs text-slate-400 font-medium">%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Opsi Tampilan di Rapor Siswa -->
+          <div class="border-t border-slate-100 pt-5 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Komponen Tampilan Cetak</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/40 cursor-pointer hover:bg-white transition-all">
+                <span class="text-xs font-semibold text-slate-800">Peringkat / Ranking</span>
+                <input type="checkbox" id="rc-toggle-ranking" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer">
+              </label>
+
+              <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/40 cursor-pointer hover:bg-white transition-all">
+                <span class="text-xs font-semibold text-slate-800">Grafik Radar Skill</span>
+                <input type="checkbox" id="rc-toggle-radar" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer">
+              </label>
+
+              <label class="flex items-center justify-between p-3.5 rounded-xl border border-slate-200/80 bg-slate-50/40 cursor-pointer hover:bg-white transition-all">
+                <span class="text-xs font-semibold text-slate-800">Catatan Khusus SPV</span>
+                <input type="checkbox" id="rc-toggle-catatan" class="rounded text-blue-600 focus:ring-blue-500 w-4 h-4 cursor-pointer">
+              </label>
+            </div>
+          </div>
+
+          <!-- Batas Rentang Predikat -->
+          <div class="border-t border-slate-100 pt-5 space-y-3">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400">Standar Predikat Nilai</h4>
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-700">Ambang Predikat A (Sangat Baik)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="rc-grade-a" min="0" max="100"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-blue-600">
+                  <span class="text-xs text-slate-400 font-medium">ke atas</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-700">Ambang Predikat B (Baik / Kompeten)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="rc-grade-b" min="0" max="100"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-blue-600">
+                  <span class="text-xs text-slate-400 font-medium">ke atas</span>
+                </div>
+              </div>
+
+              <div class="space-y-1.5">
+                <label class="block text-xs font-semibold text-slate-700">Ambang Predikat C (Cukup / Butuh Bimbingan)</label>
+                <div class="flex items-center gap-2">
+                  <input type="number" id="rc-grade-c" min="0" max="100"
+                    class="w-full px-3 py-2 bg-white border border-slate-200 rounded-lg text-xs font-semibold text-slate-900 outline-none focus:border-blue-600">
+                  <span class="text-xs text-slate-400 font-medium">ke atas</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 3: TEMPLATE SERTIFIKAT
+           ==================================================================== -->
+      <div id="setting-panel-sertifikat" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Konfigurasi Template Sertifikat Kelulusan</h3>
+            </div>
+            <button onclick="saveCertificateConfigForm()"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer self-start sm:self-auto">
+              <i class="fa-solid fa-check"></i> Simpan Template
+            </button>
+          </div>
+
+          <!-- Format Nomor Sertifikat -->
+          <div class="p-4 bg-slate-50/60 rounded-xl border border-slate-200/70 space-y-2">
+            <label class="block text-xs font-semibold text-slate-800">Format Template Nomor Sertifikat</label>
+            <input type="text" id="cert-nomor-format" oninput="updateCertPreview()" placeholder="LTC/P5/{YYYY}/{BATCH}/{NO}"
+              class="w-full px-3.5 py-2.5 bg-white border border-slate-200 rounded-xl text-xs font-mono font-semibold text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100">
+            <div class="flex items-center gap-2 text-[11px] text-slate-500 pt-1">
+              <span>Contoh hasil nomor terbit:</span>
+              <span id="cert-nomor-preview" class="font-mono font-bold text-blue-700 bg-blue-50 px-2 py-0.5 rounded border border-blue-200/60">
+                LTC/P5/2026/BATCH-A/001
+              </span>
+            </div>
+          </div>
+
+          <!-- Data Penandatangan -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Penandatangan 1 -->
+            <div class="p-4 rounded-xl border border-slate-200/70 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2">
+                <i class="fa-solid fa-signature text-blue-600"></i>
+                <span>Penandatangan 1 (Pihak Manajemen Pabrik)</span>
+              </div>
+              <div class="space-y-2">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Lengkap & Gelar</label>
+                  <input type="text" id="cert-p1-nama" placeholder="misal: Ir. H. Hendra Wijaya"
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jabatan</label>
+                  <input type="text" id="cert-p1-jabatan" placeholder="Plant Manager - Plant 5 Casting"
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">NPK / Identitas</label>
+                  <input type="text" id="cert-p1-npk" placeholder="MGR-5001"
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 outline-none focus:border-blue-600">
+                </div>
+              </div>
+            </div>
+
+            <!-- Penandatangan 2 -->
+            <div class="p-4 rounded-xl border border-slate-200/70 space-y-3">
+              <div class="flex items-center gap-2 text-xs font-bold text-slate-800 border-b border-slate-100 pb-2">
+                <i class="fa-solid fa-signature text-blue-600"></i>
+                <span>Penandatangan 2 (Pihak HRD / LTC Head)</span>
+              </div>
+              <div class="space-y-2">
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Nama Lengkap & Gelar</label>
+                  <input type="text" id="cert-p2-nama" placeholder="misal: Siti Rahmawati, S.Psi."
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">Jabatan</label>
+                  <input type="text" id="cert-p2-jabatan" placeholder="HRD & Training Center Manager"
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+                </div>
+                <div>
+                  <label class="block text-[11px] font-semibold text-slate-600 mb-1">NPK / Identitas</label>
+                  <input type="text" id="cert-p2-npk" placeholder="HRD-2015"
+                    class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 outline-none focus:border-blue-600">
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stempel & Masa Berlaku -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-2">
+            <div class="flex items-center justify-between p-4 bg-slate-50/60 rounded-xl border border-slate-200/70">
+              <div>
+                <span class="block text-xs font-semibold text-slate-800">Tampilkan Stempel Resmi Digital</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="cert-stempel-aktif" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Masa Berlaku Sertifikasi</label>
+              <input type="text" id="cert-masa-berlaku" placeholder="3 Tahun sejak diterbitkan"
+                class="w-full px-3.5 py-2.5 bg-slate-50/50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 4: BATCH & ANGKATAN
+           ==================================================================== -->
+      <div id="setting-panel-batch" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Identitas Batch & Angkatan Siswa</h3>
+            </div>
+            <button onclick="saveBatchSettingsForm()"
+              class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer self-start sm:self-auto">
+              <i class="fa-solid fa-check"></i> Simpan Perubahan Batch
+            </button>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Batch Aktif Saat Ini</label>
+              <input type="text" id="setting-batch-aktif" placeholder="misal: Batch 2026-A"
+                class="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-800 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+            </div>
+
+            <div class="flex items-center justify-between p-4 bg-slate-50/60 rounded-xl border border-slate-200/70">
+              <div>
+                <span class="block text-xs font-semibold text-slate-800">Auto-Backup Snapshot Harian</span>
+              </div>
+              <label class="relative inline-flex items-center cursor-pointer">
+                <input type="checkbox" id="setting-backup-auto" checked class="sr-only peer">
+                <div class="w-11 h-6 bg-slate-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-slate-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-blue-600"></div>
+              </label>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 5: DAFTAR MESIN PRODUKSI
+           ==================================================================== -->
+      <div id="setting-panel-machines" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Daftar Mesin Produksi</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="search-setting-machine" oninput="filterMachineTable()" placeholder="Cari mesin / section..."
+                class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-blue-600 w-48">
+              <button onclick="openMachineModal()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer">
+                <i class="fa-solid fa-plus"></i> Tambah Mesin
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                <tr>
+                  <th class="py-3 px-4">Kode Mesin</th>
+                  <th class="py-3 px-4">Nama Mesin</th>
+                  <th class="py-3 px-3">Section / Line</th>
+                  <th class="py-3 px-3">Tipe / Kapasitas</th>
+                  <th class="py-3 px-3 text-center">Status</th>
+                  <th class="py-3 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="setting-machines-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="6" class="py-8 text-center text-slate-400">Memuat data mesin...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 6: PRODUK & TARGET
+           ==================================================================== -->
+      <div id="setting-panel-products" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Master Produk & Target Manufaktur</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="search-setting-product" oninput="filterProductTable()" placeholder="Cari produk / kode..."
+                class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-blue-600 w-48">
+              <button onclick="openProductModal()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer">
+                <i class="fa-solid fa-plus"></i> Tambah Produk
+              </button>
+            </div>
+          </div>
+
+          <!-- Quick Filter Lini Proses -->
+          <div class="flex items-center gap-2 text-xs">
+            <span class="text-slate-400 font-semibold text-[11px] uppercase tracking-wider">Lini Proses:</span>
+            <button type="button" onclick="filterProductByProcess('ALL')" id="filter-proc-all"
+              class="filter-proc-btn px-3 py-1 rounded-lg font-semibold bg-slate-900 text-white transition-all cursor-pointer">
+              Semua (236)
+            </button>
+            <button type="button" onclick="filterProductByProcess('FBO')" id="filter-proc-fbo"
+              class="filter-proc-btn px-3 py-1 rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+              FBO Line (155)
+            </button>
+            <button type="button" onclick="filterProductByProcess('FURAN')" id="filter-proc-furan"
+              class="filter-proc-btn px-3 py-1 rounded-lg font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+              Furan Line (80)
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70 shadow-2xs">
+            <table class="w-full text-left text-xs text-slate-600 min-w-[1050px] border-collapse">
+              <thead class="bg-slate-50/90 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/80">
+                <tr>
+                  <th class="py-3.5 px-4 min-w-[220px] text-left">Nama Produk & Berat</th>
+                  <th class="py-3.5 px-3 min-w-[80px] text-center whitespace-nowrap">Kode Part</th>
+                  <th class="py-3.5 px-2.5 min-w-[65px] text-center whitespace-nowrap">Lini</th>
+                  <th class="py-3.5 px-2.5 min-w-[60px] text-center whitespace-nowrap" title="Target Mould per Ladle">Ladle</th>
+                  <th class="py-3.5 px-2.5 min-w-[65px] text-center whitespace-nowrap" title="Target / CT Melting (Menit)">Melting</th>
+                  <th class="py-3.5 px-2.5 min-w-[60px] text-center whitespace-nowrap" title="Target Core (Pcs/MP)">Core</th>
+                  <th class="py-3.5 px-2.5 min-w-[60px] text-center whitespace-nowrap" title="Target Furan (Pcs/MP)">Furan</th>
+                  <th class="py-3.5 px-2.5 min-w-[70px] text-center whitespace-nowrap" title="Target Grinding (Pcs/MP)">Grinding</th>
+                  <th class="py-3.5 px-2.5 min-w-[75px] text-center whitespace-nowrap" title="Target Shotblast (Pcs/MP)">Shotblast</th>
+                  <th class="py-3.5 px-2.5 min-w-[65px] text-center whitespace-nowrap" title="Target Turning Bubut (Pcs/MP)">Turning</th>
+                  <th class="py-3.5 px-2.5 min-w-[65px] text-center whitespace-nowrap" title="Target Milling Frais (Pcs/MP)">Milling</th>
+                  <th class="py-3.5 px-3 min-w-[80px] text-center whitespace-nowrap">Status</th>
+                  <th class="py-3.5 px-3 min-w-[70px] text-center whitespace-nowrap">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="setting-products-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="13" class="py-8 text-center text-slate-400">Memuat data produk...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 7: DAFTAR SPV
+           ==================================================================== -->
+      <div id="setting-panel-spv" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Daftar Supervisor & Instruktur Pembina</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="search-setting-spv" oninput="filterSpvTable()" placeholder="Cari SPV / NPK..."
+                class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-blue-600 w-48">
+              <button onclick="openSpvModal()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer">
+                <i class="fa-solid fa-plus"></i> Tambah SPV
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                <tr>
+                  <th class="py-3 px-4">Nama SPV</th>
+                  <th class="py-3 px-3">NIK / NPK</th>
+                  <th class="py-3 px-3">Departemen</th>
+                  <th class="py-3 px-3">Section Binaan</th>
+                  <th class="py-3 px-3 text-center">Status</th>
+                  <th class="py-3 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="setting-spv-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="6" class="py-8 text-center text-slate-400">Memuat data supervisor...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 8: DAFTAR SECTION
+           ==================================================================== -->
+      <div id="setting-panel-sections" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Daftar Section & Line Produksi</h3>
+            </div>
+            <div class="flex items-center gap-2">
+              <input type="text" id="search-setting-section" oninput="filterSectionTable()" placeholder="Cari section..."
+                class="px-3 py-1.5 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-blue-600 w-48">
+              <button onclick="openSectionModal()"
+                class="px-4 py-2 bg-blue-600 hover:bg-blue-700 active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer">
+                <i class="fa-solid fa-plus"></i> Tambah Section
+              </button>
+            </div>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                <tr>
+                  <th class="py-3 px-4">Nama Section</th>
+                  <th class="py-3 px-3">Departemen</th>
+                  <th class="py-3 px-4">Keterangan</th>
+                  <th class="py-3 px-3 text-center">Status</th>
+                  <th class="py-3 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="setting-sections-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="py-8 text-center text-slate-400">Memuat data section...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 9: LOG AKTIVITAS ADMIN (AUDIT TRAIL)
+           ==================================================================== -->
+      <div id="setting-panel-logs" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Audit Trail Aktivitas Admin</h3>
+            </div>
+            <button onclick="fetchActivityLogs()"
+              class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
+              <i class="fa-solid fa-rotate text-xs"></i> Refresh Log
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                <tr>
+                  <th class="py-3 px-4">Waktu</th>
+                  <th class="py-3 px-3">Admin</th>
+                  <th class="py-3 px-3">Aksi</th>
+                  <th class="py-3 px-3">Modul</th>
+                  <th class="py-3 px-4">Deskripsi Aktivitas</th>
+                </tr>
+              </thead>
+              <tbody id="setting-logs-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="py-8 text-center text-slate-400">Memuat riwayat log aktivitas...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 10: RECYCLE BIN & DATA RECOVERY
+           ==================================================================== -->
+      <div id="setting-panel-recycle" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-5">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Recycle Bin & Data Recovery</h3>
+            </div>
+            <button onclick="fetchRecycleBinItems()"
+              class="px-3.5 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs flex items-center gap-2 transition-all cursor-pointer">
+              <i class="fa-solid fa-rotate text-xs"></i> Muat Ulang
+            </button>
+          </div>
+
+          <div class="overflow-x-auto rounded-xl border border-slate-200/70">
+            <table class="w-full text-left text-xs text-slate-600">
+              <thead class="bg-slate-50/80 text-[11px] font-bold uppercase tracking-wider text-slate-500 border-b border-slate-200/70">
+                <tr>
+                  <th class="py-3 px-4">Tipe Data</th>
+                  <th class="py-3 px-4">Nama / Identitas Item</th>
+                  <th class="py-3 px-3">Dihapus Oleh</th>
+                  <th class="py-3 px-3">Waktu Hapus</th>
+                  <th class="py-3 px-4 text-center">Aksi</th>
+                </tr>
+              </thead>
+              <tbody id="setting-recycle-tbody" class="divide-y divide-slate-100">
+                <tr><td colspan="5" class="py-8 text-center text-slate-400">Memuat data terhapus...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 11: MASTER SECURITY PIN
+           ==================================================================== -->
+      <div id="setting-panel-pin" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="border-b border-slate-100 pb-4">
+            <h3 class="text-base font-bold text-slate-900">Master Security PIN (Super Admin)</h3>
+          </div>
+
+          <div class="max-w-md space-y-4">
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Master PIN Saat Ini</label>
+              <input type="password" id="setting-pin-current" placeholder="••••••" maxlength="12"
+                class="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+            </div>
+
+            <div class="space-y-1.5">
+              <label class="block text-xs font-semibold text-slate-700">Master PIN Baru (Min. 6 Karakter)</label>
+              <input type="password" id="setting-pin-new" placeholder="••••••" maxlength="12"
+                class="w-full px-3.5 py-2.5 bg-slate-50/50 hover:bg-white focus:bg-white border border-slate-200 rounded-xl text-xs font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-blue-600 focus:ring-2 focus:ring-blue-100 transition-all">
+            </div>
+
+            <button onclick="handleUpdateMasterPin()"
+              class="w-full py-2.5 bg-slate-900 hover:bg-black active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer">
+              <i class="fa-solid fa-lock text-xs"></i> Perbarui Master PIN
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ====================================================================
+           PANEL 12: BACKUP & SNAPSHOT
+           ==================================================================== -->
+      <div id="setting-panel-backup" class="setting-panel hidden space-y-6 animate-fadeIn">
+        <div class="bg-white rounded-2xl border border-slate-200/70 p-6 shadow-2xs space-y-6">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-4">
+            <div>
+              <h3 class="text-base font-bold text-slate-900">Cadangan Data & Snapshot Sistem</h3>
+            </div>
+            <button onclick="downloadCompleteBackupJson()"
+              class="px-4 py-2 bg-slate-900 hover:bg-black active:scale-98 text-white font-medium rounded-xl text-xs flex items-center justify-center gap-2 transition-all shadow-xs cursor-pointer self-start sm:self-auto">
+              <i class="fa-solid fa-download text-xs"></i> Unduh Snapshot JSON
+            </button>
+          </div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Siswa Aktif</span>
+              <span id="backup-count-siswa" class="text-lg font-black text-slate-900">-</span>
+            </div>
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Data Absensi</span>
+              <span id="backup-count-absensi" class="text-lg font-black text-slate-900">-</span>
+            </div>
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Daftar Mesin</span>
+              <span id="backup-count-machines" class="text-lg font-black text-slate-900">-</span>
+            </div>
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Master Produk</span>
+              <span id="backup-count-products" class="text-lg font-black text-slate-900">-</span>
+            </div>
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Instruktur SPV</span>
+              <span id="backup-count-spv" class="text-lg font-black text-slate-900">-</span>
+            </div>
+            <div class="p-3.5 rounded-xl border border-slate-200/70 bg-slate-50/40 text-center">
+              <span class="block text-[11px] font-medium text-slate-500">Recycle Bin</span>
+              <span id="backup-count-recycle" class="text-lg font-black text-slate-900">-</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </main>
+  </div>
+</div>
+
+<!-- ==============================================================================
+     MODAL: TAMBAH / EDIT MESIN
+     ============================================================================== -->
+<div id="modal-setting-machine" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200/80 space-y-5 animate-scaleUp">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 id="modal-machine-title" class="text-sm font-bold text-slate-900">Tambah Mesin Baru</h3>
+      <button onclick="closeMachineModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+
+    <input type="hidden" id="form-machine-id">
+    <div class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Kode Mesin *</label>
+        <input type="text" id="form-machine-kode" placeholder="misal: MC-FBO-01"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono font-semibold text-slate-900 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Mesin *</label>
+        <input type="text" id="form-machine-nama" placeholder="misal: Mesin FBO / Moulding Line"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Section / Area Line</label>
+        <select id="form-machine-section" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+          <option value="">-- Pilih Section --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Tipe / Kapasitas Teknis</label>
+        <input type="text" id="form-machine-kapasitas" placeholder="misal: Line Otomatis 60 Mould/Jam"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Status Operasional</label>
+        <select id="form-machine-status" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="AKTIF">AKTIF</option>
+          <option value="MAINTENANCE">MAINTENANCE</option>
+          <option value="STANDBY">STANDBY</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
+      <button onclick="closeMachineModal()" class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition-all cursor-pointer">Batal</button>
+      <button onclick="submitMachineForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs transition-all shadow-xs cursor-pointer">Simpan Mesin</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================================================================
+     MODAL: TAMBAH / EDIT SPV
+     ============================================================================== -->
+<div id="modal-setting-spv" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200/80 space-y-5 animate-scaleUp">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 id="modal-spv-title" class="text-sm font-bold text-slate-900">Tambah SPV Baru</h3>
+      <button onclick="closeSpvModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+
+    <input type="hidden" id="form-spv-id">
+    <div class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Lengkap *</label>
+        <input type="text" id="form-spv-nama" placeholder="misal: Bima Agung Setiawan"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">NIK / NPK</label>
+        <input type="text" id="form-spv-nik" placeholder="SPV-2011"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Departemen</label>
+        <select id="form-spv-departemen" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="Produksi">Produksi</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Quality Control">Quality Control</option>
+          <option value="PPIC">PPIC</option>
+          <option value="SHE">SHE</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Section Binaan</label>
+        <select id="form-spv-section" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+          <option value="">-- Pilih Section --</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Status Keaktifan</label>
+        <select id="form-spv-status" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="AKTIF">AKTIF</option>
+          <option value="NONAKTIF">NONAKTIF</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
+      <button onclick="closeSpvModal()" class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition-all cursor-pointer">Batal</button>
+      <button onclick="submitSpvForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs transition-all shadow-xs cursor-pointer">Simpan SPV</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================================================================
+     MODAL: TAMBAH / EDIT PRODUK
+     ============================================================================== -->
+<div id="modal-setting-product" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200/80 space-y-5 animate-scaleUp">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 id="modal-product-title" class="text-sm font-bold text-slate-900">Tambah Produk Baru</h3>
+      <button onclick="closeProductModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+
+    <input type="hidden" id="form-product-id">
+    <div class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Produk *</label>
+        <input type="text" id="form-product-nama" placeholder="misal: Brake Drum Hino Dutro"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div class="grid grid-cols-2 gap-3">
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Part No / Kode</label>
+          <input type="text" id="form-product-kode" placeholder="BD-HN-DUTRO"
+            class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-mono text-slate-800 outline-none focus:border-blue-600">
+        </div>
+        <div>
+          <label class="block text-xs font-semibold text-slate-700 mb-1">Section</label>
+          <select id="form-product-section" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+            <option value="">-- Pilih Section --</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Rincian Target Operasional per Stasiun Kerja -->
+      <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+        <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-700">Rincian Target per Stasiun Kerja</label>
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Ladle (Mould)</label>
+            <input type="number" id="form-product-target-ladle" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Melting (Menit)</label>
+            <input type="number" step="0.1" id="form-product-target-melting" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Core (Pcs/MP)</label>
+            <input type="number" id="form-product-target-core" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Furan (Pcs/MP)</label>
+            <input type="number" id="form-product-target-furan" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Grinding (Pcs)</label>
+            <input type="number" id="form-product-target-grinding" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Shotblast (Pcs)</label>
+            <input type="number" id="form-product-target-shotblast" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Turning (Bubut)</label>
+            <input type="number" id="form-product-target-turning" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+          <div>
+            <label class="block text-[10px] font-semibold text-slate-500 mb-0.5">Milling (Frais)</label>
+            <input type="number" id="form-product-target-milling" placeholder="0" class="w-full px-2 py-1.5 bg-white border border-slate-200 rounded-lg text-xs font-bold text-slate-800 outline-none focus:border-blue-600 text-center">
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Standar Kualitas / Toleransi Defect</label>
+        <input type="text" id="form-product-kualitas" placeholder="misal: Balancing tolerance <= 2g, Defect < 0.5%"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Status Produk</label>
+        <select id="form-product-status" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="AKTIF">AKTIF</option>
+          <option value="NONAKTIF">NONAKTIF</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
+      <button onclick="closeProductModal()" class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition-all cursor-pointer">Batal</button>
+      <button onclick="submitProductForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs transition-all shadow-xs cursor-pointer">Simpan Produk</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================================================================
+     MODAL: TAMBAH / EDIT SECTION
+     ============================================================================== -->
+<div id="modal-setting-section" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/40 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-xl border border-slate-200/80 space-y-5 animate-scaleUp">
+    <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+      <h3 id="modal-section-title" class="text-sm font-bold text-slate-900">Tambah Section Baru</h3>
+      <button onclick="closeSectionModal()" class="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"><i class="fa-solid fa-xmark text-sm"></i></button>
+    </div>
+
+    <input type="hidden" id="form-section-id">
+    <div class="space-y-3.5">
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Nama Section *</label>
+        <input type="text" id="form-section-nama" placeholder="misal: GRINDING"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Departemen</label>
+        <select id="form-section-departemen" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="Produksi">Produksi</option>
+          <option value="Engineering">Engineering</option>
+          <option value="Quality Control">Quality Control</option>
+          <option value="PPIC">PPIC</option>
+          <option value="SHE">SHE</option>
+        </select>
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Keterangan / Fungsi Area</label>
+        <input type="text" id="form-section-keterangan" placeholder="misal: Lini gerinda coran, pembersihan burr & toleransi Ra"
+          class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-blue-600">
+      </div>
+
+      <div>
+        <label class="block text-xs font-semibold text-slate-700 mb-1">Status Section</label>
+        <select id="form-section-status" class="w-full px-3 py-2 bg-slate-50/50 border border-slate-200 rounded-lg text-xs font-semibold text-slate-800 outline-none focus:border-blue-600">
+          <option value="AKTIF">AKTIF</option>
+          <option value="NONAKTIF">NONAKTIF</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="flex items-center justify-end gap-2 border-t border-slate-100 pt-4">
+      <button onclick="closeSectionModal()" class="px-3.5 py-1.5 text-xs text-slate-600 hover:bg-slate-100 rounded-lg transition-all cursor-pointer">Batal</button>
+      <button onclick="submitSectionForm()" class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl text-xs transition-all shadow-xs cursor-pointer">Simpan Section</button>
+    </div>
+  </div>
+</div>
+
+<!-- ==============================================================================
+     MODAL: VERIFIKASI PIN HAPUS PERMANEN (RECYCLE BIN)
+     ============================================================================== -->
+<div id="modal-permanent-delete" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900/50 backdrop-blur-xs hidden p-4">
+  <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200/90 space-y-4 animate-scaleUp">
+    <div class="text-center space-y-1">
+      <div class="w-10 h-10 rounded-full bg-rose-100 text-rose-600 flex items-center justify-center mx-auto mb-2">
+        <i class="fa-solid fa-triangle-exclamation text-base"></i>
+      </div>
+      <h3 class="text-sm font-bold text-slate-900">Hapus Permanen Data</h3>
+      <p class="text-[11px] text-slate-500">Tindakan ini tidak dapat dibatalkan. Masukkan Master Security PIN Super Admin untuk melanjutkan.</p>
+    </div>
+
+    <input type="hidden" id="permanent-delete-item-id">
+    <div class="space-y-1.5">
+      <input type="password" id="permanent-delete-pin" placeholder="••••••" maxlength="12"
+        class="w-full text-center px-4 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-sm font-mono font-bold tracking-widest text-slate-900 outline-none focus:border-rose-500 focus:ring-2 focus:ring-rose-100">
+    </div>
+
+    <div class="flex items-center justify-end gap-2 pt-2">
+      <button onclick="closePermanentDeleteModal()" class="w-1/2 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-100 rounded-xl transition-all cursor-pointer">Batal</button>
+      <button onclick="submitPermanentDelete()" class="w-1/2 py-2 bg-rose-600 hover:bg-rose-700 text-white font-semibold rounded-xl text-xs transition-all shadow-xs cursor-pointer">Hapus Permanen</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast Container -->
+<div id="setting-toast-container" class="fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none"></div>
+
+<script is:inline>
+  // Helper Toast Feedback
+  function showSettingToast(msg, type = 'success') {
+    let container = document.getElementById('setting-toast-container');
+    if (!container) {
+      container = document.createElement('div');
+      container.id = 'setting-toast-container';
+      container.className = 'fixed bottom-6 right-6 z-50 space-y-2 pointer-events-none';
+      document.body.appendChild(container);
+    }
+    const toast = document.createElement('div');
+    toast.className = `p-3 px-4 rounded-xl shadow-lg border text-xs font-semibold flex items-center gap-2.5 transition-all duration-300 animate-slideIn pointer-events-auto ${
+      type === 'success' ? 'bg-slate-900 text-white border-slate-800' : 'bg-rose-600 text-white border-rose-500'
+    }`;
+    toast.innerHTML = `<i class="fa-solid ${type === 'success' ? 'fa-circle-check text-emerald-400' : 'fa-circle-exclamation text-white'} text-sm"></i> <span>${msg}</span>`;
+    container.appendChild(toast);
+    setTimeout(() => {
+      toast.classList.add('opacity-0', 'translate-y-2');
+      setTimeout(() => toast.remove(), 300);
+    }, 3200);
+  }
+
+  // Helper RPC Call
+  async function executeRpcCall(action, args = []) {
+    const res = await fetch('/api/rpc', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action, args })
+    });
+    if (!res.ok) {
+      const err = await res.json().catch(() => ({}));
+      throw new Error(err.message || `RPC Error HTTP ${res.status}`);
+    }
+    return await res.json();
+  }
+
+  // Switch Sub-Tab Logic (Two-Column Navigation - Royal Blue Container, Pure Solid White #ffffff Active Button)
+  function switchSettingSubTab(tab) {
+    document.querySelectorAll('.setting-subtab-btn').forEach(btn => {
+      btn.classList.remove('active-subtab');
+      btn.style.setProperty('background-color', 'transparent', 'important');
+      btn.style.setProperty('color', '#ffffff', 'important');
+      btn.style.fontWeight = '400';
+      const span = btn.querySelector('span');
+      if (span) {
+        span.style.setProperty('color', '#ffffff', 'important');
+        span.style.fontWeight = '400';
+      }
+      const badge = btn.querySelector('.nav-count-badge');
+      if (badge && !badge.classList.contains('badge-recycle')) {
+        badge.style.setProperty('background-color', 'rgba(255, 255, 255, 0.2)', 'important');
+        badge.style.setProperty('color', '#ffffff', 'important');
+      }
+    });
+
+    const activeBtn = document.getElementById('setting-nav-' + tab);
+    if (activeBtn) {
+      activeBtn.classList.add('active-subtab');
+      activeBtn.style.setProperty('background-color', '#ffffff', 'important');
+      activeBtn.style.setProperty('color', '#000000', 'important');
+      activeBtn.style.fontWeight = '400';
+      const span = activeBtn.querySelector('span');
+      if (span) {
+        span.style.setProperty('color', '#000000', 'important');
+        span.style.fontWeight = '400';
+      }
+      const badge = activeBtn.querySelector('.nav-count-badge');
+      if (badge && !badge.classList.contains('badge-recycle')) {
+        badge.style.setProperty('background-color', '#f1f5f9', 'important');
+        badge.style.setProperty('color', '#000000', 'important');
+      }
+    }
+
+    document.querySelectorAll('.setting-panel').forEach(panel => panel.classList.add('hidden'));
+    const activePanel = document.getElementById('setting-panel-' + tab);
+    if (activePanel) activePanel.classList.remove('hidden');
+
+    // Trigger data fetching for respective tab
+    if (tab === 'kelulusan') fetchGraduationRules();
+    if (tab === 'reportcard') fetchReportCardConfig();
+    if (tab === 'sertifikat') fetchCertificateConfig();
+    if (tab === 'batch') fetchBatchSettings();
+    if (tab === 'machines') fetchMachineList();
+    if (tab === 'products') fetchProductList();
+    if (tab === 'spv') fetchSpvList();
+    if (tab === 'sections') fetchSectionList();
+    if (tab === 'logs') fetchActivityLogs();
+    if (tab === 'recycle') fetchRecycleBinItems();
+    if (tab === 'backup') fetchBackupSummary();
+  }
+  window.switchSettingSubTab = switchSettingSubTab;
+
+  function initAdminSettingTab() {
+    fetchGraduationRules();
+    fetchBackupSummary();
+    fetchRecycleBinItems();
+    fetchSectionList();
+    fetchMachineList();
+    fetchProductList();
+    fetchSpvList();
+  }
+  window.initAdminSettingTab = initAdminSettingTab;
+
+  // ==============================================================================
+  // HELPER: POPULASI DROPDOWN SECTION PADA MODAL
+  // ==============================================================================
+  function updateSectionDropdowns() {
+    const dropdownIds = ['form-machine-section', 'form-spv-section', 'form-product-section'];
+    dropdownIds.forEach(id => {
+      const el = document.getElementById(id);
+      if (!el) return;
+      const current = el.value;
+      let opts = '<option value="">-- Pilih Section --</option>';
+      (sectionCache || []).forEach(sec => {
+        opts += `<option value="${sec.nama_section}">${sec.nama_section} (${sec.departemen || 'Produksi'})</option>`;
+      });
+      el.innerHTML = opts;
+      if (current) el.value = current;
+    });
+  }
+
+  // ==============================================================================
+  // 1. ATURAN KELULUSAN & KKM
+  // ==============================================================================
+  async function fetchGraduationRules() {
+    try {
+      const res = await executeRpcCall('getGraduationRules', [5]);
+      if (res && res.data) {
+        const d = res.data;
+        if (document.getElementById('rule-kkm-teori')) document.getElementById('rule-kkm-teori').value = d.kkm_teori ?? 75;
+        if (document.getElementById('rule-kkm-praktik')) document.getElementById('rule-kkm-praktik').value = d.kkm_praktik ?? 80;
+        if (document.getElementById('rule-kkm-sikap')) document.getElementById('rule-kkm-sikap').value = d.kkm_sikap ?? 80;
+        if (document.getElementById('rule-min-absensi')) document.getElementById('rule-min-absensi').value = d.min_absensi ?? 90;
+        if (document.getElementById('rule-max-alpa')) document.getElementById('rule-max-alpa').value = d.max_alpa ?? 2;
+        if (document.getElementById('rule-evaluasi-mode')) document.getElementById('rule-evaluasi-mode').value = d.evaluasi_mode || 'AUTOMATIC';
+        if (document.getElementById('rule-catatan')) document.getElementById('rule-catatan').value = d.catatan_kelulusan || '';
+      }
+    } catch (err) {
+      console.warn('[fetchGraduationRules Error]:', err);
+    }
+  }
+  window.fetchGraduationRules = fetchGraduationRules;
+
+  async function saveGraduationRulesForm() {
+    try {
+      const payload = {
+        kkm_teori: Number(document.getElementById('rule-kkm-teori')?.value || 75),
+        kkm_praktik: Number(document.getElementById('rule-kkm-praktik')?.value || 80),
+        kkm_sikap: Number(document.getElementById('rule-kkm-sikap')?.value || 80),
+        min_absensi: Number(document.getElementById('rule-min-absensi')?.value || 90),
+        max_alpa: Number(document.getElementById('rule-max-alpa')?.value || 2),
+        evaluasi_mode: document.getElementById('rule-evaluasi-mode')?.value || 'AUTOMATIC',
+        catatan_kelulusan: document.getElementById('rule-catatan')?.value || ''
+      };
+
+      const res = await executeRpcCall('saveGraduationRules', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Aturan kelulusan & KKM berhasil disimpan!');
+      } else {
+        showSettingToast(res.message || 'Gagal menyimpan aturan kelulusan', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.saveGraduationRulesForm = saveGraduationRulesForm;
+
+  // ==============================================================================
+  // 2. KOMPONEN REPORT CARD
+  // ==============================================================================
+  function calculateTotalBobot() {
+    const teori = Number(document.getElementById('rc-bobot-teori')?.value || 0);
+    const praktik = Number(document.getElementById('rc-bobot-praktik')?.value || 0);
+    const sikap = Number(document.getElementById('rc-bobot-sikap')?.value || 0);
+    const safety = Number(document.getElementById('rc-bobot-safety')?.value || 0);
+    const total = teori + praktik + sikap + safety;
+
+    const badge = document.getElementById('reportcard-total-badge');
+    if (badge) {
+      badge.innerText = `Total: ${total}%`;
+      if (total === 100) {
+        badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+      } else {
+        badge.className = 'px-2.5 py-1 rounded-full text-xs font-bold bg-rose-50 text-rose-700 border border-rose-200/60 animate-pulse';
+      }
+    }
+    return total;
+  }
+  window.calculateTotalBobot = calculateTotalBobot;
+
+  async function fetchReportCardConfig() {
+    try {
+      const res = await executeRpcCall('getReportCardConfig', [5]);
+      if (res && res.data) {
+        const d = res.data;
+        if (document.getElementById('rc-bobot-teori')) document.getElementById('rc-bobot-teori').value = d.bobot_teori ?? 25;
+        if (document.getElementById('rc-bobot-praktik')) document.getElementById('rc-bobot-praktik').value = d.bobot_praktik ?? 45;
+        if (document.getElementById('rc-bobot-sikap')) document.getElementById('rc-bobot-sikap').value = d.bobot_sikap ?? 15;
+        if (document.getElementById('rc-bobot-safety')) document.getElementById('rc-bobot-safety').value = d.bobot_safety_5s ?? 15;
+        if (document.getElementById('rc-toggle-ranking')) document.getElementById('rc-toggle-ranking').checked = d.tampilkan_ranking !== false;
+        if (document.getElementById('rc-toggle-radar')) document.getElementById('rc-toggle-radar').checked = d.tampilkan_radar !== false;
+        if (document.getElementById('rc-toggle-catatan')) document.getElementById('rc-toggle-catatan').checked = d.tampilkan_catatan_spv !== false;
+        if (document.getElementById('rc-grade-a')) document.getElementById('rc-grade-a').value = d.grade_a_min ?? 90;
+        if (document.getElementById('rc-grade-b')) document.getElementById('rc-grade-b').value = d.grade_b_min ?? 80;
+        if (document.getElementById('rc-grade-c')) document.getElementById('rc-grade-c').value = d.grade_c_min ?? 70;
+        calculateTotalBobot();
+      }
+    } catch (err) {
+      console.warn('[fetchReportCardConfig Error]:', err);
+    }
+  }
+  window.fetchReportCardConfig = fetchReportCardConfig;
+
+  async function saveReportCardConfigForm() {
+    const total = calculateTotalBobot();
+    if (total !== 100) {
+      return alert(`Total bobot komponen penilaian harus tepat 100% (saat ini: ${total}%). Harap sesuaikan!`);
+    }
+
+    try {
+      const payload = {
+        bobot_teori: Number(document.getElementById('rc-bobot-teori')?.value || 25),
+        bobot_praktik: Number(document.getElementById('rc-bobot-praktik')?.value || 45),
+        bobot_sikap: Number(document.getElementById('rc-bobot-sikap')?.value || 15),
+        bobot_safety_5s: Number(document.getElementById('rc-bobot-safety')?.value || 15),
+        tampilkan_ranking: document.getElementById('rc-toggle-ranking')?.checked ?? true,
+        tampilkan_radar: document.getElementById('rc-toggle-radar')?.checked ?? true,
+        tampilkan_catatan_spv: document.getElementById('rc-toggle-catatan')?.checked ?? true,
+        grade_a_min: Number(document.getElementById('rc-grade-a')?.value || 90),
+        grade_b_min: Number(document.getElementById('rc-grade-b')?.value || 80),
+        grade_c_min: Number(document.getElementById('rc-grade-c')?.value || 70)
+      };
+
+      const res = await executeRpcCall('saveReportCardConfig', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Konfigurasi report card berhasil disimpan!');
+      } else {
+        showSettingToast(res.message || 'Gagal menyimpan konfigurasi rapor', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.saveReportCardConfigForm = saveReportCardConfigForm;
+
+  // ==============================================================================
+  // 3. TEMPLATE SERTIFIKAT
+  // ==============================================================================
+  function updateCertPreview() {
+    const fmt = document.getElementById('cert-nomor-format')?.value || 'LTC/P5/{YYYY}/{BATCH}/{NO}';
+    const currentYear = new Date().getFullYear();
+    const rendered = fmt
+      .replace('{YYYY}', currentYear)
+      .replace('{BATCH}', '2026-A')
+      .replace('{NO}', '001');
+    const previewEl = document.getElementById('cert-nomor-preview');
+    if (previewEl) previewEl.innerText = rendered;
+  }
+  window.updateCertPreview = updateCertPreview;
+
+  async function fetchCertificateConfig() {
+    try {
+      const res = await executeRpcCall('getCertificateConfig', [5]);
+      if (res && res.data) {
+        const d = res.data;
+        if (document.getElementById('cert-nomor-format')) document.getElementById('cert-nomor-format').value = d.nomor_format || 'LTC/P5/{YYYY}/{BATCH}/{NO}';
+        if (document.getElementById('cert-p1-nama')) document.getElementById('cert-p1-nama').value = d.penandatangan_1_nama || '';
+        if (document.getElementById('cert-p1-jabatan')) document.getElementById('cert-p1-jabatan').value = d.penandatangan_1_jabatan || '';
+        if (document.getElementById('cert-p1-npk')) document.getElementById('cert-p1-npk').value = d.penandatangan_1_npk || '';
+        if (document.getElementById('cert-p2-nama')) document.getElementById('cert-p2-nama').value = d.penandatangan_2_nama || '';
+        if (document.getElementById('cert-p2-jabatan')) document.getElementById('cert-p2-jabatan').value = d.penandatangan_2_jabatan || '';
+        if (document.getElementById('cert-p2-npk')) document.getElementById('cert-p2-npk').value = d.penandatangan_2_npk || '';
+        if (document.getElementById('cert-stempel-aktif')) document.getElementById('cert-stempel-aktif').checked = d.stempel_aktif !== false;
+        if (document.getElementById('cert-masa-berlaku')) document.getElementById('cert-masa-berlaku').value = d.masa_berlaku || '3 Tahun sejak diterbitkan';
+        updateCertPreview();
+      }
+    } catch (err) {
+      console.warn('[fetchCertificateConfig Error]:', err);
+    }
+  }
+  window.fetchCertificateConfig = fetchCertificateConfig;
+
+  async function saveCertificateConfigForm() {
+    try {
+      const payload = {
+        nomor_format: document.getElementById('cert-nomor-format')?.value.trim() || 'LTC/P5/{YYYY}/{BATCH}/{NO}',
+        penandatangan_1_nama: document.getElementById('cert-p1-nama')?.value.trim() || '',
+        penandatangan_1_jabatan: document.getElementById('cert-p1-jabatan')?.value.trim() || '',
+        penandatangan_1_npk: document.getElementById('cert-p1-npk')?.value.trim() || '',
+        penandatangan_2_nama: document.getElementById('cert-p2-nama')?.value.trim() || '',
+        penandatangan_2_jabatan: document.getElementById('cert-p2-jabatan')?.value.trim() || '',
+        penandatangan_2_npk: document.getElementById('cert-p2-npk')?.value.trim() || '',
+        stempel_aktif: document.getElementById('cert-stempel-aktif')?.checked ?? true,
+        masa_berlaku: document.getElementById('cert-masa-berlaku')?.value.trim() || '3 Tahun sejak diterbitkan'
+      };
+
+      const res = await executeRpcCall('saveCertificateConfig', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Template sertifikat berhasil disimpan!');
+      } else {
+        showSettingToast(res.message || 'Gagal menyimpan template sertifikat', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.saveCertificateConfigForm = saveCertificateConfigForm;
+
+  // ==============================================================================
+  // 4. BATCH & ANGKATAN
+  // ==============================================================================
+  async function fetchBatchSettings() {
+    try {
+      const res = await executeRpcCall('getSettings', [5]);
+      if (res && res.data) {
+        const d = res.data;
+        if (document.getElementById('setting-batch-aktif')) document.getElementById('setting-batch-aktif').value = d.batch_aktif || 'Batch 2026-A';
+        if (document.getElementById('setting-backup-auto')) document.getElementById('setting-backup-auto').checked = d.backup_auto !== false;
+      }
+    } catch (err) {}
+  }
+  window.fetchBatchSettings = fetchBatchSettings;
+
+  async function saveBatchSettingsForm() {
+    try {
+      const payload = {
+        batch_aktif: document.getElementById('setting-batch-aktif')?.value.trim() || 'Batch 2026-A',
+        backup_auto: document.getElementById('setting-backup-auto')?.checked ?? true
+      };
+      const res = await executeRpcCall('saveSettings', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Identitas batch berhasil diperbarui!');
+      } else {
+        showSettingToast(res.message || 'Gagal menyimpan batch', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.saveBatchSettingsForm = saveBatchSettingsForm;
+
+  // ==============================================================================
+  // 5. DAFTAR MESIN
+  // ==============================================================================
+  let machineCache = [];
+  async function fetchMachineList() {
+    const tbody = document.getElementById('setting-machines-tbody');
+    try {
+      const res = await executeRpcCall('getMasterMachines', [5]);
+      machineCache = res.data || [];
+      const badgeCount = document.getElementById('nav-machines-count');
+      if (badgeCount) badgeCount.innerText = machineCache.length;
+      renderMachineTable(machineCache);
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+  window.fetchMachineList = fetchMachineList;
+
+  function renderMachineTable(list) {
+    const tbody = document.getElementById('setting-machines-tbody');
+    if (!tbody) return;
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-400">Tidak ada data mesin ditemukan.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(m => {
+      let statusBadge = 'bg-slate-100 text-slate-500';
+      let statusDot = 'bg-slate-400';
+      if (m.status === 'AKTIF') {
+        statusBadge = 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+        statusDot = 'bg-emerald-500';
+      } else if (m.status === 'MAINTENANCE') {
+        statusBadge = 'bg-amber-50 text-amber-700 border border-amber-200/60';
+        statusDot = 'bg-amber-500';
+      }
+      return `
+        <tr class="hover:bg-slate-50/60 transition-colors">
+          <td class="py-3 px-4 font-mono font-bold text-slate-900">${m.kode_mesin}</td>
+          <td class="py-3 px-4 font-semibold text-slate-800">${m.nama_mesin}</td>
+          <td class="py-3 px-3"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-semibold text-[11px]">${m.section || '-'}</span></td>
+          <td class="py-3 px-3 text-slate-500 text-[11px] font-mono">${m.tipe_kapasitas || '-'}</td>
+          <td class="py-3 px-3 text-center">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${statusBadge}">
+              <span class="w-1.5 h-1.5 rounded-full ${statusDot}"></span>
+              ${m.status}
+            </span>
+          </td>
+          <td class="py-3 px-4 text-center">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="editMachine('${m.id}')" class="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-blue-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteMachine('${m.id}', '${m.kode_mesin}')" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function filterMachineTable() {
+    const q = (document.getElementById('search-setting-machine')?.value || '').toLowerCase().trim();
+    if (!q) {
+      renderMachineTable(machineCache);
+      return;
+    }
+    const filtered = machineCache.filter(m => 
+      (m.nama_mesin || '').toLowerCase().includes(q) ||
+      (m.kode_mesin || '').toLowerCase().includes(q) ||
+      (m.section || '').toLowerCase().includes(q)
+    );
+    renderMachineTable(filtered);
+  }
+  window.filterMachineTable = filterMachineTable;
+
+  function openMachineModal(mc = null) {
+    updateSectionDropdowns();
+    document.getElementById('form-machine-id').value = mc ? mc.id : '';
+    document.getElementById('form-machine-kode').value = mc ? mc.kode_mesin : '';
+    document.getElementById('form-machine-nama').value = mc ? mc.nama_mesin : '';
+    
+    const selSection = document.getElementById('form-machine-section');
+    if (selSection) {
+      if (mc && mc.section) {
+        if (!Array.from(selSection.options).some(o => o.value === mc.section)) {
+          selSection.add(new Option(mc.section, mc.section));
+        }
+        selSection.value = mc.section;
+      } else {
+        selSection.value = '';
+      }
+    }
+
+    document.getElementById('form-machine-kapasitas').value = mc ? mc.tipe_kapasitas : '';
+    document.getElementById('form-machine-status').value = mc ? mc.status : 'AKTIF';
+    document.getElementById('modal-machine-title').innerText = mc ? 'Edit Data Mesin' : 'Tambah Mesin Baru';
+    document.getElementById('modal-setting-machine')?.classList.remove('hidden');
+  }
+  function closeMachineModal() {
+    document.getElementById('modal-setting-machine')?.classList.add('hidden');
+  }
+  window.openMachineModal = openMachineModal;
+  window.closeMachineModal = closeMachineModal;
+
+  window.editMachine = (id) => {
+    const m = machineCache.find(x => x.id === id);
+    if (m) openMachineModal(m);
+  };
+
+  function notifyMasterOperationalUpdated() {
+    window.dispatchEvent(new CustomEvent('master-operational-updated'));
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const ch = new BroadcastChannel('ltc-operational-sync');
+        ch.postMessage({ type: 'MASTER_UPDATED', timestamp: Date.now() });
+      }
+      localStorage.setItem('ltc-master-operational-timestamp', Date.now());
+    } catch (err) {}
+  }
+
+  window.deleteMachine = async (id, kode) => {
+    if (!confirm(`Pindahkan mesin "${kode}" ke Recycle Bin?`)) return;
+    try {
+      const res = await executeRpcCall('deleteMasterMachine', [id, 5]);
+      if (res.success) {
+        showSettingToast(`Mesin ${kode} dipindahkan ke Recycle Bin.`);
+        fetchMachineList();
+        fetchRecycleBinItems();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  };
+
+  async function submitMachineForm() {
+    const kode_mesin = document.getElementById('form-machine-kode')?.value.trim();
+    const nama_mesin = document.getElementById('form-machine-nama')?.value.trim();
+    if (!kode_mesin || !nama_mesin) return alert('Kode mesin dan nama mesin wajib diisi!');
+
+    const payload = {
+      id: document.getElementById('form-machine-id')?.value || undefined,
+      kode_mesin,
+      nama_mesin,
+      section: document.getElementById('form-machine-section')?.value.trim(),
+      tipe_kapasitas: document.getElementById('form-machine-kapasitas')?.value.trim(),
+      status: document.getElementById('form-machine-status')?.value || 'AKTIF'
+    };
+
+    try {
+      const res = await executeRpcCall('saveMasterMachine', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Mesin berhasil disimpan!');
+        closeMachineModal();
+        fetchMachineList();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.submitMachineForm = submitMachineForm;
+
+  // ==============================================================================
+  // 6. LOG AKTIVITAS ADMIN (AUDIT TRAIL)
+  // ==============================================================================
+  async function fetchActivityLogs() {
+    const tbody = document.getElementById('setting-logs-tbody');
+    try {
+      const res = await executeRpcCall('getAdminActivityLogs', [5, 50]);
+      const list = res.data || [];
+      if (!tbody) return;
+      if (list.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">Belum ada riwayat aktivitas.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = list.map(log => {
+        let badgeColor = 'bg-slate-100 text-slate-600';
+        if (log.action_type === 'CREATE') badgeColor = 'bg-emerald-50 text-emerald-700 border border-emerald-200/60';
+        else if (log.action_type === 'UPDATE') badgeColor = 'bg-blue-50 text-blue-700 border border-blue-200/60';
+        else if (log.action_type === 'DELETE') badgeColor = 'bg-rose-50 text-rose-700 border border-rose-200/60';
+        else if (log.action_type === 'RESTORE') badgeColor = 'bg-purple-50 text-purple-700 border border-purple-200/60';
+        else if (log.action_type === 'LOGIN') badgeColor = 'bg-amber-50 text-amber-700 border border-amber-200/60';
+
+        const timeStr = log.created_at ? new Date(log.created_at).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+
+        return `
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3 px-4 font-mono text-[11px] text-slate-400 whitespace-nowrap">${timeStr}</td>
+            <td class="py-3 px-3 font-semibold text-slate-900">${log.admin_username}</td>
+            <td class="py-3 px-3"><span class="px-2 py-0.5 rounded-full text-[10px] font-bold ${badgeColor}">${log.action_type}</span></td>
+            <td class="py-3 px-3"><span class="font-mono text-[10px] text-slate-500 uppercase tracking-wider">${log.target_module}</span></td>
+            <td class="py-3 px-4 text-slate-700 text-xs">${log.description}</td>
+          </tr>
+        `;
+      }).join('');
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+  window.fetchActivityLogs = fetchActivityLogs;
+
+  // ==============================================================================
+  // 7. RECYCLE BIN & DATA RECOVERY
+  // ==============================================================================
+  let recycleCache = [];
+  async function fetchRecycleBinItems() {
+    const tbody = document.getElementById('setting-recycle-tbody');
+    try {
+      const res = await executeRpcCall('getRecycleBinItems', [5]);
+      recycleCache = res.data || [];
+      const badge = document.getElementById('nav-recycle-badge');
+      if (badge) {
+        badge.innerText = recycleCache.length;
+        badge.className = recycleCache.length > 0 
+          ? 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 text-rose-700' 
+          : 'px-2 py-0.5 rounded-full text-[10px] font-bold bg-slate-100 text-slate-600';
+      }
+
+      if (!tbody) return;
+      if (recycleCache.length === 0) {
+        tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">Tempat sampah kosong. Tidak ada data terhapus.</td></tr>';
+        return;
+      }
+
+      tbody.innerHTML = recycleCache.map(b => {
+        const timeStr = b.deleted_at ? new Date(b.deleted_at).toLocaleString('id-ID', { dateStyle: 'short', timeStyle: 'short' }) : '-';
+        return `
+          <tr class="hover:bg-slate-50/60 transition-colors">
+            <td class="py-3 px-4"><span class="px-2 py-0.5 rounded-md text-[10px] font-bold bg-slate-100 text-slate-700">${b.entity_type}</span></td>
+            <td class="py-3 px-4 font-semibold text-slate-900">${b.item_name || b.entity_id}</td>
+            <td class="py-3 px-3 text-slate-600">${b.deleted_by || 'Admin'}</td>
+            <td class="py-3 px-3 font-mono text-[11px] text-slate-400">${timeStr}</td>
+            <td class="py-3 px-4 text-center">
+              <div class="flex items-center justify-center gap-2">
+                <button onclick="restoreBinItem('${b.id}', '${b.item_name || ''}')"
+                  class="px-2.5 py-1 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-semibold rounded-lg text-xs flex items-center gap-1 transition-all cursor-pointer">
+                  <i class="fa-solid fa-arrow-rotate-left text-[10px]"></i> Pulihkan
+                </button>
+                <button onclick="openPermanentDeleteModal('${b.id}')"
+                  class="px-2.5 py-1 bg-rose-50 hover:bg-rose-100 text-rose-600 font-semibold rounded-lg text-xs flex items-center gap-1 transition-all cursor-pointer">
+                  <i class="fa-solid fa-trash text-[10px]"></i> Hapus
+                </button>
+              </div>
+            </td>
+          </tr>
+        `;
+      }).join('');
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+  window.fetchRecycleBinItems = fetchRecycleBinItems;
+
+  window.restoreBinItem = async (binId, itemName) => {
+    if (!confirm(`Pulihkan kembali data "${itemName}" ke sistem?`)) return;
+    try {
+      const res = await executeRpcCall('restoreRecycleBinItem', [binId, 5]);
+      if (res.success) {
+        showSettingToast(`Data "${itemName}" berhasil dipulihkan.`);
+        fetchRecycleBinItems();
+        fetchMachineList();
+        fetchSpvList();
+        fetchProductList();
+        fetchSectionList();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  };
+
+  function openPermanentDeleteModal(binId) {
+    document.getElementById('permanent-delete-item-id').value = binId;
+    document.getElementById('permanent-delete-pin').value = '';
+    document.getElementById('modal-permanent-delete')?.classList.remove('hidden');
+  }
+  function closePermanentDeleteModal() {
+    document.getElementById('modal-permanent-delete')?.classList.add('hidden');
+  }
+  window.openPermanentDeleteModal = openPermanentDeleteModal;
+  window.closePermanentDeleteModal = closePermanentDeleteModal;
+
+  async function submitPermanentDelete() {
+    const binId = document.getElementById('permanent-delete-item-id')?.value;
+    const pin = document.getElementById('permanent-delete-pin')?.value.trim();
+    if (!pin) return alert('Master Security PIN wajib diisi!');
+
+    try {
+      const res = await executeRpcCall('permanentDeleteRecycleBinItem', [binId, pin, 5]);
+      if (res.success) {
+        showSettingToast('Item berhasil dihapus secara permanen.');
+        closePermanentDeleteModal();
+        fetchRecycleBinItems();
+      } else {
+        showSettingToast(res.message || 'Gagal menghapus permanen', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.submitPermanentDelete = submitPermanentDelete;
+
+  // ==============================================================================
+  // 8. MASTER SPV
+  // ==============================================================================
+  let spvCache = [];
+  async function fetchSpvList() {
+    const tbody = document.getElementById('setting-spv-tbody');
+    try {
+      const res = await executeRpcCall('getMasterSpvList', [5]);
+      spvCache = res.data || [];
+      const badgeCount = document.getElementById('nav-spv-count');
+      if (badgeCount) badgeCount.innerText = spvCache.length;
+      renderSpvTable(spvCache);
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="6" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+
+  function renderSpvTable(list) {
+    const tbody = document.getElementById('setting-spv-tbody');
+    if (!tbody) return;
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="6" class="py-8 text-center text-slate-400">Tidak ada data supervisor ditemukan.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(s => `
+      <tr class="hover:bg-slate-50/60 transition-colors">
+        <td class="py-3 px-4 font-semibold text-slate-900">${s.nama}</td>
+        <td class="py-3 px-3 text-slate-500 font-mono text-[11px]">${s.nik || '-'}</td>
+        <td class="py-3 px-3 text-slate-600">${s.departemen || 'Produksi'}</td>
+        <td class="py-3 px-3"><span class="px-2.5 py-1 bg-slate-100 text-slate-700 rounded-md font-semibold text-[11px]">${s.section || '-'}</span></td>
+        <td class="py-3 px-3 text-center">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${s.status === 'AKTIF' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-500'}">
+            <span class="w-1.5 h-1.5 rounded-full ${s.status === 'AKTIF' ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+            ${s.status}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <div class="flex items-center justify-center gap-1">
+            <button onclick="editSpv('${s.id}')" class="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-blue-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteSpv('${s.id}', '${s.nama}')" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterSpvTable() {
+    const q = (document.getElementById('search-setting-spv')?.value || '').toLowerCase().trim();
+    if (!q) {
+      renderSpvTable(spvCache);
+      return;
+    }
+    const filtered = spvCache.filter(s =>
+      (s.nama || '').toLowerCase().includes(q) ||
+      (s.nik || '').toLowerCase().includes(q) ||
+      (s.section || '').toLowerCase().includes(q) ||
+      (s.departemen || '').toLowerCase().includes(q)
+    );
+    renderSpvTable(filtered);
+  }
+  window.filterSpvTable = filterSpvTable;
+
+  function openSpvModal(spv = null) {
+    updateSectionDropdowns();
+    document.getElementById('form-spv-id').value = spv ? spv.id : '';
+    document.getElementById('form-spv-nama').value = spv ? spv.nama : '';
+    document.getElementById('form-spv-nik').value = spv ? spv.nik : '';
+    document.getElementById('form-spv-departemen').value = spv ? spv.departemen : 'Produksi';
+    
+    const selSection = document.getElementById('form-spv-section');
+    if (selSection) {
+      if (spv && spv.section) {
+        if (!Array.from(selSection.options).some(o => o.value === spv.section)) {
+          selSection.add(new Option(spv.section, spv.section));
+        }
+        selSection.value = spv.section;
+      } else {
+        selSection.value = '';
+      }
+    }
+
+    document.getElementById('form-spv-status').value = spv ? spv.status : 'AKTIF';
+    document.getElementById('modal-spv-title').innerText = spv ? 'Edit Data SPV' : 'Tambah SPV Baru';
+    document.getElementById('modal-setting-spv')?.classList.remove('hidden');
+  }
+  function closeSpvModal() {
+    document.getElementById('modal-setting-spv')?.classList.add('hidden');
+  }
+  window.openSpvModal = openSpvModal;
+  window.closeSpvModal = closeSpvModal;
+
+  window.editSpv = (id) => {
+    const s = spvCache.find(x => x.id === id);
+    if (s) openSpvModal(s);
+  };
+
+  window.deleteSpv = async (id, nama) => {
+    if (!confirm(`Pindahkan SPV "${nama}" ke Recycle Bin?`)) return;
+    try {
+      const res = await executeRpcCall('deleteMasterSpv', [id, 5]);
+      if (res.success) {
+        showSettingToast(`Data SPV "${nama}" dipindahkan ke Recycle Bin.`);
+        fetchSpvList();
+        fetchRecycleBinItems();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  };
+
+  async function submitSpvForm() {
+    const nama = document.getElementById('form-spv-nama')?.value.trim();
+    if (!nama) return alert('Nama SPV wajib diisi!');
+    const payload = {
+      id: document.getElementById('form-spv-id')?.value || undefined,
+      nama,
+      nik: document.getElementById('form-spv-nik')?.value.trim(),
+      departemen: document.getElementById('form-spv-departemen')?.value.trim() || 'Produksi',
+      section: document.getElementById('form-spv-section')?.value.trim(),
+      status: document.getElementById('form-spv-status')?.value || 'AKTIF'
+    };
+
+    try {
+      const res = await executeRpcCall('saveMasterSpv', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Data SPV berhasil disimpan!');
+        closeSpvModal();
+        fetchSpvList();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.submitSpvForm = submitSpvForm;
+
+  // ==============================================================================
+  // 9. MASTER PRODUK
+  // ==============================================================================
+  let productCache = [];
+  async function fetchProductList() {
+    const tbody = document.getElementById('setting-products-tbody');
+    try {
+      const res = await executeRpcCall('getMasterProducts', [5]);
+      productCache = res.data || [];
+      const badgeCount = document.getElementById('nav-products-count');
+      if (badgeCount) badgeCount.innerText = productCache.length;
+      renderProductTable(productCache);
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="7" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+
+  let activeProcessFilter = 'ALL';
+  function filterProductByProcess(proc) {
+    activeProcessFilter = proc;
+    document.querySelectorAll('.filter-proc-btn').forEach(b => {
+      b.classList.remove('bg-slate-900', 'text-white');
+      b.classList.add('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+    });
+    const activeBtn = document.getElementById('filter-proc-' + proc.toLowerCase());
+    if (activeBtn) {
+      activeBtn.classList.remove('bg-slate-100', 'text-slate-600', 'hover:bg-slate-200');
+      activeBtn.classList.add('bg-slate-900', 'text-white');
+    }
+    filterProductTable();
+  }
+  window.filterProductByProcess = filterProductByProcess;
+
+  function fmtVal(v) {
+    if (v !== undefined && v !== null && Number(v) > 0) {
+      return `<span class="font-bold text-slate-800 text-[11px]">${v}</span>`;
+    }
+    return `<span class="text-slate-300 text-[11px]">-</span>`;
+  }
+
+  function renderProductTable(list) {
+    const tbody = document.getElementById('setting-products-tbody');
+    if (!tbody) return;
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="13" class="py-8 text-center text-slate-400">Tidak ada data produk ditemukan.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(p => {
+      const prosesBadge = (p.proses === 'FURAN') 
+        ? 'bg-amber-50 text-amber-700 border border-amber-200/60' 
+        : 'bg-blue-50 text-blue-700 border border-blue-200/60';
+      return `
+        <tr class="hover:bg-slate-50/70 transition-colors">
+          <td class="py-3 px-4 font-semibold text-slate-900 min-w-[220px]">
+            <div class="font-bold text-slate-900 leading-tight">${p.nama_produk}</div>
+            ${p.berat_kg ? `<div class="text-[10px] text-slate-400 font-normal mt-0.5 whitespace-nowrap">${p.berat_kg} kg/pcs</div>` : ''}
+          </td>
+          <td class="py-3 px-3 text-slate-500 font-mono text-[11px] whitespace-nowrap text-center">${p.kode_produk || '-'}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">
+            <span class="inline-flex items-center justify-center px-2 py-0.5 rounded-md font-bold text-[10px] ${prosesBadge}">${p.proses || 'FBO'}</span>
+          </td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_ladle)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_melting)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_core)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_furan)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_grinding)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_shotblast)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_turning)}</td>
+          <td class="py-3 px-2.5 text-center whitespace-nowrap">${fmtVal(p.target_milling)}</td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${(p.status || 'AKTIF') === 'AKTIF' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-500'}">
+              <span class="w-1.5 h-1.5 rounded-full ${(p.status || 'AKTIF') === 'AKTIF' ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+              ${p.status || 'AKTIF'}
+            </span>
+          </td>
+          <td class="py-3 px-3 text-center whitespace-nowrap">
+            <div class="flex items-center justify-center gap-1">
+              <button onclick="editProduct('${p.id}')" class="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-blue-600 rounded-md transition-all cursor-pointer" title="Edit Produk"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button onclick="deleteProduct('${p.id}', '${p.nama_produk}')" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-md transition-all cursor-pointer" title="Hapus Produk"><i class="fa-solid fa-trash"></i></button>
+            </div>
+          </td>
+        </tr>
+      `;
+    }).join('');
+  }
+
+  function filterProductTable() {
+    const q = (document.getElementById('search-setting-product')?.value || '').toLowerCase().trim();
+    let filtered = productCache;
+    if (activeProcessFilter !== 'ALL') {
+      filtered = filtered.filter(p => (p.proses || '').toUpperCase() === activeProcessFilter);
+    }
+    if (q) {
+      filtered = filtered.filter(p =>
+        (p.nama_produk || '').toLowerCase().includes(q) ||
+        (p.kode_produk || '').toLowerCase().includes(q) ||
+        (p.proses || '').toLowerCase().includes(q) ||
+        (p.section || '').toLowerCase().includes(q)
+      );
+    }
+    renderProductTable(filtered);
+  }
+  window.filterProductTable = filterProductTable;
+
+  function openProductModal(prd = null) {
+    updateSectionDropdowns();
+    document.getElementById('form-product-id').value = prd ? prd.id : '';
+    document.getElementById('form-product-nama').value = prd ? prd.nama_produk : '';
+    document.getElementById('form-product-kode').value = prd ? prd.kode_produk : '';
+    
+    const selSection = document.getElementById('form-product-section');
+    if (selSection) {
+      if (prd && prd.section) {
+        if (!Array.from(selSection.options).some(o => o.value === prd.section)) {
+          selSection.add(new Option(prd.section, prd.section));
+        }
+        selSection.value = prd.section;
+      } else {
+        selSection.value = '';
+      }
+    }
+
+    document.getElementById('form-product-target-ladle').value = prd ? (prd.target_ladle || '') : '';
+    document.getElementById('form-product-target-melting').value = prd ? (prd.target_melting || '') : '';
+    document.getElementById('form-product-target-core').value = prd ? (prd.target_core || '') : '';
+    document.getElementById('form-product-target-furan').value = prd ? (prd.target_furan || '') : '';
+    document.getElementById('form-product-target-grinding').value = prd ? (prd.target_grinding || '') : '';
+    document.getElementById('form-product-target-shotblast').value = prd ? (prd.target_shotblast || '') : '';
+    document.getElementById('form-product-target-turning').value = prd ? (prd.target_turning || '') : '';
+    document.getElementById('form-product-target-milling').value = prd ? (prd.target_milling || '') : '';
+
+    document.getElementById('form-product-kualitas').value = prd ? (prd.standar_kualitas || '') : '';
+    document.getElementById('form-product-status').value = prd ? (prd.status || 'AKTIF') : 'AKTIF';
+    document.getElementById('modal-product-title').innerText = prd ? 'Edit Produk & Target' : 'Tambah Produk Baru';
+    document.getElementById('modal-setting-product')?.classList.remove('hidden');
+  }
+  function closeProductModal() {
+    document.getElementById('modal-setting-product')?.classList.add('hidden');
+  }
+  window.openProductModal = openProductModal;
+  window.closeProductModal = closeProductModal;
+
+  window.editProduct = (id) => {
+    const p = productCache.find(x => x.id === id);
+    if (p) openProductModal(p);
+  };
+
+  window.deleteProduct = async (id, nama) => {
+    if (!confirm(`Pindahkan produk "${nama}" ke Recycle Bin?`)) return;
+    try {
+      const res = await executeRpcCall('deleteMasterProduct', [id, 5]);
+      if (res.success) {
+        showSettingToast(`Produk "${nama}" dipindahkan ke Recycle Bin.`);
+        fetchProductList();
+        fetchRecycleBinItems();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  };
+
+  async function submitProductForm() {
+    const nama_produk = document.getElementById('form-product-nama')?.value.trim();
+    if (!nama_produk) return alert('Nama produk wajib diisi!');
+    const payload = {
+      id: document.getElementById('form-product-id')?.value || undefined,
+      nama_produk,
+      kode_produk: document.getElementById('form-product-kode')?.value.trim(),
+      section: document.getElementById('form-product-section')?.value.trim(),
+      target_ladle: Number(document.getElementById('form-product-target-ladle')?.value || 0),
+      target_melting: Number(document.getElementById('form-product-target-melting')?.value || 0),
+      target_core: Number(document.getElementById('form-product-target-core')?.value || 0),
+      target_furan: Number(document.getElementById('form-product-target-furan')?.value || 0),
+      target_grinding: Number(document.getElementById('form-product-target-grinding')?.value || 0),
+      target_shotblast: Number(document.getElementById('form-product-target-shotblast')?.value || 0),
+      target_turning: Number(document.getElementById('form-product-target-turning')?.value || 0),
+      target_milling: Number(document.getElementById('form-product-target-milling')?.value || 0),
+      standar_kualitas: document.getElementById('form-product-kualitas')?.value.trim(),
+      status: document.getElementById('form-product-status')?.value || 'AKTIF'
+    };
+
+    try {
+      const res = await executeRpcCall('saveMasterProduct', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Produk & target berhasil disimpan!');
+        closeProductModal();
+        fetchProductList();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.submitProductForm = submitProductForm;
+
+  // ==============================================================================
+  // 10. MASTER SECTIONS
+  // ==============================================================================
+  let sectionCache = [];
+  async function fetchSectionList() {
+    const tbody = document.getElementById('setting-sections-tbody');
+    try {
+      const res = await executeRpcCall('getMasterSections', [5]);
+      sectionCache = res.data || [];
+      const badgeCount = document.getElementById('nav-sections-count');
+      if (badgeCount) badgeCount.innerText = sectionCache.length;
+      updateSectionDropdowns();
+      renderSectionTable(sectionCache);
+    } catch (err) {
+      if (tbody) tbody.innerHTML = `<tr><td colspan="5" class="py-4 text-center text-rose-500">${err.message}</td></tr>`;
+    }
+  }
+
+  function renderSectionTable(list) {
+    const tbody = document.getElementById('setting-sections-tbody');
+    if (!tbody) return;
+    if (list.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" class="py-8 text-center text-slate-400">Tidak ada data section ditemukan.</td></tr>';
+      return;
+    }
+    tbody.innerHTML = list.map(s => `
+      <tr class="hover:bg-slate-50/60 transition-colors">
+        <td class="py-3 px-4 font-bold text-slate-900">${s.nama_section}</td>
+        <td class="py-3 px-3 text-slate-700 font-semibold">${s.departemen || 'Produksi'}</td>
+        <td class="py-3 px-4 text-slate-500">${s.keterangan || '-'}</td>
+        <td class="py-3 px-3 text-center">
+          <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[10px] font-semibold ${(s.status || 'AKTIF') === 'AKTIF' ? 'bg-emerald-50 text-emerald-700 border border-emerald-200/60' : 'bg-slate-100 text-slate-500'}">
+            <span class="w-1.5 h-1.5 rounded-full ${(s.status || 'AKTIF') === 'AKTIF' ? 'bg-emerald-500' : 'bg-slate-400'}"></span>
+            ${s.status || 'AKTIF'}
+          </span>
+        </td>
+        <td class="py-3 px-4 text-center">
+          <div class="flex items-center justify-center gap-1">
+            <button onclick="editSection('${s.id}')" class="p-1.5 hover:bg-slate-100 text-slate-600 hover:text-blue-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-pen-to-square"></i></button>
+            <button onclick="deleteSection('${s.id}', '${s.nama_section}')" class="p-1.5 hover:bg-rose-50 text-slate-400 hover:text-rose-600 rounded-md transition-all cursor-pointer"><i class="fa-solid fa-trash"></i></button>
+          </div>
+        </td>
+      </tr>
+    `).join('');
+  }
+
+  function filterSectionTable() {
+    const q = (document.getElementById('search-setting-section')?.value || '').toLowerCase().trim();
+    if (!q) {
+      renderSectionTable(sectionCache);
+      return;
+    }
+    const filtered = sectionCache.filter(s =>
+      (s.nama_section || '').toLowerCase().includes(q) ||
+      (s.departemen || '').toLowerCase().includes(q) ||
+      (s.keterangan || '').toLowerCase().includes(q)
+    );
+    renderSectionTable(filtered);
+  }
+  window.filterSectionTable = filterSectionTable;
+
+  function openSectionModal(sec = null) {
+    document.getElementById('form-section-id').value = sec ? sec.id : '';
+    document.getElementById('form-section-nama').value = sec ? sec.nama_section : '';
+    document.getElementById('form-section-departemen').value = sec ? sec.departemen : 'Produksi';
+    document.getElementById('form-section-keterangan').value = sec ? sec.keterangan : '';
+    document.getElementById('form-section-status').value = sec ? sec.status : 'AKTIF';
+    document.getElementById('modal-section-title').innerText = sec ? 'Edit Section' : 'Tambah Section Baru';
+    document.getElementById('modal-setting-section')?.classList.remove('hidden');
+  }
+  function closeSectionModal() {
+    document.getElementById('modal-setting-section')?.classList.add('hidden');
+  }
+  window.openSectionModal = openSectionModal;
+  window.closeSectionModal = closeSectionModal;
+
+  window.editSection = (id) => {
+    const s = sectionCache.find(x => x.id === id);
+    if (s) openSectionModal(s);
+  };
+
+  window.deleteSection = async (id, nama) => {
+    if (!confirm(`Pindahkan section "${nama}" ke Recycle Bin?`)) return;
+    try {
+      const res = await executeRpcCall('deleteMasterSection', [id, 5]);
+      if (res.success) {
+        showSettingToast(`Section "${nama}" dipindahkan ke Recycle Bin.`);
+        fetchSectionList();
+        fetchRecycleBinItems();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  };
+
+  async function submitSectionForm() {
+    const nama_section = document.getElementById('form-section-nama')?.value.trim();
+    if (!nama_section) return alert('Nama section wajib diisi!');
+    const payload = {
+      id: document.getElementById('form-section-id')?.value || undefined,
+      nama_section: nama_section.toUpperCase(),
+      departemen: document.getElementById('form-section-departemen')?.value.trim() || 'Produksi',
+      keterangan: document.getElementById('form-section-keterangan')?.value.trim(),
+      status: document.getElementById('form-section-status')?.value || 'AKTIF'
+    };
+
+    try {
+      const res = await executeRpcCall('saveMasterSection', [payload, 5]);
+      if (res.success) {
+        showSettingToast('Section berhasil disimpan!');
+        closeSectionModal();
+        fetchSectionList();
+        notifyMasterOperationalUpdated();
+      } else {
+        showSettingToast(res.message, 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.submitSectionForm = submitSectionForm;
+
+  // ==============================================================================
+  // 11. SECURITY PIN & BACKUP
+  // ==============================================================================
+  async function fetchBackupSummary() {
+    try {
+      const res = await executeRpcCall('getSystemBackupSummary', [5]);
+      if (res && res.data) {
+        const d = res.data;
+        if (document.getElementById('backup-count-siswa')) document.getElementById('backup-count-siswa').innerText = d.siswa ?? '-';
+        if (document.getElementById('backup-count-absensi')) document.getElementById('backup-count-absensi').innerText = d.absensi ?? '-';
+        if (document.getElementById('backup-count-spv')) document.getElementById('backup-count-spv').innerText = d.spv ?? '-';
+        if (document.getElementById('backup-count-products')) document.getElementById('backup-count-products').innerText = d.products ?? '-';
+        if (document.getElementById('backup-count-machines')) document.getElementById('backup-count-machines').innerText = d.machines ?? '-';
+        if (document.getElementById('backup-count-recycle')) document.getElementById('backup-count-recycle').innerText = d.recycle_bin ?? '-';
+      }
+    } catch (err) {
+      console.warn('[fetchBackupSummary Error]:', err);
+    }
+  }
+  window.fetchBackupSummary = fetchBackupSummary;
+
+  async function handleUpdateMasterPin() {
+    const currentPin = document.getElementById('setting-pin-current')?.value;
+    const newPin = document.getElementById('setting-pin-new')?.value;
+    if (!currentPin) return alert('Masukkan PIN saat ini!');
+    if (!newPin || newPin.length < 6) return alert('PIN baru minimal 6 digit!');
+
+    try {
+      const res = await executeRpcCall('updateMasterPin', [currentPin, newPin, 5]);
+      if (res.success) {
+        showSettingToast('Master PIN berhasil diperbarui!');
+        document.getElementById('setting-pin-current').value = '';
+        document.getElementById('setting-pin-new').value = '';
+      } else {
+        showSettingToast(res.message || 'Gagal memperbarui PIN', 'error');
+      }
+    } catch (err) {
+      showSettingToast(err.message, 'error');
+    }
+  }
+  window.handleUpdateMasterPin = handleUpdateMasterPin;
+
+  async function downloadCompleteBackupJson() {
+    try {
+      showSettingToast('Menyiapkan berkas cadangan snapshot...');
+      const [settings, spv, products, sections, machines, summary] = await Promise.all([
+        executeRpcCall('getSettings', [5]),
+        executeRpcCall('getMasterSpvList', [5]),
+        executeRpcCall('getMasterProducts', [5]),
+        executeRpcCall('getMasterSections', [5]),
+        executeRpcCall('getMasterMachines', [5]),
+        executeRpcCall('getSystemBackupSummary', [5])
+      ]);
+
+      const backupBundle = {
+        app: 'LTC Indoprima Gemilang Dashboard',
+        plant: { id: 5, name: 'Plant 5 Casting' },
+        exported_at: new Date().toISOString(),
+        summary: summary.data,
+        settings: settings.data,
+        master_spv: spv.data,
+        master_products: products.data,
+        master_sections: sections.data,
+        master_machines: machines.data
+      };
+
+      const dataStr = 'data:text/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(backupBundle, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute('href', dataStr);
+      dlAnchor.setAttribute('download', `backup_ltc_plant5_${new Date().toISOString().slice(0, 10)}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+
+      showSettingToast('Snapshot JSON berhasil diunduh!');
+    } catch (err) {
+      showSettingToast('Gagal mengunduh backup: ' + err.message, 'error');
+    }
+  }
+  window.downloadCompleteBackupJson = downloadCompleteBackupJson;
+</script>

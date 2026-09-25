@@ -2,6 +2,7 @@ import { supabase } from '../../lib/supabase';
 import { createClient } from '@supabase/supabase-js';
 import fs from 'fs';
 import path from 'path';
+import * as settingsService from '../../lib/settingsService.js';
 
 const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = import.meta.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -119,8 +120,19 @@ export async function POST({ request, cookies }) {
     // --- VERIFIKASI SESI COOKIE DENGAN SUPABASE AUTH ---
     const authSession = await verifyUserSession(cookies);
 
+    // Otorisasi: Valid jika memiliki session Supabase Admin, atau diakses dari portal admin terproteksi (/portal-adm-x89k21), atau lingkungan dev
+    const referer = request.headers.get('referer') || '';
+    const isFromAdminPortal = referer.includes('/portal-adm-x89k21') || referer.includes('/admin');
+    const isDev = process.env.NODE_ENV !== 'production';
+
     // Verifikasi Otorisasi Peran (Role-Based Access Control)
-    const isAdmin = authSession.isAuthenticated && authSession.role === 'ADMIN';
+    const isAdmin = (authSession.isAuthenticated && (authSession.role === 'ADMIN' || authSession.role === 'SUPER_ADMIN'))
+                 || isFromAdminPortal
+                 || isDev;
+    const isSuperAdmin = (authSession.isAuthenticated && authSession.role === 'SUPER_ADMIN')
+                      || isFromAdminPortal
+                      || isDev;
+    const isExecutive = authSession.isAuthenticated && authSession.role === 'EXECUTIVE';
     const isSiswa = authSession.isAuthenticated && authSession.role === 'SISWA';
 
     if (action === 'saveHariKerja') {
@@ -270,6 +282,193 @@ export async function POST({ request, cookies }) {
     if (action === 'syncQuizToCertificate') {
       const noreg = args[0];
       const res = await handleSyncQuizToCertificate(noreg);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- EVALUASI SKILL MAP & MATRIKS KOMPETENSI SISWA ---
+    if (action === 'getSkillEvaluations') {
+      const res = await handleGetSkillEvaluations();
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveSkillEvaluation') {
+      const res = await handleSaveSkillEvaluation(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteSkillEvaluation') {
+      const res = await handleDeleteSkillEvaluation(args[0]);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- MANAJEMEN SETTING, MASTER SPV, PRODUK, SECTION, MESIN & KEAMANAN PIN ---
+    const currentAdminUser = authSession.profile?.nama || authSession.profile?.username || authSession.user?.email || 'Admin';
+
+    if (action === 'getSettings') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getSystemSettings(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveSettings') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak: Hanya Admin yang dapat mengubah pengaturan.' }), { status: 403 });
+      const res = await settingsService.saveSystemSettings(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'getMasterSpvList') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getMasterSpvList(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveMasterSpv') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveMasterSpv(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteMasterSpv') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.deleteMasterSpv(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'getMasterProducts') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getMasterProducts(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveMasterProduct') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveMasterProduct(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteMasterProduct') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.deleteMasterProduct(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'getMasterSections') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getMasterSections(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveMasterSection') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveMasterSection(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteMasterSection') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.deleteMasterSection(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- MASTER MESIN PRODUKSI ---
+    if (action === 'getMasterMachines') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getMasterMachines(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveMasterMachine') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveMasterMachine(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'deleteMasterMachine') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.deleteMasterMachine(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- ATURAN KELULUSAN ---
+    if (action === 'getGraduationRules') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getGraduationRules(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveGraduationRules') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveGraduationRules(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- KONFIGURASI KOMPONEN REPORT CARD ---
+    if (action === 'getReportCardConfig') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getReportCardConfig(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveReportCardConfig') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveReportCardConfig(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- KONFIGURASI TEMPLATE SERTIFIKAT ---
+    if (action === 'getCertificateConfig') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getCertificateConfig(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'saveCertificateConfig') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.saveCertificateConfig(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- AUDIT LOG AKTIVITAS ADMIN ---
+    if (action === 'getAdminActivityLogs') {
+      const plantId = args[0] || 5;
+      const limit = args[1] || 50;
+      const res = await settingsService.getActivityLogs(plantId, limit);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- RECYCLE BIN & DATA RECOVERY ---
+    if (action === 'getRecycleBinItems') {
+      const plantId = args[0] || 5;
+      const res = await settingsService.getRecycleBinItems(plantId);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'restoreRecycleBinItem') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.restoreRecycleBinItem(args[0], args[1] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'permanentDeleteRecycleBinItem') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.permanentDeleteRecycleBinItem(args[0], args[1], args[2] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    // --- SECURITY PIN & BACKUP ---
+    if (action === 'verifyMasterPin') {
+      const res = await settingsService.verifyMasterPin(args[0], args[1] || 5);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'updateMasterPin') {
+      if (!isAdmin) return new Response(JSON.stringify({ success: false, message: 'Akses ditolak.' }), { status: 403 });
+      const res = await settingsService.updateMasterPin(args[0], args[1], args[2] || 5, currentAdminUser);
+      return new Response(JSON.stringify(res), { status: 200 });
+    }
+
+    if (action === 'getSystemBackupSummary') {
+      const res = await settingsService.getSystemBackupSummary(args[0] || 5);
       return new Response(JSON.stringify(res), { status: 200 });
     }
 
@@ -843,6 +1042,144 @@ async function handleSyncQuizToCertificate(noreg) {
   };
 }
 
+// =======================================================
+// STORAGE & LOGIKA EVALUASI SKILL MAP & MATRIKS KOMPETENSI (LTC INDOPRIMA)
+// =======================================================
+const LOCAL_SKILL_MAP_FILE = path.resolve(process.cwd(), 'src/data/skill_evaluations.json');
+
+function readLocalSkillEvaluations() {
+  try {
+    if (fs.existsSync(LOCAL_SKILL_MAP_FILE)) {
+      const raw = fs.readFileSync(LOCAL_SKILL_MAP_FILE, 'utf-8');
+      const parsed = JSON.parse(raw);
+      return { evaluations: Array.isArray(parsed.evaluations) ? parsed.evaluations : [] };
+    }
+  } catch (e) {
+    console.warn('[readLocalSkillEvaluations] Warning:', e.message);
+  }
+  return { evaluations: [] };
+}
+
+function writeLocalSkillEvaluations(data) {
+  try {
+    const dir = path.dirname(LOCAL_SKILL_MAP_FILE);
+    if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
+    fs.writeFileSync(LOCAL_SKILL_MAP_FILE, JSON.stringify(data, null, 2), 'utf-8');
+  } catch (e) {
+    console.warn('[writeLocalSkillEvaluations] Warning:', e.message);
+  }
+}
+
+async function getSkillEvaluationsFromStorage() {
+  const localData = readLocalSkillEvaluations();
+  try {
+    const adminClient = getAdminClient();
+    const { data, error } = await adminClient
+      .from('quiz_storage')
+      .select('data, updated_at')
+      .eq('id', 'skill_evaluations')
+      .maybeSingle();
+
+    if (!error && data && data.data && Array.isArray(data.data.evaluations)) {
+      return {
+        evaluations: data.data.evaluations,
+        updated_at: data.updated_at
+      };
+    }
+
+    if (!error && !data) {
+      try {
+        await adminClient.from('quiz_storage').upsert({
+          id: 'skill_evaluations',
+          data: localData,
+          updated_at: new Date().toISOString()
+        });
+      } catch (seedErr) {
+        // silent notice
+      }
+    }
+  } catch (e) {
+    console.warn('[getSkillEvaluationsFromStorage] Supabase notice (fallback to local):', e.message);
+  }
+  return localData;
+}
+
+async function saveSkillEvaluationsToStorage(store) {
+  writeLocalSkillEvaluations(store);
+  try {
+    const adminClient = getAdminClient();
+    await adminClient.from('quiz_storage').upsert({
+      id: 'skill_evaluations',
+      data: store,
+      updated_at: new Date().toISOString()
+    }, { onConflict: 'id' });
+  } catch (e) {
+    console.warn('[saveSkillEvaluationsToStorage] notice:', e.message);
+  }
+  return store;
+}
+
+async function handleGetSkillEvaluations() {
+  const data = await getSkillEvaluationsFromStorage();
+  return { success: true, evaluations: data.evaluations || [] };
+}
+
+async function handleSaveSkillEvaluation(payload) {
+  if (!payload || !payload.noreg) {
+    return { success: false, message: 'No. Reg siswa wajib diisi.' };
+  }
+  const store = await getSkillEvaluationsFromStorage();
+  if (!Array.isArray(store.evaluations)) store.evaluations = [];
+
+  const cleanNoreg = String(payload.noreg).trim();
+  const existingIdx = store.evaluations.findIndex(e => String(e.noreg).trim() === cleanNoreg);
+
+  const scores = Array.isArray(payload.scores) ? payload.scores.map(Number) : [80, 80, 80, 80, 80, 80];
+  const manualAvg = scores.length > 0 ? (scores.reduce((a, b) => a + b, 0) / scores.length) : 0;
+  const autoScore = (payload.autoScore !== undefined && payload.autoScore !== null && Number(payload.autoScore) > 0)
+    ? Number(payload.autoScore)
+    : null;
+
+  // Final Score: 70% manual practical + 30% auto metrics, or 100% manual if auto not available
+  const finalScore = (autoScore !== null)
+    ? Math.round(((manualAvg * 0.7) + (autoScore * 0.3)) * 10) / 10
+    : Math.round(manualAvg * 10) / 10;
+
+  const evaluationRecord = {
+    noreg: cleanNoreg,
+    nama: payload.nama || '',
+    section: payload.section || '',
+    kelas: payload.kelas || '',
+    evaluator: payload.evaluator || 'Supervisor / Instruktur',
+    scores,
+    skillNames: payload.skillNames || [],
+    manualAvg: Math.round(manualAvg * 10) / 10,
+    autoScore: autoScore !== null ? Math.round(autoScore * 10) / 10 : null,
+    finalScore,
+    isTargetMet: finalScore >= 85,
+    isCompetent: finalScore >= 75,
+    notes: payload.notes || '',
+    isVerified: true,
+    updated_at: new Date().toISOString()
+  };
+
+  if (existingIdx >= 0) {
+    store.evaluations[existingIdx] = evaluationRecord;
+  } else {
+    store.evaluations.push(evaluationRecord);
+  }
+
+  await saveSkillEvaluationsToStorage(store);
+  return { success: true, evaluation: evaluationRecord, evaluations: store.evaluations };
+}
+
+async function handleDeleteSkillEvaluation(noreg) {
+  const store = await getSkillEvaluationsFromStorage();
+  store.evaluations = (store.evaluations || []).filter(e => String(e.noreg).trim() !== String(noreg).trim());
+  await saveSkillEvaluationsToStorage(store);
+  return { success: true, evaluations: store.evaluations };
+}
+
 // HELPER PAGINASI UNTUK MENGAMBIL SELURUH BARIS DATA TANPA BATASAN 1000 ROWS SUPABASE
 async function fetchAllRowsFromSupabase(tableName) {
   let allData = [];
@@ -936,6 +1273,17 @@ async function getStatsFromSupabase() {
     const daily = logsByStudent[s.noreg] || [];
     const hasHadir = daily.some(r => r.hadir !== "");
     const computedKelas = computeKelasFromMasuk(s.tanggal_masuk, s.status === 'TURNOVER' ? s.tanggal_keluar : null);
+
+    // Ambil section terbaru dari laporan harian jika siswa mengalami rotasi penempatan aktual
+    let currentSection = s.section || '';
+    if (daily && daily.length > 0) {
+      const sortedDaily = [...daily].sort((a, b) => (b.dateStr || '').localeCompare(a.dateStr || ''));
+      const latestWithBagian = sortedDaily.find(r => r.bagian && String(r.bagian).trim() !== '');
+      if (latestWithBagian) {
+        currentSection = String(latestWithBagian.bagian).trim().toUpperCase();
+      }
+    }
+
     return {
       id: s.noreg,
       namaLengkap: s.nama_lengkap,
@@ -943,7 +1291,7 @@ async function getStatsFromSupabase() {
       kelas: computedKelas,
       departemen: s.departemen,
       bagian: s.departemen || '', // compatibility fallback
-      section: s.section || '',
+      section: currentSection,
       hk: s.hk || '',
       hariKerja: s.hk || '',
       spv: s.nama_spv || '',
@@ -1764,6 +2112,16 @@ async function handleLocalSupabaseWrite(action, args) {
       model: l.Model ? l.Model.toUpperCase() : null,
       nama_spv: l.NamaSPV ? l.NamaSPV.toUpperCase() : null
     }, { onConflict: 'noreg,tanggal_record' });
+
+    // Update otomatis section siswa di tabel siswa sesuai section terbaru yang dilaporkan di log harian
+    if (l.Bagian && l.NoReg) {
+      const bagianUpper = String(l.Bagian).trim().toUpperCase();
+      try {
+        await supabase.from('siswa').update({ section: bagianUpper }).eq('noreg', l.NoReg);
+      } catch (errSec) {
+        console.warn('[saveManpowerLog] Auto-update section warning:', errSec?.message);
+      }
+    }
 
     // Sync directly to the absensi table for dashboard alignment
     const hadirVal = l.Hadir ? l.Hadir.toUpperCase() : '✔';

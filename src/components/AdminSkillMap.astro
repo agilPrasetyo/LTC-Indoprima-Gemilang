@@ -1,0 +1,635 @@
+---
+// AdminSkillMap.astro - LMS View: Skill Map & Matriks Kompetensi Siswa (Corporate Indoprima Theme)
+---
+
+<div class="bg-white p-4 sm:p-6 rounded-2xl border border-slate-200 shadow-2xs space-y-6">
+    <!-- Header: Title & Action Buttons -->
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-200 pb-4">
+        <div>
+            <h3 class="font-bold text-lg md:text-xl text-slate-800 tracking-tight">
+                Skill Map & Matriks Kompetensi Siswa
+            </h3>
+        </div>
+        <div class="flex items-center gap-2.5 shrink-0">
+            <button type="button" onclick="loadSkillMapData(true)"
+                class="px-4 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-medium rounded-xl text-xs transition-all cursor-pointer border border-slate-300 shadow-2xs flex items-center gap-1.5"
+                title="Muat Ulang Data Kompetensi">
+                <i class="fa-solid fa-rotate text-slate-500 text-[11px]"></i>
+                <span>Refresh Data</span>
+            </button>
+            <button type="button" onclick="exportSkillMapToExcel()"
+                class="px-4 py-2 bg-[#0B3B82] hover:bg-blue-900 active:scale-95 text-white font-semibold rounded-xl text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                title="Export Matriks Kompetensi Siswa ke File Excel">
+                <i class="fa-solid fa-file-excel text-emerald-300 text-xs"></i>
+                <span>Export Matriks Excel</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- KPI Summary Cards (4 Cards - Warna Mencolok & Tipografi Korporat Bersih) -->
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <!-- KPI 1: Rata-rata Skor Section (Vibrant Purple) -->
+        <div class="bg-gradient-to-br from-purple-500 to-purple-600 p-5 rounded-[22px] text-white shadow-md flex items-center justify-between">
+            <div class="min-w-0">
+                <p class="text-xs font-medium text-purple-100">Rata-rata Section</p>
+                <div class="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-1" id="sm-kpi-avg">0.0%</div>
+                <div class="mt-2.5 flex items-center gap-2">
+                    <span id="sm-kpi-status-badge" class="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium text-white tracking-wide">Standar</span>
+                    <span class="text-[11px] text-purple-200 font-normal">Target 85%</span>
+                </div>
+            </div>
+            <div class="text-3xl text-white/30 shrink-0 ml-2"><i class="fa-solid fa-chart-pie"></i></div>
+        </div>
+
+        <!-- KPI 2: Rasio Siswa Memenuhi Target (Vibrant Emerald / Teal) -->
+        <div class="bg-gradient-to-br from-emerald-500 to-teal-600 p-5 rounded-[22px] text-white shadow-md flex items-center justify-between">
+            <div class="min-w-0">
+                <p class="text-xs font-medium text-emerald-100">Siswa Capai Target</p>
+                <div class="flex items-baseline gap-2 mt-1">
+                    <span class="text-3xl sm:text-4xl font-bold tracking-tight text-white" id="sm-kpi-pass-count">0 / 0</span>
+                    <span class="text-xs font-medium text-emerald-200" id="sm-kpi-pass-pct">(0%)</span>
+                </div>
+                <div class="mt-2.5 flex items-center gap-2">
+                    <span class="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium text-white tracking-wide">Nilai ≥ 85%</span>
+                    <span class="text-[11px] text-emerald-200 font-normal">Kompeten</span>
+                </div>
+            </div>
+            <div class="text-3xl text-white/30 shrink-0 ml-2"><i class="fa-solid fa-user-graduate"></i></div>
+        </div>
+
+        <!-- KPI 3: Skill Tertinggi (Vibrant Amber / Orange) -->
+        <div class="bg-gradient-to-br from-amber-500 to-orange-600 p-5 rounded-[22px] text-white shadow-md flex items-center justify-between">
+            <div class="min-w-0">
+                <p class="text-xs font-medium text-amber-100">Kompetensi Tertinggi</p>
+                <div class="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-1" id="sm-kpi-top-score">0.0%</div>
+                <div class="mt-2.5 flex items-center gap-2 truncate">
+                    <span class="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium text-white tracking-wide shrink-0">Terbaik</span>
+                    <span class="text-xs font-normal text-white/95 truncate" id="sm-kpi-top-skill">-</span>
+                </div>
+            </div>
+            <div class="text-3xl text-white/30 shrink-0 ml-2"><i class="fa-solid fa-award"></i></div>
+        </div>
+
+        <!-- KPI 4: Gap Skill Terbesar (Vibrant Rose / Red) -->
+        <div class="bg-gradient-to-br from-rose-500 to-red-600 p-5 rounded-[22px] text-white shadow-md flex items-center justify-between">
+            <div class="min-w-0">
+                <p class="text-xs font-medium text-rose-100">Fokus Peningkatan</p>
+                <div class="text-3xl sm:text-4xl font-bold tracking-tight text-white mt-1" id="sm-kpi-gap-score">0.0%</div>
+                <div class="mt-2.5 flex items-center gap-2 truncate">
+                    <span class="text-[11px] bg-white/20 px-2.5 py-0.5 rounded-full font-medium text-white tracking-wide shrink-0">Bimbingan</span>
+                    <span class="text-xs font-normal text-white/95 truncate" id="sm-kpi-gap-skill">-</span>
+                </div>
+            </div>
+            <div class="text-3xl text-white/30 shrink-0 ml-2"><i class="fa-solid fa-triangle-exclamation"></i></div>
+        </div>
+    </div>
+
+    <!-- Two-Column Analytics Layout: Radar Chart & Competency Progress -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-5 items-start">
+        <!-- Kolom Kiri (7 Cols): Radar Spider Diagram Section (Model & Warna Sesuai Referensi) -->
+        <div class="lg:col-span-7 bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-2xs flex flex-col space-y-3">
+            <!-- Radar Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-200 pb-2.5">
+                <div>
+                    <h4 class="font-semibold text-sm sm:text-base text-slate-800">
+                        Diagram Radar Kompetensi Section
+                    </h4>
+                    <span id="sm-section-name-badge" class="text-xs font-normal text-slate-500">
+                        Section: Semua Section Aktif
+                    </span>
+                </div>
+
+                <!-- Legend Indicator (Deep Purple #3B1443 & Electric Magenta #D946EF) -->
+                <div class="flex items-center gap-4 text-xs font-normal">
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-[#D946EF] border border-[#D946EF]"></span>
+                        <span class="text-slate-600 text-[11px] font-normal">Capaian Aktual</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                        <span class="w-3 h-3 rounded-full bg-[#3B1443] border border-[#3B1443]"></span>
+                        <span class="text-slate-600 text-[11px] font-normal">Standar Target (85%)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Radar Canvas Container (Tinggi Terkontrol Tanpa Gap Putih Lebar) -->
+            <div class="w-full relative flex items-center justify-center h-[340px] sm:h-[370px]">
+                <canvas id="skillmap-radar-chart-canvas"></canvas>
+            </div>
+
+            <!-- 6 Competency Badges Grid (SK-01 s/d SK-06 / Pill Section) -->
+            <div id="sm-radar-skills-grid" class="grid grid-cols-2 sm:grid-cols-3 gap-2 pt-2.5 border-t border-slate-200">
+                <!-- Diisi Dinamis lewat JavaScript -->
+            </div>
+        </div>
+
+        <!-- Kolom Kanan (5 Cols): Distribusi Skor & Catatan Evaluasi Instruktur -->
+        <div class="lg:col-span-5 flex flex-col space-y-4">
+            <!-- Card 1: Distribusi Parameter Kompetensi / Section -->
+            <div class="bg-white rounded-xl p-4 sm:p-5 border border-slate-200 shadow-2xs space-y-3">
+                <div class="flex items-center justify-between border-b border-slate-200 pb-2.5">
+                    <h4 class="font-semibold text-sm text-slate-800">
+                        Capaian Parameter Kompetensi
+                    </h4>
+                    <span class="text-[11px] font-medium text-slate-500">Benchmark: 85%</span>
+                </div>
+
+                <!-- Progress Bars (Diisi Dinamis, Rapi & Scrollable jika Section Banyak) -->
+                <div id="sm-competency-progress-list" class="space-y-3 max-h-[350px] overflow-y-auto pr-1">
+                    <!-- Diisi lewat JS -->
+                </div>
+            </div>
+
+            <!-- Card 2: Catatan Evaluasi & Rekomendasi Instruktur (Corporate Memo Style) -->
+            <div class="bg-slate-50 rounded-xl p-4 sm:p-5 border border-slate-200 space-y-2">
+                <div class="flex items-center justify-between">
+                    <h5 class="font-semibold text-xs text-slate-700 uppercase tracking-wide">
+                        Catatan Evaluasi Kompetensi Section
+                    </h5>
+                    <span class="text-[11px] font-medium text-slate-500">Divisi Pelatihan & Manpower</span>
+                </div>
+                <p id="sm-training-recommendation" class="text-xs text-slate-600 leading-relaxed font-normal">
+                    Memuat catatan evaluasi kompetensi terkini...
+                </p>
+                <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-200">
+                    <span id="sm-recommendation-target-info">Standar Kelulusan Section: 85.0%</span>
+                    <span>LTC Indoprima Gemilang</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bottom Section: Matriks Kompetensi Siswa (Tabel Lengkap & Interaktif) -->
+    <div class="space-y-3.5 pt-2">
+        <div class="flex items-center justify-between gap-2 flex-wrap pb-1">
+            <div class="flex items-center gap-2.5 flex-wrap">
+                <h4 class="font-bold text-base text-slate-800 tracking-tight">
+                    Matriks Kompetensi Individual Siswa
+                </h4>
+                <button type="button" onclick="openSkillDictionaryModal()"
+                    class="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-[#3B1443] border border-purple-300 font-semibold rounded-xl text-xs transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 active:scale-95"
+                    title="Buka Kamus Standar Kompetensi (SK) 22 Section untuk acuan input & impor nilai">
+                    <i class="fa-solid fa-book-open text-xs text-[#3B1443]"></i>
+                    <span>Kamus Standar Kompetensi (22 Section)</span>
+                </button>
+            </div>
+            <div class="flex items-center gap-2">
+                <div id="sm-table-filter-tag" class="hidden items-center gap-1.5 px-3 py-1 rounded-lg text-xs font-medium bg-purple-100 text-[#3B1443] border border-purple-300">
+                    <span>Section: <strong id="sm-table-filter-name" class="font-semibold">-</strong></span>
+                    <button type="button" onclick="selectSectionFilter('ALL')" class="hover:text-rose-600 ml-1 cursor-pointer font-bold text-sm leading-none" title="Kembali ke semua section">&times;</button>
+                </div>
+                <span id="sm-table-student-count" class="px-3 py-1 rounded-lg text-xs font-semibold bg-slate-200 text-slate-800 border border-slate-300">
+                    0 Siswa Terdaftar
+                </span>
+            </div>
+        </div>
+
+        <!-- Filter Bar: Section, Kelas/Batch, dan Pencarian (Terkelompok per Departemen) -->
+        <div class="p-4 sm:p-5 bg-[#F1F5F9] rounded-2xl border border-slate-300 shadow-xs space-y-3.5">
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+                <!-- 1. Section Selector (Diisi Otomatis Terkelompok per Departemen) -->
+                <div>
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-1.5">
+                        <i class="fa-solid fa-layer-group text-purple-700 text-[11px]"></i>
+                        <span>Pilih Section</span>
+                    </label>
+                    <select id="filter-skillmap-section" onchange="onSkillMapFilterChange()"
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:ring-2 focus:ring-purple-500/20 shadow-2xs transition-all cursor-pointer">
+                        <option value="ALL" selected>Semua Section Aktif</option>
+                    </select>
+                </div>
+
+                <!-- 2. Filter Kelas / Batch -->
+                <div>
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-1.5">
+                        <i class="fa-solid fa-graduation-cap text-blue-700 text-[11px]"></i>
+                        <span>Kelas / Batch</span>
+                    </label>
+                    <select id="filter-skillmap-kelas" onchange="onSkillMapFilterChange()"
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:ring-2 focus:ring-purple-500/20 shadow-2xs transition-all cursor-pointer">
+                        <option value="">Semua Kelas</option>
+                        <option value="Kelas 1">Kelas 1</option>
+                        <option value="Kelas 2">Kelas 2</option>
+                        <option value="Kelas 3">Kelas 3</option>
+                        <option value="Kelas 4">Kelas 4</option>
+                        <option value="Kelas 5">Kelas 5</option>
+                    </select>
+                </div>
+
+                <!-- 3. Pencarian Siswa -->
+                <div class="lg:col-span-2">
+                    <label class="flex items-center gap-1.5 text-xs font-semibold text-slate-700 mb-1.5">
+                        <i class="fa-solid fa-magnifying-glass text-slate-500 text-[11px]"></i>
+                        <span>Cari Siswa</span>
+                    </label>
+                    <div class="relative">
+                        <i class="fa-solid fa-search absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400 text-xs pointer-events-none"></i>
+                        <input type="text" id="filter-skillmap-query" oninput="onSkillMapFilterChange()" placeholder="Cari nama siswa, No. Reg, nama SPV..."
+                            class="w-full pl-9 pr-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:ring-2 focus:ring-purple-500/20 shadow-2xs transition-all placeholder:text-slate-400">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Grouped Quick Filter Tabs & Chips -->
+            <div class="pt-3 border-t border-slate-200/90 space-y-2.5">
+                <div class="flex items-center justify-between gap-2.5 flex-wrap">
+                    <div class="flex items-center gap-1 p-1 bg-slate-200/80 border border-slate-300/70 rounded-xl overflow-x-auto" id="sm-filter-dept-tabs">
+                        <!-- Diinjeksi dinamis oleh JS: Tabs Departemen [Semua] [Produksi] [Engineering] [SHE & HR] [QC] -->
+                    </div>
+                    <div class="flex items-center gap-2 shrink-0">
+                        <button type="button" onclick="openSkillDictionaryModal()" 
+                            class="px-3 py-1.5 bg-purple-100 hover:bg-purple-200 text-[#3B1443] border border-purple-300/80 font-semibold rounded-xl text-xs transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 active:scale-95"
+                            title="Buka Kamus Standar Kompetensi 22 Section">
+                            <i class="fa-solid fa-book-bookmark text-[11px] text-[#3B1443]"></i>
+                            <span>Kamus SK</span>
+                        </button>
+                        <button type="button" onclick="selectSectionFilter('ALL')" 
+                            class="px-3 py-1.5 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 border border-slate-300 hover:border-rose-300 font-medium rounded-xl text-xs transition-all shadow-2xs cursor-pointer flex items-center gap-1.5 active:scale-95"
+                            title="Reset pilihan section ke semua siswa">
+                            <i class="fa-solid fa-rotate-left text-[10px]"></i>
+                            <span>Reset Section</span>
+                        </button>
+                    </div>
+                </div>
+                <div id="sm-filter-section-chips" class="flex flex-wrap items-center gap-1.5 pt-0.5">
+                    <!-- Diinjeksi dinamis oleh JS: Chips section per departemen -->
+                </div>
+            </div>
+        </div>
+
+        <!-- Section Skills Legend Bar: Menampilkan 6 Parameter SK yang Sedang Ditampilkan di Tabel -->
+        <div id="sm-section-skills-legend-bar" class="p-4 bg-[#F8FAFC] border border-purple-200/80 rounded-2xl transition-all shadow-xs hidden">
+            <!-- Diisi secara dinamis oleh JavaScript: renderSectionSkillsLegendBar(selectedSection) -->
+        </div>
+
+        <!-- Tabel Matriks Interaktif -->
+        <div class="overflow-x-auto rounded-xl border border-slate-300 shadow-sm max-h-[560px]" style="overflow-y: auto;">
+            <table class="w-full text-left text-xs border-collapse skillmap-matrix-table">
+                <thead class="sticky top-0 z-20 shadow-xs">
+                    <tr class="bg-[#1E293B] text-white font-medium border-b border-slate-700 text-[11px] tracking-wide">
+                        <th class="py-3 px-2 text-center sticky top-0 bg-[#1E293B] z-20 w-10 text-slate-200">NO</th>
+                        <th class="py-3 px-3.5 sticky top-0 bg-[#1E293B] z-20 min-w-[170px] text-white">SISWA</th>
+                        <th class="py-3 px-3 sticky top-0 bg-[#1E293B] z-20 min-w-[105px] text-slate-200">SECTION / KELAS</th>
+                        <th id="th-skill-01" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-01</th>
+                        <th id="th-skill-02" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-02</th>
+                        <th id="th-skill-03" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-03</th>
+                        <th id="th-skill-04" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-04</th>
+                        <th id="th-skill-05" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-05</th>
+                        <th id="th-skill-06" class="py-2.5 px-1.5 text-center sticky top-0 bg-[#1E293B] z-20 w-[72px] min-w-[68px]">SK-06</th>
+                        <th class="py-3 px-2.5 text-center sticky top-0 bg-navy-dark bg-[#0F172A] z-20 w-[85px] min-w-[80px] text-purple-200 font-semibold border-x border-slate-700">RATA-RATA</th>
+                        <th class="py-3 px-2 text-center sticky top-0 bg-[#1E293B] z-20 w-[105px] min-w-[100px] text-slate-200">STATUS</th>
+                        <th class="py-3 px-2 text-center sticky top-0 bg-[#1E293B] z-20 w-[125px] min-w-[120px] text-slate-200">AKSI</th>
+                    </tr>
+                </thead>
+                <tbody id="skillmap-table-tbody" class="divide-y divide-slate-100 font-normal text-slate-700">
+                    <tr>
+                        <td colspan="12" class="py-12 text-center text-xs text-slate-400 italic">
+                            Memuat matriks kompetensi siswa...
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Keterangan Status Nilai & Asal Data Riil -->
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 px-3.5 py-2.5 bg-[#F1F5F9] border border-slate-300 rounded-xl text-[11px] text-slate-700 font-normal">
+            <div class="flex items-center gap-3 flex-wrap">
+                <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-2xs"></span>
+                    <strong class="font-semibold text-slate-800">Terverifikasi:</strong> Dinilai langsung oleh Supervisor / Instruktur (Uji Praktik)
+                </span>
+                <span class="flex items-center gap-1.5">
+                    <span class="inline-block w-2.5 h-2.5 rounded-full bg-amber-500 shadow-2xs"></span>
+                    <strong class="font-semibold text-slate-800">Data Sistem:</strong> Nilai acuan awal dari kuis & presensi (sebelum ada nilai praktik)
+                </span>
+            </div>
+            <div class="text-slate-500 text-[10.5px]">
+                <span>Klik tombol <strong>Input</strong> pada siswa untuk memasukkan nilai evaluasi praktik</span>
+            </div>
+        </div>
+
+        <!-- Paginasi Tabel Matriks -->
+        <div id="skillmap-pagination-container" class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pt-3 border-t border-slate-200 text-xs">
+            <div class="text-slate-500 font-medium" id="skillmap-pagination-info">
+                Menampilkan 0 dari 0 siswa
+            </div>
+            <div class="flex items-center gap-1.5" id="skillmap-pagination-controls">
+                <!-- Tombol paginasi diinjeksi via JS -->
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Input / Edit Evaluasi Kompetensi Siswa (Hybrid: Praktik + Data Riil) -->
+<div id="modal-skill-eval" class="fixed inset-0 z-50 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-2xl w-full flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header -->
+        <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50/70 shrink-0">
+            <div class="min-w-0 pr-3">
+                <div class="flex items-center gap-2 flex-wrap">
+                    <h3 class="font-semibold text-base text-slate-800">
+                        Evaluasi Kompetensi Kejuruan Siswa
+                    </h3>
+                    <span id="sm-modal-section-badge" class="px-2 py-0.5 rounded-full text-[11px] font-normal bg-purple-50 text-[#3B1443] border border-purple-200">
+                        Section: -
+                    </span>
+                </div>
+                <p id="sm-modal-student-info" class="text-xs text-slate-500 mt-1 truncate">
+                    Memuat data siswa...
+                </p>
+            </div>
+            <button type="button" onclick="closeSkillEvaluationModal()" 
+                class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-all cursor-pointer shrink-0"
+                title="Tutup Modal">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Modal Body (Scrollable) -->
+        <div class="p-4 sm:p-5 space-y-4 overflow-y-auto flex-1">
+            <!-- 1. Panel Integrasi Data Riil Sistem -->
+            <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl space-y-2.5">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                        Integrasi Data Riil Sistem
+                    </span>
+                    <span class="text-[11px] text-slate-500 font-normal">Kuis + Absensi</span>
+                </div>
+                <div class="grid grid-cols-3 gap-2.5">
+                    <div class="p-2 bg-white rounded-lg border border-slate-200">
+                        <div class="text-[10.5px] text-slate-500">Kehadiran Presensi</div>
+                        <div id="sm-modal-attendance-pct" class="text-sm font-semibold text-slate-800 mt-0.5">0.0%</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-slate-200">
+                        <div class="text-[10.5px] text-slate-500">Kuis Kejuruan</div>
+                        <div id="sm-modal-quiz-score" class="text-sm font-semibold text-slate-800 mt-0.5">0.0%</div>
+                    </div>
+                    <div class="p-2 bg-white rounded-lg border border-slate-200">
+                        <div class="text-[10.5px] text-slate-500">Skor Acuan Sistem</div>
+                        <div id="sm-modal-auto-score" class="text-sm font-semibold text-purple-700 mt-0.5">0.0%</div>
+                    </div>
+                </div>
+                <button type="button" onclick="applySystemBaselineScores()" 
+                    class="w-full py-1.5 px-3 bg-white hover:bg-purple-50 text-[#3B1443] border border-purple-200 rounded-lg text-xs font-medium transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-2xs">
+                    <i class="fa-solid fa-wand-magic-sparkles text-[11px]"></i>
+                    <span>Terapkan Skor Acuan Sistem Sebagai Nilai Awal</span>
+                </button>
+            </div>
+
+            <!-- 2. Form Input 6 Parameter Keahlian Praktik Section -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <label class="block text-xs font-semibold text-slate-700 uppercase tracking-wide">
+                        6 Parameter Keterampilan Praktik Lini (0 - 100)
+                    </label>
+                    <span class="text-[11px] text-slate-400 font-normal">Bobot 70% Evaluasi</span>
+                </div>
+                <!-- Kontainer 6 Input Dinamis sesuai Section Siswa -->
+                <div id="sm-modal-skills-container" class="space-y-2.5">
+                    <!-- Diinjeksi dinamis via JS -->
+                </div>
+            </div>
+
+            <!-- 3. Form Evaluator & Catatan -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-slate-200">
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Nama Supervisor / Instruktur</label>
+                    <input type="text" id="sm-modal-evaluator" placeholder="Contoh: Pak Agus (SPV Grinding)"
+                        class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-normal text-slate-700 outline-none focus:border-[#3B1443] transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-medium text-slate-600 mb-1">Catatan Evaluasi / Rekomendasi</label>
+                    <input type="text" id="sm-modal-notes" placeholder="Contoh: Hasil grinding presisi, perlu latihan setting feeding"
+                        class="w-full px-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-normal text-slate-700 outline-none focus:border-[#3B1443] transition-all">
+                </div>
+            </div>
+
+            <!-- 4. Ringkasan Skor Akhir & Status Kelulusan -->
+            <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                <div>
+                    <span class="text-[11px] text-slate-500 block">Proyeksi Skor Akhir (70% Praktik + 30% Sistem):</span>
+                    <div class="flex items-baseline gap-2 mt-0.5">
+                        <span id="sm-modal-final-preview" class="text-xl font-bold text-slate-800">0.0%</span>
+                        <span id="sm-modal-status-badge" class="px-2 py-0.5 rounded text-[10.5px] font-semibold bg-slate-200 text-slate-700">
+                            Menunggu Penilaian
+                        </span>
+                    </div>
+                </div>
+                <div class="text-right text-[11px] text-slate-500">
+                    <div>Standar Target: <strong>85.0%</strong></div>
+                    <div id="sm-modal-gap-preview" class="text-slate-400 mt-0.5">Gap: -</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-end gap-2.5 p-3.5 sm:p-4 border-t border-slate-200 bg-slate-50/70 shrink-0">
+            <button type="button" onclick="closeSkillEvaluationModal()"
+                class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-medium rounded-lg text-xs transition-all border border-slate-300 cursor-pointer shadow-2xs">
+                Batal
+            </button>
+            <button type="button" id="btn-save-skill-eval" onclick="submitSkillEvaluationModal()"
+                class="px-5 py-2 bg-[#3B1443] hover:bg-purple-950 active:scale-95 text-white font-medium rounded-lg text-xs transition-all cursor-pointer shadow-xs flex items-center gap-1.5">
+                <i class="fa-solid fa-floppy-disk text-xs"></i>
+                <span>Simpan Evaluasi Kompetensi</span>
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Kamus & Daftar Lengkap Parameter Standar Kompetensi (SK 22 Section) -->
+<div id="modal-skill-dictionary" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 overflow-y-auto" style="z-index: 9000;">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-4xl w-full flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        <!-- Modal Header (Bersih Tanpa Teks Panjang) -->
+        <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-white shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="w-9 h-9 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-[#3B1443]">
+                    <i class="fa-solid fa-book-bookmark text-sm"></i>
+                </div>
+                <h3 class="font-bold text-base text-slate-800 tracking-tight">
+                    Kamus Standar Kompetensi (SK) Manufaktur
+                </h3>
+            </div>
+            <div class="flex items-center gap-2">
+                <button type="button" onclick="openAddSectionModal()" 
+                    class="px-3.5 py-2 bg-[#3B1443] hover:bg-purple-950 active:scale-95 text-white font-semibold rounded-xl text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1.5"
+                    title="Tambah Section & 6 Parameter SK Baru">
+                    <i class="fa-solid fa-plus text-xs"></i>
+                    <span>Tambah Section & SK</span>
+                </button>
+                <button type="button" onclick="closeSkillDictionaryModal()" 
+                    class="w-8 h-8 rounded-xl flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-all cursor-pointer shrink-0"
+                    title="Tutup Kamus">
+                    <i class="fa-solid fa-xmark text-sm"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Filter & Search Bar -->
+        <div class="p-3 sm:px-5 border-b border-slate-200 bg-slate-50/70 shrink-0 flex flex-col sm:flex-row gap-2.5 items-stretch sm:items-center justify-between">
+            <div class="relative flex-1">
+                <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+                <input type="text" id="sm-dict-search-input" oninput="onSkillDictionarySearch(this.value)"
+                    placeholder="Cari section atau nama skill (misal: Grinding, Bubut, Suhu Tuang, PLC)..."
+                    class="w-full pl-8 pr-3 py-1.5 bg-white border border-slate-300 rounded-lg text-xs font-normal text-slate-700 outline-none focus:border-[#3B1443] transition-all">
+            </div>
+            <div class="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0" id="sm-dict-dept-filters">
+                <button type="button" onclick="filterSkillDictionaryDept('ALL')" data-dept="ALL"
+                    class="sm-dict-dept-btn px-2.5 py-1 rounded-md text-[11px] font-medium bg-[#3B1443] text-white transition-all cursor-pointer shadow-2xs">
+                    Semua
+                </button>
+                <button type="button" onclick="filterSkillDictionaryDept('PRODUKSI')" data-dept="PRODUKSI"
+                    class="sm-dict-dept-btn px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+                    Produksi
+                </button>
+                <button type="button" onclick="filterSkillDictionaryDept('ENGINEERING')" data-dept="ENGINEERING"
+                    class="sm-dict-dept-btn px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+                    Engineering
+                </button>
+                <button type="button" onclick="filterSkillDictionaryDept('SHE')" data-dept="SHE"
+                    class="sm-dict-dept-btn px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+                    SHE & HR
+                </button>
+                <button type="button" onclick="filterSkillDictionaryDept('QC')" data-dept="QC"
+                    class="sm-dict-dept-btn px-2.5 py-1 rounded-md text-[11px] font-medium bg-slate-100 text-slate-600 hover:bg-slate-200 transition-all cursor-pointer">
+                    QC & Lainnya
+                </button>
+            </div>
+        </div>
+
+        <!-- Modal Body: Cards Grid of Sections -->
+        <div class="p-4 sm:p-5 overflow-y-auto flex-1 bg-slate-50/50">
+            <div id="sm-dictionary-cards-container" class="grid grid-cols-1 md:grid-cols-2 gap-3.5">
+                <!-- Diinjeksi Dinamis oleh JavaScript -->
+            </div>
+        </div>
+
+        <!-- Modal Footer -->
+        <div class="flex items-center justify-between p-3.5 sm:p-4 border-t border-slate-200 bg-white shrink-0">
+            <div class="flex items-center gap-3">
+                <span class="text-xs text-slate-500 font-normal" id="sm-dict-count-info">
+                    Memuat daftar section...
+                </span>
+                <span class="text-slate-300">&bull;</span>
+                <button type="button" onclick="resetSkillDictionaryToDefault()" 
+                    class="text-xs text-slate-400 hover:text-[#3B1443] transition-colors cursor-pointer"
+                    title="Kembalikan kamus ke parameter standar pabrik">
+                    Reset ke Standar Default
+                </button>
+            </div>
+            <button type="button" onclick="closeSkillDictionaryModal()"
+                class="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-medium rounded-xl text-xs transition-all border border-slate-200 cursor-pointer shadow-2xs">
+                Tutup
+            </button>
+        </div>
+    </div>
+</div>
+
+<!-- Modal Edit / Tambah Section & 6 Parameter SK -->
+<div id="modal-edit-section-skill" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs hidden items-center justify-center p-3 sm:p-4 overflow-y-auto" style="z-index: 9999;">
+    <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-xl w-full flex flex-col max-h-[92vh] overflow-hidden my-auto animate-in fade-in zoom-in-95 duration-150">
+        <!-- Header -->
+        <div class="flex items-center justify-between p-4 sm:p-5 border-b border-slate-200 bg-slate-50/70 shrink-0">
+            <div class="flex items-center gap-2.5">
+                <div class="w-8 h-8 rounded-xl bg-purple-100 border border-purple-200 flex items-center justify-center text-[#3B1443]">
+                    <i class="fa-solid fa-pen-ruler text-xs"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-sm sm:text-base text-slate-800" id="modal-section-skill-title">
+                        Edit Standar Kompetensi Section
+                    </h3>
+                    <p class="text-[11px] text-slate-500 font-normal mt-0.5">
+                        Kelola nama section, departemen, dan 6 parameter kompetensi (SK-01 s/d SK-06)
+                    </p>
+                </div>
+            </div>
+            <button type="button" onclick="closeEditSectionSkillModal()"
+                class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-400 hover:text-slate-700 hover:bg-slate-200/70 transition-all cursor-pointer">
+                <i class="fa-solid fa-xmark text-sm"></i>
+            </button>
+        </div>
+
+        <!-- Form Body -->
+        <form id="form-edit-section-skill" onsubmit="saveSectionSkillModal(event)" class="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+            <input type="hidden" id="input-sk-original-key" value="">
+            
+            <!-- Section Info -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Nama Section <span class="text-rose-500">*</span>
+                    </label>
+                    <input type="text" id="input-sk-section-name" required placeholder="Misal: Grinding, CNC, Welding..."
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:ring-2 focus:ring-purple-500/20 shadow-2xs transition-all">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-700 mb-1">
+                        Departemen <span class="text-rose-500">*</span>
+                    </label>
+                    <select id="input-sk-dept" required
+                        class="w-full px-3 py-2 bg-white border border-slate-300 rounded-xl text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:ring-2 focus:ring-purple-500/20 shadow-2xs transition-all cursor-pointer">
+                        <option value="PRODUKSI">Departemen Produksi</option>
+                        <option value="ENGINEERING">Departemen Engineering</option>
+                        <option value="SHE">Departemen SHE & HR</option>
+                        <option value="QC">Departemen Quality & Lab / Lainnya</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 6 Parameter SK Fields -->
+            <div class="space-y-2 pt-2 border-t border-slate-200">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-semibold text-slate-700">Daftar 6 Parameter Kompetensi (SK):</span>
+                    <span class="text-[10.5px] text-slate-400 font-normal">Wajib diisi 6 parameter</span>
+                </div>
+
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-01 (Parameter 1)</label>
+                        <input type="text" id="input-sk-01" required placeholder="Nama kompetensi SK-01"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-02 (Parameter 2)</label>
+                        <input type="text" id="input-sk-02" required placeholder="Nama kompetensi SK-02"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-03 (Parameter 3)</label>
+                        <input type="text" id="input-sk-03" required placeholder="Nama kompetensi SK-03"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-04 (Parameter 4)</label>
+                        <input type="text" id="input-sk-04" required placeholder="Nama kompetensi SK-04"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-05 (Parameter 5)</label>
+                        <input type="text" id="input-sk-05" required placeholder="Nama kompetensi SK-05"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                    <div>
+                        <label class="block text-[10.5px] font-semibold text-purple-900 mb-0.5">SK-06 (Parameter 6)</label>
+                        <input type="text" id="input-sk-06" required placeholder="Nama kompetensi SK-06"
+                            class="w-full px-2.5 py-1.5 bg-slate-50 border border-slate-300 rounded-lg text-xs font-medium text-slate-800 outline-none focus:border-[#3B1443] focus:bg-white transition-all">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Footer Action -->
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-slate-200">
+                <button type="button" onclick="closeEditSectionSkillModal()"
+                    class="px-4 py-2 bg-white hover:bg-slate-100 text-slate-700 font-medium rounded-xl text-xs border border-slate-300 transition-all cursor-pointer shadow-2xs">
+                    Batal
+                </button>
+                <button type="submit" id="btn-submit-section-skill"
+                    class="px-5 py-2 bg-[#3B1443] hover:bg-purple-950 active:scale-95 text-white font-semibold rounded-xl text-xs transition-all shadow-xs cursor-pointer flex items-center gap-1.5">
+                    <i class="fa-solid fa-check text-xs"></i>
+                    <span id="btn-submit-section-skill-text">Simpan Standar SK</span>
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+

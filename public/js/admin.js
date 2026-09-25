@@ -36,6 +36,85 @@
         // Update sidebar sub-menu buttons style
         updateAdminSubmenuHighlight(currentAdminTab);
 
+        // Update active sidebar nav button (nav-lms vs nav-admin vs nav-setting) & dropdowns & header title
+        const isLms = (currentAdminTab === 'kelola-quiz' || currentAdminTab === 'kelola-sertifikat' || currentAdminTab === 'skill-map');
+        const isSetting = (currentAdminTab === 'kelola-setting');
+        const navLms = document.getElementById('nav-lms');
+        const navAdmin = document.getElementById('nav-admin');
+        const navSetting = document.getElementById('nav-setting');
+        const lmsSubmenu = document.getElementById('nav-lms-submenu');
+        const lmsChevron = document.getElementById('lms-chevron');
+        const adminSubmenu = document.getElementById('nav-admin-submenu');
+        const adminChevron = document.getElementById('admin-chevron');
+
+        const titleHeader = document.getElementById('header-view-title');
+        if (titleHeader) {
+            if (currentAdminTab === 'kelola-quiz') {
+                titleHeader.innerText = 'LMS - Quiz & Evaluasi Teori';
+            } else if (currentAdminTab === 'kelola-sertifikat') {
+                titleHeader.innerText = 'LMS - Kelola Sertifikat';
+            } else if (currentAdminTab === 'skill-map') {
+                titleHeader.innerText = 'LMS - Skill map';
+            } else if (currentAdminTab === 'kelola-setting') {
+                titleHeader.innerText = 'Setting';
+            } else {
+                titleHeader.innerText = 'Admin';
+            }
+        }
+
+        if (isSetting) {
+            if (navSetting) {
+                navSetting.classList.remove('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+                navSetting.classList.add('text-white', 'bg-blue-600');
+            }
+            if (navAdmin) {
+                navAdmin.classList.remove('text-white', 'bg-blue-600');
+                navAdmin.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (navLms) {
+                navLms.classList.remove('text-white', 'bg-blue-600');
+                navLms.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (adminSubmenu) adminSubmenu.classList.add('hidden');
+            if (adminChevron) adminChevron.classList.remove('rotate-180');
+            if (lmsSubmenu) lmsSubmenu.classList.add('hidden');
+            if (lmsChevron) lmsChevron.classList.remove('rotate-180');
+        } else if (isLms) {
+            if (navSetting) {
+                navSetting.classList.remove('text-white', 'bg-blue-600');
+                navSetting.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (navLms) {
+                navLms.classList.remove('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+                navLms.classList.add('text-white', 'bg-blue-600');
+            }
+            if (navAdmin) {
+                navAdmin.classList.remove('text-white', 'bg-blue-600');
+                navAdmin.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (lmsSubmenu) lmsSubmenu.classList.remove('hidden');
+            if (lmsChevron) lmsChevron.classList.add('rotate-180');
+            if (adminSubmenu) adminSubmenu.classList.add('hidden');
+            if (adminChevron) adminChevron.classList.remove('rotate-180');
+        } else {
+            if (navSetting) {
+                navSetting.classList.remove('text-white', 'bg-blue-600');
+                navSetting.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (navAdmin) {
+                navAdmin.classList.remove('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+                navAdmin.classList.add('text-white', 'bg-blue-600');
+            }
+            if (navLms) {
+                navLms.classList.remove('text-white', 'bg-blue-600');
+                navLms.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
+            }
+            if (adminSubmenu) adminSubmenu.classList.remove('hidden');
+            if (adminChevron) adminChevron.classList.add('rotate-180');
+            if (lmsSubmenu) lmsSubmenu.classList.add('hidden');
+            if (lmsChevron) lmsChevron.classList.remove('rotate-180');
+        }
+
         // Toggle tab content panels
         document.querySelectorAll('.admin-tab-content').forEach(content => {
             content.classList.add('hidden');
@@ -122,6 +201,14 @@
         } else if (currentAdminTab === 'kelola-quiz') {
             if (typeof loadQuizAdminData === 'function') {
                 loadQuizAdminData();
+            }
+        } else if (currentAdminTab === 'skill-map') {
+            if (typeof loadSkillMapData === 'function') {
+                loadSkillMapData();
+            }
+        } else if (currentAdminTab === 'kelola-setting') {
+            if (typeof initAdminSettingTab === 'function') {
+                initAdminSettingTab();
             }
         }
     }

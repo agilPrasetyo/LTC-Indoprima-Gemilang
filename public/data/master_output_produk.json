@@ -4,15 +4,17 @@
     "nama": "PLATE CAMSHAFT THRUST",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.1,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 210,
       "SHOTBLAST": 1000,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 30,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -20,15 +22,17 @@
     "nama": "REAR WHEEL HUB",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 12,
       "CORE": 150,
       "FURAN": 0,
       "FETTLING": 160,
       "GRINDING": 160,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 55,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -36,15 +40,17 @@
     "nama": "REAR AXLE 50-DT-0X009-00-04",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0,
+      "LADLE": 0,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 0,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -52,15 +58,17 @@
     "nama": "GEAR DIA.1022 x 102 MM",
     "proses": "FBO",
     "targets": {
+      "MELTING": 166,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.5,
       "FETTLING": 0,
       "GRINDING": 1,
       "SHOTBLAST": 1,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -68,15 +76,17 @@
     "nama": "Mits. FE 74S (125PS)-RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.6,
+      "LADLE": 7,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 30,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 20,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -84,15 +94,17 @@
     "nama": "Mits. FE 347/447 (125PS/136PS) - RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.5,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -100,15 +112,17 @@
     "nama": "Mits. FE 119/449 (120PS) - FR/RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.4,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 30,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 20,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -116,15 +130,17 @@
     "nama": "HINO DUTRO HT 130HD - RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.8,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 52,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 15,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -132,15 +148,17 @@
     "nama": "DAIHATSU GRANDMAX 1.5 RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2,
+      "LADLE": 14,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -148,15 +166,17 @@
     "nama": "Mits. FE 74/75 HDV (135PS HDX) - FR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 5.3,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -164,15 +184,17 @@
     "nama": "SUZUKI CARRY FUTURA 1.5- RR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.9,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -180,15 +202,17 @@
     "nama": "MITSUBITSHI L-300",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2,
+      "LADLE": 13,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -196,15 +220,17 @@
     "nama": "ML270113 MITS. CANTER 125 PS HD-REAR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.2,
+      "LADLE": 7,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 8,
       "MILLING": 30,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -212,15 +238,17 @@
     "nama": "BRAKE DRUM FR RH LH (PARTEX)",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.5,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 15,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -228,15 +256,17 @@
     "nama": "49.3-55-56-6-91-97",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.3,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -244,15 +274,17 @@
     "nama": "49-57-58-6-104-110",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -260,15 +292,17 @@
     "nama": "51-58-59-6-112-118",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -276,15 +310,17 @@
     "nama": "64-76-78-6-114-120",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 14,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -292,15 +328,17 @@
     "nama": "52.5-59-60-6-91-97",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -308,15 +346,17 @@
     "nama": "61-71.5-72.5-6-100",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 11,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -324,15 +364,17 @@
     "nama": "56-63-64-6-92-98",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.9,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -340,15 +382,17 @@
     "nama": "61-72-74-6-114-120",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 11,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -356,15 +400,17 @@
     "nama": "61-74-77-6-114-120",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 14,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -372,15 +418,17 @@
     "nama": "FA (51-59.6-60.6-59.1-6-67-28.7-101.7)",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1,
+      "LADLE": 15,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 60,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -388,15 +436,17 @@
     "nama": "PRISMA MOULD TEMBAGA",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 88,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.5,
       "FETTLING": 0.5,
       "GRINDING": 0.5,
       "SHOTBLAST": 3,
-      "PAINTING": 2,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 3
+      "WELDING": 3,
+      "PAINTING": 0
     }
   },
   {
@@ -404,15 +454,17 @@
     "nama": "CAWAN PRISMA, MATERIAL : FCD 450",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 166,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.5,
       "FETTLING": 0.2,
       "GRINDING": 0.2,
       "SHOTBLAST": 3,
-      "PAINTING": 3,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0.4
+      "WELDING": 0.4,
+      "PAINTING": 0
     }
   },
   {
@@ -420,15 +472,17 @@
     "nama": "SIDE BEARER HOUSING 07.0-M25019",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 200,
-      "PAINTING": 115.2,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 24
+      "WELDING": 24,
+      "PAINTING": 0
     }
   },
   {
@@ -436,15 +490,17 @@
     "nama": "SEPATU REM BLOK",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.7,
+      "LADLE": 11,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 104.73,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 18
+      "WELDING": 18,
+      "PAINTING": 0
     }
   },
   {
@@ -452,15 +508,17 @@
     "nama": "BRAKE BLOCK HEAD 08_0M25011",
     "proses": "FBO",
     "targets": {
+      "MELTING": 5.7,
+      "LADLE": 9,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 24,
       "GRINDING": 40,
       "SHOTBLAST": 200,
-      "PAINTING": 104.73,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -468,15 +526,17 @@
     "nama": "SUSPENSION ASSEMBLY",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 13.3,
+      "LADLE": 2,
       "CORE": 15,
       "FURAN": 1,
       "FETTLING": 4,
       "GRINDING": 5,
       "SHOTBLAST": 12,
-      "PAINTING": 10,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 4
+      "WELDING": 4,
+      "PAINTING": 0
     }
   },
   {
@@ -484,15 +544,17 @@
     "nama": "FRICTION WEDGE BTC.024.C.05.00.01",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.5,
+      "LADLE": 8,
       "CORE": 90,
       "FURAN": 0,
       "FETTLING": 30,
       "GRINDING": 35,
       "SHOTBLAST": 200,
-      "PAINTING": 100,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 30
+      "WELDING": 30,
+      "PAINTING": 0
     }
   },
   {
@@ -500,15 +562,17 @@
     "nama": "FOLLOWER",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 5,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 70,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 6
+      "WELDING": 6,
+      "PAINTING": 0
     }
   },
   {
@@ -516,15 +580,17 @@
     "nama": "NARROW ADAPTER 5X9 INCH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.2,
+      "LADLE": 13,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 100,
-      "PAINTING": 150,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -532,15 +598,17 @@
     "nama": "SPACER 1728-306-021-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.8,
+      "LADLE": 13,
       "CORE": 180,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 500,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -548,15 +616,17 @@
     "nama": "LINER FOR BLASTING SURFACE, WA242A",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.9,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 0,
       "GRINDING": 3,
       "SHOTBLAST": 30,
-      "PAINTING": 160,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -564,15 +634,17 @@
     "nama": "LINER FOR BLASTING SURFACE, WA 0241A",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.3,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 0,
       "GRINDING": 3,
       "SHOTBLAST": 30,
-      "PAINTING": 160,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -580,15 +652,17 @@
     "nama": "DOG LINER, 3B4210F2009A",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 2.7,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 30,
-      "PAINTING": 160,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 8
+      "WELDING": 8,
+      "PAINTING": 0
     }
   },
   {
@@ -596,15 +670,17 @@
     "nama": "IMPELLER BLADE, WA-P 00990",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 30,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -612,15 +688,17 @@
     "nama": "LINER COR MANGAN DINDING",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.6,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 30,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -628,15 +706,17 @@
     "nama": "BRACKET CONVEYOR PQ3 FCD45",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.4,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 10,
       "GRINDING": 5,
       "SHOTBLAST": 30,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -644,15 +724,17 @@
     "nama": "BLADE SSP; S200F-P 0020A",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.5,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 30,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -660,15 +742,17 @@
     "nama": "BLADE 19-AX30",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.7,
+      "LADLE": 25,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -676,15 +760,17 @@
     "nama": "TOP SIDE LINER 18-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -692,15 +778,17 @@
     "nama": "FRONT SIDE LINER 53-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -708,15 +796,17 @@
     "nama": "REAR SIDE LINER 54-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -724,15 +814,17 @@
     "nama": "END LINER 45-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -740,15 +832,17 @@
     "nama": "LINEAR GUIDE IPGE 19-35 (CASTING)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 30,
       "GRINDING": 30,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 2,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -756,15 +850,17 @@
     "nama": "LINEAR GUIDE IPGE 35-55 (CASTING)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 30,
       "GRINDING": 30,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 2,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -772,15 +868,17 @@
     "nama": "BOTTOM ROLL ENG-036662",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 11.9,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 20,
       "SHOTBLAST": 50,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -788,15 +886,17 @@
     "nama": "TOP ROLL ENG-036660",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 11.9,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 20,
       "SHOTBLAST": 50,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -804,15 +904,17 @@
     "nama": "Q4258772 IRON CASTING MOLD",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 72,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.4,
       "FETTLING": 0.7,
       "GRINDING": 0.5,
       "SHOTBLAST": 30,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 2
+      "WELDING": 2,
+      "PAINTING": 0
     }
   },
   {
@@ -820,15 +922,17 @@
     "nama": "INNER TUBE VERTICAL",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.3,
+      "LADLE": 10,
       "CORE": 350,
       "FURAN": 0,
       "FETTLING": 250,
       "GRINDING": 50,
       "SHOTBLAST": 1000,
-      "PAINTING": 0,
       "TURNING": 200,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -836,15 +940,17 @@
     "nama": "SUB SCREW VERTICAL",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 12,
       "CORE": 300,
       "FURAN": 0,
       "FETTLING": 300,
       "GRINDING": 125,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 300,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -852,15 +958,17 @@
     "nama": "PINION GEAR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.1,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 150,
       "SHOTBLAST": 2000,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -868,15 +976,17 @@
     "nama": "BEVEL GEAR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.1,
+      "LADLE": 12,
       "CORE": 250,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 250,
       "SHOTBLAST": 8000,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -884,15 +994,17 @@
     "nama": "BEARING HOUSING EN25/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.4,
+      "LADLE": 13,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 200,
-      "PAINTING": 250,
       "TURNING": 20,
       "MILLING": 20,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -900,15 +1012,17 @@
     "nama": "BEARING HOUSING EN35A/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 10,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 200,
-      "PAINTING": 250,
       "TURNING": 20,
       "MILLING": 20,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -916,15 +1030,17 @@
     "nama": "BEARING HOUSING EN35/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 9,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 25,
       "SHOTBLAST": 150,
-      "PAINTING": 200,
       "TURNING": 25,
       "MILLING": 15,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -932,15 +1048,17 @@
     "nama": "BEARING HOUSING EN45A/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 9,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 150,
-      "PAINTING": 200,
       "TURNING": 15,
       "MILLING": 15,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -948,15 +1066,17 @@
     "nama": "CASING COVER EN1-160/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 14,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 70,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 50,
       "MILLING": 100,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -964,15 +1084,17 @@
     "nama": "CASING COVER EN 1-200/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.8,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 60,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 30,
       "MILLING": 60,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -980,15 +1102,17 @@
     "nama": "CASING COVER EN 1-250/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.9,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 180,
-      "PAINTING": 150,
       "TURNING": 30,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -996,15 +1120,17 @@
     "nama": "CASING COVER EN1-315/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 5,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 150,
-      "PAINTING": 110.77,
       "TURNING": 30,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1012,15 +1138,17 @@
     "nama": "CASING COVER EN2-160 /FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.1,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 200,
-      "PAINTING": 174.55,
       "TURNING": 15,
       "MILLING": 60,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1028,15 +1156,17 @@
     "nama": "CASING COVER EN2-200 /FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.8,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 200,
-      "PAINTING": 146.94,
       "TURNING": 10,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1044,15 +1174,17 @@
     "nama": "CASING COVER EN2-250 /FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 40,
       "SHOTBLAST": 180,
-      "PAINTING": 150,
       "TURNING": 30,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1060,15 +1192,17 @@
     "nama": "CASING COVER EN3-200/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 11,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 60,
       "SHOTBLAST": 200,
-      "PAINTING": 146.94,
       "TURNING": 10,
       "MILLING": 60,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1076,15 +1210,17 @@
     "nama": "CASING COVER EN3-315/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.5,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 45,
       "SHOTBLAST": 150,
-      "PAINTING": 110.77,
       "TURNING": 5,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1092,15 +1228,17 @@
     "nama": "CASING COVER EN4-200/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 9,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 45,
       "SHOTBLAST": 200,
-      "PAINTING": 146.94,
       "TURNING": 5,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1108,15 +1246,17 @@
     "nama": "CASING COVER EN4-250/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 45,
       "SHOTBLAST": 200,
-      "PAINTING": 114.29,
       "TURNING": 5,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1124,15 +1264,17 @@
     "nama": "CASING COVER EN5-250/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.3,
+      "LADLE": 11,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 45,
       "SHOTBLAST": 180,
-      "PAINTING": 114.29,
       "TURNING": 5,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1140,15 +1282,17 @@
     "nama": "STAGE CASING WK-80",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 14,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 60,
       "SHOTBLAST": 80,
-      "PAINTING": 80,
       "TURNING": 9,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1156,15 +1300,17 @@
     "nama": "STAGE CASING WK-65",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.8,
+      "LADLE": 14,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 60,
       "SHOTBLAST": 80,
-      "PAINTING": 60,
       "TURNING": 10,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1172,15 +1318,17 @@
     "nama": "VOLUTE CASING EN 50-1602 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.4,
+      "LADLE": 9,
       "CORE": 20,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 6,
       "SHOTBLAST": 30,
-      "PAINTING": 70,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1188,15 +1336,17 @@
     "nama": "PULLEY 6B2",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1204,15 +1354,17 @@
     "nama": "PULLEY 6B3",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1220,15 +1372,17 @@
     "nama": "PULLEY 5B2",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 14,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1236,15 +1390,17 @@
     "nama": "PULLEY 5B2H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 12,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1252,15 +1408,17 @@
     "nama": "PULLEY 6B2H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1268,15 +1426,17 @@
     "nama": "PULLEY 6,5B2H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.2,
+      "LADLE": 13,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1284,15 +1444,17 @@
     "nama": "PULLEY 6,5B3",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 13,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1300,15 +1462,17 @@
     "nama": "PULLEY 6B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.9,
+      "LADLE": 10,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1316,15 +1480,17 @@
     "nama": "PULLEY 5B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.4,
+      "LADLE": 9,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1332,15 +1498,17 @@
     "nama": "PULLEY 5,5B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.6,
+      "LADLE": 8,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1348,15 +1516,17 @@
     "nama": "PULLEY 3A1H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1364,15 +1534,17 @@
     "nama": "PULLEY 3,5A1H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.9,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1380,15 +1552,17 @@
     "nama": "PULLEY 3A2H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.3,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1396,15 +1570,17 @@
     "nama": "PULLEY 3,5A2H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1412,15 +1588,17 @@
     "nama": "PULLEY 4A1H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1428,15 +1606,17 @@
     "nama": "PULLEY 4,5A1H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1444,15 +1624,17 @@
     "nama": "PULLEY 9B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1460,15 +1642,17 @@
     "nama": "PULLEY 10B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.3,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1476,15 +1660,17 @@
     "nama": "PULLEY 3A1",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1492,15 +1678,17 @@
     "nama": "PULLEY 3B1",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1508,15 +1696,17 @@
     "nama": "PULLEY 3,5B1",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.6,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1524,15 +1714,17 @@
     "nama": "PULLEY 8B3H",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.7,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 55,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1540,15 +1732,17 @@
     "nama": "OUTER TUBE",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 7,
       "CORE": 18,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 25,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 50,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1556,15 +1750,17 @@
     "nama": "CAP 145 MM",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 15,
       "CORE": 70,
       "FURAN": 0,
       "FETTLING": 300,
       "GRINDING": 200,
       "SHOTBLAST": 800,
-      "PAINTING": 0,
       "TURNING": 100,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1572,15 +1768,17 @@
     "nama": "IMPELLER BLADE STB-2C WA 0149A",
     "proses": "\\N",
     "targets": {
+      "MELTING": 1,
+      "LADLE": 0,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1588,15 +1786,17 @@
     "nama": "M341732 BREMS- FHRUNGS SUPPORT ROH",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6,
+      "LADLE": 4,
       "CORE": 70,
       "FURAN": 2,
       "FETTLING": 300,
       "GRINDING": 200,
       "SHOTBLAST": 800,
-      "PAINTING": 0,
       "TURNING": 100,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1604,15 +1804,17 @@
     "nama": "M349301 FÜHRUNGSSUPPORT ROH",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 3,
       "CORE": 70,
       "FURAN": 6,
       "FETTLING": 200,
       "GRINDING": 100,
       "SHOTBLAST": 800,
-      "PAINTING": 0,
       "TURNING": 100,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1620,15 +1822,17 @@
     "nama": "HANGER BRACKET 07.0.M25001",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.4,
+      "LADLE": 9,
       "CORE": 20,
       "FURAN": 0,
       "FETTLING": 15,
       "GRINDING": 15,
       "SHOTBLAST": 100,
-      "PAINTING": 50,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 6
+      "WELDING": 6,
+      "PAINTING": 0
     }
   },
   {
@@ -1636,15 +1840,17 @@
     "nama": "BOTTOM CENTER PLATE 07.0.M25012",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 7.1,
+      "LADLE": 2,
       "CORE": 100,
       "FURAN": 1,
       "FETTLING": 8,
       "GRINDING": 6,
       "SHOTBLAST": 100,
-      "PAINTING": 10,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 1
+      "WELDING": 1,
+      "PAINTING": 0
     }
   },
   {
@@ -1652,15 +1858,17 @@
     "nama": "IMPELLER BLADE STB-2C WA 0149A",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.7,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 24,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1668,15 +1876,17 @@
     "nama": "TOP LINER 20-SX30",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.9,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1684,15 +1894,17 @@
     "nama": "GUIDE COUPLER BODY",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 25,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -1700,15 +1912,17 @@
     "nama": "HOUSING SPRING",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.9,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 30,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -1716,15 +1930,17 @@
     "nama": "SUPPORT SUSPENSION LH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 10,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 30,
       "GRINDING": 20,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 6
+      "WELDING": 6,
+      "PAINTING": 0
     }
   },
   {
@@ -1732,15 +1948,17 @@
     "nama": "SUPPORT SUSPENSION RH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 10,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 30,
       "GRINDING": 15,
       "SHOTBLAST": 150,
-      "PAINTING": 60,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 6
+      "WELDING": 6,
+      "PAINTING": 0
     }
   },
   {
@@ -1748,15 +1966,17 @@
     "nama": "WEAR PLATE",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.9,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 300,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 30
+      "WELDING": 30,
+      "PAINTING": 0
     }
   },
   {
@@ -1764,15 +1984,17 @@
     "nama": "M311173-B - FLANSCH L D390X100",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -1780,15 +2002,17 @@
     "nama": "M336747-B - HUBWERK BEARBEIT",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 5,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 5
+      "WELDING": 5,
+      "PAINTING": 0
     }
   },
   {
@@ -1796,15 +2020,17 @@
     "nama": "M339281-A - X ROLLENHALTER B",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 8,
       "GRINDING": 8,
       "SHOTBLAST": 40,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -1812,15 +2038,17 @@
     "nama": "M337801-A - L FAHRWERK LLS",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 40,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 8
+      "WELDING": 8,
+      "PAINTING": 0
     }
   },
   {
@@ -1828,15 +2056,17 @@
     "nama": "M337801-A - L FAHRWERK LLS",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 40,
-      "PAINTING": 0,
       "TURNING": 5,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1844,15 +2074,17 @@
     "nama": "M337800 - LG FAHRWERK AS",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 40,
-      "PAINTING": 0,
       "TURNING": 5,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1860,15 +2092,17 @@
     "nama": "ORING LINE 140",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.1,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 40,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 30,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1876,15 +2110,17 @@
     "nama": "ORING LINE 170",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 35,
       "GRINDING": 35,
       "SHOTBLAST": 80,
-      "PAINTING": 0,
       "TURNING": 60,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1892,15 +2128,17 @@
     "nama": "COVER 17A-27-42760",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.3,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 0,
       "GRINDING": 0,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1908,15 +2146,17 @@
     "nama": "COVER 17A-27-42750",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.2,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 1,
       "FETTLING": 5,
       "GRINDING": 5,
       "SHOTBLAST": 50,
-      "PAINTING": 30,
       "TURNING": 2,
       "MILLING": 2,
-      "WELDING": 2
+      "WELDING": 2,
+      "PAINTING": 0
     }
   },
   {
@@ -1924,15 +2164,17 @@
     "nama": "M314246-B SEITENFUHRUNG-GUSS",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.2,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1940,15 +2182,17 @@
     "nama": "M314384A SEITENFUHRUNG KURZ",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.6,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1956,15 +2200,17 @@
     "nama": "M336563-B ROLLENHALTER HEA140 BEARBEITET",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.4,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1972,15 +2218,17 @@
     "nama": "CHAIN EXTRACTOR BOTTOM ASH BOILER",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 6,
       "CORE": 50,
       "FURAN": 0,
       "FETTLING": 100,
       "GRINDING": 50,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -1988,15 +2236,17 @@
     "nama": "NL03-00099F FLANSCH Ø305x90",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 19,
+      "LADLE": 3,
       "CORE": 13,
       "FURAN": 10,
       "FETTLING": 9,
       "GRINDING": 10,
       "SHOTBLAST": 15,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2004,15 +2254,17 @@
     "nama": "L08-098183 LAGER-FLANSCH Ø275/Ø159X90",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 2.8,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 3,
       "GRINDING": 3,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2020,15 +2272,17 @@
     "nama": "M344367 CASTING - LAGERFLANSCH AS D390",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2036,15 +2290,17 @@
     "nama": "M344367 MACHINING - LAGERFLANSCH AS D390",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2052,15 +2308,17 @@
     "nama": "M344366 CASTING - LAGERFLANSCH LLS D390",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2068,15 +2326,17 @@
     "nama": "M344366 MACHINING - LAGERFLANSCH LLS D390",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 4,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2084,15 +2344,17 @@
     "nama": "VOLUTE CASING EN 32-1604 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4,
+      "LADLE": 8,
       "CORE": 10,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 6,
       "SHOTBLAST": 50,
-      "PAINTING": 45,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2100,15 +2362,17 @@
     "nama": "SUSPENTION COUPLER 31.0-U03006",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 13.3,
+      "LADLE": 2,
       "CORE": 15,
       "FURAN": 1,
       "FETTLING": 45,
       "GRINDING": 6,
       "SHOTBLAST": 20,
-      "PAINTING": 20,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 6
+      "WELDING": 6,
+      "PAINTING": 0
     }
   },
   {
@@ -2116,15 +2380,17 @@
     "nama": "B48BW1122 CAP COVER",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 80,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 25
+      "WELDING": 25,
+      "PAINTING": 0
     }
   },
   {
@@ -2132,15 +2398,17 @@
     "nama": "B48BW1622 AXLE BOX CAP",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 80,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 25
+      "WELDING": 25,
+      "PAINTING": 0
     }
   },
   {
@@ -2148,15 +2416,17 @@
     "nama": "HANGER BRACKET 07.0.M25001",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.4,
+      "LADLE": 9,
       "CORE": 20,
       "FURAN": 0,
       "FETTLING": 15,
       "GRINDING": 15,
       "SHOTBLAST": 100,
-      "PAINTING": 50,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2164,15 +2434,17 @@
     "nama": "GUIDE COUPLER BODY",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 15,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 15
+      "WELDING": 15,
+      "PAINTING": 0
     }
   },
   {
@@ -2180,15 +2452,17 @@
     "nama": "HOUSING SPRING",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.9,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 15,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -2196,63 +2470,17 @@
     "nama": "SUPPORT SUSPENSION LH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 10,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 15,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
-    }
-  },
-  {
-    "id": "147",
-    "nama": "\\N",
-    "proses": "\\N",
-    "targets": {
-      "CORE": 0,
-      "FURAN": 0,
-      "FETTLING": 0,
-      "GRINDING": 0,
-      "SHOTBLAST": 0,
-      "PAINTING": 0,
-      "TURNING": 0,
-      "MILLING": 0,
-      "WELDING": 0
-    }
-  },
-  {
-    "id": "148",
-    "nama": "\\N",
-    "proses": "\\N",
-    "targets": {
-      "CORE": 0,
-      "FURAN": 0,
-      "FETTLING": 0,
-      "GRINDING": 0,
-      "SHOTBLAST": 0,
-      "PAINTING": 0,
-      "TURNING": 0,
-      "MILLING": 0,
-      "WELDING": 0
-    }
-  },
-  {
-    "id": "149",
-    "nama": "\\N",
-    "proses": "\\N",
-    "targets": {
-      "CORE": 0,
-      "FURAN": 0,
-      "FETTLING": 0,
-      "GRINDING": 0,
-      "SHOTBLAST": 0,
-      "PAINTING": 0,
-      "TURNING": 0,
-      "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -2260,15 +2488,17 @@
     "nama": "SUPPORT SUSPENSION RH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.6,
+      "LADLE": 10,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 15,
       "SHOTBLAST": 200,
-      "PAINTING": 200,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 20
+      "WELDING": 20,
+      "PAINTING": 0
     }
   },
   {
@@ -2276,15 +2506,17 @@
     "nama": "WEAR PLATE",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.9,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 30,
       "SHOTBLAST": 200,
-      "PAINTING": 300,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 30
+      "WELDING": 30,
+      "PAINTING": 0
     }
   },
   {
@@ -2292,15 +2524,17 @@
     "nama": "BODY SUPPORT DEVICE (STOPPER TYPE)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 0,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 0,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2308,15 +2542,17 @@
     "nama": "BODY SUPPORT DEVICE ( NO STOPPER)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 0,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 0,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2324,15 +2560,17 @@
     "nama": "END LINER (MODIF) 45-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2340,15 +2578,17 @@
     "nama": "BOTTOM CENTER PLATE 07.0-M25012.0 REV B",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 5.1,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 20,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 1
+      "WELDING": 1,
+      "PAINTING": 0
     }
   },
   {
@@ -2356,15 +2596,17 @@
     "nama": "BRAKE SHOE HEAD",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.4,
+      "LADLE": 10,
       "CORE": 20,
       "FURAN": 0,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 56,
-      "PAINTING": 45,
       "TURNING": 0,
       "MILLING": 15,
-      "WELDING": 25
+      "WELDING": 25,
+      "PAINTING": 0
     }
   },
   {
@@ -2372,15 +2614,17 @@
     "nama": "BRAKE STRUT",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.4,
+      "LADLE": 8,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 15,
       "GRINDING": 10,
       "SHOTBLAST": 50,
-      "PAINTING": 40,
       "TURNING": 0,
       "MILLING": 15,
-      "WELDING": 25
+      "WELDING": 25,
+      "PAINTING": 0
     }
   },
   {
@@ -2388,15 +2632,17 @@
     "nama": "BRAKE GUIDE RH LH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 7.1,
+      "LADLE": 8,
       "CORE": 30,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 15,
       "SHOTBLAST": 45,
-      "PAINTING": 35,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2404,15 +2650,17 @@
     "nama": "ARM KNUCKLE 1854-434-084-0A",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.1,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 500,
       "GRINDING": 137,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2420,15 +2668,17 @@
     "nama": "METAL PTO FRONT 1854-334-082-0A",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 8,
       "CORE": 150,
       "FURAN": 0,
       "FETTLING": 200,
       "GRINDING": 137,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2436,15 +2686,17 @@
     "nama": "METAL/CASE 8686-202-021-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 10,
       "CORE": 300,
       "FURAN": 0,
       "FETTLING": 300,
       "GRINDING": 100,
       "SHOTBLAST": 500,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2452,15 +2704,17 @@
     "nama": "METAL/INPUT 8686-201-021-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 15,
       "CORE": 120,
       "FURAN": 0,
       "FETTLING": 200,
       "GRINDING": 100,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2468,15 +2722,17 @@
     "nama": "METAL/INPUT/CASE 8686-202-023-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 10,
       "CORE": 80,
       "FURAN": 0,
       "FETTLING": 100,
       "GRINDING": 60,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2484,15 +2740,17 @@
     "nama": "METAL/PULLEY 8686-201-023-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 15,
       "CORE": 120,
       "FURAN": 0,
       "FETTLING": 250,
       "GRINDING": 120,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2500,15 +2758,17 @@
     "nama": "PULLEY/V2B93  8686-201-022-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 6,
       "CORE": 120,
       "FURAN": 0,
       "FETTLING": 200,
       "GRINDING": 60,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2516,15 +2776,17 @@
     "nama": "PULLEY/V2B102 8687-201-001-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.2,
+      "LADLE": 9,
       "CORE": 150,
       "FURAN": 0,
       "FETTLING": 150,
       "GRINDING": 120,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2532,15 +2794,17 @@
     "nama": "SLEVEE 175-150-200",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 7.1,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 25,
       "FETTLING": 60,
       "GRINDING": 50,
       "SHOTBLAST": 66,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2548,15 +2812,17 @@
     "nama": "SLEEVE 190-175-120",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 7.1,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 56,
       "GRINDING": 55,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2564,15 +2830,17 @@
     "nama": "VOLUTE CASING EN 32-2004 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 7.2,
+      "LADLE": 8,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 45,
       "GRINDING": 38,
       "SHOTBLAST": 50,
-      "PAINTING": 35,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 25
+      "WELDING": 25,
+      "PAINTING": 0
     }
   },
   {
@@ -2580,15 +2848,17 @@
     "nama": "VOLUTE CASING EN 40-2002 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.9,
+      "LADLE": 8,
       "CORE": 10,
       "FURAN": 0,
       "FETTLING": 45,
       "GRINDING": 35,
       "SHOTBLAST": 50,
-      "PAINTING": 30,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 15
+      "WELDING": 15,
+      "PAINTING": 0
     }
   },
   {
@@ -2596,15 +2866,17 @@
     "nama": "VOLUTE CASING EN 40-2502 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.9,
+      "LADLE": 8,
       "CORE": 15,
       "FURAN": 0,
       "FETTLING": 35,
       "GRINDING": 25,
       "SHOTBLAST": 40,
-      "PAINTING": 35,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 15
+      "WELDING": 15,
+      "PAINTING": 0
     }
   },
   {
@@ -2612,15 +2884,17 @@
     "nama": "DRAFT GEAR STOPPER 31.0-E12052",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 9.8,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 1,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0.75
+      "WELDING": 0.75,
+      "PAINTING": 0
     }
   },
   {
@@ -2628,15 +2902,17 @@
     "nama": "LINER FOR CEILING SURFACE, WA0107B",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 9,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 5,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2644,15 +2920,17 @@
     "nama": "PRISMA MOULD TEMBAGA REFURBISHED (MATERIAL : FCD 450)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 88,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.5,
       "FETTLING": 1,
       "GRINDING": 1,
       "SHOTBLAST": 3,
-      "PAINTING": 2,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 3
+      "WELDING": 3,
+      "PAINTING": 0
     }
   },
   {
@@ -2660,15 +2938,17 @@
     "nama": "M311172 FLANSCH ANTRIEBSSEITE D390 X 100",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.5,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2676,15 +2956,17 @@
     "nama": "OUTER RING FX16-0041-02",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 30,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2692,15 +2974,17 @@
     "nama": "MIDDLE RING FX16-0042-02",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 30,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2708,15 +2992,17 @@
     "nama": "MIDDLE RING FX16-0043-02",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2724,15 +3010,17 @@
     "nama": "COVER 195-27-44371",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 10,
       "GRINDING": 15,
       "SHOTBLAST": 10,
-      "PAINTING": 5,
       "TURNING": 5,
       "MILLING": 5,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2740,15 +3028,17 @@
     "nama": "COR BUCKET ELEVATOR 3A4750R0003",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2756,15 +3046,17 @@
     "nama": "NL03-00569A LAGER-FLANSCH ø275/ø159x90",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.8,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 3,
       "GRINDING": 3,
       "SHOTBLAST": 10,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2772,15 +3064,17 @@
     "nama": "BRACKET ; RR SPG RR 8980310630",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 9,
       "CORE": 40,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 14,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 6,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2788,15 +3082,17 @@
     "nama": "EAGLE IRON 355",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.8,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 50,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2804,15 +3100,17 @@
     "nama": "EAGLE IRON 570",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.8,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 20,
       "GRINDING": 10,
       "SHOTBLAST": 50,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2820,15 +3118,17 @@
     "nama": "PULLEY",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.2,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 12,
       "GRINDING": 12,
       "SHOTBLAST": 8,
-      "PAINTING": 0,
       "TURNING": 2,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -2836,15 +3136,17 @@
     "nama": "LINEAR GUIDE 55-75 (NEW)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2852,15 +3154,17 @@
     "nama": "COR FC 250 UPPER S-BLADE 07",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2868,15 +3172,17 @@
     "nama": "COR FC 250 UPPER BLADE 07",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 10,
       "GRINDING": 10,
       "SHOTBLAST": 20,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2884,15 +3190,17 @@
     "nama": "METAL/CASE 1868-122-083-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 6.8,
+      "LADLE": 15,
       "CORE": 40,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 45,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2900,15 +3208,17 @@
     "nama": "SPACER BLOCK 338_2303",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 40,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2916,15 +3226,17 @@
     "nama": "BRACKET ; RR SPG RR RH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 9,
       "CORE": 300,
       "FURAN": 0,
       "FETTLING": 24,
       "GRINDING": 20,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 12,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2932,15 +3244,17 @@
     "nama": "BRACKET ; RR SPG RR LH",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 9,
       "CORE": 300,
       "FURAN": 0,
       "FETTLING": 24,
       "GRINDING": 20,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 12,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2948,15 +3262,17 @@
     "nama": "FRONT COVER 02-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 200,
-      "PAINTING": 174.55,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2964,15 +3280,17 @@
     "nama": "BACK SIDE TOP COVER 27-AX30",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 200,
-      "PAINTING": 174.55,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2980,15 +3298,17 @@
     "nama": "BACK SIDE BOTTOM COVER 46-AX3",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 200,
-      "PAINTING": 174.55,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -2996,15 +3316,17 @@
     "nama": "BRAKE DRUM RR RH LH (PARTEX)",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.5,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 15,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3012,15 +3334,17 @@
     "nama": "DRUM BRAKE REAR",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.8,
+      "LADLE": 11,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 100,
       "GRINDING": 200,
       "SHOTBLAST": 250,
-      "PAINTING": 0,
       "TURNING": 100,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3028,15 +3352,17 @@
     "nama": "WALL LINER (FRONT) 55WL-SX30",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.1,
+      "LADLE": 15,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 0,
       "GRINDING": 250,
       "SHOTBLAST": 8000,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3044,15 +3370,17 @@
     "nama": "TOP LINNER FOR ROTATION LINE 55 CH-SX30",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 16,
       "CORE": 0,
       "FURAN": 10,
       "FETTLING": 0,
       "GRINDING": 200,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 25,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3060,15 +3388,17 @@
     "nama": "PULLEY/V2B90  8686-201-024-0",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 6,
       "CORE": 120,
       "FURAN": 0,
       "FETTLING": 200,
       "GRINDING": 60,
       "SHOTBLAST": 300,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3076,15 +3406,17 @@
     "nama": "IMPELER BLADE WA 2075 C (CTH)",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 5.7,
+      "LADLE": 6,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 24,
       "GRINDING": 40,
       "SHOTBLAST": 200,
-      "PAINTING": 104.73,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -3092,15 +3424,17 @@
     "nama": "PRISMA MOLD TEMBAGA /  STEEL CASTING",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 88,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.5,
       "FETTLING": 1,
       "GRINDING": 0.5,
       "SHOTBLAST": 3,
-      "PAINTING": 2,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0.2
+      "WELDING": 0.2,
+      "PAINTING": 0
     }
   },
   {
@@ -3108,15 +3442,17 @@
     "nama": "ROUND BAR",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 2,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 50,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3124,15 +3460,17 @@
     "nama": "CYLINDER LINER BLANK TE007 013-167A",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.8,
+      "LADLE": 7,
       "CORE": 25,
       "FURAN": 0,
       "FETTLING": 30,
       "GRINDING": 20,
       "SHOTBLAST": 60,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3140,15 +3478,17 @@
     "nama": "SLEEVE LOWER COUNTER BORE BEFORE CUTTING 12V140",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 40,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3156,15 +3496,17 @@
     "nama": "SLEEVE LOWER COUNTER BORE BEFORE CUTTING 6D170",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 40,
       "GRINDING": 40,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3172,15 +3514,17 @@
     "nama": "CONCAVE 603/9053TT",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 47.6,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.4,
       "FETTLING": 0.5,
       "GRINDING": 0.5,
       "SHOTBLAST": 3,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0.5
+      "WELDING": 0.5,
+      "PAINTING": 0
     }
   },
   {
@@ -3188,15 +3532,17 @@
     "nama": "MANTLE 603/9106TT",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 47.6,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 0.4,
       "FETTLING": 0.5,
       "GRINDING": 0.5,
       "SHOTBLAST": 3,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0.5
+      "WELDING": 0.5,
+      "PAINTING": 0
     }
   },
   {
@@ -3204,15 +3550,17 @@
     "nama": "COVER RR AXLE HOUSING",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 60,
+      "LADLE": 1,
       "CORE": 20,
       "FURAN": 1,
       "FETTLING": 4,
       "GRINDING": 4,
       "SHOTBLAST": 8,
-      "PAINTING": 0,
       "TURNING": 30,
       "MILLING": 20,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -3220,15 +3568,17 @@
     "nama": "GRINDING BALL 60",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 210,
       "GRINDING": 0,
       "SHOTBLAST": 350,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3236,15 +3586,17 @@
     "nama": "GRINDING BALL 70",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 210,
       "GRINDING": 0,
       "SHOTBLAST": 350,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3252,15 +3604,17 @@
     "nama": "GRINDING BALL 80",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 210,
       "GRINDING": 0,
       "SHOTBLAST": 350,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3268,15 +3622,17 @@
     "nama": "GRINDING BALL 90",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.4,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 210,
       "GRINDING": 0,
       "SHOTBLAST": 350,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3284,15 +3640,17 @@
     "nama": "11012 Z5616 LINER A500FE",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 9,
       "CORE": 35,
       "FURAN": 0,
       "FETTLING": 70,
       "GRINDING": 20,
       "SHOTBLAST": 150,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3300,15 +3658,17 @@
     "nama": "11012 Z5617 LINER A500FE",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.3,
+      "LADLE": 9,
       "CORE": 35,
       "FURAN": 0,
       "FETTLING": 70,
       "GRINDING": 20,
       "SHOTBLAST": 150,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3316,15 +3676,17 @@
     "nama": "ELBOW 203-62-11111",
     "proses": "FBO",
     "targets": {
+      "MELTING": 0.5,
+      "LADLE": 8,
       "CORE": 100,
       "FURAN": 0,
       "FETTLING": 200,
       "GRINDING": 60,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3332,15 +3694,17 @@
     "nama": "TOGGLE PLATE",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.1,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 12,
       "GRINDING": 12,
       "SHOTBLAST": 8,
-      "PAINTING": 0,
       "TURNING": 2,
       "MILLING": 0,
-      "WELDING": 10
+      "WELDING": 10,
+      "PAINTING": 0
     }
   },
   {
@@ -3348,15 +3712,17 @@
     "nama": "GRATE BAR TYPE A 300 T",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.5,
+      "LADLE": 12,
       "CORE": 10,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 20,
       "SHOTBLAST": 250,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3364,15 +3730,17 @@
     "nama": "VOLUTE CASTING EN050-1602",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.1,
+      "LADLE": 12,
       "CORE": 7,
       "FURAN": 0,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 140,
-      "PAINTING": 84,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3380,15 +3748,17 @@
     "nama": "VOLUTE CASING EN 50-2002 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4,
+      "LADLE": 10,
       "CORE": 7,
       "FURAN": 0,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 140,
-      "PAINTING": 84,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3396,15 +3766,17 @@
     "nama": "VOLUTE CASING EN 32-1604 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 2.9,
+      "LADLE": 10,
       "CORE": 7,
       "FURAN": 0,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 140,
-      "PAINTING": 84,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3412,15 +3784,17 @@
     "nama": "VOLUTE CASING EN 40-2002 JIS 10K FF/FC250",
     "proses": "FBO",
     "targets": {
+      "MELTING": 10.2,
+      "LADLE": 3,
       "CORE": 7,
       "FURAN": 0,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 140,
-      "PAINTING": 84,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3428,15 +3802,17 @@
     "nama": "SHELL LINER VL1",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.2,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3444,15 +3820,17 @@
     "nama": "SHELL LINER H",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 7.7,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3460,15 +3838,17 @@
     "nama": "SHELL LINER L1",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3476,15 +3856,17 @@
     "nama": "SHELL LINER IW",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 7.7,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3492,15 +3874,17 @@
     "nama": "SHELL LINER IO",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 8,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3508,15 +3892,17 @@
     "nama": "SHELL LINER IW1",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 8,
+      "LADLE": 5,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3524,15 +3910,17 @@
     "nama": "SHELL LINER VH1",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.4,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3540,15 +3928,17 @@
     "nama": "SHELL LINER L",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.4,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 28,
       "GRINDING": 28,
       "SHOTBLAST": 84,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3556,15 +3946,17 @@
     "nama": "SHELL LINER M",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 32,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 14,
       "GRINDING": 14,
       "SHOTBLAST": 14,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3572,15 +3964,17 @@
     "nama": "SHELL LINER H2",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 34.7,
+      "LADLE": 1,
       "CORE": 0,
       "FURAN": 4,
       "FETTLING": 14,
       "GRINDING": 14,
       "SHOTBLAST": 14,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 14
+      "WELDING": 14,
+      "PAINTING": 0
     }
   },
   {
@@ -3588,15 +3982,17 @@
     "nama": "YA258C072-01 SUB WEIGHT CAST IRON 30 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.7,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3604,15 +4000,17 @@
     "nama": "YA258C072-02 SUB WEIGHT CAST IRON 30 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 4.7,
+      "LADLE": 8,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3620,15 +4018,17 @@
     "nama": "YA258C072-03 SUB WEIGHT CAST IRON 37 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 5.7,
+      "LADLE": 7,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3636,15 +4036,17 @@
     "nama": "YA258C072-04 SUB WEIGHT CAST IRON 37 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 5.7,
+      "LADLE": 7,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3652,15 +4054,17 @@
     "nama": "JA012C826 (NO.1) SUB WEIGHT CAST IRON 40 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 6.2,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3668,15 +4072,17 @@
     "nama": "JA012C826 (NO.2) SUB WEIGHT CAST IRON 60 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 9,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 50,
       "GRINDING": 20,
       "SHOTBLAST": 25,
-      "PAINTING": 25,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3684,15 +4090,17 @@
     "nama": "JA012C826 (NO.2) SUB WEIGHT CAST IRON 60 KG",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 9,
+      "LADLE": 4,
       "CORE": 0,
       "FURAN": 8,
       "FETTLING": 210,
       "GRINDING": 42,
       "SHOTBLAST": 70,
-      "PAINTING": 84,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3700,15 +4108,17 @@
     "nama": "OUTER RING FX16-0041-03",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 6,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 10,
       "MILLING": 30,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3716,15 +4126,17 @@
     "nama": "MIDDLE RING FX16-0042-03",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 30,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3732,15 +4144,17 @@
     "nama": "MIDDLE RING FX16-0043-03",
     "proses": "FBO",
     "targets": {
+      "MELTING": 3.8,
+      "LADLE": 12,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 20,
       "GRINDING": 20,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 20,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3748,15 +4162,17 @@
     "nama": "LINEAR GUIDE 19-35",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 30,
       "GRINDING": 30,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 2,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3764,15 +4180,17 @@
     "nama": "LINEAR GUIDE 35-55",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.7,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 3,
       "FETTLING": 30,
       "GRINDING": 30,
       "SHOTBLAST": 0,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 2,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3780,15 +4198,17 @@
     "nama": "Square Block",
     "proses": "FURAN",
     "targets": {
+      "MELTING": 3.6,
+      "LADLE": 3,
       "CORE": 0,
       "FURAN": 2,
       "FETTLING": 50,
       "GRINDING": 50,
       "SHOTBLAST": 100,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3796,15 +4216,17 @@
     "nama": "HINO DUTRO HT 130HD - RR IPV",
     "proses": "FBO",
     "targets": {
+      "MELTING": 4.8,
+      "LADLE": 9,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 0,
       "GRINDING": 52,
       "SHOTBLAST": 200,
-      "PAINTING": 0,
       "TURNING": 15,
       "MILLING": 40,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   },
   {
@@ -3812,15 +4234,17 @@
     "nama": "BRACKET BD-080C-2",
     "proses": "FBO",
     "targets": {
+      "MELTING": 1.3,
+      "LADLE": 10,
       "CORE": 0,
       "FURAN": 0,
       "FETTLING": 210,
       "GRINDING": 22,
       "SHOTBLAST": 350,
-      "PAINTING": 0,
       "TURNING": 0,
       "MILLING": 0,
-      "WELDING": 0
+      "WELDING": 0,
+      "PAINTING": 0
     }
   }
 ]

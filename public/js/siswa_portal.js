@@ -700,9 +700,9 @@ var selectedMaintenanceMachines = [];
 var produkRowCounter = 0;
 
 // Load master product catalog from JSON
-function loadMasterProdukCatalog() {
-    if (masterProdukCatalog.length > 0) return Promise.resolve(masterProdukCatalog);
-    return fetch('/data/master_output_produk.json')
+function loadMasterProdukCatalog(forceRefresh = false) {
+    if (!forceRefresh && masterProdukCatalog.length > 0) return Promise.resolve(masterProdukCatalog);
+    return fetch('/data/master_output_produk.json?t=' + Date.now())
         .then(res => res.json())
         .then(data => {
             masterProdukCatalog = data || [];
@@ -714,6 +714,7 @@ function loadMasterProdukCatalog() {
             return [];
         });
 }
+window.loadMasterProdukCatalog = loadMasterProdukCatalog;
 
 // Ensure catalog is loaded on page startup & immediately populate student fields
 if (typeof document !== 'undefined') {
@@ -897,7 +898,7 @@ function getSectionCategory(bagian) {
     if (bg === 'MELTING') {
         return 'MELTING';
     }
-    if (['GRINDING', 'PAINTING', 'CORE', 'SHOTBLAST', 'FURAN', 'FETTLING', 'FETLING', 'CNC / MACHINING', 'GALAH IBK'].includes(bg)) {
+    if (['GRINDING', 'PAINTING', 'CORE', 'SHOTBLAST', 'FURAN', 'FBO', 'FETTLING', 'FETLING', 'CNC / MACHINING', 'GALAH IBK'].includes(bg)) {
         return 'PRODUKSI';
     }
     if (['QC POURING', 'QC LAB PASIR', 'QC LAB LOGAM'].includes(bg)) {
@@ -1127,7 +1128,7 @@ function getSectionTargetColumn(bagian) {
     if (bg === 'PAINTING') return 'PAINTING';
     if (bg === 'CORE') return 'CORE';
     if (bg === 'SHOTBLAST') return 'SHOTBLAST';
-    if (bg === 'FURAN') return 'FURAN';
+    if (bg === 'FURAN' || bg === 'FBO') return 'FURAN';
     if (bg === 'FETTLING' || bg === 'FETLING') return 'FETTLING';
     if (bg === 'CNC / MACHINING') return 'TURNING'; // Default CNC
     return 'GRINDING';

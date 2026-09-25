@@ -658,6 +658,16 @@
 
             const res = await executeRpcCall('submitQuizAnswer', [payload]);
             if (res && res.success) {
+                // Broadcast sync event ke tab Admin yang sedang terbuka
+                try {
+                    if (typeof BroadcastChannel !== 'undefined') {
+                        const channel = new BroadcastChannel('ltc_quiz_sync_channel');
+                        channel.postMessage({ type: 'QUIZ_SUBMITTED', noreg: studentNoreg, quizId: currentQuizId });
+                        channel.close();
+                    }
+                    localStorage.setItem('ltc_quiz_last_submission', String(Date.now()));
+                } catch (e) {}
+
                 // Hapus cache pengerjaan lokal
                 localStorage.removeItem(`quiz_answers_${currentQuizId}_${studentNoreg}`);
                 localStorage.removeItem(`quiz_timer_start_${currentQuizId}_${studentNoreg}`);

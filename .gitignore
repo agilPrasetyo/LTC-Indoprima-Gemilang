@@ -31,3 +31,5 @@ scratch-*.js
 test-*.js
 /*.jpg
 /*.png
+~$*
+*.tmp

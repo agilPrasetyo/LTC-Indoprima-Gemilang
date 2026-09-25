@@ -1,0 +1,439 @@
+{
+  "evaluations": [
+    {
+      "nama": "BENITO ALFANDO SAPUTRA",
+      "kelas": "Kelas 5",
+      "noreg": "2605033",
+      "notes": "",
+      "scores": [
+        54,
+        60,
+        46,
+        57,
+        57,
+        59
+      ],
+      "section": "GRINDING",
+      "autoScore": 98,
+      "evaluator": "BIMA AGUNG SETYAWAN",
+      "manualAvg": 55.5,
+      "finalScore": 68.3,
+      "isVerified": true,
+      "skillNames": [
+        "Surface Grinding",
+        "Cylindrical Grinding",
+        "Wheel Dressing & Balance",
+        "Precision Measurement",
+        "Toleransi & Finishing Ra",
+        "Tool & Machine Setup"
+      ],
+      "updated_at": "2026-09-21T06:53:59.108Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "ACHMAD RIZALUL ARIK ANNIZAR",
+      "kelas": "Kelas 4",
+      "noreg": "PRA0778",
+      "notes": "",
+      "scores": [
+        52,
+        56,
+        74,
+        54,
+        47,
+        67
+      ],
+      "section": "PATTERN",
+      "autoScore": 97,
+      "evaluator": "ALDEVA DESNANDRI",
+      "manualAvg": 58.3,
+      "finalScore": 69.9,
+      "isVerified": true,
+      "skillNames": [
+        "Pembuatan Pola Cetakan Kayu/Resin",
+        "Dimensi & Shrinkage Allowance",
+        "Perbaikan & Modifikasi Pola",
+        "Finishing Permukaan Pattern",
+        "Pemeliharaan Master Pattern",
+        "Verifikasi Gambar Kerja CAD"
+      ],
+      "updated_at": "2026-09-21T06:54:15.160Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "RIAN WAHYU KURNIAWAN",
+      "kelas": "Kelas 5",
+      "noreg": "2605042",
+      "notes": "",
+      "scores": [
+        50,
+        48,
+        53,
+        45,
+        64,
+        51
+      ],
+      "section": "GRINDING",
+      "autoScore": 84.6,
+      "evaluator": "MOHAMMAT YASIR MA'ARIF",
+      "manualAvg": 51.8,
+      "finalScore": 61.7,
+      "isVerified": true,
+      "skillNames": [
+        "Surface Grinding",
+        "Cylindrical Grinding",
+        "Wheel Dressing & Balance",
+        "Precision Measurement",
+        "Toleransi & Finishing Ra",
+        "Tool & Machine Setup"
+      ],
+      "updated_at": "2026-09-21T06:54:28.269Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "SANDO ASHAR MUKTI",
+      "kelas": "Kelas 5",
+      "noreg": "2605018",
+      "notes": "",
+      "scores": [
+        55,
+        64,
+        66,
+        52,
+        59,
+        66
+      ],
+      "section": "CORE",
+      "autoScore": 96.8,
+      "evaluator": "WIRA ATMOJO SASELAH",
+      "manualAvg": 60.3,
+      "finalScore": 71.3,
+      "isVerified": true,
+      "skillNames": [
+        "Pembuatan Inti Pasir",
+        "Resin & Sand Mixing",
+        "Core Assembly & Coating",
+        "Core Baking & Curing",
+        "Inspeksi Cacat Retak/Patah",
+        "Finishing & Deburring Core"
+      ],
+      "updated_at": "2026-09-21T06:54:48.955Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "ERIZAL GIBRAN JUNIANSYAH",
+      "kelas": "Kelas 5",
+      "noreg": "2605039",
+      "notes": "",
+      "scores": [
+        52,
+        53,
+        61,
+        51,
+        59,
+        54
+      ],
+      "section": "GRINDING",
+      "autoScore": 96.7,
+      "evaluator": "BIMA AGUNG SETYAWAN",
+      "manualAvg": 55,
+      "finalScore": 67.5,
+      "isVerified": true,
+      "skillNames": [
+        "Surface Grinding",
+        "Cylindrical Grinding",
+        "Wheel Dressing & Balance",
+        "Precision Measurement",
+        "Toleransi & Finishing Ra",
+        "Tool & Machine Setup"
+      ],
+      "updated_at": "2026-09-21T06:55:02.740Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "CHANDRA HIDAYAT",
+      "kelas": "Kelas 1",
+      "noreg": "2608105",
+      "notes": "",
+      "scores": [
+        51,
+        57,
+        60,
+        42,
+        45,
+        51
+      ],
+      "section": "FURAN",
+      "autoScore": 90.5,
+      "evaluator": "WIRA ATMOJO SASELAH",
+      "manualAvg": 51,
+      "finalScore": 62.9,
+      "isVerified": true,
+      "skillNames": [
+        "Pola & Cetakan Pasir Furan",
+        "Hardener & Resin Ratio",
+        "Compaction & Stripping",
+        "Mould Coating & Drying",
+        "Gating & Riser Setup",
+        "Mould Assembly & Clamping"
+      ],
+      "updated_at": "2026-09-21T06:55:28.195Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "AL ROZAQ SYA'BAN",
+      "kelas": "Kelas 3",
+      "noreg": "2607121",
+      "notes": "",
+      "scores": [
+        46,
+        44,
+        51,
+        49,
+        54,
+        53
+      ],
+      "section": "MAINTENANCE",
+      "autoScore": 98,
+      "evaluator": "OKY WAHYU PRATAMA",
+      "manualAvg": 49.5,
+      "finalScore": 64.1,
+      "isVerified": true,
+      "skillNames": [
+        "Preventive Maintenance (PM)",
+        "Diagnosa Elektrikal & Wiring",
+        "Sistem Hidrolik & Pneumatik",
+        "Mechanical Alignment & Bearing",
+        "Troubleshooting Sensor & PLC",
+        "Prosedur Lockout / Tagout (LOTO)"
+      ],
+      "updated_at": "2026-09-21T06:55:46.960Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "SEPTIO NUR HIDAYAT",
+      "kelas": "Kelas 5",
+      "noreg": "2605047",
+      "notes": "",
+      "scores": [
+        50,
+        54,
+        48,
+        44,
+        53,
+        54
+      ],
+      "section": "GRINDING",
+      "autoScore": 96.7,
+      "evaluator": "MOHAMMAT YASIR MA'ARIF",
+      "manualAvg": 50.5,
+      "finalScore": 64.4,
+      "isVerified": true,
+      "skillNames": [
+        "Surface Grinding",
+        "Cylindrical Grinding",
+        "Wheel Dressing & Balance",
+        "Precision Measurement",
+        "Toleransi & Finishing Ra",
+        "Tool & Machine Setup"
+      ],
+      "updated_at": "2026-09-21T06:55:58.899Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "FARREL GERALDI PRATAMA",
+      "kelas": "Kelas 5",
+      "noreg": "2605041",
+      "notes": "",
+      "scores": [
+        47,
+        46,
+        51,
+        48,
+        53,
+        47
+      ],
+      "section": "SHOTBLAST",
+      "autoScore": 98,
+      "evaluator": "BIMA AGUNG SETYAWAN",
+      "manualAvg": 48.7,
+      "finalScore": 63.5,
+      "isVerified": true,
+      "skillNames": [
+        "Operasi Mesin Shotblast",
+        "Pengaturan Media Steel Shot",
+        "Pembersihan Sisa Pasir Cor",
+        "Siklus & Waktu Blasting",
+        "Inspeksi Kebersihan SA 2.5",
+        "Perawatan Dust Collector"
+      ],
+      "updated_at": "2026-09-21T06:56:12.151Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "RAFLY MAULANA SYARIEF KHUSEIN",
+      "kelas": "Kelas 3",
+      "noreg": "PRA0783",
+      "notes": "",
+      "scores": [
+        48,
+        44,
+        48,
+        48,
+        49,
+        53
+      ],
+      "section": "CORE",
+      "autoScore": 92.5,
+      "evaluator": "WIRA ATMOJO SASELAH",
+      "manualAvg": 48.3,
+      "finalScore": 61.6,
+      "isVerified": true,
+      "skillNames": [
+        "Pembuatan Inti Pasir",
+        "Resin & Sand Mixing",
+        "Core Assembly & Coating",
+        "Core Baking & Curing",
+        "Inspeksi Cacat Retak/Patah",
+        "Finishing & Deburring Core"
+      ],
+      "updated_at": "2026-09-21T06:56:36.184Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "M. ERI RAIKHAN",
+      "kelas": "Kelas 4",
+      "noreg": "PRA0779",
+      "notes": "",
+      "scores": [
+        45,
+        43,
+        48,
+        48,
+        40,
+        51
+      ],
+      "section": "PPIC",
+      "autoScore": 98,
+      "evaluator": "AINUN UMAMI",
+      "manualAvg": 45.8,
+      "finalScore": 61.5,
+      "isVerified": true,
+      "skillNames": [
+        "Master Production Schedule (MPS)",
+        "Monitoring Kapasitas Mesin",
+        "Kontrol Stok Bahan Baku & Part",
+        "Pemantauan Delivery Schedule",
+        "Administrasi Work-In-Progress (WIP)",
+        "Koordinasi Lintas Divisi Pabrik"
+      ],
+      "updated_at": "2026-09-21T06:56:47.251Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "RIZKY NOVANDA YULIAWAN",
+      "kelas": "Kelas 5",
+      "noreg": "2604129",
+      "notes": "",
+      "scores": [
+        42,
+        43,
+        56,
+        43,
+        56,
+        45
+      ],
+      "section": "QC POURING",
+      "autoScore": 94.5,
+      "evaluator": "MUHTADIN",
+      "manualAvg": 47.5,
+      "finalScore": 61.6,
+      "isVerified": true,
+      "skillNames": [
+        "Pengecekan Suhu Tuang Logam",
+        "Thermal Analysis (CELOX / Curva)",
+        "Verifikasi Inokulasi Logam",
+        "Uji Kecepatan Alir Cetakan",
+        "Pemeriksaan Spektrometri Sampel",
+        "Dokumentasi Heat Number Cor"
+      ],
+      "updated_at": "2026-09-21T06:56:59.585Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "nama": "M. BAGAS SETIAWAN",
+      "kelas": "Kelas 2",
+      "noreg": "2608047",
+      "notes": "",
+      "scores": [
+        44,
+        50,
+        47,
+        50,
+        45,
+        40
+      ],
+      "section": "LADLE",
+      "autoScore": 98,
+      "evaluator": "IRVAN TRISAPTA PERMANA",
+      "manualAvg": 46,
+      "finalScore": 61.6,
+      "isVerified": true,
+      "skillNames": [
+        "Pemanasan Pre-heat Ladle",
+        "Pelapisan Refractory Lining",
+        "Perawatan Mekanisme Tilting",
+        "Inspeksi Ketahanan Dinding Ladle",
+        "Pencegahan Slag Carryover",
+        "Safety Transportasi Logam Cair"
+      ],
+      "updated_at": "2026-09-21T07:10:18.663Z",
+      "isCompetent": false,
+      "isTargetMet": false
+    },
+    {
+      "noreg": "2604144",
+      "nama": "MIVTHA MAULUDIA",
+      "section": "ADM PRODUKSI",
+      "kelas": "Kelas 5",
+      "evaluator": "YURA BAGUS NANDHA TAMA",
+      "scores": [
+        43,
+        48,
+        48,
+        40,
+        59,
+        44
+      ],
+      "skillNames": [
+        "Rekapitulasi Laporan Manpower",
+        "Pencatatan Plan vs Aktual Output",
+        "Monitoring Efisiensi Lini (OEE)",
+        "Input Data Scrap & Reject",
+        "Administrasi Surat Jalan",
+        "Pengarsipan Dokumen Kerja"
+      ],
+      "manualAvg": 47,
+      "autoScore": 98,
+      "finalScore": 62.3,
+      "isTargetMet": false,
+      "isCompetent": false,
+      "notes": "",
+      "isVerified": true,
+      "updated_at": "2026-09-21T07:11:08.673Z"
+    }
+  ],
+  "updated_at": "2026-09-21T07:10:18.668+00:00"
+}

@@ -578,240 +578,31 @@ if (typeof Chart !== 'undefined') {
         }, 4000);
     }
 
-    const createDummyDaily = (perfLabel, score) => {
-        const arr = [];
-        const today = new Date();
-        for (let i = 30; i >= 0; i--) {
-            const cursor = new Date(today);
-            cursor.setDate(today.getDate() - i);
-            const yyyy = cursor.getFullYear();
-            const mm = String(cursor.getMonth() + 1).padStart(2, '0');
-            const dd = String(cursor.getDate()).padStart(2, '0');
-            const dateStr = `${yyyy}-${mm}-${dd}`;
-            
-            if (perfLabel === "Hadir") {
-                arr.push({ 
-                    dateStr: dateStr, 
-                    hadir: cursor.getDay() === 0 ? "" : "✔", 
-                    keterangan: cursor.getDay() === 0 ? "Off" : "On duty" 
-                });
-            } else {
-                const target = 100;
-                // Hari Minggu plan = 0, actual = 0
-                const isSunday = cursor.getDay() === 0;
-                const planValue = isSunday ? 0 : target;
-                const actualValue = isSunday ? 0 : Math.max(0, Math.round(target * (score / 100)) + (i % 3 === 0 ? 5 : -5));
-                arr.push({ 
-                    dateStr: dateStr, 
-                    plan: planValue, 
-                    actual: actualValue, 
-                    reject: isSunday ? 0 : 2, 
-                    percent: planValue > 0 ? Math.max(0, Math.min(100, Math.round((actualValue / planValue) * 100))) : 0 
-                });
-            }
-        }
-        return arr;
-    };
+    const createDummyDaily = () => [];
 
-    const fallbackSiswa = [
-        { id: "2601190", namaLengkap: "FARANDI SATRIA NUGRAHA", email: "2601190@indoprima.com", bagian: "PAINTING", kelas: "Kelas 6", masuk: "2026-01-20", wilayah: "SMG", spv: "Pak Bambang (SMG)", daerahAsal: "Demak", nilai: 100, status: "Aktif", perfLabel: "Plan", dailyRecords: createDummyDaily("Plan", 100) },
-        { id: "2601176", namaLengkap: "MUHAMMAD ROJI", email: "2601176@indoprima.com", bagian: "ADM PPIC", kelas: "Kelas 6", masuk: "2026-01-20", wilayah: "SBY", spv: "Bu Sri (SBY)", daerahAsal: "Gresik", nilai: 100, status: "Aktif", perfLabel: "Hadir", dailyRecords: createDummyDaily("Hadir", 100) },
-        { id: "2601184", namaLengkap: "MOCHAMMAD IQBAL HABIBI", email: "2601184@indoprima.com", bagian: "CORE", kelas: "Kelas 6", masuk: "2026-01-20", wilayah: "BPP", spv: "Pak Anton (BPP)", daerahAsal: "Balikpapan", nilai: 95, status: "Aktif", perfLabel: "Plan", dailyRecords: createDummyDaily("Plan", 95) },
-        { id: "2602002", namaLengkap: "ANDHIKA RISKI SAPUTRA", email: "2602002@indoprima.com", bagian: "GRINDING", kelas: "Kelas 5", masuk: "2026-02-20", wilayah: "SBY", spv: "Pak Agus (SBY)", daerahAsal: "Surabaya", nilai: 120, status: "Aktif", perfLabel: "Plan", dailyRecords: createDummyDaily("Plan", 120) },
-        { id: "2602006", namaLengkap: "HANDIKA PRADANA PUTRA", email: "2602006@indoprima.com", bagian: "CORE", kelas: "Kelas 5", masuk: "2026-02-20", wilayah: "BPP", spv: "Pak Anton (BPP)", daerahAsal: "Penajam", nilai: 95, status: "Aktif", perfLabel: "Hadir", dailyRecords: createDummyDaily("Hadir", 95) }
-    ];
-
-    const fallbackTurnover = [
-        { id: "2601111", namaLengkap: "AQSAL RAIHAN M.", bagian: "CORE", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "10/05/2026", keterangan: "Lulus", alasan: "Lulus Magang Kerja Unggulan", wilayah: "JEMBER" },
-        { id: "2601183", namaLengkap: "TRIO FARIT HENDRAWAN", bagian: "PAINTING", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "11/05/2026", keterangan: "Indisipliner", alasan: "Pelanggaran berulang tata tertib mesin", wilayah: "SIDOARJO" },
-        { id: "2602003", namaLengkap: "AHMAD HANIFAN", bagian: "GRINDING", kelas: "Kelas 5", masuk: "2025-12-20", tanggalKeluar: "12/05/2026", keterangan: "Indisipliner", alasan: "Sering tidak hadir tanpa keterangan", wilayah: "MALANG" },
-        { id: "2602010", namaLengkap: "FAIS WAHYUDA", bagian: "LADLE", kelas: "Kelas 4", masuk: "2026-01-20", tanggalKeluar: "15/05/2026", keterangan: "Resign", alasan: "Membantu usaha keluarga", wilayah: "MADIUN" },
-        { id: "2602022", namaLengkap: "FAHNI AZIZCAHYO", bagian: "CORE", kelas: "Kelas 3", masuk: "2026-02-20", tanggalKeluar: "17/05/2026", keterangan: "Resign", alasan: "Kondisi kesehatan tidak mendukung", wilayah: "KEDIRI" },
-        { id: "2602035", namaLengkap: "AHMAD NASHOIKHUDIN", bagian: "PAINTING", kelas: "Kelas 5", masuk: "2025-12-20", tanggalKeluar: "19/05/2026", keterangan: "Resign", alasan: "Mendapat pekerjaan di kampung halaman", wilayah: "GRESIK" },
-        { id: "2602041", namaLengkap: "MUHAMMAD RIZKY", bagian: "GRINDING", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "21/05/2026", keterangan: "Lulus", alasan: "Program magang berakhir", wilayah: "LAMONGAN" },
-        { id: "2602050", namaLengkap: "JESEN SENDI", bagian: "LADLE", kelas: "Kelas 6", masuk: "2025-11-20", tanggalKeluar: "22/05/2026", keterangan: "Lulus", alasan: "Program magang berakhir dengan baik", wilayah: "MOJOKERTO" }
-    ];
-
-    const fallbackUsers = [
-        { id: "USER-20260620-0001", namaLengkap: "Admin Utama", email: "admin@indoprima.com", role: "Admin", nomorRegistrasi: "" },
-        { id: "USER-20260620-0002", namaLengkap: "Executive Visitor", email: "visitor@indoprima.com", role: "Visitor", nomorRegistrasi: "" },
-        { id: "USER-20260620-0003", namaLengkap: "MUHAMMAD ROJI", email: "2601176@indoprima.com", role: "Siswa", nomorRegistrasi: "2601176" }
-    ];
-
-    const fallbackSafety = [
-        {
-            id: 1,
-            noreg: "2601190",
-            nama: "FARANDI SATRIA NUGRAHA",
-            kelas: "Kelas 1",
-            bagian: "POURING",
-            spv: "BIMA AGUNG SETYAWAN",
-            jenisKecelakaan: "Percikan Cairan Logam Panas (Molten Metal Splash)",
-            kategori: "Ringan",
-            tanggal: "2026-04-14",
-            keterangan: "Terkena percikan besi cair (FC/FCD) pada apron lengan kiri saat penuangan ke dalam mold. Kompres dingin & First Aid poliklinik."
-        },
-        {
-            id: 2,
-            noreg: "2602006",
-            nama: "HANDIKA PRADANA PUTRA",
-            kelas: "Kelas 2",
-            bagian: "COREMAKING",
-            spv: "AMIR SUPRAPTO",
-            jenisKecelakaan: "Terpapar Debu Pasir Silika & Iritasi Mata",
-            kategori: "Ringan",
-            tanggal: "2026-04-22",
-            keterangan: "Hembusan debu pasir core ke mata kanan saat pembersihan cetakan inti. Pembilasan eyewash station, tidak ada cedera permanen."
-        },
-        {
-            id: 3,
-            noreg: "2603130",
-            nama: "BERLIANO ABISYAH ENANTA",
-            kelas: "Kelas 5",
-            bagian: "GRINDING & FETTLING",
-            spv: "MOHAMMAT YASIR MA'ARIF",
-            jenisKecelakaan: "Tergores Tajam Sisa Riser (Burr Scratch)",
-            kategori: "Ringan",
-            tanggal: "2026-05-06",
-            keterangan: "Lengan kanan tergores sirip benda kerja hasil casting galah saat pemotongan riser gerinda. Pembersihan luka dan balut kassa."
-        },
-        {
-            id: 4,
-            noreg: "2605046",
-            nama: "ARDO ARDIANTARA FARREL",
-            kelas: "Kelas 3",
-            bagian: "MOLDING LINE",
-            spv: "AMIR SUPRAPTO",
-            jenisKecelakaan: "Terjepit Rangka Cetakan (Flask Pinch Injury)",
-            kategori: "Sedang",
-            tanggal: "2026-05-18",
-            keterangan: "Jari telunjuk kanan tersepit saat perakitan cope and drag rangka cetakan manual. Rontgen klinik perusahaan (tidak ada fraktur)."
-        },
-        {
-            id: 5,
-            noreg: "2602002",
-            nama: "ANDHIKA RISKI SAPUTRA",
-            kelas: "Kelas 2",
-            bagian: "MELTING (TUNGKU INDUKSI)",
-            spv: "BIMA AGUNG SETYAWAN",
-            jenisKecelakaan: "Kait Ladle Miring (Near Miss Hook Crane)",
-            kategori: "Near Miss",
-            tanggal: "2026-05-27",
-            keterangan: "Kait crane penopang Ladle besi cair 500kg sempat tersangkut stopper. Tidak ada tumpahan, inspeksi ulang safety latch crane."
-        },
-        {
-            id: 6,
-            noreg: "2603143",
-            nama: "MUHAMMAD MUZAKY BASTOMI",
-            kelas: "Kelas 5",
-            bagian: "SHOTBLAST",
-            spv: "MOHAMMAT YASIR MA'ARIF",
-            jenisKecelakaan: "Terkena Pantulan Steel Shot (Peluru Pasir Besi)",
-            kategori: "Ringan",
-            tanggal: "2026-06-03",
-            keterangan: "Satu butir steel shot meluncur dari celah seal pintu mesin shotblast mengenai paha kanan. Penambahan rubber curtain di pintu mesin."
-        },
-        {
-            id: 7,
-            noreg: "2605043",
-            nama: "LEO WIBISONO",
-            kelas: "Kelas 3",
-            bagian: "PATTERN SHOP",
-            spv: "BIMA AGUNG SETYAWAN",
-            jenisKecelakaan: "Tertimpa Model Cetakan Kayu (Pattern Foot Contusion)",
-            kategori: "Ringan",
-            tanggal: "2026-06-12",
-            keterangan: "Model cetakan cylinder liner terjatuh dari rak penyimpanan mengenai sepatu safety. Sepatu safety menahan dampak, memar ringan."
-        },
-        {
-            id: 8,
-            noreg: "2601176",
-            nama: "MUHAMMAD ROJI",
-            kelas: "Kelas 1",
-            bagian: "POURING",
-            spv: "AINUN UMAMI",
-            jenisKecelakaan: "Uap Terperangkap Saat Penuangan (Mold Gas Pop)",
-            kategori: "Near Miss",
-            tanggal: "2026-06-25",
-            keterangan: "Letupan uap gas kecil dari lubang penambah (riser vent) akibat kelembaban pasir cetak. APD Face Shield melindungi muka penuh."
-        },
-        {
-            id: 9,
-            noreg: "2602130",
-            nama: "MUHAMMAD RIZKY",
-            kelas: "Kelas 2",
-            bagian: "QUALITY CONTROL CASTING",
-            spv: "MOHAMMAT YASIR MA'ARIF",
-            jenisKecelakaan: "Tersenggol Benda Kerja Panas (Hot Casting Touch)",
-            kategori: "Ringan",
-            tanggal: "2026-07-02",
-            keterangan: "Sarung tangan menyentuh benda kerja pasir shake-out yang belum dingin 100%. Luka bakar ringan derajat 1 pada kulit telapak."
-        },
-        {
-            id: 10,
-            noreg: "2603155",
-            nama: "AYU AGUSTINA",
-            kelas: "Kelas 3",
-            bagian: "LABORATORIUM METALOGRAFI",
-            spv: "WIRA ATMOJO SASELAH",
-            jenisKecelakaan: "Tumpahan Reagen Sketsa Cairan Asam Etching",
-            kategori: "Near Miss",
-            tanggal: "2026-07-09",
-            keterangan: "Botol nital 2% tersenggol saat persiapan pengujian mikrostruktur logam pengecoran. Cairan tertampung di tray, netralisasi NaHCO3."
-        },
-        {
-            id: 11,
-            noreg: "2601190",
-            nama: "FARANDI SATRIA NUGRAHA",
-            kelas: "Kelas 1",
-            bagian: "POURING",
-            spv: "BIMA AGUNG SETYAWAN",
-            jenisKecelakaan: "Tergelincir Di Area Sand Handling",
-            kategori: "Ringan",
-            tanggal: "2026-07-16",
-            keterangan: "Tergelincir pasir cetak basah di jalur walk-way lantai pouring. Terjadi terkilir pergelangan kaki ringan, kompres gel analgesic."
-        },
-        {
-            id: 12,
-            noreg: "2605046",
-            nama: "ARDO ARDIANTARA FARREL",
-            kelas: "Kelas 3",
-            bagian: "GRINDING & FETTLING",
-            spv: "AMIR SUPRAPTO",
-            jenisKecelakaan: "Serpihan Gram Masuk Kacamata Safety",
-            kategori: "Ringan",
-            tanggal: "2026-07-21",
-            keterangan: "Gram halus gerinda melayang masuk celah kacamata saat pembersihan produk casting. Pembersihan mata irigasi cairan steril."
-        }
-    ];
+    const fallbackSiswa = [];
+    const fallbackTurnover = [];
+    const fallbackUsers = [];
+    const fallbackSafety = [];
 
     const fallbackStats = {
         cards: { 
-            totalSiswa: 5, 
-            siswaBaru: 5, 
-            lulus: 8,
-            turnoverDetails: { resign: 3, lulus: 3, indisipliner: 2 }
+            totalSiswa: 0, 
+            siswaBaru: 0, 
+            lulus: 0,
+            turnoverDetails: { resign: 0, lulus: 0, indisipliner: 0 }
         },
-        finance: { income: 45000000, expense: 12000000, balance: 33000000 },
-        recent: [
-            { id: "TRANS-20260620-0001", tipe: "Pemasukan", kat: "Uang SPP LTC", jumlah: 15000000, tanggal: "20/06/2026", ket: "Pembayaran SPP Kolektif Juni" }
-        ],
-        siswa: fallbackSiswa,
-        monthYear: { year: 2026, month: 3 },
-        turnover: fallbackTurnover,
-        safety: fallbackSafety,
-        populasi: [
-            { tanggal: "2026-06-20", kontrak: 100, ltc: 5, outsourcing: 10, satpamSupir: 5, totalKaryawan: 120, totalLtc: 5 }
-        ],
-        costRates: [
-            { kelas: "Kelas 1", uangSaku: 3000000, transport: 500000 },
-            { kelas: "Kelas 2", uangSaku: 3100000, transport: 500000 },
-            { kelas: "Kelas 3", uangSaku: 3250000, transport: 500000 },
-            { kelas: "Kelas 4", uangSaku: 3450000, transport: 500000 },
-            { kelas: "Kelas 5", uangSaku: 3700000, transport: 500000 }
-        ]
+        finance: { income: 0, expense: 0, balance: 0 },
+        recent: [],
+        siswa: [],
+        monthYear: { year: new Date().getFullYear(), month: new Date().getMonth() + 1 },
+        turnover: [],
+        safety: [],
+        populasi: [],
+        costRates: []
     };
     window.fallbackStats = fallbackStats;
+
 
     function startRealtimeClock() {
         const updateClocks = () => {
@@ -1199,14 +990,26 @@ if (typeof Chart !== 'undefined') {
         const _proceedToDashboard = () => {
             document.getElementById('app').classList.remove('hidden');
 
-            document.getElementById('user-display-name').innerText = currentUser.namaLengkap;
-            document.getElementById('user-display-role').innerText = currentUser.role.toUpperCase();
+            const displayName = (currentUser && currentUser.namaLengkap) ? currentUser.namaLengkap : '-';
+            const displayRole = (currentUser && currentUser.role === 'Admin') ? 'Super Admin' : ((currentUser && currentUser.role) || '-');
+
+            const nameEl = document.getElementById('user-display-name');
+            if (nameEl) nameEl.innerText = displayName;
+
+            const roleEl = document.getElementById('user-display-role');
+            if (roleEl) roleEl.innerText = displayRole;
 
             const adminNav = document.getElementById('nav-admin');
+            const lmsNav = document.getElementById('nav-lms');
+            const settingBottom = document.getElementById('sidebar-setting-bottom');
             if (currentUser.role === 'Admin') {
-                adminNav.classList.remove('hidden');
+                if (adminNav) adminNav.classList.remove('hidden');
+                if (lmsNav) lmsNav.classList.remove('hidden');
+                if (settingBottom) settingBottom.classList.remove('hidden');
             } else {
-                adminNav.classList.add('hidden');
+                if (adminNav) adminNav.classList.add('hidden');
+                if (lmsNav) lmsNav.classList.add('hidden');
+                if (settingBottom) settingBottom.classList.add('hidden');
             }
 
             const appSidebar = document.getElementById('app-sidebar');
@@ -1784,6 +1587,25 @@ if (typeof Chart !== 'undefined') {
         }
     }
 
+    function toggleUserMenuDropdown(e) {
+        if (e) e.stopPropagation();
+        const dropdown = document.getElementById('header-user-dropdown');
+        if (!dropdown) return;
+        dropdown.classList.toggle('hidden');
+    }
+    window.toggleUserMenuDropdown = toggleUserMenuDropdown;
+
+    // Tutup dropdown menu akun saat klik di luar
+    document.addEventListener('click', function(e) {
+        const container = document.getElementById('user-menu-dropdown-container');
+        const dropdown = document.getElementById('header-user-dropdown');
+        if (container && dropdown && !dropdown.classList.contains('hidden')) {
+            if (!container.contains(e.target)) {
+                dropdown.classList.add('hidden');
+            }
+        }
+    });
+
     function switchView(viewName) {
         // Auto-close mobile / split-screen sidebar drawer
         toggleMobileSidebar(false);
@@ -1854,7 +1676,16 @@ if (typeof Chart !== 'undefined') {
             btn.classList.add('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
         });
 
-        const activeBtn = document.getElementById('nav-' + viewName);
+        let activeBtn = document.getElementById('nav-' + viewName);
+        if (viewName === 'admin' && typeof currentAdminTab !== 'undefined') {
+            if (currentAdminTab === 'kelola-quiz' || currentAdminTab === 'kelola-sertifikat' || currentAdminTab === 'skill-map') {
+                activeBtn = document.getElementById('nav-lms');
+            } else if (currentAdminTab === 'kelola-setting') {
+                activeBtn = document.getElementById('nav-setting');
+            } else {
+                activeBtn = document.getElementById('nav-admin');
+            }
+        }
         if (activeBtn) {
             activeBtn.classList.remove('text-slate-800', 'hover:bg-slate-50', 'hover:text-[#0B3B82]');
             activeBtn.classList.add('text-white', 'bg-blue-600');
@@ -1869,15 +1700,21 @@ if (typeof Chart !== 'undefined') {
             activeMobileBtn.classList.add('active');
         }
 
-        // Enforce admin nav visibility strictly based on role
+        // Enforce admin & lms & setting nav visibility strictly based on role
         const adminNav = document.getElementById('nav-admin');
+        const lmsNav = document.getElementById('nav-lms');
+        const settingBottom = document.getElementById('sidebar-setting-bottom');
         const mobileAdminNav = document.getElementById('mobile-nav-admin');
         if (adminNav) {
             if (currentUser && currentUser.role === 'Admin') {
                 adminNav.classList.remove('hidden');
+                if (lmsNav) lmsNav.classList.remove('hidden');
+                if (settingBottom) settingBottom.classList.remove('hidden');
                 if (mobileAdminNav) { mobileAdminNav.classList.remove('hidden'); mobileAdminNav.classList.add('flex'); }
             } else {
                 adminNav.classList.add('hidden');
+                if (lmsNav) lmsNav.classList.add('hidden');
+                if (settingBottom) settingBottom.classList.add('hidden');
                 if (mobileAdminNav) { mobileAdminNav.classList.add('hidden'); mobileAdminNav.classList.remove('flex'); }
             }
         }
@@ -1906,8 +1743,18 @@ if (typeof Chart !== 'undefined') {
             'admin': 'Admin'
         };
         
+        let headerTitle = titleMap[viewName] || 'Dashboard';
+        if (viewName === 'admin' && typeof currentAdminTab !== 'undefined') {
+            if (currentAdminTab === 'kelola-quiz') {
+                headerTitle = 'LMS - Quiz & Evaluasi Teori';
+            } else if (currentAdminTab === 'kelola-sertifikat') {
+                headerTitle = 'LMS - Kelola Sertifikat';
+            } else if (currentAdminTab === 'skill-map') {
+                headerTitle = 'LMS - Skill map';
+            }
+        }
         const titleHeader = document.getElementById('header-view-title');
-        if (titleHeader) titleHeader.innerText = titleMap[viewName] || 'Dashboard';
+        if (titleHeader) titleHeader.innerText = headerTitle;
 
         if (viewName === 'siswa') renderSiswaView();
         if (viewName === 'sisi-siswa' && typeof populateSiswaPortalFields === 'function') populateSiswaPortalFields();
@@ -1923,18 +1770,35 @@ if (typeof Chart !== 'undefined') {
         if (viewName === 'absensi' && typeof renderAbsensiView === 'function') renderAbsensiView();
         if (viewName === 'safety' && typeof renderSafetyView === 'function') renderSafetyView();
         
-        // Manage Admin Submenu State
+        // Manage Admin & LMS Submenu State
         const adminSubmenu = document.getElementById('nav-admin-submenu');
         const adminChevron = document.getElementById('admin-chevron');
+        const lmsSubmenu = document.getElementById('nav-lms-submenu');
+        const lmsChevron = document.getElementById('lms-chevron');
+
         if (viewName === 'admin') {
-            if (adminSubmenu) adminSubmenu.classList.remove('hidden');
-            if (adminChevron) adminChevron.classList.add('rotate-180');
+            const isLmsTab = (typeof currentAdminTab !== 'undefined') && 
+                             (currentAdminTab === 'kelola-quiz' || currentAdminTab === 'kelola-sertifikat' || currentAdminTab === 'skill-map');
+            if (isLmsTab) {
+                if (lmsSubmenu) lmsSubmenu.classList.remove('hidden');
+                if (lmsChevron) lmsChevron.classList.add('rotate-180');
+                if (adminSubmenu) adminSubmenu.classList.add('hidden');
+                if (adminChevron) adminChevron.classList.remove('rotate-180');
+            } else {
+                if (adminSubmenu) adminSubmenu.classList.remove('hidden');
+                if (adminChevron) adminChevron.classList.add('rotate-180');
+                if (lmsSubmenu) lmsSubmenu.classList.add('hidden');
+                if (lmsChevron) lmsChevron.classList.remove('rotate-180');
+            }
+
             if (typeof updateAdminSubmenuHighlight === 'function' && typeof currentAdminTab !== 'undefined') {
                 updateAdminSubmenuHighlight(currentAdminTab);
             }
         } else {
             if (adminSubmenu) adminSubmenu.classList.add('hidden');
             if (adminChevron) adminChevron.classList.remove('rotate-180');
+            if (lmsSubmenu) lmsSubmenu.classList.add('hidden');
+            if (lmsChevron) lmsChevron.classList.remove('rotate-180');
         }
 
         if (viewName === 'turnover' && mapTurnoverInstance) {
@@ -1942,13 +1806,42 @@ if (typeof Chart !== 'undefined') {
         }
     }
 
+    function toggleLmsMenu() {
+        const lmsSubmenu = document.getElementById('nav-lms-submenu');
+        const lmsChevron = document.getElementById('lms-chevron');
+        const adminView = document.getElementById('view-admin');
+        const isLmsActive = adminView && !adminView.classList.contains('hidden') &&
+                            (typeof currentAdminTab !== 'undefined' && 
+                            (currentAdminTab === 'kelola-quiz' || currentAdminTab === 'kelola-sertifikat' || currentAdminTab === 'skill-map'));
+        
+        if (!isLmsActive) {
+            if (typeof currentAdminTab !== 'undefined') currentAdminTab = 'kelola-quiz';
+            switchView('admin');
+            if (typeof switchAdminTab === 'function') switchAdminTab('kelola-quiz');
+        } else {
+            if (lmsSubmenu) {
+                const isHidden = lmsSubmenu.classList.toggle('hidden');
+                if (lmsChevron) {
+                    if (isHidden) lmsChevron.classList.remove('rotate-180');
+                    else lmsChevron.classList.add('rotate-180');
+                }
+            }
+        }
+    }
+    window.toggleLmsMenu = toggleLmsMenu;
+
     function toggleAdminMenu() {
         const adminSubmenu = document.getElementById('nav-admin-submenu');
         const adminChevron = document.getElementById('admin-chevron');
         const adminView = document.getElementById('view-admin');
+        const isAdminActive = adminView && !adminView.classList.contains('hidden') &&
+                              (typeof currentAdminTab !== 'undefined' && 
+                              currentAdminTab !== 'kelola-quiz' && currentAdminTab !== 'kelola-sertifikat' && currentAdminTab !== 'skill-map');
         
-        if (!adminView || adminView.classList.contains('hidden')) {
+        if (!isAdminActive) {
+            if (typeof currentAdminTab !== 'undefined') currentAdminTab = 'kelola-siswa';
             switchView('admin');
+            if (typeof switchAdminTab === 'function') switchAdminTab('kelola-siswa');
         } else {
             if (adminSubmenu) {
                 const isHidden = adminSubmenu.classList.toggle('hidden');

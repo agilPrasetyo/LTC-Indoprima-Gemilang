@@ -45,6 +45,16 @@ export const POST = async ({ request }) => {
 
     if (error) throw error;
 
+    // Update otomatis section siswa di tabel siswa sesuai section terbaru yang dilaporkan di log harian
+    if (l.Bagian && l.NoReg) {
+      const bagianUpper = String(l.Bagian).trim().toUpperCase();
+      try {
+        await supabase.from('siswa').update({ section: bagianUpper }).eq('noreg', l.NoReg);
+      } catch (errSec) {
+        console.warn('[manpower/index.js] Auto-update section warning:', errSec?.message);
+      }
+    }
+
     return new Response(JSON.stringify({ success: true, message: 'Log manpower harian berhasil disimpan.' }), {
       status: 200,
       headers: { 'Content-Type': 'application/json' }

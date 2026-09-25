@@ -204,6 +204,33 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
           <span class="nav-text font-normal">Safety / K3</span>
         </button>
 
+        <!-- Menu LMS & Sub-Menu Dropdown (Khusus Sidebar Desktop) -->
+        <div id="nav-lms-wrapper" class="w-full space-y-1.5">
+          <button id="nav-lms" onclick="toggleLmsMenu()" class="nav-btn w-full hidden flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-slate-800 hover:bg-slate-50 hover:text-[#0B3B82] transition-all duration-200 text-left group">
+            <div class="flex items-center gap-3">
+              <i class="fa-solid fa-book-open-reader text-base w-5 text-center text-slate-600"></i>
+              <span class="nav-text font-normal">LMS</span>
+            </div>
+            <i id="lms-chevron" class="fa-solid fa-chevron-down text-[11px] text-slate-400 group-hover:text-[#0B3B82] transition-transform duration-200"></i>
+          </button>
+
+          <!-- Sub Menu Navigasi LMS (Indented Clean List) -->
+          <div id="nav-lms-submenu" class="hidden border-l-2 border-slate-100 ml-5 pl-2.5 py-1 space-y-1 animate-fadeIn">
+            <button onclick="switchView('admin'); switchAdminTab('kelola-quiz');" id="subnav-admin-kelola-quiz"
+              class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
+              <span class="truncate">Quiz & Evaluasi</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('skill-map');" id="subnav-admin-skill-map"
+              class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
+              <span class="truncate">Skill map</span>
+            </button>
+            <button onclick="switchView('admin'); switchAdminTab('kelola-sertifikat');" id="subnav-admin-kelola-sertifikat"
+              class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
+              <span class="truncate">Kelola Sertifikat</span>
+            </button>
+          </div>
+        </div>
+
         <!-- Menu Admin & Sub-Menu Dropdown (Khusus Sidebar Desktop) -->
         <div id="nav-admin-wrapper" class="w-full space-y-1.5">
           <button id="nav-admin" onclick="toggleAdminMenu()" class="nav-btn w-full hidden flex items-center justify-between px-3.5 py-2.5 rounded-xl text-sm text-slate-800 hover:bg-slate-50 hover:text-[#0B3B82] transition-all duration-200 text-left group">
@@ -224,14 +251,6 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
               class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
               <span class="truncate">Manajemen Akun</span>
             </button>
-            <button onclick="switchView('admin'); switchAdminTab('kelola-sertifikat');" id="subnav-admin-kelola-sertifikat"
-              class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
-              <span class="truncate">Kelola Sertifikat</span>
-            </button>
-            <button onclick="switchView('admin'); switchAdminTab('kelola-quiz');" id="subnav-admin-kelola-quiz"
-              class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
-              <span class="truncate">Quiz</span>
-            </button>
             <button onclick="switchView('admin'); switchAdminTab('log-manpower');" id="subnav-admin-log-manpower"
               class="admin-subnav-btn w-full flex items-center px-3 py-2 rounded-lg text-[13px] font-normal text-slate-600 hover:text-[#0B3B82] hover:bg-slate-50 transition-all text-left">
               <span class="truncate">Log Manpower</span>
@@ -251,24 +270,16 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
           </div>
         </div>
       </nav>
+
+      <!-- Bottom Section: Setting (Terpisah dari Admin, Pojok Kiri Paling Bawah) -->
+      <div id="sidebar-setting-bottom" class="shrink-0 pt-3 mt-2 border-t border-slate-200/80">
+        <button id="nav-setting" onclick="switchView('admin'); switchAdminTab('kelola-setting');" class="nav-btn w-full flex items-center gap-3 px-3.5 py-2.5 rounded-xl text-sm text-slate-800 hover:bg-slate-50 hover:text-[#0B3B82] transition-all duration-200 text-left group cursor-pointer" title="Pengaturan Sistem">
+          <i class="fa-solid fa-gear text-base w-5 text-center text-slate-600 group-hover:rotate-45 transition-transform duration-300"></i>
+          <span class="nav-text font-normal">Setting</span>
+        </button>
+      </div>
     </div>
 
-    <!-- User Profile Area in Sidebar (Pinned firmly at bottom) -->
-    <div class="border-t border-slate-200/80 pt-3 mt-2 shrink-0 sidebar-user-area">
-      <div class="flex items-center gap-2.5 mb-2.5 user-info-container transition-opacity duration-300">
-        <div class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-slate-500 border border-slate-200 shrink-0">
-          <i class="fa-solid fa-user text-xs"></i>
-        </div>
-        <div class="overflow-hidden">
-          <p class="font-normal text-xs text-slate-800 truncate leading-tight" id="user-display-name">-</p>
-          <p class="text-[9px] font-normal text-slate-400 tracking-wider uppercase mt-0.5" id="user-display-role">-</p>
-        </div>
-      </div>
-      <button onclick="logout()" class="logout-btn w-full flex items-center justify-center gap-2 py-2 bg-slate-100/80 hover:bg-rose-500/10 hover:text-rose-600 rounded-xl text-xs font-normal text-slate-600 transition-all duration-300">
-        <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
-        <span class="logout-text">Keluar Sesi</span>
-      </button>
-    </div>
   </aside>
 
   <!-- =============================================
@@ -333,25 +344,68 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
 
         <!-- Breadcrumb / View Title -->
         <div>
-          <h1 class="font-display font-extrabold text-lg md:text-xl text-brand-textMain tracking-tight transition-all duration-300" id="header-view-title">Dashboard Monitor</h1>
+          <h1 class="font-semibold text-lg md:text-xl text-slate-800 tracking-tight transition-all duration-300" id="header-view-title">Dashboard Monitor</h1>
         </div>
       </div>
       
-      <!-- Right Header Actions (Sync, Status, Clock) -->
-      <div class="flex items-center gap-3 sm:gap-5">
+      <!-- Right Header Actions (Sync, Status, Clock, User Profile & Logout) -->
+      <div class="flex items-center gap-2 sm:gap-3 md:gap-4">
         <!-- Live Sync Dot & Text Status -->
-        <div class="hidden sm:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-semibold text-brand-textSub shadow-sm">
+        <div class="hidden xl:flex items-center gap-2 px-3 py-1.5 bg-slate-50 border border-slate-100 rounded-full text-[10px] font-semibold text-brand-textSub shadow-xs">
           <span id="sync-live-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
           <span id="header-conn-status">Terhubung ke server</span>
         </div>
 
-        <button onclick="syncDataManual()" class="p-2.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-brand-blue active:scale-95 transition-all duration-300 shadow-sm border border-slate-100 bg-white flex items-center justify-center" title="Sinkronisasi Data Manual">
+        <button onclick="syncDataManual()" class="p-2 sm:p-2.5 rounded-full hover:bg-slate-100 text-slate-500 hover:text-brand-blue active:scale-95 transition-all duration-300 shadow-xs border border-slate-100 bg-white flex items-center justify-center cursor-pointer" title="Sinkronisasi Data Manual">
           <i class="fa-solid fa-rotate text-sm" id="header-sync-spinner"></i>
         </button>
 
         <!-- Digital Realtime Clock -->
-        <div class="hidden md:flex items-center gap-2 px-4 py-2 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-bold text-slate-500 tracking-wider shadow-sm uppercase select-none" id="realtime-clock">
+        <div class="hidden lg:flex items-center gap-2 px-3.5 py-1.5 bg-slate-50 border border-slate-100 rounded-2xl text-[10px] font-bold text-slate-500 tracking-wider shadow-xs uppercase select-none" id="realtime-clock">
           <span>Memuat Jam...</span>
+        </div>
+
+        <!-- Vertical Divider -->
+        <div class="hidden sm:block h-6 w-px bg-slate-200/80"></div>
+
+        <!-- User Profile Pill & Dropdown (Paling Kanan - Sesuai Desain Acuan) -->
+        <div class="relative" id="user-menu-dropdown-container">
+          <button 
+            type="button" 
+            id="header-user-btn" 
+            onclick="toggleUserMenuDropdown(event)" 
+            class="flex items-center gap-2.5 sm:gap-3 px-3 py-1.5 sm:px-3.5 sm:py-2 bg-[#F1F5F9] hover:bg-slate-200/80 active:scale-[0.98] rounded-2xl transition-all duration-150 cursor-pointer select-none text-left border border-slate-200/60 shadow-2xs group"
+            title="Klik untuk membuka menu akun"
+          >
+            <!-- Blue circle avatar dengan outline user icon persis acuan -->
+            <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-full bg-[#0D3B82] flex items-center justify-center shrink-0 shadow-xs group-hover:scale-105 transition-transform duration-150">
+              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" stroke-width="2.2">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+            </div>
+
+            <!-- Nama & Role Pengguna -->
+            <div class="overflow-hidden max-w-[110px] sm:max-w-[150px] md:max-w-[190px]">
+              <p class="font-semibold text-xs sm:text-[13px] text-slate-800 truncate leading-snug" id="user-display-name">-</p>
+              <p class="text-[11px] sm:text-xs font-normal text-slate-500 truncate mt-0.5 leading-tight" id="user-display-role">-</p>
+            </div>
+          </button>
+
+          <!-- Dropdown Menu (Hanya muncul ketika akun di-klik) -->
+          <div 
+            id="header-user-dropdown" 
+            class="hidden absolute right-0 top-full mt-1.5 w-full min-w-[120px] bg-white border border-slate-200/90 rounded-2xl shadow-xl shadow-slate-300/40 p-1.5 z-50 animate-fadeIn"
+          >
+            <!-- Tombol Keluar -->
+            <button 
+              type="button" 
+              onclick="logout()" 
+              class="w-full flex items-center justify-center gap-2 px-3 py-2 text-xs font-semibold text-rose-600 hover:bg-rose-50 active:bg-rose-100 rounded-xl transition-all duration-150 cursor-pointer"
+            >
+              <i class="fa-solid fa-arrow-right-from-bracket text-xs"></i>
+              <span>Keluar</span>
+            </button>
+          </div>
         </div>
       </div>
     </header>
@@ -546,10 +600,10 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
             <div>
                 <label class="block text-xs font-bold text-brand-textMain mb-1">Kategori Insiden <span class="text-rose-500">*</span></label>
                 <select id="safety-form-kategori" class="w-full px-3.5 py-2.5 text-xs bg-slate-50 border border-slate-200 rounded-xl font-semibold outline-none focus:border-brand-blue focus:bg-white transition-all cursor-pointer">
-                    <option value="Ringan">Ringan (First Aid / Pertolongan Pertama)</option>
-                    <option value="Near Miss">Near Miss (Hampir Celaka)</option>
-                    <option value="Sedang">Sedang (Medical Treatment / Pengobatan Klinik)</option>
-                    <option value="Berat">Berat (Lost Time Injury / Jam Kerja Hilang)</option>
+                    <option value="FA">FA (First Aid)</option>
+                    <option value="MTI">MTI (Medical Treatment Injury)</option>
+                    <option value="TA">TA (Total Accident)</option>
+                    <option value="Fatality">Fatality</option>
                 </select>
             </div>
 
@@ -1516,13 +1570,18 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Nomor Mesin</label>
-                        <input type="text" id="mp-modal-mesin" placeholder="Contoh: CNC-01"
+                        <input type="text" id="mp-modal-mesin" list="mp-modal-machine-datalist" placeholder="Contoh: CNC-01"
                             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                        <datalist id="mp-modal-machine-datalist"></datalist>
                     </div>
                     <div>
                         <label class="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">Model / Item</label>
-                        <input type="text" id="mp-modal-model" placeholder="Contoh: ORING 170"
+                        <input type="text" id="mp-modal-model" list="mp-modal-product-datalist" placeholder="Contoh: ORING 170"
+                            oninput="window.handleMpModalModelInput && window.handleMpModalModelInput(this.value)"
+                            onchange="window.handleMpModalModelInput && window.handleMpModalModelInput(this.value)"
                             class="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-xs outline-none focus:border-blue-600 focus:bg-white transition-all font-medium text-slate-800">
+                        <datalist id="mp-modal-product-datalist"></datalist>
+                        <div id="mp-modal-model-hint" class="text-[10px] text-blue-600 font-semibold mt-1 hidden"></div>
                     </div>
                 </div>
             </div>
@@ -1579,6 +1638,199 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
         </form>
     </div>
 </div>
+
+<!-- ==============================================================================
+     SINKRONISASI OTOMATIS: MASTER OPERASIONAL -> FORMULIR REPORT HARIAN
+     ============================================================================== -->
+<script is:inline>
+  window.MASTER_OPERATIONAL_CACHE = window.MASTER_OPERATIONAL_CACHE || {
+    products: [],
+    machines: [],
+    spv: [],
+    sections: []
+  };
+
+  async function fetchOperationalMasterData(force = false) {
+    if (!force && window.MASTER_OPERATIONAL_CACHE.products && window.MASTER_OPERATIONAL_CACHE.products.length > 0) {
+      return window.MASTER_OPERATIONAL_CACHE;
+    }
+    try {
+      const [prodsRes, mcsRes, spvsRes, secsRes] = await Promise.all([
+        fetch('/api/rpc', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ action: 'getMasterProducts', args: [5] }) }).then(r => r.json()),
+        fetch('/api/rpc', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ action: 'getMasterMachines', args: [5] }) }).then(r => r.json()),
+        fetch('/api/rpc', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ action: 'getMasterSpvList', args: [5] }) }).then(r => r.json()),
+        fetch('/api/rpc', { method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({ action: 'getMasterSections', args: [5] }) }).then(r => r.json())
+      ]);
+      window.MASTER_OPERATIONAL_CACHE = {
+        products: prodsRes.data || [],
+        machines: mcsRes.data || [],
+        spv: spvsRes.data || [],
+        sections: secsRes.data || []
+      };
+    } catch (err) {
+      console.warn('[Operational Sync] Failed to fetch master data:', err);
+    }
+    return window.MASTER_OPERATIONAL_CACHE;
+  }
+
+  async function syncOperationalMasterForms(force = false) {
+    const data = await fetchOperationalMasterData(force);
+
+    // 1. Sinkronisasi Dropdown SPV di Manpower Modal (Admin)
+    const mpSpvSelect = document.getElementById('mp-modal-spv');
+    if (mpSpvSelect && Array.isArray(data.spv) && data.spv.length > 0) {
+      const currentVal = mpSpvSelect.value;
+      let html = '<option value="">-- Pilih SPV --</option>';
+      data.spv.forEach(s => {
+        html += `<option value="${s.nama}">${s.nama} (${s.section || s.departemen || 'Produksi'})</option>`;
+      });
+      mpSpvSelect.innerHTML = html;
+      if (currentVal) mpSpvSelect.value = currentVal;
+    }
+
+    // 2. Sinkronisasi Dropdown Bagian / Section di Manpower Modal (Admin)
+    const mpBagianSelect = document.getElementById('mp-modal-bagian');
+    if (mpBagianSelect && Array.isArray(data.sections) && data.sections.length > 0) {
+      const currentVal = mpBagianSelect.value;
+      let html = '<option value="">-- Pilih Bagian Operasional --</option>';
+      data.sections.forEach(sec => {
+        html += `<option value="${sec.nama_section}">${sec.nama_section} (${sec.departemen || 'Produksi'})</option>`;
+      });
+      mpBagianSelect.innerHTML = html;
+      if (currentVal) mpBagianSelect.value = currentVal;
+    }
+
+    // 3. Sinkronisasi Datalist Mesin di Manpower Modal (Admin)
+    const mpMachineDatalist = document.getElementById('mp-modal-machine-datalist');
+    if (mpMachineDatalist && Array.isArray(data.machines)) {
+      mpMachineDatalist.innerHTML = data.machines.map(m => 
+        `<option value="${m.nama_mesin}">[${m.kode_mesin}] - ${m.section}</option>`
+      ).join('');
+    }
+
+    // 4. Sinkronisasi Datalist Produk & Target di Manpower Modal (Admin)
+    const mpProductDatalist = document.getElementById('mp-modal-product-datalist');
+    if (mpProductDatalist && Array.isArray(data.products)) {
+      mpProductDatalist.innerHTML = data.products.map(p => 
+        `<option value="${p.nama_produk}">${p.kode_produk} - Target: ${p.target_output} pcs (${p.proses})</option>`
+      ).join('');
+    }
+
+    // 5. Sinkronisasi Dropdown SPV di Siswa Portal (jika elemen tersedia di halaman)
+    const siswaSpvSelect = document.getElementById('input-siswa-spv-absen');
+    if (siswaSpvSelect && Array.isArray(data.spv) && data.spv.length > 0) {
+      const currentVal = siswaSpvSelect.value;
+      let html = '<option value="" disabled selected>Pilih Supervisor</option>';
+      data.spv.forEach(s => {
+        html += `<option value="${s.nama}">${s.nama} (${s.section || s.departemen})</option>`;
+      });
+      siswaSpvSelect.innerHTML = html;
+      if (currentVal) siswaSpvSelect.value = currentVal;
+    }
+
+    // 6. Sinkronisasi Dropdown Bagian di Siswa Portal (jika elemen tersedia di halaman)
+    const siswaBagianSelect = document.getElementById('input-siswa-bagian');
+    if (siswaBagianSelect && Array.isArray(data.sections) && data.sections.length > 0) {
+      const currentVal = siswaBagianSelect.value;
+      let html = '<option value="" disabled selected>Pilih Bagian Penempatan</option>';
+      
+      const depts = {};
+      data.sections.forEach(s => {
+        const d = s.departemen || 'Lainnya';
+        if (!depts[d]) depts[d] = [];
+        depts[d].push(s);
+      });
+
+      Object.keys(depts).forEach(deptName => {
+        html += `<optgroup label="── DEPARTEMEN ${deptName.toUpperCase()} ──">`;
+        depts[deptName].forEach(s => {
+          html += `<option value="${s.nama_section}">${s.nama_section}</option>`;
+        });
+        html += `</optgroup>`;
+      });
+
+      siswaBagianSelect.innerHTML = html;
+      if (currentVal) siswaBagianSelect.value = currentVal;
+    }
+
+    // 7. Muat ulang katalog multi-produk di Siswa Portal
+    if (typeof window.loadMasterProdukCatalog === 'function') {
+      window.loadMasterProdukCatalog(true);
+    }
+  }
+  window.syncOperationalMasterForms = syncOperationalMasterForms;
+
+  // Handler saat user memilih atau mengetik Model Produk di Manpower Modal
+  window.handleMpModalModelInput = function(val) {
+    const hintEl = document.getElementById('mp-modal-model-hint');
+    const planInput = document.getElementById('mp-modal-plan');
+    if (!val || !val.trim()) {
+      if (hintEl) hintEl.classList.add('hidden');
+      return;
+    }
+
+    const searchVal = val.trim().toUpperCase();
+    const prods = window.MASTER_OPERATIONAL_CACHE?.products || [];
+    const matched = prods.find(p => 
+      (p.nama_produk && p.nama_produk.toUpperCase() === searchVal) ||
+      (p.kode_produk && p.kode_produk.toUpperCase() === searchVal)
+    );
+
+    if (matched) {
+      if (planInput) {
+        planInput.value = matched.target_output || 0;
+        if (typeof window.updateMpModalEfficiency === 'function') {
+          window.updateMpModalEfficiency();
+        }
+      }
+      if (hintEl) {
+        hintEl.innerHTML = `<i class="fa-solid fa-bolt text-amber-500"></i> Target Master: <strong>${matched.target_output} pcs/MP</strong> [${matched.proses || 'FBO'}]${matched.berat_kg ? ` • Berat: ${matched.berat_kg} kg` : ''}`;
+        hintEl.classList.remove('hidden');
+      }
+    } else {
+      if (hintEl) hintEl.classList.add('hidden');
+    }
+  };
+
+  // Event listener saat data master operasional di Settings diperbarui (Lokal)
+  window.addEventListener('master-operational-updated', () => {
+    console.log('[AppShell] Master operational data updated. Re-syncing forms...');
+    syncOperationalMasterForms(true);
+  });
+
+  // Saluran sinkronisasi antar-tab browser (BroadcastChannel + LocalStorage fallback)
+  try {
+    if (typeof BroadcastChannel !== 'undefined') {
+      const syncChannel = new BroadcastChannel('ltc-operational-sync');
+      syncChannel.onmessage = (event) => {
+        if (event.data?.type === 'MASTER_UPDATED') {
+          console.log('[AppShell] Cross-tab sync: Master operational updated. Re-syncing...');
+          syncOperationalMasterForms(true);
+        }
+      };
+    }
+  } catch (err) {}
+
+  window.addEventListener('storage', (e) => {
+    if (e.key === 'ltc-master-operational-timestamp') {
+      console.log('[AppShell] Cross-tab storage event: Master updated. Re-syncing...');
+      syncOperationalMasterForms(true);
+    }
+  });
+
+  // Saat tab browser difokuskan kembali oleh pengguna (Auto-refresh on tab switch)
+  window.addEventListener('focus', () => {
+    syncOperationalMasterForms(true);
+  });
+
+  // Jalankan inisialisasi awal saat dokumen siap
+  document.addEventListener('DOMContentLoaded', () => {
+    syncOperationalMasterForms(true);
+  });
+  if (document.readyState === 'complete' || document.readyState === 'interactive') {
+    syncOperationalMasterForms(true);
+  }
+</script>
 
 <!-- MODAL TUTORIAL PENGISIAN FORMULIR SISWA (ROOT LEVEL) -->
 <div id="modal-siswa-tutorial" class="hidden fixed inset-0 z-[100] flex items-center justify-center bg-slate-900/60 backdrop-blur-md p-4 overflow-y-auto" onclick="if(event.target===this)closeSiswaTutorialModal()">
@@ -1806,7 +2058,7 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
                 </div>
                 <div class="pt-2 border-t border-slate-100">
                     <span class="text-[10px] text-slate-400 font-semibold block">Jenis Kecelakaan</span>
-                    <span class="font-extrabold text-slate-800 text-xs block mt-0.5" id="safety-detail-jenis">-</span>
+                    <span class="font-bold text-slate-800 text-xs block mt-0.5" id="safety-detail-jenis">-</span>
                 </div>
             </div>
 
@@ -1832,7 +2084,7 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
 
 <!-- Memuat Script Real-Time Engine secara teratur -->
 <script is:inline src="/js/api.js?v=71.0"></script>
-<script is:inline src="/js/global.js?v=74.0"></script>
+<script is:inline src="/js/global.js?v=76.0"></script>
 <script is:inline src="/js/dashboard.js?v=72.0"></script>
 <script is:inline src="/js/siswa.js?v=71.0"></script>
 <script is:inline src="/js/turnover.js?v=71.0"></script>
@@ -1844,6 +2096,7 @@ const supabaseUrl = import.meta.env.PUBLIC_SUPABASE_URL || 'https://xpoddtzxsopw
 <script is:inline src="/js/jszip.min.js"></script>
 <script is:inline src="/js/sertifikat_generator.js?v=2.2"></script>
 <script is:inline src="/js/admin.js?v=81.0"></script>
-<script is:inline src="/js/quiz_admin.js?v=1.5"></script>
+<script is:inline src="/js/quiz_admin.js?v=1.7"></script>
+<script is:inline src="/js/skill_map.js?v=2.1"></script>
 <script is:inline src="/js/absensi.js?v=71.0"></script>
-<script is:inline src="/js/safety.js?v=76.0"></script>
+<script is:inline src="/js/safety.js?v=79.0"></script>

@@ -131,6 +131,50 @@ function formatSafetyDate(dStr) {
     }
 }
 
+function normalizeSafetyCategory(kat) {
+    if (!kat) return 'FA';
+    const k = String(kat).trim().toUpperCase();
+    if (k === 'FA' || k.includes('RINGAN') || k.includes('FIRST')) return 'FA';
+    if (k === 'MTI' || k.includes('SEDANG') || k.includes('MEDICAL')) return 'MTI';
+    if (k === 'TA' || k.includes('BERAT') || k.includes('LOST') || k.includes('NEAR') || k.includes('HAMPIR') || k.includes('TOTAL')) return 'TA';
+    if (k === 'FATALITY' || k.includes('FATAL') || k.includes('MATI')) return 'Fatality';
+    return kat;
+}
+
+function getSafetyCategoryBadge(rawKat) {
+    const kat = normalizeSafetyCategory(rawKat);
+    if (kat === 'FA') {
+        return {
+            label: 'FA',
+            badgeClass: 'bg-emerald-50 text-emerald-700 border-emerald-200',
+            dotClass: 'bg-emerald-500'
+        };
+    } else if (kat === 'MTI') {
+        return {
+            label: 'MTI',
+            badgeClass: 'bg-blue-50 text-blue-700 border-blue-200',
+            dotClass: 'bg-blue-500'
+        };
+    } else if (kat === 'TA') {
+        return {
+            label: 'TA',
+            badgeClass: 'bg-amber-50 text-amber-700 border-amber-200',
+            dotClass: 'bg-amber-500'
+        };
+    } else if (kat === 'Fatality') {
+        return {
+            label: 'Fatality',
+            badgeClass: 'bg-rose-50 text-rose-700 border-rose-200',
+            dotClass: 'bg-rose-500'
+        };
+    }
+    return {
+        label: kat,
+        badgeClass: 'bg-slate-100 text-slate-700 border-slate-200',
+        dotClass: 'bg-slate-500'
+    };
+}
+
 function openSafetyDetailModal(id, noreg) {
     const modal = document.getElementById('safety-detail-modal');
     if (!modal) return;
@@ -161,7 +205,7 @@ function openSafetyDetailModal(id, noreg) {
     const noregVal = record.noreg || '-';
     const spv = record.spv || '-';
     const jenis = record.jenisKecelakaan || '-';
-    const kat = record.kategori || 'Ringan';
+    const kat = normalizeSafetyCategory(record.kategori || 'FA');
     const ket = record.keterangan || 'Tidak ada catatan tambahan.';
 
     // Avatar Initials
@@ -186,25 +230,14 @@ function openSafetyDetailModal(id, noreg) {
     const ketEl = document.getElementById('safety-detail-keterangan');
     if (ketEl) ketEl.textContent = ket;
 
-    let badgeClass = "bg-blue-50 text-blue-600 border-blue-200";
-    const katLower = kat.toLowerCase();
-    if (katLower.includes('near') || katLower.includes('hampir')) {
-        badgeClass = "bg-amber-50 text-amber-700 border-amber-200";
-    } else if (katLower.includes('ringan') || katLower.includes('first')) {
-        badgeClass = "bg-blue-50 text-blue-700 border-blue-200";
-    } else if (katLower.includes('sedang')) {
-        badgeClass = "bg-orange-50 text-orange-700 border-orange-200";
-    } else if (katLower.includes('berat') || katLower.includes('lost')) {
-        badgeClass = "bg-rose-50 text-rose-700 border-rose-200";
-    }
-
+    const badgeInfo = getSafetyCategoryBadge(kat);
     const badgeEl = document.getElementById('safety-detail-kategori-badge');
     const textEl = document.getElementById('safety-detail-kategori-text');
     if (badgeEl) {
-        badgeEl.className = `px-2.5 py-0.5 rounded-full text-[10px] font-extrabold border ${badgeClass}`;
-        badgeEl.textContent = kat;
+        badgeEl.className = `px-2.5 py-0.5 rounded-full text-[10px] font-bold border ${badgeInfo.badgeClass}`;
+        badgeEl.textContent = badgeInfo.label;
     }
-    if (textEl) textEl.textContent = kat;
+    if (textEl) textEl.textContent = badgeInfo.label;
 
     modal.classList.remove('hidden');
 }
@@ -247,7 +280,10 @@ function filterSafetyTable() {
     }
 
     if (kategoriVal) {
-        filtered = filtered.filter(item => (item.kategori || '').toLowerCase().includes(kategoriVal));
+        filtered = filtered.filter(item => {
+            const itemNorm = normalizeSafetyCategory(item.kategori).toLowerCase();
+            return itemNorm === kategoriVal || itemNorm.includes(kategoriVal) || (item.kategori || '').toLowerCase().includes(kategoriVal);
+        });
     }
 
     filtered.sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
@@ -285,23 +321,7 @@ function filterSafetyTable() {
             ? matchSiswa.kelas 
             : (item.kelas || '-');
 
-        let badgeClass = "bg-slate-100 text-slate-700 border-slate-200";
-        let dotClass = "bg-slate-500";
-        const kat = (item.kategori || '').toLowerCase();
-        if (kat.includes('near') || kat.includes('hampir')) {
-            badgeClass = "bg-amber-50 text-amber-800 border-amber-200/80";
-            dotClass = "bg-amber-500";
-        } else if (kat.includes('ringan') || kat.includes('first')) {
-            badgeClass = "bg-blue-50 text-blue-800 border-blue-200/80";
-            dotClass = "bg-blue-500";
-        } else if (kat.includes('sedang')) {
-            badgeClass = "bg-orange-50 text-orange-800 border-orange-200/80";
-            dotClass = "bg-orange-500";
-        } else if (kat.includes('berat') || kat.includes('lost')) {
-            badgeClass = "bg-rose-50 text-rose-800 border-rose-200/80";
-            dotClass = "bg-rose-500";
-        }
-
+        const badgeInfo = getSafetyCategoryBadge(item.kategori);
         const safeId = item.id || '';
         const safeNoReg = item.noreg || '';
 
@@ -313,7 +333,7 @@ function filterSafetyTable() {
                 </span>
             </td>
             <td class="py-3 px-3.5 min-w-[150px]">
-                <div class="font-extrabold text-slate-800 text-xs">${item.nama || '-'}</div>
+                <div class="font-bold text-slate-800 text-xs">${item.nama || '-'}</div>
                 <div class="text-[10.5px] font-semibold text-slate-400 mt-0.5 flex items-center gap-1.5">
                     <span class="text-blue-600 font-bold">${item.noreg || '-'}</span>
                     <span class="text-slate-300">•</span>
@@ -330,13 +350,13 @@ function filterSafetyTable() {
                     <span>${item.spv || '-'}</span>
                 </div>
             </td>
-            <td class="py-3 px-3.5 min-w-[150px] font-bold text-slate-700 text-xs">
+            <td class="py-3 px-3.5 min-w-[240px] max-w-[320px] font-bold text-slate-700 text-xs leading-relaxed">
                 ${item.jenisKecelakaan || '-'}
             </td>
-            <td class="py-3 px-3 whitespace-nowrap">
-                <span class="px-2.5 py-1 rounded-full text-[10px] font-extrabold border whitespace-nowrap inline-flex items-center gap-1.5 ${badgeClass}">
-                    <span class="w-1.5 h-1.5 rounded-full ${dotClass}"></span>
-                    ${item.kategori || 'Ringan'}
+            <td class="py-3 px-3 whitespace-nowrap min-w-[110px]">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap inline-flex items-center gap-1.5 ${badgeInfo.badgeClass}">
+                    <span class="w-1.5 h-1.5 rounded-full ${badgeInfo.dotClass}"></span>
+                    ${badgeInfo.label}
                 </span>
             </td>
             <td class="py-3 px-3 text-slate-500 max-w-[160px] lg:max-w-[180px] truncate text-xs font-normal" title="${item.keterangan || '-'}">
@@ -392,7 +412,10 @@ function filterAdminSafetyTable(resetPage = false) {
     }
 
     if (kategoriVal) {
-        filtered = filtered.filter(item => (item.kategori || '').toLowerCase().includes(kategoriVal));
+        filtered = filtered.filter(item => {
+            const itemNorm = normalizeSafetyCategory(item.kategori).toLowerCase();
+            return itemNorm === kategoriVal || itemNorm.includes(kategoriVal) || (item.kategori || '').toLowerCase().includes(kategoriVal);
+        });
     }
 
     filtered.sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
@@ -437,7 +460,7 @@ function filterAdminSafetyTable(resetPage = false) {
 
     pageItems.forEach(item => {
         const tr = document.createElement('tr');
-        tr.className = "hover:bg-slate-50/70 transition-colors text-xs";
+        tr.className = "group hover:bg-slate-50/50 transition-all-300 border-b border-slate-50 text-xs font-semibold";
 
         const matchSiswa = studentList.find(s => String(s.id || s.noreg || s.nomorRegistrasi) === String(item.noreg));
         const syncedSection = (matchSiswa && (matchSiswa.section || matchSiswa.bagian || matchSiswa.departemen)) 
@@ -447,38 +470,29 @@ function filterAdminSafetyTable(resetPage = false) {
             ? matchSiswa.kelas 
             : (item.kelas || '-');
 
-        let badgeClass = "bg-slate-100 text-slate-600 border-slate-200";
-        const kat = (item.kategori || '').toLowerCase();
-        if (kat.includes('near') || kat.includes('hampir')) {
-            badgeClass = "bg-amber-50 text-amber-600 border-amber-200";
-        } else if (kat.includes('ringan') || kat.includes('first')) {
-            badgeClass = "bg-blue-50 text-blue-600 border-blue-200";
-        } else if (kat.includes('sedang')) {
-            badgeClass = "bg-orange-50 text-orange-600 border-orange-200";
-        } else if (kat.includes('berat') || kat.includes('lost')) {
-            badgeClass = "bg-rose-50 text-rose-600 border-rose-200";
-        }
+        const badgeInfo = getSafetyCategoryBadge(item.kategori);
 
         tr.innerHTML = `
-            <td class="py-3 px-4 font-bold text-slate-600">${item.tanggal || '-'}</td>
-            <td class="py-3 px-4 font-bold text-brand-blue">${item.noreg || '-'}</td>
-            <td class="py-3 px-4 font-extrabold text-brand-textMain">${item.nama || '-'}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600 whitespace-nowrap min-w-[90px]">${syncedKelas}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${syncedSection}</td>
-            <td class="py-3 px-4 font-semibold text-slate-600">${item.spv || '-'}</td>
-            <td class="py-3 px-4 font-extrabold text-slate-800">${item.jenisKecelakaan || '-'}</td>
-            <td class="py-3 px-4 whitespace-nowrap min-w-[120px]">
-                <span class="px-3 py-1 rounded-full text-[10px] font-extrabold border whitespace-nowrap inline-block ${badgeClass}">
-                    ${item.kategori || 'Ringan'}
+            <td class="py-2.5 px-3 font-semibold text-slate-600 whitespace-nowrap">${item.tanggal || '-'}</td>
+            <td class="py-2.5 px-3 font-mono font-bold text-slate-800 whitespace-nowrap">${item.noreg || '-'}</td>
+            <td class="py-2.5 px-3.5 font-bold text-brand-textMain whitespace-nowrap">${item.nama || '-'}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap min-w-[95px] text-slate-600 font-semibold">${syncedKelas}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-700 whitespace-nowrap">${syncedSection}</td>
+            <td class="py-2.5 px-3 text-slate-600 whitespace-nowrap">${item.spv || '-'}</td>
+            <td class="py-2.5 px-3 font-bold text-slate-700 min-w-[240px] max-w-[320px] leading-relaxed">${item.jenisKecelakaan || '-'}</td>
+            <td class="py-2.5 px-3 whitespace-nowrap min-w-[110px]">
+                <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold border whitespace-nowrap inline-flex items-center gap-1.5 ${badgeInfo.badgeClass}">
+                    <span class="w-1.5 h-1.5 rounded-full ${badgeInfo.dotClass}"></span>
+                    ${badgeInfo.label}
                 </span>
             </td>
-            <td class="py-3 px-4 text-brand-textSub max-w-xs truncate" title="${item.keterangan || '-'}">${item.keterangan || '-'}</td>
-            <td class="py-3 px-4 text-center">
+            <td class="py-2.5 px-3 text-brand-textSub max-w-xs truncate font-normal" title="${item.keterangan || '-'}">${item.keterangan || '-'}</td>
+            <td class="py-2.5 px-3 text-center whitespace-nowrap">
                 <div class="flex items-center justify-center gap-1.5">
-                    <button onclick="editSafetyRecord(${item.id})" class="px-2.5 py-1 bg-amber-500/10 hover:bg-amber-500/20 text-amber-600 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1">
+                    <button onclick="editSafetyRecord(${item.id})" class="px-2 py-0.5 bg-amber-50 hover:bg-amber-100 text-amber-700 rounded-lg text-[10px] font-bold transition-all-300 flex items-center gap-1">
                         <i class="fa-solid fa-pen-to-square"></i> Edit
                     </button>
-                    <button onclick="deleteSafetyRecord(${item.id})" class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-600 rounded-lg font-bold text-[11px] transition-all flex items-center gap-1">
+                    <button onclick="deleteSafetyRecord(${item.id})" class="px-2 py-0.5 bg-rose-50 hover:bg-rose-100 text-rose-600 rounded-lg text-[10px] font-bold transition-all-300 flex items-center gap-1">
                         <i class="fa-solid fa-trash-can"></i> Hapus
                     </button>
                 </div>
@@ -632,14 +646,14 @@ function updateSafetyCharts() {
         let key = item.tanggal.substring(0, 7);
         if (filterType === 'date-range') key = item.tanggal;
         if (!periodMap[key]) {
-            periodMap[key] = { 'Near Miss': 0, 'Ringan': 0, 'Sedang': 0, 'Berat': 0, total: 0 };
+            periodMap[key] = { 'FA': 0, 'MTI': 0, 'TA': 0, 'Fatality': 0, total: 0 };
         }
-        const kat = (item.kategori || '').toLowerCase();
-        if (kat.includes('near') || kat.includes('hampir')) periodMap[key]['Near Miss']++;
-        else if (kat.includes('ringan') || kat.includes('first')) periodMap[key]['Ringan']++;
-        else if (kat.includes('sedang')) periodMap[key]['Sedang']++;
-        else if (kat.includes('berat') || kat.includes('lost')) periodMap[key]['Berat']++;
-        else periodMap[key]['Ringan']++;
+        const kat = normalizeSafetyCategory(item.kategori);
+        if (periodMap[key][kat] !== undefined) {
+            periodMap[key][kat]++;
+        } else {
+            periodMap[key]['FA']++;
+        }
         periodMap[key].total++;
     });
 
@@ -663,10 +677,10 @@ function updateSafetyCharts() {
         return key;
     });
 
-    const nearMissData = sortedKeys.map(k => periodMap[k]['Near Miss']);
-    const ringanData = sortedKeys.map(k => periodMap[k]['Ringan']);
-    const sedangData = sortedKeys.map(k => periodMap[k]['Sedang']);
-    const beratData = sortedKeys.map(k => periodMap[k]['Berat']);
+    const faData = sortedKeys.map(k => periodMap[k]['FA']);
+    const mtiData = sortedKeys.map(k => periodMap[k]['MTI']);
+    const taData = sortedKeys.map(k => periodMap[k]['TA']);
+    const fatalityData = sortedKeys.map(k => periodMap[k]['Fatality']);
     const totalTrendData = sortedKeys.map(k => periodMap[k].total);
 
     const trendCtx = trendCanvas.getContext('2d');
@@ -762,10 +776,10 @@ function updateSafetyCharts() {
             datasets: [
                 {
                     type: 'bar',
-                    label: 'Near Miss',
-                    data: nearMissData.length > 0 ? nearMissData : [0],
-                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FDE68A', '#D97706'), // Amber / Kuning Waspada
-                    hoverBackgroundColor: '#B45309',
+                    label: 'FA',
+                    data: faData.length > 0 ? faData : [0],
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#A7F3D0', '#059669'), // Emerald / First Aid
+                    hoverBackgroundColor: '#047857',
                     stack: 'severity',
                     barThickness: 34,
                     maxBarThickness: 38,
@@ -776,9 +790,9 @@ function updateSafetyCharts() {
                 },
                 {
                     type: 'bar',
-                    label: 'Ringan',
-                    data: ringanData.length > 0 ? ringanData : [0],
-                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#93C5FD', '#2563EB'), // Biru / Penanganan Ringan
+                    label: 'MTI',
+                    data: mtiData.length > 0 ? mtiData : [0],
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#93C5FD', '#2563EB'), // Blue / Medical Treatment
                     hoverBackgroundColor: '#1D4ED8',
                     stack: 'severity',
                     barThickness: 34,
@@ -790,10 +804,10 @@ function updateSafetyCharts() {
                 },
                 {
                     type: 'bar',
-                    label: 'Sedang',
-                    data: sedangData.length > 0 ? sedangData : [0],
-                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FED7AA', '#C2410C'), // Cokelat / Oranye Perawatan Medis
-                    hoverBackgroundColor: '#9A3412',
+                    label: 'TA',
+                    data: taData.length > 0 ? taData : [0],
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FDE68A', '#D97706'), // Amber / Time Loss or Traffic Accident
+                    hoverBackgroundColor: '#B45309',
                     stack: 'severity',
                     barThickness: 34,
                     maxBarThickness: 38,
@@ -804,9 +818,9 @@ function updateSafetyCharts() {
                 },
                 {
                     type: 'bar',
-                    label: 'Berat',
-                    data: beratData.length > 0 ? beratData : [0],
-                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FCA5A5', '#DC2626'), // Merah / Kasus Berat & Fatal
+                    label: 'Fatality',
+                    data: fatalityData.length > 0 ? fatalityData : [0],
+                    backgroundColor: (c) => createPillarGradient(c.chart.ctx, c.chart.chartArea, '#FCA5A5', '#DC2626'), // Rose / Fatal
                     hoverBackgroundColor: '#991B1B',
                     stack: 'severity',
                     barThickness: 34,
@@ -918,23 +932,20 @@ function updateSafetyCharts() {
 
     if (currentSafetyDistTab === 'kategori') {
         // --- TAB 1: KATEGORI KEPARAHAN ---
-        const distGroup = { 'Near Miss': 0, 'Ringan': 0, 'Sedang': 0, 'Berat': 0 };
+        const distGroup = { 'FA': 0, 'MTI': 0, 'TA': 0, 'Fatality': 0 };
         filtered.forEach(item => {
-            const kat = (item.kategori || '').toLowerCase();
-            if (kat.includes('near') || kat.includes('hampir')) distGroup['Near Miss']++;
-            else if (kat.includes('ringan') || kat.includes('first')) distGroup['Ringan']++;
-            else if (kat.includes('sedang')) distGroup['Sedang']++;
-            else if (kat.includes('berat') || kat.includes('lost')) distGroup['Berat']++;
-            else distGroup['Ringan']++;
+            const kat = normalizeSafetyCategory(item.kategori);
+            if (distGroup[kat] !== undefined) distGroup[kat]++;
+            else distGroup['FA']++;
         });
 
         if (centerVal) centerVal.textContent = totalCount;
         if (centerLabel) centerLabel.textContent = totalCount > 0 ? 'Total Insiden' : 'Nihil Kasus';
 
-        const catLabels = ['Near Miss', 'Ringan', 'Sedang', 'Berat'];
-        const catValues = [distGroup['Near Miss'], distGroup['Ringan'], distGroup['Sedang'], distGroup['Berat']];
-        const catColors = ['#F59E0B', '#3B82F6', '#F97316', '#EF4444'];
-        const catHoverColors = ['#D97706', '#2563EB', '#EA580C', '#DC2626'];
+        const catLabels = ['FA', 'MTI', 'TA', 'Fatality'];
+        const catValues = [distGroup['FA'], distGroup['MTI'], distGroup['TA'], distGroup['Fatality']];
+        const catColors = ['#10B981', '#3B82F6', '#F59E0B', '#EF4444'];
+        const catHoverColors = ['#059669', '#2563EB', '#D97706', '#DC2626'];
 
         const chartData = totalCount > 0 ? catValues : [1];
         const chartColors = totalCount > 0 ? catColors : ['#E2E8F0'];
@@ -1143,7 +1154,7 @@ function openSafetyModal(idToEdit = null) {
             if (bagianInput) bagianInput.value = record.bagian || '';
             if (spvInput) spvInput.value = record.spv || '';
             if (jenisInput) jenisInput.value = record.jenisKecelakaan || '';
-            if (kategoriSelect) kategoriSelect.value = record.kategori || 'Ringan';
+            if (kategoriSelect) kategoriSelect.value = normalizeSafetyCategory(record.kategori) || 'FA';
             if (ketTextarea) ketTextarea.value = record.keterangan || '';
         }
     } else {
@@ -1155,7 +1166,7 @@ function openSafetyModal(idToEdit = null) {
         if (bagianInput) bagianInput.value = '';
         if (spvInput) spvInput.value = '';
         if (jenisInput) jenisInput.value = '';
-        if (kategoriSelect) kategoriSelect.value = 'Ringan';
+        if (kategoriSelect) kategoriSelect.value = 'FA';
         if (ketTextarea) ketTextarea.value = '';
     }
 
@@ -1213,7 +1224,7 @@ function saveSafetyData() {
         bagian: bagian || (siswaObj ? (siswaObj.departemen || siswaObj.bagian || siswaObj.section) : ''),
         spv: spv || '',
         jenisKecelakaan: jenis,
-        kategori: kategori || 'Ringan',
+        kategori: normalizeSafetyCategory(kategori) || 'FA',
         tanggal,
         keterangan: ket || ''
     };
