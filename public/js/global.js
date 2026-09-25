@@ -1326,6 +1326,11 @@ if (typeof Chart !== 'undefined') {
             updateAbsensiChart();
         }
 
+        // Trigger real-time sync for Monitoring Safety K3 on dashboard
+        if (typeof updateSafetyKPIStats === 'function') {
+            updateSafetyKPIStats();
+        }
+
         const cardStats = data.cards || {};
         const turnDetails = cardStats.turnoverDetails || { resign: 0, lulus: 0, indisipliner: 0 };
         
@@ -1506,6 +1511,11 @@ if (typeof Chart !== 'undefined') {
 
         // Tampilkan biaya LTC bulan berjalan di kartu dashboard
         updateDashboardLTCCost();
+
+        // Sinkronisasi data kartu Monitoring Safety (K3) pada dashboard
+        if (typeof updateSafetyKPIStats === 'function') {
+            updateSafetyKPIStats();
+        }
     }
 
     function applyDateRangeFilter() {

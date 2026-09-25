@@ -87,33 +87,55 @@ function updateSafetyKPIStats() {
     const zeroDaysEl = document.getElementById('stat-safety-zero-days');
     const thisMonthEl = document.getElementById('stat-safety-this-month');
 
-    if (!totalEl || !zeroDaysEl || !thisMonthEl) return;
+    // Dashboard Safety Card Elements
+    const dashTotalEl = document.getElementById('dash-safety-total-val');
+    const dashZeroDaysEl = document.getElementById('dash-safety-zero-val');
+    const dashMonthEl = document.getElementById('dash-safety-month-val');
+    const dashLastDescEl = document.getElementById('dash-safety-last-desc');
 
     const data = getSafetyDataset();
     const totalCount = data.length;
-    totalEl.textContent = totalCount;
 
     // Hitung Insiden Bulan Ini
     const currentMonthKey = new Date().toISOString().substring(0, 7); // YYYY-MM
     const thisMonthCount = data.filter(s => s.tanggal && s.tanggal.substring(0, 7) === currentMonthKey).length;
-    thisMonthEl.textContent = thisMonthCount;
 
     // Hitung Zero Accident Days (Hari Bebas Kecelakaan sejak insiden terakhir)
+    let zeroDaysText = '365+ Hari';
+    let latestIncidentText = '-';
+
     if (totalCount === 0) {
-        zeroDaysEl.textContent = '365+ Hari';
+        zeroDaysText = '365+ Hari';
     } else {
         const dates = data.map(s => new Date(s.tanggal)).filter(d => !isNaN(d));
         if (dates.length === 0) {
-            zeroDaysEl.textContent = '365+ Hari';
+            zeroDaysText = '365+ Hari';
         } else {
             const latestDate = new Date(Math.max(...dates));
             const today = new Date();
             const diffTime = Math.abs(today - latestDate);
             const diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
-            zeroDaysEl.textContent = `${diffDays} Hari`;
+            zeroDaysText = `${diffDays} Hari`;
+        }
+
+        const sorted = [...data].sort((a, b) => (b.tanggal || '').localeCompare(a.tanggal || ''));
+        if (sorted.length > 0 && sorted[0]) {
+            latestIncidentText = sorted[0].jenisKecelakaan || sorted[0].jenis_kecelakaan || sorted[0].keterangan || '-';
         }
     }
+
+    // Update elemen di Halaman Safety (jika elemen tersedia di DOM)
+    if (totalEl) totalEl.textContent = totalCount;
+    if (thisMonthEl) thisMonthEl.textContent = thisMonthCount;
+    if (zeroDaysEl) zeroDaysEl.textContent = zeroDaysText;
+
+    // Update elemen di Card Monitoring Safety Dashboard (sinkron 100% dengan Menu Safety)
+    if (dashTotalEl) dashTotalEl.textContent = totalCount;
+    if (dashMonthEl) dashMonthEl.textContent = thisMonthCount;
+    if (dashZeroDaysEl) dashZeroDaysEl.textContent = zeroDaysText;
+    if (dashLastDescEl) dashLastDescEl.textContent = latestIncidentText;
 }
+window.updateSafetyKPIStats = updateSafetyKPIStats;
 
 function formatSafetyDate(dStr) {
     if (!dStr) return '-';
